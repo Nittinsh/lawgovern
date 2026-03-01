@@ -191,8 +191,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--ink);color:var(--white);h
       ✅ Compliance checklists by company type<br>
       ✅ Full calendar of all deadlines · Updated Feb 2026
     </div>
-    <div class="akerr" id="akerr" style="display:none;color:var(--red);font-size:12px;margin-bottom:8px;padding:8px;background:#ef444415;border-radius:8px;text-align:center;"></div>    <button class="akbtn" onclick="saveKey()">Enter LawGovern →</button>
-    <div style="font-size:10px;color:var(--slate);margin-top:10px;text-align:center;">Key stored only in your browser session · Never shared</div>
+    <div class="akerr" id="akerr" style="display:none;color:var(--red);font-size:12px;margin-bottom:8px;padding:8px;background:#ef444415;border-radius:8px;text-align:center;"></div>
+    <div style="font-size:11px;color:var(--slate);font-weight:600;margin-bottom:6px;">YOUR ACCESS CODE</div>
+    <input class="akinput" id="akinput" type="text" placeholder="e.g. NITTIN01" autocomplete="off" 
+      style="text-transform:uppercase;letter-spacing:3px;text-align:center;margin-bottom:14px;width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:10px;padding:12px;font-size:16px;outline:none;"
+      onkeydown="if(event.key==='Enter')saveKey()" 
+      oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')">
+    <button class="akbtn" onclick="saveKey()" style="width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);font-weight:700;font-size:15px;border:none;border-radius:10px;cursor:pointer;">Enter LawGovern →</button>
   </div>
 </div>
 
