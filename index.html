@@ -191,12 +191,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--ink);color:var(--white);h
       ✅ Compliance checklists by company type<br>
       ✅ Full calendar of all deadlines · Updated Feb 2026
     </div>
-    <div class="akerr" id="akerr" style="display:none;color:var(--red);font-size:12px;margin-bottom:8px;padding:8px;background:#ef444415;border-radius:8px;text-align:center;"></div>
-    <div style="font-size:11px;color:var(--slate);font-weight:600;margin-bottom:5px;">ACCESS CODE</div>
-    <input class="akinput" id="akinput" type="text" placeholder="e.g. NITTIN01" autocomplete="off" style="text-transform:uppercase;letter-spacing:3px;text-align:center;margin-bottom:12px;" onkeydown="if(event.key==='Enter')document.getElementById('gkey').focus()" oninput="this.value=this.value.toUpperCase()">
-    <div style="font-size:11px;color:var(--slate);font-weight:600;margin-bottom:5px;">GROQ API KEY &nbsp;<a href="https://console.groq.com/keys" target="_blank" style="color:var(--gold);font-weight:400;font-size:10px;">get free key ↗</a></div>
-    <input class="akinput" id="gkey" type="password" placeholder="gsk_..." autocomplete="off" style="margin-bottom:14px;" onkeydown="if(event.key==='Enter')saveKey()">
-    <button class="akbtn" onclick="saveKey()">Enter LawGovern →</button>
+    <div class="akerr" id="akerr" style="display:none;color:var(--red);font-size:12px;margin-bottom:8px;padding:8px;background:#ef444415;border-radius:8px;text-align:center;"></div>    <button class="akbtn" onclick="saveKey()">Enter LawGovern →</button>
     <div style="font-size:10px;color:var(--slate);margin-top:10px;text-align:center;">Key stored only in your browser session · Never shared</div>
   </div>
 </div>
@@ -223,6 +218,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--ink);color:var(--white);h
   <div class="tab" onclick="sw('cl')" id="t-cl">📋 Checklist</div>
   <div class="tab" onclick="sw('cal')" id="t-cal">📅 Calendar</div>
   <div class="tab" onclick="sw('ff')" id="t-ff">🔍 Form Finder</div>
+  <div class="tab" onclick="sw('admin')" id="t-admin">⚙️ Admin</div>
 </div>
 
 <div class="panels">
@@ -341,11 +337,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--ink);color:var(--white);h
 var ACCESS_CODE = '';
 
 // ── ADD/REMOVE CLIENT CODES HERE ──
-var VALID_CODES = ['NITTIN01','DEMO123','LAWGOV01','TRIAL01'];
+// Codes stored in localStorage — managed via Admin panel
+function getCodes() {
+  var stored = localStorage.getItem('lg_codes');
+  if (stored) return JSON.parse(stored);
+  // Default codes — first time only
+  var defaults = ['NITTIN01','DEMO123','LAWGOV01','TRIAL01'];
+  localStorage.setItem('lg_codes', JSON.stringify(defaults));
+  return defaults;
+}
+function saveCodes(arr) { localStorage.setItem('lg_codes', JSON.stringify(arr)); }
+var VALID_CODES = getCodes();
 
 function saveKey() {
+  VALID_CODES = getCodes(); // refresh from localStorage
   var code = document.getElementById('akinput').value.trim().toUpperCase();
-  var gk   = document.getElementById('gkey').value.trim();
   var err  = document.getElementById('akerr');
   if (!code || code.length < 4) {
     err.style.display='block'; err.textContent='❌ Please enter your access code.'; return;
@@ -353,13 +359,10 @@ function saveKey() {
   if (!VALID_CODES.includes(code)) {
     err.style.display='block'; err.textContent='❌ Invalid access code. Please try again.'; return;
   }
-  if (!gk || !gk.startsWith('gsk_') || gk.length < 20) {
-    err.style.display='block'; err.textContent='❌ Enter a valid Groq key (starts with gsk_). Get free at console.groq.com/keys'; return;
-  }
+
   err.style.display = 'none';
   ACCESS_CODE = code;
   sessionStorage.setItem('lg_code', code);
-  sessionStorage.setItem('lg_gk', gk);
   document.getElementById('akovl').style.display = 'none';
   updateMode();
 }
@@ -367,9 +370,7 @@ function saveKey() {
 function changeKey() {
   ACCESS_CODE = '';
   sessionStorage.removeItem('lg_code');
-  sessionStorage.removeItem('lg_gk');
   document.getElementById('akinput').value = '';
-  document.getElementById('gkey').value = '';
   document.getElementById('akerr').style.display = 'none';
   document.getElementById('akovl').style.display = 'flex';
 }
@@ -382,15 +383,73 @@ function updateMode() {
   if (ind) { ind.textContent = '● AI Active'; ind.className = 'aimode'; }
 }
 
+// ── ADMIN FUNCTIONS ──
+function renderCodes() {
+  var codes = getCodes();
+  var list = document.getElementById('codelist');
+  var count = document.getElementById('codecount');
+  if (!list) return;
+  count.textContent = codes.length + ' active';
+  if (codes.length === 0) {
+    list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--slate);font-size:12px;">No codes yet.</div>';
+    return;
+  }
+  var rows = '';
+  for (var i = 0; i < codes.length; i++) {
+    var c = codes[i];
+    var isOwner = (c === 'NITTIN01');
+    rows += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--ink);">';
+    rows += '<div style="display:flex;align-items:center;gap:10px;">';
+    rows += '<div style="width:8px;height:8px;border-radius:50%;background:var(--green);"></div>';
+    rows += '<span style="font-family:monospace;font-size:13px;color:var(--white);letter-spacing:2px;">' + c + '</span>';
+    if (isOwner) rows += '<span style="font-size:9px;background:var(--gdim);border:1px solid var(--gold);color:var(--gold2);padding:1px 6px;border-radius:8px;">OWNER</span>';
+    rows += '</div>';
+    if (isOwner) {
+      rows += '<span style="font-size:11px;color:var(--slate);">Protected</span>';
+    } else {
+      rows += '<button onclick="delCode(this)" data-code="' + c + '" style="background:#ef444420;border:1px solid #ef444440;color:#ef4444;font-size:11px;font-weight:600;padding:4px 12px;border-radius:7px;cursor:pointer;">Remove</button>';
+    }
+    rows += '</div>';
+  }
+  list.innerHTML = rows;
+}
+
+function addCode() {
+  var inp = document.getElementById('newcode');
+  var err = document.getElementById('adderr');
+  var code = inp.value.trim().toUpperCase();
+  if (!code || code.length < 3) { err.style.display='block'; err.textContent='Code must be at least 3 characters.'; return; }
+  var codes = getCodes();
+  if (codes.includes(code)) { err.style.display='block'; err.textContent='This code already exists.'; return; }
+  codes.push(code);
+  saveCodes(codes);
+  VALID_CODES = codes;
+  inp.value = '';
+  err.style.display = 'none';
+  renderCodes();
+}
+
+function delCode(btn) {
+  var code = btn.getAttribute('data-code');
+  if (!confirm('Remove access code "' + code + '"?')) return;
+  var codes = getCodes().filter(function(c) { return c !== code; });
+  saveCodes(codes);
+  VALID_CODES = codes;
+  renderCodes();
+}
+
+// Override sw to render codes when admin tab opened
+var _origSw = typeof sw === 'function' ? sw : null;
+
 window.addEventListener('DOMContentLoaded', function() {
   var sc = sessionStorage.getItem('lg_code');
-  var gk = sessionStorage.getItem('lg_gk');
-  if (sc && VALID_CODES.includes(sc) && gk && gk.startsWith('gsk_')) {
+  if (sc && VALID_CODES.includes(sc)) {
     ACCESS_CODE = sc;
     document.getElementById('akovl').style.display = 'none';
     updateMode();
   }
   rc();
+  renderCodes();
 });
 
 // ═══════════════════════════════════════════════════
@@ -650,7 +709,7 @@ FORMAT INSTRUCTIONS:
 - Always mention if something is a common mistake or misconception`;
 
 async function callGroq(question, history) {
-  var GROQ_KEY = sessionStorage.getItem('lg_gk') || '';
+  var GROQ_KEY = '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';
   if (!GROQ_KEY) throw new Error('No Groq key found. Please refresh and log in again.');
   var messages = [{role: 'system', content: SYS}];
   history.forEach(function(h) { messages.push({role: h.role, content: h.content}); });
