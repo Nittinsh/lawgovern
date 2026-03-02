@@ -216,6 +216,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--ink);color:var(--white);h
   <div class="hright">
     <div id="modebadge" class="hbadge">● AI + Offline</div>
     <div class="hkeybtn" onclick="changeKey()">🔑 Key</div>
+    <div class="hkeybtn" onclick="doLogout()" style="background:#ef444420;border-color:#ef444450;color:#ef4444;">⏻ Logout</div>
   </div>
 </div>
 
@@ -226,6 +227,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--ink);color:var(--white);h
   <div class="tab" onclick="sw('cal')" id="t-cal">📅 Calendar</div>
   <div class="tab" onclick="sw('ff')" id="t-ff">🔍 Form Finder</div>
   <div class="tab" onclick="sw('res')" id="t-res">📝 Resolutions</div>
+  <div class="tab" onclick="sw('docs')" id="t-docs" style="display:none;">&#128196; Notices &amp; Minutes</div>
   <div class="tab" onclick="sw('admin')" id="t-admin">⚙️ Admin</div>
 </div>
 
@@ -339,27 +341,72 @@ body{font-family:'DM Sans',sans-serif;background:var(--ink);color:var(--white);h
 <div class="panel" id="p-res">
   <div style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
     <div style="background:var(--ink2);border-bottom:1px solid var(--ink4);padding:12px 16px;flex-shrink:0;">
-      <div style="font-size:11px;color:var(--gold);font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;">Select Resolution Type</div>
+      <div style="font-size:11px;color:var(--gold);font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;">Resolution Drafting</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;" id="rescats">
-        <button class="rcatb on" onclick="setRCat(this,'board')">Board Resolution</button>
-        <button class="rcatb" onclick="setRCat(this,'ordinary')">Ordinary Resolution</button>
-        <button class="rcatb" onclick="setRCat(this,'special')">Special Resolution</button>
-        <button class="rcatb" onclick="setRCat(this,'circular')">Circular Resolution</button>
+        <button class="rcatb on" onclick="setRCat(this,'board')">Board</button>
+        <button class="rcatb" onclick="setRCat(this,'ordinary')">Ordinary</button>
+        <button class="rcatb" onclick="setRCat(this,'special')">Special</button>
+        <button class="rcatb" onclick="setRCat(this,'circular')">Circular</button>
+        <button class="rcatb" onclick="setRCat(this,'custom')" style="border-color:var(--gold);color:var(--gold2);">&#10024; Custom</button>
       </div>
-      <div style="display:flex;gap:8px;">
-        <select id="restype" onchange="updateResHint()" style="flex:1;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 12px;font-size:13px;outline:none;">
-          <option value="">-- Select purpose --</option>
-        </select>
-        <button onclick="draftRes()" style="background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);font-weight:700;font-size:13px;border:none;border-radius:9px;padding:0 18px;cursor:pointer;">Draft &#8594;</button>
+      <div id="res-dropdown-area">
+        <div style="display:flex;gap:8px;">
+          <select id="restype" onchange="updateResHint()" style="flex:1;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 12px;font-size:13px;outline:none;">
+            <option value="">-- Select purpose --</option>
+          </select>
+          <button onclick="draftRes()" style="background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);font-weight:700;font-size:13px;border:none;border-radius:9px;padding:0 18px;cursor:pointer;">Draft &#8594;</button>
+        </div>
+        <div id="resextra" style="margin-top:8px;"></div>
+        <div id="reshint" style="font-size:11px;color:var(--slate);margin-top:5px;font-style:italic;"></div>
       </div>
-      <div id="resextra" style="margin-top:8px;"></div>
-      <div id="reshint" style="font-size:11px;color:var(--slate);margin-top:5px;font-style:italic;"></div>
+      <div id="res-custom-area" style="display:none;">
+        <textarea id="custom-res-input" placeholder="Describe the resolution you need. Example: &#10;• Conversion of loan of Rs.50 lakhs from ABC Ltd into equity shares&#10;• Appointment of nominee director by XYZ Bank&#10;• Approval of ESOPs for 100 employees at Rs.10 exercise price&#10;• Authorization to file patent application" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:10px 13px;font-size:13px;outline:none;resize:vertical;min-height:80px;font-family:inherit;box-sizing:border-box;"></textarea>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+          <div style="font-size:11px;color:var(--slate);">Describe any resolution in plain English — AI will draft it legally</div>
+          <button onclick="draftCustomRes()" style="background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);font-weight:700;font-size:13px;border:none;border-radius:9px;padding:8px 18px;cursor:pointer;flex-shrink:0;">Draft &#8594;</button>
+        </div>
+      </div>
     </div>
     <div style="flex:1;overflow-y:auto;padding:14px 16px;" id="resout">
       <div style="text-align:center;padding:40px 20px;color:var(--slate);">
         <div style="font-size:36px;margin-bottom:10px;">&#128221;</div>
         <div style="font-size:14px;font-weight:600;color:var(--slate2);margin-bottom:8px;">Resolution Drafting Tool</div>
-        <div style="font-size:12px;line-height:1.9;color:var(--slate);">Select type above &#8594; Choose purpose &#8594; Click Draft<br>Get a complete legally worded resolution instantly</div>
+        <div style="font-size:12px;line-height:1.9;">Choose from 60+ templates or describe any custom resolution<br>Get complete legally worded output instantly</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="panel" id="p-docs">
+  <div style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
+    <div style="background:var(--ink2);border-bottom:1px solid var(--ink4);padding:12px 16px;flex-shrink:0;">
+      <div style="font-size:11px;color:var(--gold);font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;">Document Drafting</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;">
+        <button class="rcatb on" id="dcatb-notice" onclick="setDCat(this,'notice')">&#128236; Notice</button>
+        <button class="rcatb" id="dcatb-agenda" onclick="setDCat(this,'agenda')">&#128203; Agenda</button>
+        <button class="rcatb" id="dcatb-minutes" onclick="setDCat(this,'minutes')">&#128221; Minutes</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <select id="doctype" onchange="updateDocHint()" style="flex:1;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 12px;font-size:13px;outline:none;">
+          <option value="">-- Select meeting type --</option>
+        </select>
+        <select id="doclisted" style="background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 12px;font-size:12px;outline:none;">
+          <option value="unlisted">Unlisted Company</option>
+          <option value="listed">Listed Company</option>
+        </select>
+      </div>
+      <div>
+        <textarea id="docdetails" placeholder="Add specific details (optional): company name, date, venue, agenda items, director names, quarter, financial figures etc." style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:10px 13px;font-size:12px;outline:none;resize:vertical;min-height:60px;font-family:inherit;box-sizing:border-box;"></textarea>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+        <div id="dochint" style="font-size:11px;color:var(--slate);font-style:italic;"></div>
+        <button onclick="draftDoc()" style="background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);font-weight:700;font-size:13px;border:none;border-radius:9px;padding:8px 20px;cursor:pointer;">Draft &#8594;</button>
+      </div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:14px 16px;" id="docout">
+      <div style="text-align:center;padding:40px 20px;color:var(--slate);">
+        <div style="font-size:36px;margin-bottom:10px;">&#128196;</div>
+        <div style="font-size:14px;font-weight:600;color:var(--slate2);margin-bottom:8px;">Notice · Agenda · Minutes Drafting</div>
+        <div style="font-size:12px;line-height:1.9;">Drafted as per Companies Act 2013 · SS-1 · SS-2<br>Listed companies: also per SEBI LODR 2015</div>
       </div>
     </div>
   </div>
@@ -450,6 +497,8 @@ function updateMode() {
   if (adminTab) {
     adminTab.style.display = (ACCESS_CODE === 'NITTIN01') ? '' : 'none';
   }
+  var docsTab = document.getElementById('t-docs');
+  if (docsTab) docsTab.style.display = '';
 }
 
 // ── ADMIN FUNCTIONS ──
@@ -705,6 +754,191 @@ function initRes() {
   });
 }
 
+
+// ── LOGOUT ──
+function doLogout() {
+  if (!confirm('Log out of LawGovern?')) return;
+  ACCESS_CODE = '';
+  sessionStorage.removeItem('lg_code');
+  sessionStorage.removeItem('lg_gk');
+  document.getElementById('akinput').value = '';
+  document.getElementById('akerr').style.display = 'none';
+  document.getElementById('akovl').style.display = 'flex';
+}
+
+// ── CUSTOM RESOLUTION ──
+function setRCat(btn, cat) {
+  document.querySelectorAll('.rcatb').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  RES_CAT = cat;
+  var dropArea = document.getElementById('res-dropdown-area');
+  var customArea = document.getElementById('res-custom-area');
+  if (cat === 'custom') {
+    dropArea.style.display = 'none';
+    customArea.style.display = '';
+  } else {
+    dropArea.style.display = '';
+    customArea.style.display = 'none';
+    var sel = document.getElementById('restype');
+    sel.innerHTML = '<option value="">-- Select purpose --</option>';
+    (RES_TYPES[cat] || []).forEach(function(t) {
+      sel.innerHTML += '<option value="' + t.v + '">' + t.l + '</option>';
+    });
+    document.getElementById('reshint').textContent = '';
+    document.getElementById('resextra').innerHTML = '';
+  }
+}
+
+async function draftCustomRes() {
+  var input = document.getElementById('custom-res-input').value.trim();
+  if (!input) { alert('Please describe the resolution you need.'); return; }
+  var outEl = document.getElementById('resout');
+  outEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--slate);"><div class="dots"><span></span><span></span><span></span></div><div style="margin-top:10px;font-size:12px;">Drafting resolution...</div></div>';
+  var RES_SYS = 'You are an expert Indian corporate law drafter. Draft complete, professionally worded board/shareholder resolutions under Companies Act 2013. Use proper legal language with RESOLVED THAT, RESOLVED FURTHER THAT, authorization clauses. Mention relevant section numbers. Leave [COMPANY NAME], [DATE], [DIN] as placeholders. State which MCA form to file and within what deadline.';
+  var prompt = 'Draft a complete resolution for: ' + input + '. Include all necessary RESOLVED THAT clauses, statutory references, and compliance requirements.';
+  try {
+    var GROQ_KEY = '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';
+    var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
+      body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:RES_SYS},{role:'user',content:prompt}],max_tokens:2000,temperature:0.1})
+    });
+    var data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    var text = data.choices[0].message.content;
+    outEl.innerHTML = '<div class="resbody"><div class="reshead"><div><div style="font-size:14px;color:var(--gold2);">Custom Resolution</div><div style="font-size:11px;color:var(--slate);">' + input.slice(0,60) + (input.length>60?'...':'') + '</div></div><button class="rescopy" onclick="copyResOut()">&#128203; Copy</button></div><div class="rescontent" id="rescontent">' + formatAI(text) + '</div></div><div style="font-size:11px;color:var(--slate);padding:4px 2px;">&#10003; Replace all [PLACEHOLDER] items before use.</div>';
+  } catch(e) {
+    outEl.innerHTML = '<div style="color:var(--red);padding:20px;font-size:13px;">&#9888; Error: ' + e.message + '</div>';
+  }
+}
+
+function copyResOut() {
+  var el = document.getElementById('rescontent');
+  if (!el) return;
+  navigator.clipboard.writeText(el.innerText).then(function() {
+    var btn = document.querySelector('.rescopy');
+    if(btn){btn.textContent='Copied!';setTimeout(function(){btn.textContent='Copy';},2000);}
+  });
+}
+
+// ── NOTICES / AGENDA / MINUTES ──
+var DOC_CAT = 'notice';
+var DOC_TYPES = {
+  notice: [
+    {v:'bm_q1', l:'Board Meeting — Q1 (April-June results)'},
+    {v:'bm_q2', l:'Board Meeting — Q2 (July-September results)'},
+    {v:'bm_q3', l:'Board Meeting — Q3 (October-December results)'},
+    {v:'bm_q4', l:'Board Meeting — Q4/Annual results'},
+    {v:'bm_general', l:'Board Meeting — General business'},
+    {v:'bm_accounts', l:'Board Meeting — Approval of Financial Statements'},
+    {v:'bm_dividend', l:'Board Meeting — Declaration of Dividend'},
+    {v:'bm_appt', l:'Board Meeting — Appointment of Director/KMP'},
+    {v:'agm', l:'Annual General Meeting (AGM)'},
+    {v:'egm', l:'Extraordinary General Meeting (EGM)'},
+    {v:'postal_ballot', l:'Postal Ballot Notice'},
+    {v:'audit_committee', l:'Audit Committee Meeting'},
+    {v:'nrc', l:'NRC Meeting'},
+    {v:'src', l:'Stakeholders Relationship Committee'},
+  ],
+  agenda: [
+    {v:'bm_q1_ag', l:'Board Meeting — Q1 Agenda'},
+    {v:'bm_q2_ag', l:'Board Meeting — Q2 Agenda'},
+    {v:'bm_q3_ag', l:'Board Meeting — Q3 Agenda'},
+    {v:'bm_q4_ag', l:'Board Meeting — Q4/Annual Accounts Agenda'},
+    {v:'bm_general_ag', l:'Board Meeting — General Agenda'},
+    {v:'agm_ag', l:'AGM Agenda'},
+    {v:'egm_ag', l:'EGM Agenda'},
+    {v:'audit_committee_ag', l:'Audit Committee Agenda'},
+  ],
+  minutes: [
+    {v:'bm_minutes', l:'Board Meeting Minutes'},
+    {v:'bm_q1_min', l:'Board Meeting Minutes — Q1 Results'},
+    {v:'bm_q4_min', l:'Board Meeting Minutes — Annual Accounts'},
+    {v:'agm_minutes', l:'Annual General Meeting Minutes'},
+    {v:'egm_minutes', l:'EGM Minutes'},
+    {v:'audit_committee_min', l:'Audit Committee Minutes'},
+    {v:'nrc_min', l:'NRC Meeting Minutes'},
+  ]
+};
+
+var DOC_HINTS = {
+  bm_q1: 'SS-1 requires 7 days notice. Include: date, time, venue, agenda. For listed: intimate BSE/NSE 2 days prior (Reg 29 LODR).',
+  bm_q2: 'Same as Q1. Trading window closed — intimation to exchange 2 days before meeting.',
+  bm_q3: 'Same pattern. Q3 results within 45 days of Dec 31.',
+  bm_q4: 'Annual accounts meeting. Auditor must attend. 7 days notice. Listed: 5 days advance notice to exchange (Reg 29).',
+  agm: 'SS-2: 21 clear days notice. Shorter notice with 95% member consent. Include explanatory statement for all special business.',
+  egm: 'SS-2: 21 clear days notice. Shorter notice with majority consent. Must include explanatory statement.',
+  postal_ballot: 'Sec 110: 30 days for voting. Scrutinizer must be a PCS/CA.',
+};
+
+function setDCat(btn, cat) {
+  document.querySelectorAll('[id^="dcatb-"]').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  DOC_CAT = cat;
+  var sel = document.getElementById('doctype');
+  sel.innerHTML = '<option value="">-- Select meeting type --</option>';
+  (DOC_TYPES[cat] || []).forEach(function(t) {
+    sel.innerHTML += '<option value="' + t.v + '">' + t.l + '</option>';
+  });
+  document.getElementById('dochint').textContent = '';
+}
+
+function updateDocHint() {
+  var v = document.getElementById('doctype').value;
+  document.getElementById('dochint').textContent = DOC_HINTS[v] ? '💡 ' + DOC_HINTS[v] : '';
+}
+
+async function draftDoc() {
+  var typeVal = document.getElementById('doctype').value;
+  var typeSel = document.getElementById('doctype');
+  var typeLabel = typeSel.options[typeSel.selectedIndex] ? typeSel.options[typeSel.selectedIndex].text : '';
+  var isListed = document.getElementById('doclisted').value === 'listed';
+  var details = document.getElementById('docdetails').value.trim();
+  if (!typeVal) { alert('Please select a meeting type.'); return; }
+
+  var outEl = document.getElementById('docout');
+  outEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--slate);"><div class="dots"><span></span><span></span><span></span></div><div style="margin-top:10px;font-size:12px;">Drafting document...</div></div>';
+
+  var catLabel = {notice:'Notice', agenda:'Agenda', minutes:'Minutes'}[DOC_CAT];
+  var listedNote = isListed ? ' The company is a LISTED entity — apply SEBI LODR 2015 requirements in addition (Reg 29 exchange intimation, Reg 30 disclosure, Reg 33 financial results timeline). Include all LODR-specific requirements.' : ' The company is UNLISTED.';
+
+  var DOC_SYS = 'You are an expert Indian company secretary. Draft complete, legally compliant corporate documents as per Companies Act 2013, Secretarial Standard 1 (SS-1 for board meetings) and Secretarial Standard 2 (SS-2 for general meetings), and SEBI LODR 2015 for listed companies. Every document must contain ALL mandatory elements required by law. Use proper formal language. Leave [COMPANY NAME], [DATE], [VENUE], [DIRECTOR NAME], [DIN] as placeholders where specific details are unknown.';
+
+  var prompt = 'Draft a complete ' + catLabel + ' for: ' + typeLabel + '.' + listedNote + (details ? ' Specific details provided: ' + details + '.' : '') +
+    ' Requirements: (1) Include ALL mandatory contents as per SS-1/SS-2 and Companies Act. (2) For notices: include proper heading, date, venue, agenda items with notes, attendance/proxy instructions, statutory notes. (3) For agendas: include all agenda items with item numbers, proposer, supporting documents required. (4) For minutes: include proper format with attendance, quorum confirmation, discussions, resolutions passed, action items. (5) Mention any filing requirements (MGT-14, DIR-12, ADT-1 etc.) and deadlines at the end.';
+
+  try {
+    var GROQ_KEY = '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';
+    var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
+      body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:DOC_SYS},{role:'user',content:prompt}],max_tokens:3000,temperature:0.1})
+    });
+    var data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    var text = data.choices[0].message.content;
+    outEl.innerHTML = '<div class="resbody"><div class="reshead"><div><div style="font-size:14px;color:var(--gold2);">' + catLabel + '</div><div style="font-size:11px;color:var(--slate);">' + typeLabel + (isListed ? ' · Listed' : '') + '</div></div><button class="rescopy" onclick="copyDocOut()">&#128203; Copy</button></div><div class="rescontent" id="doccontent">' + formatAI(text) + '</div></div><div style="font-size:11px;color:var(--slate);padding:4px 2px;">&#10003; Replace all [PLACEHOLDER] items before finalising. Have your CS review before dispatch.</div>';
+  } catch(e) {
+    outEl.innerHTML = '<div style="color:var(--red);padding:20px;font-size:13px;">&#9888; Error: ' + e.message + '</div>';
+  }
+}
+
+function copyDocOut() {
+  var el = document.getElementById('doccontent');
+  if (!el) return;
+  navigator.clipboard.writeText(el.innerText).then(function() {
+    var btn = document.querySelector('.rescopy');
+    if(btn){btn.textContent='Copied!';setTimeout(function(){btn.textContent='Copy';},2000);}
+  });
+}
+
+function initDocs() {
+  var sel = document.getElementById('doctype');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">-- Select meeting type --</option>';
+  (DOC_TYPES['notice'] || []).forEach(function(t) {
+    sel.innerHTML += '<option value="' + t.v + '">' + t.l + '</option>';
+  });
+}
+
 window.addEventListener('DOMContentLoaded', function() {
   var sc = sessionStorage.getItem('lg_code');
   if (sc && VALID_CODES.includes(sc)) {
@@ -714,6 +948,7 @@ window.addEventListener('DOMContentLoaded', function() {
   }
   rc();
   initRes();
+  initDocs();
 });
 
 // ═══════════════════════════════════════════════════
