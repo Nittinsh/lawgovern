@@ -445,6 +445,11 @@ function updateMode() {
   b.style.cssText = 'background:#c9a84c20;border:1px solid var(--gold);color:var(--gold2);font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;';
   var ind = document.getElementById('modeind');
   if (ind) { ind.textContent = '● AI Active'; ind.className = 'aimode'; }
+  // Show Admin tab ONLY for NITTIN01
+  var adminTab = document.getElementById('t-admin');
+  if (adminTab) {
+    adminTab.style.display = (ACCESS_CODE === 'NITTIN01') ? '' : 'none';
+  }
 }
 
 // ── ADMIN FUNCTIONS ──
@@ -650,7 +655,8 @@ async function draftRes() {
     (details ? ' Specific details: ' + details + '.' : '') +
     ' Format it as a proper resolution with: (1) Recitals/Whereas clauses where needed, (2) RESOLVED THAT clause (bold the RESOLVED THAT), (3) RESOLVED FURTHER THAT for any additional resolutions, (4) Authorization clause for filing/signing, (5) Note which MCA form must be filed and within what deadline. Use proper legal language. Leave [COMPANY NAME], [DATE], [DIRECTOR NAME], [DIN: XXXXXX] as placeholders where specific details are unknown.';
 
-  var messages = [{role:'system', content: SYS}, {role:'user', content: prompt}];
+  var RES_SYS = 'You are an expert Indian corporate law drafter. Draft complete, professionally worded resolutions under Companies Act 2013 and SEBI regulations. Use proper legal language. Include RESOLVED THAT, RESOLVED FURTHER THAT, authorization clauses. Leave [COMPANY NAME], [DATE], [DIN] as placeholders. Mention which MCA form to file and deadline.';
+  var messages = [{role:'system', content: RES_SYS}, {role:'user', content: prompt}];
 
   try {
     var GROQ_KEY = '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';
