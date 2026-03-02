@@ -412,6 +412,120 @@ body{font-family:'DM Sans',sans-serif;background:var(--ink);color:var(--white);h
   </div>
 </div>
 
+
+<div class="panel" id="p-penalty">
+  <div style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
+    <div style="flex:1;overflow-y:auto;padding:16px;">
+
+      <!-- HEADER -->
+      <div style="background:linear-gradient(135deg,var(--ink3),var(--ink4));border:1px solid var(--ink4);border-radius:14px;padding:16px 20px;margin-bottom:14px;">
+        <div style="font-family:serif;font-size:17px;color:var(--gold2);margin-bottom:3px;">⚖️ Penalty Calculator + Compliance Checklist</div>
+        <div style="font-size:12px;color:var(--slate);">Calculate exact penalties for late filings · Generate complete annual compliance checklist</div>
+      </div>
+
+      <!-- TWO COLUMNS -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+
+        <!-- LEFT: PENALTY CALC -->
+        <div style="background:var(--ink2);border:1px solid var(--ink4);border-radius:12px;overflow:hidden;">
+          <div style="background:var(--ink3);padding:10px 14px;border-bottom:1px solid var(--ink4);font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;">Penalty Calculator</div>
+          <div style="padding:14px;">
+            <div style="font-size:11px;color:var(--slate);margin-bottom:5px;">Select Form / Default</div>
+            <select id="pen-form" onchange="updatePenForm()" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:8px;padding:8px 10px;font-size:12px;outline:none;margin-bottom:10px;">
+              <option value="">-- Select Form --</option>
+              <option value="AOC-4">AOC-4 (Financial Statements)</option>
+              <option value="MGT-7">MGT-7 (Annual Return)</option>
+              <option value="MGT-7A">MGT-7A (Abridged Annual Return)</option>
+              <option value="ADT-1">ADT-1 (Auditor Appointment)</option>
+              <option value="DIR-12">DIR-12 (Director Change)</option>
+              <option value="DIR-3KYC">DIR-3 KYC</option>
+              <option value="INC-20A">INC-20A (Commencement)</option>
+              <option value="MGT-14">MGT-14 (Resolutions)</option>
+              <option value="DPT-3">DPT-3 (Deposits/Loans)</option>
+              <option value="BEN-2">BEN-2 (SBO)</option>
+              <option value="CHG-1">CHG-1 (Charge Creation)</option>
+              <option value="PAS-3">PAS-3 (Return of Allotment)</option>
+              <option value="SH-7">SH-7 (Increase in Auth Capital)</option>
+              <option value="MSME-1">MSME-1</option>
+              <option value="MR-1">MR-1 (MD/WTD Appointment)</option>
+              <option value="INC-22">INC-22 (Registered Office)</option>
+              <option value="AGM-default">AGM Not Held in Time</option>
+              <option value="board-meeting">Board Meeting Not Held</option>
+              <option value="CS-not-appointed">CS Not Appointed</option>
+              <option value="secretarial-audit">Secretarial Audit Not Done</option>
+            </select>
+            <div style="font-size:11px;color:var(--slate);margin-bottom:5px;">Days of Default / Delay</div>
+            <input id="pen-days" type="number" min="1" placeholder="e.g. 30" oninput="calcPenalty()" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:8px;padding:8px 10px;font-size:13px;outline:none;margin-bottom:10px;box-sizing:border-box;">
+            <div style="font-size:11px;color:var(--slate);margin-bottom:5px;">Company Type</div>
+            <select id="pen-type" onchange="calcPenalty()" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:8px;padding:8px 10px;font-size:12px;outline:none;margin-bottom:12px;">
+              <option value="other">Private / Public Unlisted</option>
+              <option value="small">Small Company / OPC</option>
+              <option value="listed">Listed Company</option>
+            </select>
+            <div id="pen-result" style="background:var(--ink3);border:1px solid var(--ink4);border-radius:10px;padding:12px;font-size:12px;line-height:1.9;color:var(--slate2);min-height:80px;">
+              <span style="color:var(--slate);">Select form and enter days to calculate penalty</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: CHECKLIST GENERATOR -->
+        <div style="background:var(--ink2);border:1px solid var(--ink4);border-radius:12px;overflow:hidden;">
+          <div style="background:var(--ink3);padding:10px 14px;border-bottom:1px solid var(--ink4);font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;">Compliance Checklist Generator</div>
+          <div style="padding:14px;">
+            <div style="font-size:11px;color:var(--slate);margin-bottom:5px;">Company Type</div>
+            <select id="cl-type" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:8px;padding:8px 10px;font-size:12px;outline:none;margin-bottom:8px;">
+              <option value="private">Private Limited</option>
+              <option value="public">Public Unlisted</option>
+              <option value="listed">Listed Company</option>
+              <option value="opc">One Person Company (OPC)</option>
+              <option value="small">Small Company</option>
+              <option value="sec8">Section 8 Company</option>
+              <option value="llp">LLP</option>
+            </select>
+            <div style="font-size:11px;color:var(--slate);margin-bottom:5px;">Paid-up Capital (Rs. Crore)</div>
+            <input id="cl-capital" type="number" placeholder="e.g. 5" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:8px;padding:8px 10px;font-size:13px;outline:none;margin-bottom:8px;box-sizing:border-box;">
+            <div style="font-size:11px;color:var(--slate);margin-bottom:5px;">Annual Turnover (Rs. Crore)</div>
+            <input id="cl-turnover" type="number" placeholder="e.g. 50" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:8px;padding:8px 10px;font-size:13px;outline:none;margin-bottom:8px;box-sizing:border-box;">
+            <div style="font-size:11px;color:var(--slate);margin-bottom:5px;">Net Profit (Rs. Crore, if any)</div>
+            <input id="cl-profit" type="number" placeholder="e.g. 6" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:8px;padding:8px 10px;font-size:13px;outline:none;margin-bottom:10px;box-sizing:border-box;">
+            <button onclick="genChecklist()" style="width:100%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);font-weight:700;font-size:13px;border:none;border-radius:9px;padding:10px;cursor:pointer;">Generate Checklist &#8594;</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHECKLIST OUTPUT -->
+      <div id="cl-output" style="margin-top:14px;"></div>
+
+    </div>
+  </div>
+</div>
+
+<div class="panel" id="p-tracker">
+  <div style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
+    <div style="background:var(--ink2);border-bottom:1px solid var(--ink4);padding:12px 16px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:11px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:1px;">📡 SEBI &amp; MCA Circular Tracker</div>
+          <div style="font-size:11px;color:var(--slate);margin-top:2px;">Latest circulars with plain English summaries · Powered by AI</div>
+        </div>
+        <button onclick="loadCirculars()" style="background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);font-weight:700;font-size:12px;border:none;border-radius:9px;padding:8px 16px;cursor:pointer;">&#8635; Refresh</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="rcatb on" id="trk-sebi" onclick="filterTracker(this,'sebi')">SEBI</button>
+        <button class="rcatb" id="trk-mca" onclick="filterTracker(this,'mca')">MCA</button>
+        <button class="rcatb" id="trk-all" onclick="filterTracker(this,'all')">All</button>
+      </div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:14px 16px;" id="tracker-out">
+      <div style="text-align:center;padding:40px 20px;color:var(--slate);">
+        <div style="font-size:36px;margin-bottom:10px;">📡</div>
+        <div style="font-size:14px;font-weight:600;color:var(--slate2);margin-bottom:8px;">SEBI &amp; MCA Circular Tracker</div>
+        <div style="font-size:12px;line-height:1.9;">Click Refresh to fetch latest circulars<br>AI summarises each one in plain English</div>
+        <button onclick="loadCirculars()" style="margin-top:16px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);font-weight:700;font-size:13px;border:none;border-radius:9px;padding:10px 24px;cursor:pointer;">Load Latest Circulars</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="panel" id="p-admin">
   <div class="ps" id="adminpanel" style="max-width:600px;margin:0 auto;padding:16px;">
     <div style="background:linear-gradient(135deg,var(--ink3),var(--ink4));border:1px solid var(--ink4);border-radius:14px;padding:20px;margin-bottom:16px;">
@@ -499,6 +613,10 @@ function updateMode() {
   }
   var docsTab = document.getElementById('t-docs');
   if (docsTab) docsTab.style.display = '';
+  var penaltyTab = document.getElementById('t-penalty');
+  if (penaltyTab) penaltyTab.style.display = '';
+  var trackerTab = document.getElementById('t-tracker');
+  if (trackerTab) trackerTab.style.display = '';
 }
 
 // ── ADMIN FUNCTIONS ──
@@ -936,6 +1054,260 @@ function initDocs() {
   sel.innerHTML = '<option value="">-- Select meeting type --</option>';
   (DOC_TYPES['notice'] || []).forEach(function(t) {
     sel.innerHTML += '<option value="' + t.v + '">' + t.l + '</option>';
+  });
+}
+
+
+// ══════════════════════════════════════════
+// PENALTY CALCULATOR
+// ══════════════════════════════════════════
+var PEN_DATA = {
+  'AOC-4':        {label:'AOC-4', base:1000, maxPen:10*100000, officer:null, section:'Sec 137', note:'Rs.1,000/day max Rs.10 Lakh'},
+  'MGT-7':        {label:'MGT-7', base:50000, perDay:100, maxPen:null, officer:null, section:'Sec 92', note:'Rs.50,000 + Rs.100/day (no cap)'},
+  'MGT-7A':       {label:'MGT-7A', base:50000, perDay:100, maxPen:null, section:'Sec 92', note:'Rs.50,000 + Rs.100/day'},
+  'ADT-1':        {label:'ADT-1', base:25000, maxPen:5*100000, section:'Sec 139', note:'Rs.25,000 to Rs.5 Lakh'},
+  'DIR-12':       {label:'DIR-12', base:50000, perDay:500, maxPen:null, section:'Sec 149/152', note:'Rs.50,000 + Rs.500/day'},
+  'DIR-3KYC':     {label:'DIR-3 KYC', base:5000, fixed:true, section:'Rule 12A', note:'Rs.5,000 flat reactivation fee (DIN deactivated from 1 Oct)'},
+  'INC-20A':      {label:'INC-20A', co_base:50000, dir_perDay:1000, section:'Sec 10A', note:'Company Rs.50,000; Director Rs.1,000/day'},
+  'MGT-14':       {label:'MGT-14', co_base:500000, officer_base:100000, section:'Sec 117', note:'Company Rs.5 Lakh; Officer Rs.1 Lakh'},
+  'DPT-3':        {label:'DPT-3', perDay:5000, maxDay:25000, section:'Rule 21', note:'Rs.5,000/day min, Rs.25,000/day max continuing'},
+  'BEN-2':        {label:'BEN-2', base:100000, perDay:1000, section:'SBO Rules', note:'Rs.1 Lakh + Rs.1,000/day continuing'},
+  'CHG-1':        {label:'CHG-1', base:500000, maxPen:50*100000, section:'Sec 77/86', note:'Rs.5 Lakh to Rs.50 Lakh (Company)'},
+  'PAS-3':        {label:'PAS-3', perDay:1000, maxPen:25*100000, section:'Sec 42/62', note:'Rs.1,000/day max Rs.25 Lakh'},
+  'SH-7':         {label:'SH-7', perDay:1000, maxPen:5*100000, section:'Sec 61', note:'Rs.1,000/day max Rs.5 Lakh'},
+  'MSME-1':       {label:'MSME-1', perDay:25000, section:'MSME Act', note:'Rs.25,000/day continuing default'},
+  'MR-1':         {label:'MR-1', base:50000, perDay:500, section:'Sec 196/203', note:'Rs.50,000 + Rs.500/day'},
+  'INC-22':       {label:'INC-22', perDay:1000, section:'Sec 12', note:'Rs.1,000/day (officer Rs.1 Lakh)'},
+  'AGM-default':  {label:'AGM Default', base:100000, perDay:5000, section:'Sec 96', note:'Rs.1 Lakh + Rs.5,000/day continuing default'},
+  'board-meeting':{label:'Board Meeting Default', perMeeting:25000, section:'Sec 173', note:'Rs.25,000 per director per missed meeting'},
+  'CS-not-appointed':{label:'CS Not Appointed', base:100000, maxBase:500000, perDay:500, section:'Sec 203', note:'Rs.1 Lakh to Rs.5 Lakh + Rs.500/day'},
+  'secretarial-audit':{label:'Secretarial Audit Not Done', base:100000, maxBase:500000, section:'Sec 204', note:'Rs.1 Lakh to Rs.5 Lakh'},
+};
+
+function updatePenForm() { calcPenalty(); }
+
+function calcPenalty() {
+  var form = document.getElementById('pen-form').value;
+  var days = parseInt(document.getElementById('pen-days').value) || 0;
+  var coType = document.getElementById('pen-type').value;
+  var resEl = document.getElementById('pen-result');
+  if (!form || !PEN_DATA[form]) {
+    resEl.innerHTML = '<span style="color:var(--slate);">Select form and enter days to calculate</span>';
+    return;
+  }
+  var d = PEN_DATA[form];
+  var html = '<div style="font-weight:700;color:var(--gold2);margin-bottom:6px;">' + d.label + ' — ' + d.section + '</div>';
+  var pen = 0;
+  
+  // Small company / OPC: penalty is 1/2 of normal (Companies Amendment Act 2020)
+  var smallReduction = (coType === 'small') ? 0.5 : 1;
+  
+  if (d.fixed) {
+    html += '<div>Flat fee: <strong style="color:var(--gold)">Rs.5,000</strong> to reactivate DIN</div>';
+  } else if (form === 'INC-20A') {
+    var coPen = 50000;
+    var dirPen = days * 1000;
+    if(coType==='small'){coPen=25000; dirPen=Math.round(dirPen*0.5);}
+    html += '<div>Company penalty: <strong style="color:var(--gold)">Rs.' + coPen.toLocaleString('en-IN') + '</strong></div>';
+    if(days>0) html += '<div>Director penalty (' + days + ' days): <strong style="color:var(--gold)">Rs.' + dirPen.toLocaleString('en-IN') + '</strong></div>';
+  } else if (form === 'MGT-14') {
+    var cp = Math.round(500000*smallReduction);
+    var op = Math.round(100000*smallReduction);
+    html += '<div>Company: <strong style="color:var(--gold)">Rs.' + cp.toLocaleString('en-IN') + '</strong></div>';
+    html += '<div>Officer: <strong style="color:var(--gold)">Rs.' + op.toLocaleString('en-IN') + '</strong></div>';
+    html += '<div style="color:#f97316;font-size:11px;margin-top:4px;">Note: No condonation — even 1 day late = full penalty</div>';
+  } else if (form === 'board-meeting') {
+    if(days>0){
+      var pp = Math.round(25000*days*smallReduction);
+      html += '<div>Per director, ' + days + ' missed meeting(s): <strong style="color:var(--gold)">Rs.' + pp.toLocaleString('en-IN') + '</strong></div>';
+    } else {
+      html += '<div>Rs.25,000 per director per missed meeting</div>';
+    }
+  } else if (form === 'DPT-3') {
+    if(days>0){
+      var minP = 5000*days; var maxP = 25000*days;
+      if(coType==='small'){minP=Math.round(minP*0.5);maxP=Math.round(maxP*0.5);}
+      html += '<div>Min penalty (' + days + ' days): <strong style="color:var(--gold)">Rs.' + minP.toLocaleString('en-IN') + '</strong></div>';
+      html += '<div>Max penalty: <strong style="color:#ef4444">Rs.' + maxP.toLocaleString('en-IN') + '</strong></div>';
+    }
+  } else if (form === 'secretarial-audit' || form === 'CS-not-appointed') {
+    var bp = Math.round((d.base||100000)*smallReduction);
+    var mp = Math.round((d.maxBase||500000)*smallReduction);
+    html += '<div>Range: <strong style="color:var(--gold)">Rs.' + bp.toLocaleString('en-IN') + ' to Rs.' + mp.toLocaleString('en-IN') + '</strong></div>';
+    if(d.perDay && days>0){
+      var pd = Math.round(d.perDay*days*smallReduction);
+      html += '<div>+ continuing default (' + days + ' days): <strong style="color:#ef4444">Rs.' + pd.toLocaleString('en-IN') + '</strong></div>';
+    }
+  } else {
+    if(d.base){
+      pen = Math.round(d.base*smallReduction);
+      html += '<div>Base penalty: <strong style="color:var(--gold)">Rs.' + pen.toLocaleString('en-IN') + '</strong></div>';
+    }
+    if(d.perDay && days>0){
+      var daily = Math.round(d.perDay*days*smallReduction);
+      pen += daily;
+      html += '<div>Daily penalty (' + days + ' days @ Rs.' + d.perDay + '): <strong style="color:var(--gold)">Rs.' + daily.toLocaleString('en-IN') + '</strong></div>';
+    }
+    if(d.maxPen && pen > d.maxPen){
+      pen = Math.round(d.maxPen*smallReduction)||d.maxPen;
+      html += '<div style="color:#f97316;">Capped at maximum: <strong>Rs.' + pen.toLocaleString('en-IN') + '</strong></div>';
+    }
+    if(pen>0) html += '<div style="margin-top:6px;padding:8px;background:var(--ink4);border-radius:6px;"><span style="color:var(--slate);">Total Estimated:</span> <strong style="color:var(--gold);font-size:14px;">Rs.' + pen.toLocaleString('en-IN') + '</strong></div>';
+  }
+  
+  html += '<div style="font-size:10px;color:var(--slate);margin-top:6px;">⚖️ ' + d.note + (coType==='small'?' · 50% reduction for Small Co/OPC':'') + '</div>';
+  html += '<div style="font-size:10px;color:var(--slate);margin-top:2px;">* Estimate only. Adjudicating officer may vary. Compounding available for most offences.</div>';
+  resEl.innerHTML = html;
+}
+
+// ══════════════════════════════════════════
+// COMPLIANCE CHECKLIST GENERATOR
+// ══════════════════════════════════════════
+async function genChecklist() {
+  var coType = document.getElementById('cl-type').value;
+  var capital = parseFloat(document.getElementById('cl-capital').value) || 0;
+  var turnover = parseFloat(document.getElementById('cl-turnover').value) || 0;
+  var profit = parseFloat(document.getElementById('cl-profit').value) || 0;
+  var outEl = document.getElementById('cl-output');
+  
+  outEl.innerHTML = '<div style="text-align:center;padding:30px;color:var(--slate);"><div class="dots"><span></span><span></span><span></span></div><div style="margin-top:10px;font-size:12px;">Generating checklist...</div></div>';
+  
+  var coTypeLabels = {private:'Private Limited',public:'Public Unlisted',listed:'Listed Company',opc:'OPC',small:'Small Company',sec8:'Section 8',llp:'LLP'};
+  var label = coTypeLabels[coType] || coType;
+  
+  // Determine applicable compliances
+  var isSmall = coType==='small' || coType==='opc';
+  var isListed = coType==='listed';
+  var isPublic = coType==='public' || coType==='listed';
+  var needsCS = isListed || capital>=10;
+  var needsSecAudit = isListed || capital>=50 || turnover>=250;
+  var needsIntAudit = isListed || (isPublic && (capital>=50 || turnover>=200));
+  var needsCostAudit = false; // industry specific
+  var needsCSR = profit>=5 || turnover>=1000 || capital>=500;
+  var needsMR1 = isPublic;
+  var needsSBO = true;
+  var needsMSME = capital>=0; // all companies
+  var needsXBRL = isListed || (isPublic && (capital>=5 || turnover>=100));
+  var needsSR = coType==='src' || isListed;
+  var need9B = coType==='private' && !isSmall; // demat rule
+
+  var prompt = 'Generate a complete annual compliance checklist for a ' + label + ' company with paid-up capital Rs.' + capital + ' Crore, turnover Rs.' + turnover + ' Crore, net profit Rs.' + profit + ' Crore. ' +
+    'Format as a clear table/list with: Form Name | Due Date | Applicable? (Yes/No/Conditional) | Penalty for default. ' +
+    'Include ALL forms and compliances: INC-20A check, DIR-3 KYC, DPT-3, AOC-4, MGT-7/7A, ADT-1, BEN-2, MSME-1, MGT-14, PAS-6 (if applicable), MR-1 (if applicable), secretarial audit MR-3 (if applicable), cost audit (if applicable), CSR (if applicable' + (needsCSR?' — APPLICABLE':'') + '), IEPF compliance, board meeting requirements, AGM requirements, demat of shares' + (need9B?' — MANDATORY (Rule 9B)':'') + '. ' +
+    'Also list: (1) Critical items specific to this company profile, (2) Recent 2025-2026 changes they must know, (3) Top 3 risks for this company type.';
+
+  try {
+    var GROQ_KEY = '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';
+    var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
+      body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:'You are an expert Indian company secretary. Generate precise, complete compliance checklists. Be specific about due dates, penalties, and applicability conditions. Use the current FY 2025-26 calendar.'},{role:'user',content:prompt}],max_tokens:3000,temperature:0.1})
+    });
+    var data = await res.json();
+    if(data.error) throw new Error(data.error.message);
+    var text = data.choices[0].message.content;
+    outEl.innerHTML = '<div class="resbody"><div class="reshead"><div><div style="font-size:14px;color:var(--gold2);">Compliance Checklist — ' + label + '</div><div style="font-size:11px;color:var(--slate);">Capital: Rs.' + capital + 'Cr · Turnover: Rs.' + turnover + 'Cr · Profit: Rs.' + profit + 'Cr</div></div><button class="rescopy" onclick="copyEl(\'cl-content\')">&#128203; Copy</button></div><div class="rescontent" id="cl-content">' + formatAI(text) + '</div></div>';
+  } catch(e) {
+    outEl.innerHTML = '<div style="color:var(--red);padding:20px;font-size:13px;">Error: ' + e.message + '</div>';
+  }
+}
+
+// ══════════════════════════════════════════
+// CIRCULAR TRACKER
+// ══════════════════════════════════════════
+var ALL_CIRCULARS = [];
+var TRACKER_FILTER = 'sebi';
+
+function filterTracker(btn, filter) {
+  document.querySelectorAll('[id^="trk-"]').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  TRACKER_FILTER = filter;
+  renderCirculars();
+}
+
+async function loadCirculars() {
+  var outEl = document.getElementById('tracker-out');
+  outEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--slate);"><div class="dots"><span></span><span></span><span></span></div><div style="margin-top:10px;font-size:12px;">Fetching latest circulars and summarising...</div></div>';
+
+  var prompt = 'List the 10 most important and recent SEBI circulars and MCA notifications from 2025 and 2026 (up to Feb 2026) that corporate compliance professionals must know. For each one provide: (1) Source (SEBI or MCA), (2) Title/Subject, (3) Date, (4) Reference number if known, (5) Plain English summary in 2-3 sentences explaining what it means practically for companies. Focus on: LODR amendments, PIT amendments, Companies Act rules, MCA V3 changes, new forms, new requirements. Format each as: SOURCE | DATE | TITLE | SUMMARY. Be specific and accurate.';
+
+  try {
+    var GROQ_KEY = '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';
+    var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
+      body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[
+        {role:'system',content:'You are an expert Indian corporate law tracker. List recent SEBI and MCA circulars/notifications with accurate dates and plain English summaries. Only include real, verified circulars you know with certainty.'},
+        {role:'user',content:prompt}
+      ],max_tokens:3000,temperature:0.1})
+    });
+    var data = await res.json();
+    if(data.error) throw new Error(data.error.message);
+    var text = data.choices[0].message.content;
+    
+    // Parse into cards
+    ALL_CIRCULARS = [];
+    var lines = text.split('\n').filter(l=>l.trim());
+    var current = null;
+    for(var i=0;i<lines.length;i++){
+      var l = lines[i].trim();
+      if(!l) continue;
+      if(l.match(/^[0-9]+\./)||l.match(/^\*\*[0-9]/)||l.includes('|')){
+        if(current) ALL_CIRCULARS.push(current);
+        var isSEBI = l.toUpperCase().includes('SEBI');
+        var isMCA = l.toUpperCase().includes('MCA');
+        current = {source: isSEBI?'SEBI':isMCA?'MCA':'SEBI', text:l, full:l};
+      } else if(current) {
+        current.full += '\n' + l;
+      }
+    }
+    if(current) ALL_CIRCULARS.push(current);
+    
+    // If parsing failed, just show full text
+    if(ALL_CIRCULARS.length < 3) {
+      ALL_CIRCULARS = [{source:'all', text:'', full:text}];
+    }
+    
+    renderCirculars();
+  } catch(e) {
+    outEl.innerHTML = '<div style="color:var(--red);padding:20px;font-size:13px;">Error: ' + e.message + '<br><br>Try refreshing.</div>';
+  }
+}
+
+function renderCirculars() {
+  var outEl = document.getElementById('tracker-out');
+  if(!ALL_CIRCULARS.length){
+    outEl.innerHTML = '<div style="text-align:center;padding:30px;color:var(--slate);">Click Refresh to load circulars</div>';
+    return;
+  }
+  
+  // If single block (unparsed), just render
+  if(ALL_CIRCULARS.length===1 && ALL_CIRCULARS[0].source==='all'){
+    outEl.innerHTML = '<div class="resbody"><div class="rescontent">' + formatAI(ALL_CIRCULARS[0].full) + '</div></div>';
+    return;
+  }
+  
+  var filtered = TRACKER_FILTER==='all' ? ALL_CIRCULARS : ALL_CIRCULARS.filter(c=>c.source.toLowerCase()===TRACKER_FILTER);
+  if(!filtered.length) filtered = ALL_CIRCULARS;
+  
+  var html = filtered.map(function(c,i){
+    var color = c.source==='SEBI' ? 'var(--gold2)' : '#60a5fa';
+    var bg = c.source==='SEBI' ? 'var(--gdim)' : '#1e3a5f';
+    return '<div class="resbody" style="margin-bottom:10px;">' +
+      '<div class="reshead">' +
+        '<span style="font-size:10px;font-weight:700;padding:2px 9px;border-radius:8px;background:'+bg+';color:'+color+';border:1px solid '+color+';">'+c.source+'</span>' +
+      '</div>' +
+      '<div style="padding:12px 16px;font-size:12px;line-height:1.8;color:var(--slate2);">' + formatAI(c.full) + '</div>' +
+    '</div>';
+  }).join('');
+  
+  outEl.innerHTML = html + '<div style="font-size:11px;color:var(--slate);padding:8px 4px;text-align:center;">Source: AI knowledge base updated to Feb 2026 · For latest, always verify on sebi.gov.in / mca.gov.in</div>';
+}
+
+function copyEl(id) {
+  var el = document.getElementById(id);
+  if(!el) return;
+  navigator.clipboard.writeText(el.innerText).then(function(){
+    var btn = document.querySelector('.rescopy');
+    if(btn){btn.textContent='Copied!';setTimeout(function(){btn.textContent='Copy';},2000);}
   });
 }
 
