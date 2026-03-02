@@ -1228,49 +1228,83 @@ function filterTracker(btn, filter) {
 
 async function loadCirculars() {
   var outEl = document.getElementById('tracker-out');
-  outEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--slate);"><div class="dots"><span></span><span></span><span></span></div><div style="margin-top:10px;font-size:12px;">Fetching latest circulars and summarising...</div></div>';
+  outEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--slate);"><div class="dots"><span></span><span></span><span></span></div><div style="margin-top:10px;font-size:12px;">Fetching LIVE circulars from SEBI &amp; MCA websites...</div></div>';
 
-  var prompt = 'List the 10 most important and recent SEBI circulars and MCA notifications from 2025 and 2026 (up to Feb 2026) that corporate compliance professionals must know. For each one provide: (1) Source (SEBI or MCA), (2) Title/Subject, (3) Date, (4) Reference number if known, (5) Plain English summary in 2-3 sentences explaining what it means practically for companies. Focus on: LODR amendments, PIT amendments, Companies Act rules, MCA V3 changes, new forms, new requirements. Format each as: SOURCE | DATE | TITLE | SUMMARY. Be specific and accurate.';
+  try {
+    // Use Anthropic API with web_search tool for LIVE data
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        tools: [{"type": "web_search_20250305", "name": "web_search"}],
+        system: 'You are an expert Indian corporate law tracker. Search for and provide the LATEST real circulars from SEBI (sebi.gov.in) and MCA (mca.gov.in). For each circular provide: Source (SEBI or MCA) | Date | Title | Reference Number | Plain English Summary (2-3 sentences on what companies must do). Be accurate and only report real circulars you find.',
+        messages: [{
+          role: 'user',
+          content: 'Search sebi.gov.in and mca.gov.in for the latest circulars and notifications from 2025 and 2026. Find at least 5 SEBI circulars and 5 MCA notifications. For each one provide the exact title, date, reference number, and a 2-3 sentence plain English summary explaining what it means for companies. Format: SOURCE | DATE | TITLE | REF | SUMMARY'
+        }]
+      })
+    });
 
+    var data = await res.json();
+    if(data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+
+    // Extract text from all content blocks
+    var fullText = '';
+    if(data.content) {
+      data.content.forEach(function(block) {
+        if(block.type === 'text') fullText += block.text + '\n';
+      });
+    }
+
+    if(!fullText.trim()) throw new Error('No content returned');
+
+    // Parse into circular cards
+    ALL_CIRCULARS = [];
+    var sections = fullText.split(/\n(?=[0-9]+\.|\*\*[0-9]|SEBI \||MCA \|)/);
+    sections.forEach(function(sec) {
+      sec = sec.trim();
+      if(sec.length < 20) return;
+      var isSEBI = /SEBI/i.test(sec.slice(0,50));
+      var isMCA = /MCA/i.test(sec.slice(0,50));
+      ALL_CIRCULARS.push({
+        source: isSEBI ? 'SEBI' : isMCA ? 'MCA' : 'SEBI',
+        full: sec
+      });
+    });
+
+    if(ALL_CIRCULARS.length < 2) {
+      ALL_CIRCULARS = [{source:'all', full: fullText}];
+    }
+
+    renderCirculars();
+
+  } catch(e) {
+    // Fallback to Groq with known latest circulars
+    outEl.innerHTML = '<div style="padding:10px;font-size:12px;color:var(--slate);text-align:center;">Live fetch unavailable — loading from knowledge base...</div>';
+    await loadCircularsFallback();
+  }
+}
+
+async function loadCircularsFallback() {
+  var outEl = document.getElementById('tracker-out');
   try {
     var GROQ_KEY = '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';
     var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
       body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[
-        {role:'system',content:'You are an expert Indian corporate law tracker. List recent SEBI and MCA circulars/notifications with accurate dates and plain English summaries. Only include real, verified circulars you know with certainty.'},
-        {role:'user',content:prompt}
+        {role:'system',content:'You are an expert Indian corporate law tracker. List the most important recent SEBI and MCA circulars from 2024-2026 with accurate dates and plain English summaries. Include: SEBI LODR Third Amendment Dec 2024, SEBI LODR Amendment Jan 2026 (HVDLE Rs.5000Cr), MCA MGT-7 amendment abolishing MGT-8 Jul 2025, MCA AOC-4 absolute rupees Jul 2025, SEBI PIT SDD requirements, SEBI physical transfer window Feb 2026, MCA Rule 9B demat for private companies Oct 2023, NFRA circular Feb 2026 two-way communication. Format each as numbered item: SOURCE | DATE | TITLE | SUMMARY'},
+        {role:'user',content:'List 12 most important recent SEBI and MCA circulars/notifications from 2024-2026 with plain English summaries. Include exact dates and reference numbers where known.'}
       ],max_tokens:3000,temperature:0.1})
     });
     var data = await res.json();
     if(data.error) throw new Error(data.error.message);
     var text = data.choices[0].message.content;
-    
-    // Parse into cards
-    ALL_CIRCULARS = [];
-    var lines = text.split('\n').filter(l=>l.trim());
-    var current = null;
-    for(var i=0;i<lines.length;i++){
-      var l = lines[i].trim();
-      if(!l) continue;
-      if(l.match(/^[0-9]+\./)||l.match(/^\*\*[0-9]/)||l.includes('|')){
-        if(current) ALL_CIRCULARS.push(current);
-        var isSEBI = l.toUpperCase().includes('SEBI');
-        var isMCA = l.toUpperCase().includes('MCA');
-        current = {source: isSEBI?'SEBI':isMCA?'MCA':'SEBI', text:l, full:l};
-      } else if(current) {
-        current.full += '\n' + l;
-      }
-    }
-    if(current) ALL_CIRCULARS.push(current);
-    
-    // If parsing failed, just show full text
-    if(ALL_CIRCULARS.length < 3) {
-      ALL_CIRCULARS = [{source:'all', text:'', full:text}];
-    }
-    
+    ALL_CIRCULARS = [{source:'all', full:text}];
     renderCirculars();
-  } catch(e) {
-    outEl.innerHTML = '<div style="color:var(--red);padding:20px;font-size:13px;">Error: ' + e.message + '<br><br>Try refreshing.</div>';
+  } catch(e2) {
+    outEl.innerHTML = '<div style="color:var(--red);padding:20px;font-size:13px;">Error: ' + e2.message + '</div>';
   }
 }
 
