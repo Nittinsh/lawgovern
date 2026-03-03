@@ -230,6 +230,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--ink);color:var(--white);h
   <div class="tab" onclick="sw('docs')" id="t-docs" style="display:none;">&#128196; Notices &amp; Minutes</div>
   <div class="tab" onclick="sw('penalty')" id="t-penalty" style="display:none;">&#9878; Penalty Calc</div>
   <div class="tab" onclick="sw('tracker')" id="t-tracker" style="display:none;">&#128225; Circulars</div>
+  <div class="tab" onclick="sw('xlaw')" id="t-xlaw" style="display:none;">⚡ Cross-Law</div>
+  <div class="tab" onclick="sw('scn')" id="t-scn" style="display:none;">📨 SCN Reply</div>
+  <div class="tab" onclick="sw('cases')" id="t-cases" style="display:none;">⚖️ NCLT Cases</div>
+  <div class="tab" onclick="sw('compound')" id="t-compound" style="display:none;">🤝 Compounding</div>
+  <div class="tab" onclick="sw('deeplaw')" id="t-deeplaw" style="display:none;">🔬 Deep Law</div>
+  <div class="tab" onclick="sw('opinion')" id="t-opinion" style="display:none;">📜 Legal Opinion</div>
   <div class="tab" onclick="sw('admin')" id="t-admin">⚙️ Admin</div>
 </div>
 
@@ -538,6 +544,219 @@ body{font-family:'DM Sans',sans-serif;background:var(--ink);color:var(--white);h
     <div id="trk-status" style="background:var(--ink3);border-top:1px solid var(--ink4);padding:6px 16px;font-size:11px;color:var(--slate);flex-shrink:0;display:none;text-align:center;"></div>
   </div>
 </div>
+<div class="panel" id="p-xlaw">
+  <div style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
+    <div style="background:var(--ink2);border-bottom:1px solid var(--ink4);padding:12px 16px;flex-shrink:0;">
+      <div style="font-size:11px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">⚡ Cross-Law Impact Analyser</div>
+      <div style="font-size:11px;color:var(--slate);margin-bottom:10px;">Enter any corporate action → get complete ripple effect across ALL laws (Companies Act, SEBI, FEMA, Tax, Stamp Duty, IBC)</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;" id="xlaw-examples">
+        <button class="rcatb" onclick="xlawEx(this)">Increase authorised capital</button>
+        <button class="rcatb" onclick="xlawEx(this)">Appoint a new MD</button>
+        <button class="rcatb" onclick="xlawEx(this)">Transfer shares to NRI</button>
+        <button class="rcatb" onclick="xlawEx(this)">Issue debentures (NCDs)</button>
+        <button class="rcatb" onclick="xlawEx(this)">Change registered office to another state</button>
+        <button class="rcatb" onclick="xlawEx(this)">Merger of two companies</button>
+        <button class="rcatb" onclick="xlawEx(this)">Private placement of shares</button>
+        <button class="rcatb" onclick="xlawEx(this)">Buy-back of shares</button>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <input id="xlaw-input" type="text" placeholder="Describe the corporate action... e.g. 'Company wants to give loan to its subsidiary'" style="flex:1;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 13px;font-size:13px;outline:none;">
+        <button onclick="runXLaw()" style="background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);font-weight:700;font-size:13px;border:none;border-radius:9px;padding:0 20px;cursor:pointer;white-space:nowrap;">Analyse ⚡</button>
+      </div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:14px 16px;" id="xlaw-out">
+      <div style="text-align:center;padding:40px 20px;color:var(--slate);">
+        <div style="font-size:36px;margin-bottom:10px;">⚡</div>
+        <div style="font-size:14px;font-weight:600;color:var(--slate2);margin-bottom:8px;">Cross-Law Impact Analyser</div>
+        <div style="font-size:12px;line-height:1.9;">Describe any corporate action above<br>Get complete legal impact across Companies Act, SEBI, FEMA, Income Tax, Stamp Duty, and IBC</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="panel" id="p-scn">
+  <div style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
+    <div style="background:var(--ink2);border-bottom:1px solid var(--ink4);padding:12px 16px;flex-shrink:0;">
+      <div style="font-size:11px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">📨 Show Cause Notice Reply Drafter</div>
+      <div style="font-size:11px;color:var(--slate);margin-bottom:10px;">Describe the SCN / ROC notice → AI drafts complete legal reply with grounds of defence, case law, and compounding option</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <button class="rcatb" onclick="scnEx(this)">SCN for late AOC-4 filing</button>
+        <button class="rcatb" onclick="scnEx(this)">SCN for not holding AGM</button>
+        <button class="rcatb" onclick="scnEx(this)">SCN for DPT-3 default</button>
+        <button class="rcatb" onclick="scnEx(this)">SCN for MGT-7 late filing</button>
+        <button class="rcatb" onclick="scnEx(this)">SEBI SCN for LODR violation</button>
+        <button class="rcatb" onclick="scnEx(this)">SCN for not appointing CS</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <select id="scn-issuer" style="background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 12px;font-size:12px;outline:none;">
+          <option value="ROC">ROC (Registrar of Companies)</option>
+          <option value="SEBI">SEBI</option>
+          <option value="RD">Regional Director</option>
+          <option value="NCLT">NCLT</option>
+          <option value="MCA">MCA (Ministry)</option>
+        </select>
+        <select id="scn-compounding" style="background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 12px;font-size:12px;outline:none;">
+          <option value="yes">Include Compounding Option</option>
+          <option value="no">Reply Only (no compounding)</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <textarea id="scn-input" placeholder="Describe the SCN / violation in detail...&#10;E.g.: ROC issued SCN for not filing AOC-4 for FY 2023-24 and FY 2024-25. Company is a private limited company, paid-up Rs.5 Crore. AGM was held but forms not filed due to change in accounts team." style="flex:1;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 13px;font-size:12px;outline:none;resize:none;min-height:70px;font-family:inherit;box-sizing:border-box;"></textarea>
+        <button onclick="runSCN()" style="background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);font-weight:700;font-size:13px;border:none;border-radius:9px;padding:0 16px;cursor:pointer;align-self:flex-end;">Draft Reply</button>
+      </div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:14px 16px;" id="scn-out">
+      <div style="text-align:center;padding:40px 20px;color:var(--slate);">
+        <div style="font-size:36px;margin-bottom:10px;">📨</div>
+        <div style="font-size:14px;font-weight:600;color:var(--slate2);margin-bottom:8px;">SCN Reply Drafter</div>
+        <div style="font-size:12px;line-height:1.9;">Describe the show cause notice above<br>AI drafts complete reply with legal grounds, case citations, and compounding strategy</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="panel" id="p-cases">
+  <div style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
+    <div style="background:var(--ink2);border-bottom:1px solid var(--ink4);padding:12px 16px;flex-shrink:0;">
+      <div style="font-size:11px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">⚖️ NCLT / NCLAT / SAT Case Finder</div>
+      <div style="font-size:11px;color:var(--slate);margin-bottom:10px;">Search real tribunal decisions explained in plain English — what judges decided and what it means for your compliance</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <button class="rcatb" onclick="caseEx(this)">Director disqualification 164(2) relief</button>
+        <button class="rcatb" onclick="caseEx(this)">Oppression and mismanagement 50:50 JV</button>
+        <button class="rcatb" onclick="caseEx(this)">IBC CIRP against personal guarantor</button>
+        <button class="rcatb" onclick="caseEx(this)">SEBI SAT insider trading penalty reduced</button>
+        <button class="rcatb" onclick="caseEx(this)">AGM extension allowed by ROC</button>
+        <button class="rcatb" onclick="caseEx(this)">Charge registration condonation NCLT</button>
+        <button class="rcatb" onclick="caseEx(this)">RPT violation SEBI order</button>
+        <button class="rcatb" onclick="caseEx(this)">Revival of struck off company Sec 252</button>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <input id="cases-input" type="text" placeholder="Search case law... e.g. 'director disqualification relief', 'compounding application allowed', 'SEBI penalty reduced on appeal'" style="flex:1;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 13px;font-size:13px;outline:none;">
+        <select id="cases-forum" style="background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 12px;font-size:12px;outline:none;">
+          <option value="all">All Forums</option>
+          <option value="NCLT">NCLT</option>
+          <option value="NCLAT">NCLAT</option>
+          <option value="SAT">SAT (SEBI)</option>
+          <option value="HC">High Courts</option>
+          <option value="SC">Supreme Court</option>
+        </select>
+        <button onclick="runCases()" style="background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);font-weight:700;font-size:13px;border:none;border-radius:9px;padding:0 16px;cursor:pointer;">Search</button>
+      </div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:14px 16px;" id="cases-out">
+      <div style="text-align:center;padding:40px 20px;color:var(--slate);">
+        <div style="font-size:36px;margin-bottom:10px;">⚖️</div>
+        <div style="font-size:14px;font-weight:600;color:var(--slate2);margin-bottom:8px;">NCLT / NCLAT / SAT Case Finder</div>
+        <div style="font-size:12px;line-height:1.9;">Search real judicial decisions in plain English<br>Covers NCLT, NCLAT, SAT, High Courts, Supreme Court</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="panel" id="p-compound">
+  <div style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
+    <div style="background:var(--ink2);border-bottom:1px solid var(--ink4);padding:12px 16px;flex-shrink:0;">
+      <div style="font-size:11px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">🤝 Compounding Application Drafter</div>
+      <div style="font-size:11px;color:var(--slate);margin-bottom:10px;">Describe the default → AI drafts complete compounding application under Section 441 with fees, documents checklist, and jurisdiction</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <button class="rcatb" onclick="compoundEx(this)">Late filing AOC-4 multiple years</button>
+        <button class="rcatb" onclick="compoundEx(this)">AGM not held for 2 years</button>
+        <button class="rcatb" onclick="compoundEx(this)">Charge not registered within 30 days</button>
+        <button class="rcatb" onclick="compoundEx(this)">DPT-3 not filed for 3 years</button>
+        <button class="rcatb" onclick="compoundEx(this)">Director appointment without filing DIR-12</button>
+        <button class="rcatb" onclick="compoundEx(this)">MGT-14 not filed for special resolution</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <input id="compound-company" placeholder="Company Name" style="flex:1;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 13px;font-size:12px;outline:none;">
+        <input id="compound-cin" placeholder="CIN (optional)" style="flex:1;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 13px;font-size:12px;outline:none;">
+        <select id="compound-type" style="background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 12px;font-size:12px;outline:none;">
+          <option value="pvt">Private Limited</option>
+          <option value="pub">Public Limited</option>
+          <option value="listed">Listed Company</option>
+          <option value="small">Small Company</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <textarea id="compound-input" placeholder="Describe the default/violation in detail...&#10;E.g.: Company did not file AOC-4 for FY 2022-23 and FY 2023-24. The delay is due to the company having financial difficulty and change in management. Both forms have now been filed with late fee." style="flex:1;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 13px;font-size:12px;outline:none;resize:none;min-height:70px;font-family:inherit;box-sizing:border-box;"></textarea>
+        <button onclick="runCompound()" style="background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);font-weight:700;font-size:13px;border:none;border-radius:9px;padding:0 16px;cursor:pointer;align-self:flex-end;">Draft Application</button>
+      </div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:14px 16px;" id="compound-out">
+      <div style="text-align:center;padding:40px 20px;color:var(--slate);">
+        <div style="font-size:36px;margin-bottom:10px;">🤝</div>
+        <div style="font-size:14px;font-weight:600;color:var(--slate2);margin-bottom:8px;">Compounding Application Drafter</div>
+        <div style="font-size:12px;line-height:1.9;">Describe the violation above<br>AI drafts complete Section 441 compounding application with fees calculation, jurisdiction, and documents list</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="panel" id="p-deeplaw">
+  <div style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
+    <div style="background:var(--ink2);border-bottom:1px solid var(--ink4);padding:12px 16px;flex-shrink:0;">
+      <div style="font-size:11px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">🔬 Deep Law Interpretation Engine</div>
+      <div style="font-size:11px;color:var(--slate);margin-bottom:10px;">Complex legal questions that stump even experienced CSs — complete analysis with section, proviso, exception, circular, case law, and practical answer</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <button class="rcatb" onclick="deepEx(this)">Can director who resigned be liable for acts after resignation?</button>
+        <button class="rcatb" onclick="deepEx(this)">Can Section 8 company pay sitting fees to directors?</button>
+        <button class="rcatb" onclick="deepEx(this)">Private company register if 100% demat shares?</button>
+        <button class="rcatb" onclick="deepEx(this)">Director absent from 3 consecutive meetings — what happens?</button>
+        <button class="rcatb" onclick="deepEx(this)">Can OPC have more than one director?</button>
+        <button class="rcatb" onclick="deepEx(this)">Loan to director — exactly what is permitted under Sec 185?</button>
+        <button class="rcatb" onclick="deepEx(this)">Can a company accept deposit from its own director?</button>
+        <button class="rcatb" onclick="deepEx(this)">When does UPSI period actually begin for quarterly results?</button>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <input id="deeplaw-input" type="text" placeholder="Ask the hardest compliance question you have... exact legal interpretation, grey area, edge case" style="flex:1;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 13px;font-size:13px;outline:none;">
+        <button onclick="runDeepLaw()" style="background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);font-weight:700;font-size:13px;border:none;border-radius:9px;padding:0 20px;cursor:pointer;white-space:nowrap;">Analyse 🔬</button>
+      </div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:14px 16px;" id="deeplaw-out">
+      <div style="text-align:center;padding:40px 20px;color:var(--slate);">
+        <div style="font-size:36px;margin-bottom:10px;">🔬</div>
+        <div style="font-size:14px;font-weight:600;color:var(--slate2);margin-bottom:8px;">Deep Law Interpretation Engine</div>
+        <div style="font-size:12px;line-height:1.9;">The questions that have no easy answer<br>Complete legal analysis: section + proviso + exception + MCA circular + case law + practical answer</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="panel" id="p-opinion">
+  <div style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
+    <div style="background:var(--ink2);border-bottom:1px solid var(--ink4);padding:12px 16px;flex-shrink:0;">
+      <div style="font-size:11px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">📜 Legal Opinion Drafter</div>
+      <div style="font-size:11px;color:var(--slate);margin-bottom:10px;">Describe the legal question → AI drafts complete structured legal opinion (Question of Law → Provisions → Analysis → Opinion)</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <button class="rcatb" onclick="opinionEx(this)">Can company give loan to wholly owned subsidiary?</button>
+        <button class="rcatb" onclick="opinionEx(this)">Is this transaction a related party transaction?</button>
+        <button class="rcatb" onclick="opinionEx(this)">Does this company need secretarial audit?</button>
+        <button class="rcatb" onclick="opinionEx(this)">Can private company accept deposits from directors?</button>
+        <button class="rcatb" onclick="opinionEx(this)">Is special resolution required for this change?</button>
+        <button class="rcatb" onclick="opinionEx(this)">Does this qualify as a material subsidiary?</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <input id="opinion-re" placeholder="RE: (Subject of Opinion)" style="flex:1;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 13px;font-size:12px;outline:none;">
+        <select id="opinion-format" style="background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 12px;font-size:12px;outline:none;">
+          <option value="full">Full Formal Opinion</option>
+          <option value="short">Short Note / Memo</option>
+          <option value="checklist">Checklist Format</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <textarea id="opinion-input" placeholder="Describe the facts and the legal question...&#10;E.g.: XYZ Pvt Ltd (paid-up Rs.8 Crore) wants to give an interest-free loan of Rs.50 Lakh to its wholly-owned subsidiary ABC Pvt Ltd for working capital purposes. The parent company has no outstanding bank loans. Please advise whether this is permissible and what procedure to follow." style="flex:1;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 13px;font-size:12px;outline:none;resize:none;min-height:70px;font-family:inherit;box-sizing:border-box;"></textarea>
+        <button onclick="runOpinion()" style="background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);font-weight:700;font-size:13px;border:none;border-radius:9px;padding:0 16px;cursor:pointer;align-self:flex-end;">Draft Opinion</button>
+      </div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:14px 16px;" id="opinion-out">
+      <div style="text-align:center;padding:40px 20px;color:var(--slate);">
+        <div style="font-size:36px;margin-bottom:10px;">📜</div>
+        <div style="font-size:14px;font-weight:600;color:var(--slate2);margin-bottom:8px;">Legal Opinion Drafter</div>
+        <div style="font-size:12px;line-height:1.9;">Describe the facts and legal question above<br>AI drafts complete structured legal opinion with analysis, provisions, and clear conclusion</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="panel" id="p-admin">
   <div class="ps" id="adminpanel" style="max-width:600px;margin:0 auto;padding:16px;">
     <div style="background:linear-gradient(135deg,var(--ink3),var(--ink4));border:1px solid var(--ink4);border-radius:14px;padding:20px;margin-bottom:16px;">
@@ -629,6 +848,7 @@ function updateMode() {
   if (penaltyTab) penaltyTab.style.display = '';
   var trackerTab = document.getElementById('t-tracker');
   if (trackerTab) trackerTab.style.display = '';
+  ['t-xlaw','t-scn','t-cases','t-compound','t-deeplaw','t-opinion'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display='';});
 }
 
 // ── ADMIN FUNCTIONS ──
@@ -2310,6 +2530,177 @@ function getCurated(src){
   if(src==='mca'||src==='mca-rules')return D.filter(function(c){return c.source==='MCA';});
   if(src==='sebi'||src==='sebi-reg'||src==='sebi-orders')return D.filter(function(c){return c.source==='SEBI';});
   return D;
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// SHARED AI HELPER FOR NEW FEATURES
+// ═══════════════════════════════════════════════════════════════
+
+async function aiCall(systemPrompt, userPrompt, outputId, loadingMsg) {
+  var outEl = document.getElementById(outputId);
+  outEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--slate);"><div class="dots"><span></span><span></span><span></span></div><div style="margin-top:12px;font-size:13px;color:var(--slate2);">' + loadingMsg + '</div></div>';
+  try {
+    var GROQ_KEY = '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';
+    var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + GROQ_KEY},
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [{role: 'system', content: systemPrompt}, {role: 'user', content: userPrompt}],
+        max_tokens: 4000,
+        temperature: 0.15
+      })
+    });
+    var data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    var text = data.choices[0].message.content;
+    return text;
+  } catch(e) {
+    outEl.innerHTML = '<div style="color:var(--red);padding:20px;font-size:13px;">&#9888; Error: ' + e.message + '</div>';
+    return null;
+  }
+}
+
+function renderAIOut(text, outputId, title, subtitle) {
+  var outEl = document.getElementById(outputId);
+  outEl.innerHTML = '<div class="resbody">' +
+    '<div class="reshead">' +
+      '<div><div style="font-family:Georgia,serif;font-size:14px;color:var(--gold2);">' + title + '</div>' +
+      '<div style="font-size:11px;color:var(--slate);">' + subtitle + '</div></div>' +
+      '<button class="rescopy" onclick="copyEl(\'' + outputId + '-content\')">&#128203; Copy</button>' +
+    '</div>' +
+    '<div class="rescontent" id="' + outputId + '-content">' + formatAI(text) + '</div>' +
+  '</div>';
+}
+
+function copyEl(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  navigator.clipboard.writeText(el.innerText).then(function() {
+    document.querySelectorAll('.rescopy').forEach(function(b) { b.textContent = 'Copied!'; });
+    setTimeout(function() { document.querySelectorAll('.rescopy').forEach(function(b) { b.textContent = '📋 Copy'; }); }, 2000);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 1. CROSS-LAW IMPACT ANALYSER
+// ═══════════════════════════════════════════════════════════════
+function xlawEx(btn) { document.getElementById('xlaw-input').value = btn.textContent.trim(); runXLaw(); }
+
+async function runXLaw() {
+  var action = document.getElementById('xlaw-input').value.trim();
+  if (!action) { alert('Please describe the corporate action.'); return; }
+
+  var SYS = 'You are India\'s leading corporate law expert (FCS + CA + Lawyer combined). When given a corporate action, analyse its COMPLETE legal impact across ALL applicable laws. Your analysis must be exhaustive and practical.';
+
+  var prompt = 'A company wants to: ' + action + '\n\nProvide a COMPLETE cross-law impact analysis in this exact structure:\n\n## CORPORATE ACTION\nBrief description of what is being done.\n\n## COMPANIES ACT 2013 IMPACT\n- Required resolutions (Board/Ordinary/Special)\n- Forms to file and deadlines\n- Section references\n- Restrictions or conditions\n\n## SEBI / LODR IMPACT (if listed company)\n- Disclosures required\n- Regulations triggered\n- Timelines\n\n## FEMA / RBI IMPACT (if foreign element)\n- Approvals needed\n- Forms to file\n- Timelines\n\n## INCOME TAX IMPACT\n- Tax implications\n- TDS if applicable\n- Section 56(2) or other provisions\n\n## STAMP DUTY IMPACT\n- Instruments that attract stamp duty\n- Approximate rate (state-wise if different)\n\n## IBC / CREDITOR IMPACT\n- Any impact on existing creditors or charges\n- Consent needed from lenders\n\n## STEP-BY-STEP COMPLETE PROCEDURE\nNumbered checklist of every step to be done, in order, with timelines.\n\n## COMMON MISTAKES TO AVOID\nTop 3-5 mistakes companies make in this transaction.\n\nBe exhaustive. This should be everything a CS needs to execute this transaction correctly.';
+
+  var text = await aiCall(SYS, prompt, 'xlaw-out', 'Analysing cross-law impact...');
+  if (text) renderAIOut(text, 'xlaw-out', 'Cross-Law Impact Analysis', action);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 2. SCN REPLY DRAFTER
+// ═══════════════════════════════════════════════════════════════
+function scnEx(btn) { document.getElementById('scn-input').value = btn.textContent.trim(); }
+
+async function runSCN() {
+  var desc = document.getElementById('scn-input').value.trim();
+  var issuer = document.getElementById('scn-issuer').value;
+  var withCompound = document.getElementById('scn-compounding').value === 'yes';
+  if (!desc) { alert('Please describe the SCN / violation.'); return; }
+
+  var SYS = 'You are an expert Indian company secretary and corporate lawyer specialising in ROC adjudication, SEBI enforcement, and NCLT proceedings. Draft complete, legally sound replies to show cause notices with proper legal grounds, cited provisions, and practical mitigation arguments.';
+
+  var prompt = 'Draft a complete reply to a Show Cause Notice from ' + issuer + '.\n\nFacts: ' + desc + '\n\nDraft the reply in this structure:\n\n## REPLY TO SHOW CAUSE NOTICE\n\n**To:** The [' + issuer + ']\n**Subject:** Reply to SCN dated [DATE] in respect of [VIOLATION]\n\n## PRELIMINARY SUBMISSIONS\n(Jurisdiction, standing, procedural compliance)\n\n## FACTS OF THE CASE\n(Company background, what happened, timeline)\n\n## GROUNDS OF DEFENCE\n1. [Ground 1 with legal basis]\n2. [Ground 2 with legal basis]\n3. [Ground 3 — mitigating circumstances]\n\n## APPLICABLE LEGAL PROVISIONS\n(Exact sections, rules, circulars — with proper citation)\n\n## CASE LAW IN SUPPORT\n(Cite 3-5 relevant NCLT/NCLAT/HC/SC decisions that support the defence)\n\n## PENALTY CALCULATION (if applicable)\n(Show how penalty should be calculated if not fully defended)\n\n' + (withCompound ? '## COMPOUNDING APPLICATION (Sec 441)\n(Why compounding should be permitted, amount, jurisdiction — RD or NCLT)\n\n## DOCUMENTS TO ENCLOSE FOR COMPOUNDING\n(List all documents needed)\n\n' : '') + '## PRAYER\n(Specific relief requested)\n\n## DOCUMENTS ENCLOSED\n(Checklist of supporting documents)\n\nLeave [COMPANY NAME], [CIN], [DATE], [DIRECTOR NAME] as placeholders.';
+
+  var text = await aiCall(SYS, prompt, 'scn-out', 'Drafting SCN reply with legal grounds...');
+  if (text) renderAIOut(text, 'scn-out', 'Reply to Show Cause Notice', issuer + ' — ' + desc.slice(0,60) + '...');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 3. NCLT / NCLAT CASE FINDER
+// ═══════════════════════════════════════════════════════════════
+function caseEx(btn) { document.getElementById('cases-input').value = btn.textContent.trim(); runCases(); }
+
+async function runCases() {
+  var query = document.getElementById('cases-input').value.trim();
+  var forum = document.getElementById('cases-forum').value;
+  if (!query) { alert('Please enter a topic to search.'); return; }
+
+  var SYS = 'You are India\'s leading corporate law case database. You know all significant NCLT, NCLAT, SAT, High Court, and Supreme Court decisions on Companies Act, SEBI, and IBC matters. Present cases accurately with citations and explain their practical significance.';
+
+  var forumNote = forum === 'all' ? 'all Indian tribunals and courts (NCLT, NCLAT, SAT, High Courts, Supreme Court)' : forum;
+
+  var prompt = 'Find and explain significant judicial decisions from ' + forumNote + ' on the topic: ' + query + '\n\nFor each case provide:\n\n**Case Name:** [Full citation]\n**Forum:** [NCLT/NCLAT/SAT/HC/SC]\n**Year:** [Year]\n**Facts:** [2-3 sentences — what happened]\n**Decision:** [What the court/tribunal decided]\n**Key Ratio/Principle:** [The legal principle established]\n**Practical Significance:** [What this means for companies/CS professionals]\n**Impact on Compliance:** [How this changes/clarifies compliance practice]\n\n---\n\nProvide at least 5-8 relevant cases. Include both company-favorable and regulator-favorable decisions for a complete picture. If a case is very recent (2024-2026), note it as particularly important. Include the exact paragraph numbers or section of judgment where the key ratio appears if known.';
+
+  var text = await aiCall(SYS, prompt, 'cases-out', 'Searching tribunal decisions...');
+  if (text) renderAIOut(text, 'cases-out', 'Case Law Analysis', query + (forum !== 'all' ? ' · ' + forum : ''));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 4. COMPOUNDING APPLICATION DRAFTER
+// ═══════════════════════════════════════════════════════════════
+function compoundEx(btn) { document.getElementById('compound-input').value = btn.textContent.trim(); }
+
+async function runCompound() {
+  var desc = document.getElementById('compound-input').value.trim();
+  var company = document.getElementById('compound-company').value.trim() || '[COMPANY NAME]';
+  var cin = document.getElementById('compound-cin').value.trim() || '[CIN]';
+  var coType = document.getElementById('compound-type').value;
+  if (!desc) { alert('Please describe the default/violation.'); return; }
+
+  var coTypeLabel = {pvt:'Private Limited', pub:'Public Unlisted', listed:'Listed Company', small:'Small Company'}[coType] || coType;
+
+  var SYS = 'You are an expert in Indian corporate law specialising in compounding applications under Section 441 of Companies Act 2013. Draft complete, legally sound compounding applications that address all requirements of the adjudicating authority.';
+
+  var prompt = 'Draft a complete Compounding Application under Section 441 of the Companies Act 2013.\n\nDetails:\n- Company: ' + company + ' (CIN: ' + cin + ')\n- Type: ' + coTypeLabel + '\n- Default/Violation: ' + desc + '\n\nDraft in this exact structure:\n\n## APPLICATION FOR COMPOUNDING OF OFFENCE\n**Under Section 441 of the Companies Act, 2013**\n\n**To,**\n**The Registrar of Companies / Regional Director / NCLT**\n[Appropriate jurisdiction based on offence]\n\n## DETAILS OF APPLICANT\n(Company details, CIN, registered office, paid-up capital, directors)\n\n## NATURE OF OFFENCE\n(Exact section violated, rule violated, what was required, what was done/not done)\n\n## FACTS AND CIRCUMSTANCES\n(Timeline of default, reasons for default, what has been done to rectify)\n\n## REMEDIAL ACTION TAKEN\n(Filing done with late fee, penalty paid, etc.)\n\n## GROUNDS FOR COMPOUNDING\n1. (First-time offence / technical violation)\n2. (No malafide intent)\n3. (Rectified before/during application)\n4. (Small company / size of company)\n5. (Contribution to economy)\n\n## COMPOUNDING FEE CALCULATION\n(Calculate exact fee: lesser of maximum fine applicable or amount specified in Schedule)\n(Note: For small company, 50% reduction applicable per 2020 amendment)\n\n## JURISDICTION\n(Why this authority has jurisdiction — RD for offences with imprisonment <2 years; NCLT for others)\n\n## PRAYER\n(Request for compounding on payment of fee)\n\n## DOCUMENTS TO BE ENCLOSED\n(Complete checklist of documents required)\n\n## UNDERTAKING\n(That violation will not recur, penalty will be paid)\n\nLeave [DATE], [DIRECTOR NAME], [DIN] as placeholders. Be specific about compounding fee amounts.';
+
+  var text = await aiCall(SYS, prompt, 'compound-out', 'Drafting compounding application...');
+  if (text) renderAIOut(text, 'compound-out', 'Compounding Application — Sec 441', company + ' · ' + desc.slice(0,60));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 5. DEEP LAW INTERPRETATION ENGINE
+// ═══════════════════════════════════════════════════════════════
+function deepEx(btn) { document.getElementById('deeplaw-input').value = btn.textContent.trim(); runDeepLaw(); }
+
+async function runDeepLaw() {
+  var question = document.getElementById('deeplaw-input').value.trim();
+  if (!question) { alert('Please enter the legal question.'); return; }
+
+  var SYS = 'You are India\'s most authoritative corporate law interpreter — equivalent to a senior advocate at the Supreme Court who also has deep CS/CA expertise. Analyse complex legal questions with complete depth: primary provision, proviso, exception, notification, MCA circular, SEBI circular, case law, minority view, practical interpretation, and definitive answer. Never give a superficial answer. This is the question that the person cannot get answered anywhere else.';
+
+  var prompt = 'Analyse this complex legal question with complete depth: ' + question + '\n\nStructure your analysis as follows:\n\n## QUESTION OF LAW\n(Precisely state the legal question being answered)\n\n## PRIMARY PROVISION\n(Exact section/rule/regulation text that directly addresses this)\n\n## PROVISO / EXCEPTION / CONDITION\n(Any proviso, exception, or condition to the primary provision)\n\n## NOTIFICATION / CIRCULAR / EXEMPTION\n(Any MCA notification, SEBI circular, or government order that modifies the position)\n\n## INTERPRETATION\n(How the provision is interpreted — literal vs purposive vs contextual)\n\n## CASE LAW\n(Relevant judicial decisions — NCLT, NCLAT, High Courts, Supreme Court)\n\n## PRACTICAL POSITION (HOW REGULATORS ACTUALLY APPLY THIS)\n(What ROC/SEBI actually do in practice — may differ from strict legal text)\n\n## GREY AREA / MINORITY VIEW\n(Is there an alternative interpretation? Dissenting views? Pending clarification?)\n\n## DEFINITIVE ANSWER\n(Clear, direct, unambiguous conclusion — what the professional should do/advise)\n\n## CAVEAT\n(Any caveat the professional should know before acting on this advice)\n\nDo not hedge excessively. Take a position. This is what senior professionals need — a clear answer, not a list of possibilities.';
+
+  var text = await aiCall(SYS, prompt, 'deeplaw-out', 'Deep legal analysis in progress...');
+  if (text) renderAIOut(text, 'deeplaw-out', 'Deep Law Analysis', question.slice(0,80) + '...');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 6. LEGAL OPINION DRAFTER
+// ═══════════════════════════════════════════════════════════════
+function opinionEx(btn) { document.getElementById('opinion-input').value = btn.textContent.trim(); }
+
+async function runOpinion() {
+  var facts = document.getElementById('opinion-input').value.trim();
+  var re = document.getElementById('opinion-re').value.trim() || 'Legal Opinion';
+  var format = document.getElementById('opinion-format').value;
+  if (!facts) { alert('Please describe the facts and legal question.'); return; }
+
+  var SYS = 'You are a senior Indian company secretary (FCS) and corporate lawyer drafting formal legal opinions for corporate clients. Your opinions are structured, legally precise, cite exact provisions, and give clear actionable conclusions. You write like Vinod Kothari Consultants or Cyril Amarchand Mangaldas — authoritative, precise, practical.';
+
+  var formatNote = format === 'full' ?
+    'Draft a FULL FORMAL LEGAL OPINION in the following structure:\n\n**LEGAL OPINION**\n**RE: ' + re + '**\n\n1. FACTS AND BACKGROUND\n2. QUESTION(S) OF LAW\n3. APPLICABLE STATUTORY PROVISIONS\n4. ANALYSIS\n   4.1 [First issue]\n   4.2 [Second issue, if any]\n5. OPINION\n6. CONDITIONS / LIMITATIONS\n7. DOCUMENTS REQUIRED / PROCEDURAL STEPS\n8. CAVEAT' :
+    format === 'short' ?
+    'Draft a SHORT LEGAL NOTE / MEMO in this structure:\n\n**NOTE ON: ' + re + '**\n\n**Background:** [1 para]\n**Issue:** [Precise question]\n**Applicable Provisions:** [Sections/rules]\n**Analysis:** [Core analysis]\n**Conclusion:** [Clear answer]\n**Action Required:** [Steps to follow]' :
+    'Draft a COMPLIANCE CHECKLIST OPINION in this structure:\n\n**COMPLIANCE CHECKLIST: ' + re + '**\n\n**Legal Position:** [Summary]\n\n**Required Actions:**\n☐ [Step 1]\n☐ [Step 2]\n[etc.]\n\n**Documents Required:**\n☐ [Doc 1]\n[etc.]\n\n**Timelines:**\n[Timeline summary]\n\n**Penalty for Non-Compliance:**\n[Penalty]';
+
+  var prompt = 'Facts and question: ' + facts + '\n\n' + formatNote + '\n\nUse exact section numbers. Cite recent amendments up to 2026. Leave [COMPANY NAME], [DATE] as placeholders. Conclude with a definitive answer.';
+
+  var text = await aiCall(SYS, prompt, 'opinion-out', 'Drafting legal opinion...');
+  if (text) renderAIOut(text, 'opinion-out', 'Legal Opinion', 'RE: ' + re);
 }
 
 </script>
