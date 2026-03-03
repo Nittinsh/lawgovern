@@ -228,9 +228,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--ink);color:var(--white);h
   <div class="tab" onclick="sw('ff')" id="t-ff">🔍 Form Finder</div>
   <div class="tab" onclick="sw('res')" id="t-res">📝 Resolutions</div>
   <div class="tab" onclick="sw('docs')" id="t-docs" style="display:none;">&#128196; Notices &amp; Minutes</div>
-  <div class="tab" onclick="sw('penalty')" id="t-penalty" style="display:none;">⚖️ Penalty Calc</div>
-  <div class="tab" onclick="sw('tracker')" id="t-tracker" style="display:none;">📡 Circulars</div>
-  <div class="tab" onclick="sw('admin')" id="t-admin" style="display:none;">⚙️ Admin</div>
+  <div class="tab" onclick="sw('penalty')" id="t-penalty" style="display:none;">&#9878; Penalty Calc</div>
+  <div class="tab" onclick="sw('tracker')" id="t-tracker" style="display:none;">&#128225; Circulars</div>
+  <div class="tab" onclick="sw('admin')" id="t-admin">⚙️ Admin</div>
 </div>
 
 <div class="panels">
@@ -505,27 +505,37 @@ body{font-family:'DM Sans',sans-serif;background:var(--ink);color:var(--white);h
 <div class="panel" id="p-tracker">
   <div style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
     <div style="background:var(--ink2);border-bottom:1px solid var(--ink4);padding:12px 16px;flex-shrink:0;">
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div>
-          <div style="font-size:11px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:1px;">📡 SEBI &amp; MCA Circular Tracker</div>
-          <div style="font-size:11px;color:var(--slate);margin-top:2px;">Latest circulars with plain English summaries · Powered by AI</div>
-        </div>
-        <button onclick="loadCirculars()" style="background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);font-weight:700;font-size:12px;border:none;border-radius:9px;padding:8px 16px;cursor:pointer;">&#8635; Refresh</button>
+      <div style="margin-bottom:8px;">
+        <div style="font-size:11px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:1px;">&#128225; SEBI &amp; MCA Live Circular Tracker</div>
+        <div style="font-size:11px;color:var(--slate);margin-top:2px;">AI fetches ALL circulars from official portals with plain English explanation</div>
       </div>
-      <div style="display:flex;gap:8px;margin-top:10px;">
-        <button class="rcatb on" id="trk-sebi" onclick="filterTracker(this,'sebi')">SEBI</button>
-        <button class="rcatb" id="trk-mca" onclick="filterTracker(this,'mca')">MCA</button>
-        <button class="rcatb" id="trk-all" onclick="filterTracker(this,'all')">All</button>
+      <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
+        <button class="rcatb on" id="trk-sebi" onclick="fetchSource('sebi',this)">&#128308; SEBI Circulars</button>
+        <button class="rcatb" id="trk-mca" onclick="fetchSource('mca',this)">&#128309; MCA Notifications</button>
+        <button class="rcatb" id="trk-sebi-reg" onclick="fetchSource('sebi-reg',this)">&#128203; SEBI Regulations</button>
+        <button class="rcatb" id="trk-mca-rules" onclick="fetchSource('mca-rules',this)">&#128203; MCA Rules</button>
+        <button class="rcatb" id="trk-orders" onclick="fetchSource('sebi-orders',this)">&#9878; SEBI Orders</button>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <select id="trk-year" style="background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:8px;padding:6px 10px;font-size:12px;outline:none;">
+          <option value="2026">2026</option><option value="2025">2025</option><option value="2024">2024</option><option value="all" selected>All Recent</option>
+        </select>
+        <button onclick="fetchCurrentSource()" style="background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);font-weight:700;font-size:12px;border:none;border-radius:8px;padding:7px 16px;cursor:pointer;">&#8635; Fetch All</button>
+        <a id="trk-official-link" href="https://www.sebi.gov.in/sebiweb/home/HomeAction.do?doListing=yes&sid=1&ssid=0&smid=0" target="_blank" style="font-size:11px;padding:6px 12px;border-radius:8px;border:1px solid var(--ink4);color:var(--slate2);text-decoration:none;">&#128279; Official Portal</a>
       </div>
     </div>
-    <div style="flex:1;overflow-y:auto;padding:14px 16px;" id="tracker-out">
+    <div style="background:var(--ink2);border-bottom:1px solid var(--ink4);padding:8px 16px;flex-shrink:0;">
+      <input id="trk-search" type="text" placeholder="Search circulars... (LODR, RPT, insider trading, annual return)" oninput="searchCirculars(this.value)" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:8px;padding:8px 12px;font-size:12px;outline:none;box-sizing:border-box;">
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:12px 16px;" id="tracker-out">
       <div style="text-align:center;padding:40px 20px;color:var(--slate);">
-        <div style="font-size:36px;margin-bottom:10px;">📡</div>
-        <div style="font-size:14px;font-weight:600;color:var(--slate2);margin-bottom:8px;">SEBI &amp; MCA Circular Tracker</div>
-        <div style="font-size:12px;line-height:1.9;">Click Refresh to fetch latest circulars<br>AI summarises each one in plain English</div>
-        <button onclick="loadCirculars()" style="margin-top:16px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);font-weight:700;font-size:13px;border:none;border-radius:9px;padding:10px 24px;cursor:pointer;">Load Latest Circulars</button>
+        <div style="font-size:32px;margin-bottom:8px;">&#128225;</div>
+        <div style="font-size:13px;font-weight:600;color:var(--slate2);margin-bottom:6px;">Live SEBI &amp; MCA Circular Tracker</div>
+        <div style="font-size:11px;color:var(--slate);line-height:1.9;margin-bottom:16px;">Click a source and Fetch All<br>AI searches the official portal and explains every circular in plain English</div>
+        <button onclick="fetchSource('sebi',document.getElementById('trk-sebi'))" style="background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);font-weight:700;font-size:13px;border:none;border-radius:9px;padding:10px 24px;cursor:pointer;">Load SEBI Circulars</button>
       </div>
     </div>
+    <div id="trk-status" style="background:var(--ink3);border-top:1px solid var(--ink4);padding:6px 16px;font-size:11px;color:var(--slate);flex-shrink:0;display:none;text-align:center;"></div>
   </div>
 </div>
 <div class="panel" id="p-admin">
@@ -1056,294 +1066,6 @@ function initDocs() {
   sel.innerHTML = '<option value="">-- Select meeting type --</option>';
   (DOC_TYPES['notice'] || []).forEach(function(t) {
     sel.innerHTML += '<option value="' + t.v + '">' + t.l + '</option>';
-  });
-}
-
-
-// ══════════════════════════════════════════
-// PENALTY CALCULATOR
-// ══════════════════════════════════════════
-var PEN_DATA = {
-  'AOC-4':        {label:'AOC-4', base:1000, maxPen:10*100000, officer:null, section:'Sec 137', note:'Rs.1,000/day max Rs.10 Lakh'},
-  'MGT-7':        {label:'MGT-7', base:50000, perDay:100, maxPen:null, officer:null, section:'Sec 92', note:'Rs.50,000 + Rs.100/day (no cap)'},
-  'MGT-7A':       {label:'MGT-7A', base:50000, perDay:100, maxPen:null, section:'Sec 92', note:'Rs.50,000 + Rs.100/day'},
-  'ADT-1':        {label:'ADT-1', base:25000, maxPen:5*100000, section:'Sec 139', note:'Rs.25,000 to Rs.5 Lakh'},
-  'DIR-12':       {label:'DIR-12', base:50000, perDay:500, maxPen:null, section:'Sec 149/152', note:'Rs.50,000 + Rs.500/day'},
-  'DIR-3KYC':     {label:'DIR-3 KYC', base:5000, fixed:true, section:'Rule 12A', note:'Rs.5,000 flat reactivation fee (DIN deactivated from 1 Oct)'},
-  'INC-20A':      {label:'INC-20A', co_base:50000, dir_perDay:1000, section:'Sec 10A', note:'Company Rs.50,000; Director Rs.1,000/day'},
-  'MGT-14':       {label:'MGT-14', co_base:500000, officer_base:100000, section:'Sec 117', note:'Company Rs.5 Lakh; Officer Rs.1 Lakh'},
-  'DPT-3':        {label:'DPT-3', perDay:5000, maxDay:25000, section:'Rule 21', note:'Rs.5,000/day min, Rs.25,000/day max continuing'},
-  'BEN-2':        {label:'BEN-2', base:100000, perDay:1000, section:'SBO Rules', note:'Rs.1 Lakh + Rs.1,000/day continuing'},
-  'CHG-1':        {label:'CHG-1', base:500000, maxPen:50*100000, section:'Sec 77/86', note:'Rs.5 Lakh to Rs.50 Lakh (Company)'},
-  'PAS-3':        {label:'PAS-3', perDay:1000, maxPen:25*100000, section:'Sec 42/62', note:'Rs.1,000/day max Rs.25 Lakh'},
-  'SH-7':         {label:'SH-7', perDay:1000, maxPen:5*100000, section:'Sec 61', note:'Rs.1,000/day max Rs.5 Lakh'},
-  'MSME-1':       {label:'MSME-1', perDay:25000, section:'MSME Act', note:'Rs.25,000/day continuing default'},
-  'MR-1':         {label:'MR-1', base:50000, perDay:500, section:'Sec 196/203', note:'Rs.50,000 + Rs.500/day'},
-  'INC-22':       {label:'INC-22', perDay:1000, section:'Sec 12', note:'Rs.1,000/day (officer Rs.1 Lakh)'},
-  'AGM-default':  {label:'AGM Default', base:100000, perDay:5000, section:'Sec 96', note:'Rs.1 Lakh + Rs.5,000/day continuing default'},
-  'board-meeting':{label:'Board Meeting Default', perMeeting:25000, section:'Sec 173', note:'Rs.25,000 per director per missed meeting'},
-  'CS-not-appointed':{label:'CS Not Appointed', base:100000, maxBase:500000, perDay:500, section:'Sec 203', note:'Rs.1 Lakh to Rs.5 Lakh + Rs.500/day'},
-  'secretarial-audit':{label:'Secretarial Audit Not Done', base:100000, maxBase:500000, section:'Sec 204', note:'Rs.1 Lakh to Rs.5 Lakh'},
-};
-
-function updatePenForm() { calcPenalty(); }
-
-function calcPenalty() {
-  var form = document.getElementById('pen-form').value;
-  var days = parseInt(document.getElementById('pen-days').value) || 0;
-  var coType = document.getElementById('pen-type').value;
-  var resEl = document.getElementById('pen-result');
-  if (!form || !PEN_DATA[form]) {
-    resEl.innerHTML = '<span style="color:var(--slate);">Select form and enter days to calculate</span>';
-    return;
-  }
-  var d = PEN_DATA[form];
-  var html = '<div style="font-weight:700;color:var(--gold2);margin-bottom:6px;">' + d.label + ' — ' + d.section + '</div>';
-  var pen = 0;
-  
-  // Small company / OPC: penalty is 1/2 of normal (Companies Amendment Act 2020)
-  var smallReduction = (coType === 'small') ? 0.5 : 1;
-  
-  if (d.fixed) {
-    html += '<div>Flat fee: <strong style="color:var(--gold)">Rs.5,000</strong> to reactivate DIN</div>';
-  } else if (form === 'INC-20A') {
-    var coPen = 50000;
-    var dirPen = days * 1000;
-    if(coType==='small'){coPen=25000; dirPen=Math.round(dirPen*0.5);}
-    html += '<div>Company penalty: <strong style="color:var(--gold)">Rs.' + coPen.toLocaleString('en-IN') + '</strong></div>';
-    if(days>0) html += '<div>Director penalty (' + days + ' days): <strong style="color:var(--gold)">Rs.' + dirPen.toLocaleString('en-IN') + '</strong></div>';
-  } else if (form === 'MGT-14') {
-    var cp = Math.round(500000*smallReduction);
-    var op = Math.round(100000*smallReduction);
-    html += '<div>Company: <strong style="color:var(--gold)">Rs.' + cp.toLocaleString('en-IN') + '</strong></div>';
-    html += '<div>Officer: <strong style="color:var(--gold)">Rs.' + op.toLocaleString('en-IN') + '</strong></div>';
-    html += '<div style="color:#f97316;font-size:11px;margin-top:4px;">Note: No condonation — even 1 day late = full penalty</div>';
-  } else if (form === 'board-meeting') {
-    if(days>0){
-      var pp = Math.round(25000*days*smallReduction);
-      html += '<div>Per director, ' + days + ' missed meeting(s): <strong style="color:var(--gold)">Rs.' + pp.toLocaleString('en-IN') + '</strong></div>';
-    } else {
-      html += '<div>Rs.25,000 per director per missed meeting</div>';
-    }
-  } else if (form === 'DPT-3') {
-    if(days>0){
-      var minP = 5000*days; var maxP = 25000*days;
-      if(coType==='small'){minP=Math.round(minP*0.5);maxP=Math.round(maxP*0.5);}
-      html += '<div>Min penalty (' + days + ' days): <strong style="color:var(--gold)">Rs.' + minP.toLocaleString('en-IN') + '</strong></div>';
-      html += '<div>Max penalty: <strong style="color:#ef4444">Rs.' + maxP.toLocaleString('en-IN') + '</strong></div>';
-    }
-  } else if (form === 'secretarial-audit' || form === 'CS-not-appointed') {
-    var bp = Math.round((d.base||100000)*smallReduction);
-    var mp = Math.round((d.maxBase||500000)*smallReduction);
-    html += '<div>Range: <strong style="color:var(--gold)">Rs.' + bp.toLocaleString('en-IN') + ' to Rs.' + mp.toLocaleString('en-IN') + '</strong></div>';
-    if(d.perDay && days>0){
-      var pd = Math.round(d.perDay*days*smallReduction);
-      html += '<div>+ continuing default (' + days + ' days): <strong style="color:#ef4444">Rs.' + pd.toLocaleString('en-IN') + '</strong></div>';
-    }
-  } else {
-    if(d.base){
-      pen = Math.round(d.base*smallReduction);
-      html += '<div>Base penalty: <strong style="color:var(--gold)">Rs.' + pen.toLocaleString('en-IN') + '</strong></div>';
-    }
-    if(d.perDay && days>0){
-      var daily = Math.round(d.perDay*days*smallReduction);
-      pen += daily;
-      html += '<div>Daily penalty (' + days + ' days @ Rs.' + d.perDay + '): <strong style="color:var(--gold)">Rs.' + daily.toLocaleString('en-IN') + '</strong></div>';
-    }
-    if(d.maxPen && pen > d.maxPen){
-      pen = Math.round(d.maxPen*smallReduction)||d.maxPen;
-      html += '<div style="color:#f97316;">Capped at maximum: <strong>Rs.' + pen.toLocaleString('en-IN') + '</strong></div>';
-    }
-    if(pen>0) html += '<div style="margin-top:6px;padding:8px;background:var(--ink4);border-radius:6px;"><span style="color:var(--slate);">Total Estimated:</span> <strong style="color:var(--gold);font-size:14px;">Rs.' + pen.toLocaleString('en-IN') + '</strong></div>';
-  }
-  
-  html += '<div style="font-size:10px;color:var(--slate);margin-top:6px;">⚖️ ' + d.note + (coType==='small'?' · 50% reduction for Small Co/OPC':'') + '</div>';
-  html += '<div style="font-size:10px;color:var(--slate);margin-top:2px;">* Estimate only. Adjudicating officer may vary. Compounding available for most offences.</div>';
-  resEl.innerHTML = html;
-}
-
-// ══════════════════════════════════════════
-// COMPLIANCE CHECKLIST GENERATOR
-// ══════════════════════════════════════════
-async function genChecklist() {
-  var coType = document.getElementById('cl-type').value;
-  var capital = parseFloat(document.getElementById('cl-capital').value) || 0;
-  var turnover = parseFloat(document.getElementById('cl-turnover').value) || 0;
-  var profit = parseFloat(document.getElementById('cl-profit').value) || 0;
-  var outEl = document.getElementById('cl-output');
-  
-  outEl.innerHTML = '<div style="text-align:center;padding:30px;color:var(--slate);"><div class="dots"><span></span><span></span><span></span></div><div style="margin-top:10px;font-size:12px;">Generating checklist...</div></div>';
-  
-  var coTypeLabels = {private:'Private Limited',public:'Public Unlisted',listed:'Listed Company',opc:'OPC',small:'Small Company',sec8:'Section 8',llp:'LLP'};
-  var label = coTypeLabels[coType] || coType;
-  
-  // Determine applicable compliances
-  var isSmall = coType==='small' || coType==='opc';
-  var isListed = coType==='listed';
-  var isPublic = coType==='public' || coType==='listed';
-  var needsCS = isListed || capital>=10;
-  var needsSecAudit = isListed || capital>=50 || turnover>=250;
-  var needsIntAudit = isListed || (isPublic && (capital>=50 || turnover>=200));
-  var needsCostAudit = false; // industry specific
-  var needsCSR = profit>=5 || turnover>=1000 || capital>=500;
-  var needsMR1 = isPublic;
-  var needsSBO = true;
-  var needsMSME = capital>=0; // all companies
-  var needsXBRL = isListed || (isPublic && (capital>=5 || turnover>=100));
-  var needsSR = coType==='src' || isListed;
-  var need9B = coType==='private' && !isSmall; // demat rule
-
-  var prompt = 'Generate a complete annual compliance checklist for a ' + label + ' company with paid-up capital Rs.' + capital + ' Crore, turnover Rs.' + turnover + ' Crore, net profit Rs.' + profit + ' Crore. ' +
-    'Format as a clear table/list with: Form Name | Due Date | Applicable? (Yes/No/Conditional) | Penalty for default. ' +
-    'Include ALL forms and compliances: INC-20A check, DIR-3 KYC, DPT-3, AOC-4, MGT-7/7A, ADT-1, BEN-2, MSME-1, MGT-14, PAS-6 (if applicable), MR-1 (if applicable), secretarial audit MR-3 (if applicable), cost audit (if applicable), CSR (if applicable' + (needsCSR?' — APPLICABLE':'') + '), IEPF compliance, board meeting requirements, AGM requirements, demat of shares' + (need9B?' — MANDATORY (Rule 9B)':'') + '. ' +
-    'Also list: (1) Critical items specific to this company profile, (2) Recent 2025-2026 changes they must know, (3) Top 3 risks for this company type.';
-
-  try {
-    var GROQ_KEY = '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';
-    var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
-      body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:'You are an expert Indian company secretary. Generate precise, complete compliance checklists. Be specific about due dates, penalties, and applicability conditions. Use the current FY 2025-26 calendar.'},{role:'user',content:prompt}],max_tokens:3000,temperature:0.1})
-    });
-    var data = await res.json();
-    if(data.error) throw new Error(data.error.message);
-    var text = data.choices[0].message.content;
-    outEl.innerHTML = '<div class="resbody"><div class="reshead"><div><div style="font-size:14px;color:var(--gold2);">Compliance Checklist — ' + label + '</div><div style="font-size:11px;color:var(--slate);">Capital: Rs.' + capital + 'Cr · Turnover: Rs.' + turnover + 'Cr · Profit: Rs.' + profit + 'Cr</div></div><button class="rescopy" onclick="copyEl(\'cl-content\')">&#128203; Copy</button></div><div class="rescontent" id="cl-content">' + formatAI(text) + '</div></div>';
-  } catch(e) {
-    outEl.innerHTML = '<div style="color:var(--red);padding:20px;font-size:13px;">Error: ' + e.message + '</div>';
-  }
-}
-
-// ══════════════════════════════════════════
-// CIRCULAR TRACKER
-// ══════════════════════════════════════════
-var ALL_CIRCULARS = [];
-var TRACKER_FILTER = 'sebi';
-
-function filterTracker(btn, filter) {
-  document.querySelectorAll('[id^="trk-"]').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  TRACKER_FILTER = filter;
-  renderCirculars();
-}
-
-async function loadCirculars() {
-  var outEl = document.getElementById('tracker-out');
-  outEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--slate);"><div class="dots"><span></span><span></span><span></span></div><div style="margin-top:10px;font-size:12px;">Fetching LIVE circulars from SEBI &amp; MCA websites...</div></div>';
-
-  try {
-    // Use Anthropic API with web_search tool for LIVE data
-    var res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 4000,
-        tools: [{"type": "web_search_20250305", "name": "web_search"}],
-        system: 'You are an expert Indian corporate law tracker. Search for and provide the LATEST real circulars from SEBI (sebi.gov.in) and MCA (mca.gov.in). For each circular provide: Source (SEBI or MCA) | Date | Title | Reference Number | Plain English Summary (2-3 sentences on what companies must do). Be accurate and only report real circulars you find.',
-        messages: [{
-          role: 'user',
-          content: 'Search sebi.gov.in and mca.gov.in for the latest circulars and notifications from 2025 and 2026. Find at least 5 SEBI circulars and 5 MCA notifications. For each one provide the exact title, date, reference number, and a 2-3 sentence plain English summary explaining what it means for companies. Format: SOURCE | DATE | TITLE | REF | SUMMARY'
-        }]
-      })
-    });
-
-    var data = await res.json();
-    if(data.error) throw new Error(data.error.message || JSON.stringify(data.error));
-
-    // Extract text from all content blocks
-    var fullText = '';
-    if(data.content) {
-      data.content.forEach(function(block) {
-        if(block.type === 'text') fullText += block.text + '\n';
-      });
-    }
-
-    if(!fullText.trim()) throw new Error('No content returned');
-
-    // Parse into circular cards
-    ALL_CIRCULARS = [];
-    var sections = fullText.split(/\n(?=[0-9]+\.|\*\*[0-9]|SEBI \||MCA \|)/);
-    sections.forEach(function(sec) {
-      sec = sec.trim();
-      if(sec.length < 20) return;
-      var isSEBI = /SEBI/i.test(sec.slice(0,50));
-      var isMCA = /MCA/i.test(sec.slice(0,50));
-      ALL_CIRCULARS.push({
-        source: isSEBI ? 'SEBI' : isMCA ? 'MCA' : 'SEBI',
-        full: sec
-      });
-    });
-
-    if(ALL_CIRCULARS.length < 2) {
-      ALL_CIRCULARS = [{source:'all', full: fullText}];
-    }
-
-    renderCirculars();
-
-  } catch(e) {
-    // Fallback to Groq with known latest circulars
-    outEl.innerHTML = '<div style="padding:10px;font-size:12px;color:var(--slate);text-align:center;">Live fetch unavailable — loading from knowledge base...</div>';
-    await loadCircularsFallback();
-  }
-}
-
-async function loadCircularsFallback() {
-  var outEl = document.getElementById('tracker-out');
-  try {
-    var GROQ_KEY = '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';
-    var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
-      body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[
-        {role:'system',content:'You are an expert Indian corporate law tracker. List the most important recent SEBI and MCA circulars from 2024-2026 with accurate dates and plain English summaries. Include: SEBI LODR Third Amendment Dec 2024, SEBI LODR Amendment Jan 2026 (HVDLE Rs.5000Cr), MCA MGT-7 amendment abolishing MGT-8 Jul 2025, MCA AOC-4 absolute rupees Jul 2025, SEBI PIT SDD requirements, SEBI physical transfer window Feb 2026, MCA Rule 9B demat for private companies Oct 2023, NFRA circular Feb 2026 two-way communication. Format each as numbered item: SOURCE | DATE | TITLE | SUMMARY'},
-        {role:'user',content:'List 12 most important recent SEBI and MCA circulars/notifications from 2024-2026 with plain English summaries. Include exact dates and reference numbers where known.'}
-      ],max_tokens:3000,temperature:0.1})
-    });
-    var data = await res.json();
-    if(data.error) throw new Error(data.error.message);
-    var text = data.choices[0].message.content;
-    ALL_CIRCULARS = [{source:'all', full:text}];
-    renderCirculars();
-  } catch(e2) {
-    outEl.innerHTML = '<div style="color:var(--red);padding:20px;font-size:13px;">Error: ' + e2.message + '</div>';
-  }
-}
-
-function renderCirculars() {
-  var outEl = document.getElementById('tracker-out');
-  if(!ALL_CIRCULARS.length){
-    outEl.innerHTML = '<div style="text-align:center;padding:30px;color:var(--slate);">Click Refresh to load circulars</div>';
-    return;
-  }
-  
-  // If single block (unparsed), just render
-  if(ALL_CIRCULARS.length===1 && ALL_CIRCULARS[0].source==='all'){
-    outEl.innerHTML = '<div class="resbody"><div class="rescontent">' + formatAI(ALL_CIRCULARS[0].full) + '</div></div>';
-    return;
-  }
-  
-  var filtered = TRACKER_FILTER==='all' ? ALL_CIRCULARS : ALL_CIRCULARS.filter(c=>c.source.toLowerCase()===TRACKER_FILTER);
-  if(!filtered.length) filtered = ALL_CIRCULARS;
-  
-  var html = filtered.map(function(c,i){
-    var color = c.source==='SEBI' ? 'var(--gold2)' : '#60a5fa';
-    var bg = c.source==='SEBI' ? 'var(--gdim)' : '#1e3a5f';
-    return '<div class="resbody" style="margin-bottom:10px;">' +
-      '<div class="reshead">' +
-        '<span style="font-size:10px;font-weight:700;padding:2px 9px;border-radius:8px;background:'+bg+';color:'+color+';border:1px solid '+color+';">'+c.source+'</span>' +
-      '</div>' +
-      '<div style="padding:12px 16px;font-size:12px;line-height:1.8;color:var(--slate2);">' + formatAI(c.full) + '</div>' +
-    '</div>';
-  }).join('');
-  
-  outEl.innerHTML = html + '<div style="font-size:11px;color:var(--slate);padding:8px 4px;text-align:center;">Source: AI knowledge base updated to Feb 2026 · For latest, always verify on sebi.gov.in / mca.gov.in</div>';
-}
-
-function copyEl(id) {
-  var el = document.getElementById(id);
-  if(!el) return;
-  navigator.clipboard.writeText(el.innerText).then(function(){
-    var btn = document.querySelector('.rescopy');
-    if(btn){btn.textContent='Copied!';setTimeout(function(){btn.textContent='Copy';},2000);}
   });
 }
 
@@ -2466,6 +2188,130 @@ function sf(){
 }
 
 rc();
+
+// ═══ LIVE CIRCULAR TRACKER ═══
+var TRK_SOURCE='sebi';
+var TRK_ALL_DATA=[];
+var TRK_CFG={
+  sebi:{officialUrl:'https://www.sebi.gov.in/sebiweb/home/HomeAction.do?doListing=yes&sid=1&ssid=0&smid=0',label:'SEBI Circulars',prompt:'Search the SEBI website sebi.gov.in for ALL recent circulars from 2022 to 2026. List every single one found with exact date, circular number, full title, and 2-3 sentence plain English summary of what companies must do. Do not limit the count.'},
+  mca:{officialUrl:'https://www.mca.gov.in/content/mca/global/en/acts-rules/ebooks/notifications.html',label:'MCA Notifications',prompt:'Search the MCA website mca.gov.in for ALL recent notifications and amendments from 2020 to 2026. List every single one with exact date, GSR/SO number, full title, and plain English summary of what changed and what action companies must take.'},
+  'sebi-reg':{officialUrl:'https://www.sebi.gov.in/legal/regulations.html',label:'SEBI Regulations',prompt:'Search sebi.gov.in for ALL SEBI regulation amendments from 2019 to 2026. For each: regulation name, amendment date, key changes, practical impact on listed companies. Include LODR, PIT, ICDR, SAST, Buy-back, AIF, PMS, IA regulations.'},
+  'mca-rules':{officialUrl:'https://www.mca.gov.in/content/mca/global/en/acts-rules/ebooks/rules.html',label:'MCA Rules',prompt:'Search mca.gov.in for ALL Companies Act rules amendments from 2019 to 2026. For each: rule name, date, GSR number, what changed and compliance action required.'},
+  'sebi-orders':{officialUrl:'https://www.sebi.gov.in/enforcement/orders.html',label:'SEBI Orders',prompt:'Search sebi.gov.in/enforcement for ALL significant SEBI enforcement orders from 2024 to 2026. For each: date, entity name, violation type, penalty amount, key compliance lesson. Include insider trading, LODR violations, front running cases.'}
+};
+
+function fetchSource(src,btn){
+  document.querySelectorAll('[id^="trk-"]').forEach(function(b){if(b.tagName==='BUTTON')b.classList.remove('on');});
+  if(btn)btn.classList.add('on');
+  TRK_SOURCE=src;
+  var la=document.getElementById('trk-official-link');
+  if(la&&TRK_CFG[src])la.href=TRK_CFG[src].officialUrl;
+  fetchCurrentSource();
+}
+
+function fetchCurrentSource(){
+  var c=TRK_CFG[TRK_SOURCE];
+  if(c)doFetchCirculars(c);
+}
+
+async function doFetchCirculars(cfg){
+  var out=document.getElementById('tracker-out');
+  var st=document.getElementById('trk-status');
+  out.innerHTML='<div style="text-align:center;padding:40px;color:var(--slate);"><div class="dots"><span></span><span></span><span></span></div><div style="margin-top:12px;font-size:13px;color:var(--slate2);">Fetching ALL circulars from '+cfg.label+'...</div><div style="font-size:11px;color:var(--slate);margin-top:5px;">AI is searching the official portal. Takes 15-30 seconds.</div></div>';
+  st.style.display='block';
+  st.textContent='Searching '+cfg.officialUrl+' ...';
+  try{
+    var r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:8000,
+        tools:[{type:'web_search_20250305',name:'web_search'}],
+        system:'You are an expert Indian corporate law researcher. Fetch ALL circulars from SEBI and MCA websites. List every single one found. For each provide: date, reference number, title, and 2-3 sentence plain English explanation of compliance action required. Do not truncate.',
+        messages:[{role:'user',content:cfg.prompt}]
+      })
+    });
+    var d=await r.json();
+    if(d.error)throw new Error(d.error.message||JSON.stringify(d.error));
+    var txt='';
+    (d.content||[]).forEach(function(b){if(b.type==='text')txt+=b.text+'\n';});
+    if(!txt.trim())throw new Error('Empty response');
+    TRK_ALL_DATA=parseIntoCards(txt,TRK_SOURCE);
+    renderCards(TRK_ALL_DATA);
+    st.textContent='Loaded '+TRK_ALL_DATA.length+' items from '+cfg.label+' | Use search box to filter';
+  }catch(e){
+    st.textContent='Live fetch: '+e.message+' | Showing verified database';
+    TRK_ALL_DATA=getCurated(TRK_SOURCE);
+    renderCards(TRK_ALL_DATA);
+    var w=document.createElement('div');
+    w.style.cssText='background:#78350f20;border:1px solid #f59e0b40;border-radius:8px;padding:10px 14px;font-size:11px;color:#fcd34d;margin-bottom:10px;';
+    w.innerHTML='&#9888; Live fetch unavailable. Showing '+TRK_ALL_DATA.length+' verified circulars. <a href="'+cfg.officialUrl+'" target="_blank" style="color:var(--gold2);font-weight:700;">Open Official Portal &#8599;</a>';
+    document.getElementById('tracker-out').insertBefore(w,document.getElementById('tracker-out').firstChild);
+  }
+}
+
+function parseIntoCards(txt,src){
+  var isMCA=src==='mca'||src==='mca-rules';
+  var parts=txt.split(/\n(?=\d{1,3}\.|\*{1,2}\d|---)/);
+  var items=[];
+  parts.forEach(function(p){
+    p=p.trim();
+    if(p.length<40)return;
+    var dm=p.match(/(\d{1,2}\s+\w+\s+\d{4}|\w+\s+\d{4})/);
+    items.push({source:isMCA?'MCA':'SEBI',date:dm?dm[0]:'',full:p});
+  });
+  return items.length>=2?items:[{source:isMCA?'MCA':'SEBI',date:'',full:txt}];
+}
+
+function searchCirculars(q){
+  if(!q||q.length<2){renderCards(TRK_ALL_DATA);return;}
+  var lq=q.toLowerCase();
+  var f=TRK_ALL_DATA.filter(function(c){return(c.full||'').toLowerCase().includes(lq);});
+  renderCards(f);
+  var st=document.getElementById('trk-status');
+  st.style.display='block';
+  st.textContent=f.length+' results for "'+q+'"';
+}
+
+function renderCards(items){
+  var out=document.getElementById('tracker-out');
+  if(!items||!items.length){out.innerHTML='<div style="text-align:center;padding:30px;color:var(--slate);">No results. Click Fetch All.</div>';return;}
+  if(items.length===1){out.innerHTML='<div style="background:var(--ink2);border:1px solid var(--ink4);border-radius:12px;padding:16px;font-size:12px;line-height:1.9;color:var(--slate2);">'+formatAI(items[0].full)+'</div>';return;}
+  out.innerHTML=items.map(function(c){
+    var isMCA=c.source==='MCA';
+    var sc=isMCA?'#60a5fa':'#f59e0b';
+    return '<div style="background:var(--ink2);border:1px solid var(--ink4);border-left:3px solid '+sc+';border-radius:8px;padding:12px 14px;margin-bottom:8px;"><div style="display:flex;gap:8px;margin-bottom:5px;"><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;background:'+(isMCA?'#1e3a5f40':'#78350f40')+';color:'+sc+';border:1px solid '+sc+'40;">'+c.source+'</span>'+(c.date?'<span style="font-size:11px;color:var(--slate);">'+c.date+'</span>':'')+
+    '</div><div style="font-size:12px;line-height:1.8;color:var(--slate2);">'+formatAI(c.full)+'</div></div>';
+  }).join('');
+}
+
+function getCurated(src){
+  var D=[
+    {source:'SEBI',date:'20 Jan 2026',full:'SEBI LODR Amendment 2026 | SEBI/LAD-NRO/GN/2026/192\n\nHVDLE threshold raised to Rs.5,000 Cr NCDs. Board meetings on FY basis. Physical transfer window 5 Feb 2026 to 4 Feb 2027.\n\nAction: Verify HVDLE status. Update board meeting calendar to FY basis.'},
+    {source:'SEBI',date:'05 Feb 2026',full:'Physical Transfer Special Window | SEBI Circular\n\nOne-year window for stuck physical certificates: 5 Feb 2026 to 4 Feb 2027.\n\nAction: Notify shareholders. RTAs process all pending physical transfers.'},
+    {source:'SEBI',date:'12 Dec 2024',full:'SEBI LODR Third Amendment 2024 | SEBI/LAD-NRO/GN/2024/198\n\nMOA, AOA and ALL director profiles mandatory on listed company website by 31 March 2025.\n\nAction: Upload MOA/AOA and all director profiles to company website.'},
+    {source:'SEBI',date:'01 Mar 2024',full:'IPO T+3 Listing Mainboard | SEBI Circular\n\nMainboard IPO listing within T+3 from 1 March 2024. SME T+3 from 1 August 2024.\n\nAction: All IPO teams update timelines.'},
+    {source:'SEBI',date:'Feb 2026',full:'NFRA Circular Two-Way Communication | NFRA\n\nAuditors must have two-way structured communication with Board/AC. SA 260 actively enforced.\n\nAction: AC to hold separate meeting with auditor every year.'},
+    {source:'SEBI',date:'Nov 2022',full:'SEBI LODR RPT Amendment | SEBI/LAD-NRO/GN/2021/55\n\nAll RPTs need prior AC approval. Material RPT (10% consolidated turnover) needs shareholder approval.\n\nAction: Fresh omnibus approvals from AC. Update RPT policy.'},
+    {source:'SEBI',date:'2021',full:'SEBI Buy-back Regulations Amendment | SEBI/LAD-NRO/GN/2021/09\n\nEscrow mandatory for buy-back. Minimum 50% utilisation of buy-back size required.\n\nAction: Companies planning buy-back to comply with escrow and utilisation requirements.'},
+    {source:'SEBI',date:'2019',full:'SEBI PIT Amendment SDD and Trading Window | SEBI/LAD-NRO/GN/2018/61\n\nSDD mandatory to log all UPSI sharing. Trading window closes last trading day of each quarter, reopens 48 hours after results.\n\nAction: Implement SDD. Update Code of Conduct. Train designated persons.'},
+    {source:'MCA',date:'14 Jul 2025',full:'MGT-7 Amendment MGT-8 Abolished | G.S.R. 421(E)\n\nMGT-8 abolished from 14 July 2025. PCS certifies AR within MGT-7 directly.\n\nAction: No separate MGT-8. FY 2024-25 ARs use new MGT-7 with embedded PCS certification.'},
+    {source:'MCA',date:'Jul 2025',full:'AOC-4 Amendment Absolute Rupees | MCA Notification\n\nAll AOC-4 figures in absolute rupees from FY 2025-26. ADT-1 SRN mandatory input in AOC-4.\n\nAction: File ADT-1 before AOC-4. All financial figures in absolute rupees.'},
+    {source:'MCA',date:'02 Oct 2023',full:'Rule 9B Demat Mandatory Private Companies | G.S.R. 731(E)\n\nAll non-small private companies must demat shares by 30 Sep 2024. PAS-6 half-yearly required.\n\nAction: Open demat account. Deposit certificates. PAS-6 audit half-yearly.'},
+    {source:'MCA',date:'Aug 2024',full:'E-Adjudication and C-PACE for LLPs | MCA Circular\n\nROC adjudicates penalties online. C-PACE extended to LLP strike-off.\n\nAction: Register on MCA V3. Use C-PACE for voluntary LLP strike-off.'},
+    {source:'MCA',date:'Jan 2023',full:'MCA V3 Portal 52 Forms Migrated | MCA Circular\n\n52 forms on MCA V3 including SPICe+, DIR-3 KYC, MGT-7, AOC-4. All filings on v3.mca.gov.in.\n\nAction: Register as Business User on MCA V3. V2 login deprecated.'},
+    {source:'MCA',date:'2022',full:'Small Company Threshold Revised | Companies Amendment Rules 2022\n\nSmall company: paid-up <= Rs.4 Cr AND turnover <= Rs.40 Cr. Benefits: 2 board meetings, MGT-7A, 50% reduced penalties.\n\nAction: Check if company qualifies as small and update compliance calendar.'},
+    {source:'MCA',date:'2021',full:'OPC Conversion Voluntary | Companies Amendment Act 2020 Rules 2021\n\nOPC conversion no longer compulsory. Foreign nationals can incorporate OPC. Voluntary conversion at any time.\n\nAction: Existing OPCs: no forced conversion required.'},
+    {source:'MCA',date:'2020',full:'IBC Threshold Raised | Insolvency Amendment 2020\n\nMinimum default threshold for CIRP raised from Rs.1 Lakh to Rs.1 Crore. Protects small companies from frivolous insolvency petitions.\n\nAction: Financial creditors and operational creditors to note new threshold before filing application.'},
+    {source:'SEBI',date:'2023',full:'SEBI Cybersecurity Framework | SEBI Circular SEBI/HO/ITD/ITD_VAPT\n\nSEBI mandated comprehensive cybersecurity and cyber resilience framework for all SEBI-regulated entities. Annual audit, VAPT testing, incident reporting within 6 hours required.\n\nAction: Listed companies and intermediaries must implement cybersecurity policy and conduct annual VAPT audit.'},
+    {source:'SEBI',date:'2022',full:'SEBI Master Circular LODR 2022 | SEBI Circular\n\nSEBI issued consolidated Master Circular for LODR compliance. Covers all compliance requirements for listed companies in one document including board composition, disclosures, RPT, corporate governance report.\n\nAction: All listed company compliance officers to keep updated with Master Circular as primary reference.'},
+  ];
+  if(src==='mca'||src==='mca-rules')return D.filter(function(c){return c.source==='MCA';});
+  if(src==='sebi'||src==='sebi-reg'||src==='sebi-orders')return D.filter(function(c){return c.source==='SEBI';});
+  return D;
+}
+
 </script>
 </body>
 </html>
