@@ -923,7 +923,7 @@ async function draftRes() {
     var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
-      body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:messages,max_tokens:3000,temperature:0.1})
+      body:JSON.stringify({model:'llama-3.1-8b-instant',messages:messages,max_tokens:3000,temperature:0.1})
     });
     var data = await res.json();
     if (data.error) throw new Error(data.error.message);
@@ -1011,7 +1011,7 @@ async function draftCustomRes() {
     var GROQ_KEY = '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';
     var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
-      body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:RES_SYS},{role:'user',content:prompt}],max_tokens:2000,temperature:0.1})
+      body:JSON.stringify({model:'llama-3.1-8b-instant',messages:[{role:'system',content:RES_SYS},{role:'user',content:prompt}],max_tokens:2000,temperature:0.1})
     });
     var data = await res.json();
     if (data.error) throw new Error(data.error.message);
@@ -1121,7 +1121,7 @@ async function draftDoc() {
     var GROQ_KEY = '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';
     var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
-      body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:DOC_SYS},{role:'user',content:prompt}],max_tokens:3000,temperature:0.1})
+      body:JSON.stringify({model:'llama-3.1-8b-instant',messages:[{role:'system',content:DOC_SYS},{role:'user',content:prompt}],max_tokens:3000,temperature:0.1})
     });
     var data = await res.json();
     if (data.error) throw new Error(data.error.message);
@@ -2439,7 +2439,7 @@ function searchKB(query,maxSections){
   top.forEach(function(key){
     var parts=key.split(':'),type=parts[0],num=parts[1];
     var text=KB[type]&&KB[type][num];
-    if(text){var label=type==='ca'?'Companies Act §'+num:type==='lodr'?'LODR Reg '+num:'ICDR Reg '+num;result.push('['+label+']\n'+text.substring(0,1800));}
+    if(text){var label=type==='ca'?'Companies Act §'+num:type==='lodr'?'LODR Reg '+num:'ICDR Reg '+num;result.push('['+label+']\n'+text.substring(0,1200));}
   });
   return result.join('\n\n---\n\n');
 }
@@ -2451,7 +2451,7 @@ async function callGroq(question, history) {
   var messages = [{role: 'system', content: SYS}];
   history.forEach(function(h) { messages.push({role: h.role, content: h.content}); });
   // Inject corrections + relevant sections from full Acts database
-  var kbSections = searchKB(question, 15);
+  var kbSections = searchKB(question, 8);
   var corrSections = searchCorrections(question);
   var enrichedQ = question;
   if (corrSections) enrichedQ = corrSections + '\n\n' + enrichedQ;
@@ -2461,7 +2461,7 @@ async function callGroq(question, history) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + GROQ_KEY },
     body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
+      model: 'llama-3.1-8b-instant',
       messages: messages,
       max_tokens: 4096,
       temperature: 0.2
@@ -3030,7 +3030,7 @@ async function aiCallKB(userPrompt, outputId, loadingMsg) {
   
   try {
     // Search KB for relevant sections
-    var relevantSections = searchKB(userPrompt, 15);
+    var relevantSections = searchKB(userPrompt, 8);
     
     // Build enriched prompt
     var corrections = searchCorrections(userPrompt);
@@ -3045,9 +3045,9 @@ async function aiCallKB(userPrompt, outputId, loadingMsg) {
       method: 'POST',
       headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + GROQ_KEY},
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
+        model: 'llama-3.1-8b-instant',
         messages: [{role: 'system', content: SYS}, {role: 'user', content: enrichedPrompt}],
-        max_tokens: 4000,
+        max_tokens: 2000,
         temperature: 0.1
       })
     });
@@ -3066,7 +3066,7 @@ async function aiCallWebKB(systemExtra, userPrompt, outputId, loadingMsg) {
   outEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--slate);"><div class="dots"><span></span><span></span><span></span></div><div style="margin-top:12px;font-size:13px;color:var(--slate2);">' + loadingMsg + '</div><div style="font-size:11px;color:var(--slate);margin-top:5px;">Searching live legal sources + consulting full Acts database...</div></div>';
   
   try {
-    var relevantSections = searchKB(userPrompt, 20);
+    var relevantSections = searchKB(userPrompt, 10);
     var corrections = searchCorrections(userPrompt);
     var enrichedPrompt = userPrompt;
     if (corrections) enrichedPrompt = corrections + '\n\n' + enrichedPrompt;
