@@ -919,7 +919,7 @@ async function draftRes() {
   var messages = [{role:'system', content: RES_SYS}, {role:'user', content: prompt}];
 
   try {
-    var GROQ_KEY = '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';
+    var GROQ_KEY = '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';
     var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
@@ -1008,7 +1008,7 @@ async function draftCustomRes() {
   var RES_SYS = 'You are an expert Indian corporate law drafter. Draft complete, professionally worded board/shareholder resolutions under Companies Act 2013. Use proper legal language with RESOLVED THAT, RESOLVED FURTHER THAT, authorization clauses. Mention relevant section numbers. Leave [COMPANY NAME], [DATE], [DIN] as placeholders. State which MCA form to file and within what deadline.';
   var prompt = 'Draft a complete resolution for: ' + input + '. Include all necessary RESOLVED THAT clauses, statutory references, and compliance requirements.';
   try {
-    var GROQ_KEY = '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';
+    var GROQ_KEY = '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';
     var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
       body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:RES_SYS},{role:'user',content:prompt}],max_tokens:2000,temperature:0.1})
@@ -1118,7 +1118,7 @@ async function draftDoc() {
     ' Requirements: (1) Include ALL mandatory contents as per SS-1/SS-2 and Companies Act. (2) For notices: include proper heading, date, venue, agenda items with notes, attendance/proxy instructions, statutory notes. (3) For agendas: include all agenda items with item numbers, proposer, supporting documents required. (4) For minutes: include proper format with attendance, quorum confirmation, discussions, resolutions passed, action items. (5) Mention any filing requirements (MGT-14, DIR-12, ADT-1 etc.) and deadlines at the end.';
 
   try {
-    var GROQ_KEY = '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';
+    var GROQ_KEY = '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';
     var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
       body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:DOC_SYS},{role:'user',content:prompt}],max_tokens:3000,temperature:0.1})
@@ -2446,7 +2446,7 @@ function searchKB(query,maxSections){
 
 
 async function callGroq(question, history) {
-  var GROQ_KEY = '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';
+  var GROQ_KEY = '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';
   if (!GROQ_KEY) throw new Error('No Groq key found. Please refresh and log in again.');
   var messages = [{role: 'system', content: SYS}];
   history.forEach(function(h) { messages.push({role: h.role, content: h.content}); });
@@ -3040,7 +3040,7 @@ async function aiCallKB(userPrompt, outputId, loadingMsg) {
       enrichedPrompt = enrichedPrompt + '\n\n[RELEVANT LEGAL PROVISIONS FROM PRIMARY SOURCES]\n' + relevantSections;
     }
     
-    var GROQ_KEY = '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';
+    var GROQ_KEY = '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';
     var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + GROQ_KEY},
