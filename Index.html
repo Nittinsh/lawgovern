@@ -944,8 +944,7 @@ async function draftRes() {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
-      system_instruction: {parts: [{text: SYS}]},
-      contents: messages.filter(m=>m.role!=='system').map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]})),
+      contents: [{role:'user',parts:[{text:'[SYSTEM]\n'+SYS}]},{role:'model',parts:[{text:'Ready.'}]}].concat(messages.filter(m=>m.role!=='system').map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]}))),
       generationConfig: {temperature: 0.1, maxOutputTokens: 3000}
     })
   })
@@ -1037,8 +1036,7 @@ async function draftCustomRes() {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
-      system_instruction: {parts: [{text: SYS}]},
-      contents: messages.filter(m=>m.role!=='system').map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]})),
+      contents: [{role:'user',parts:[{text:'[SYSTEM]\n'+SYS}]},{role:'model',parts:[{text:'Ready.'}]}].concat(messages.filter(m=>m.role!=='system').map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]}))),
       generationConfig: {temperature: 0.1, maxOutputTokens: 3000}
     })
   })
@@ -1152,8 +1150,7 @@ async function draftDoc() {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
-      system_instruction: {parts: [{text: SYS}]},
-      contents: messages.filter(m=>m.role!=='system').map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]})),
+      contents: [{role:'user',parts:[{text:'[SYSTEM]\n'+SYS}]},{role:'model',parts:[{text:'Ready.'}]}].concat(messages.filter(m=>m.role!=='system').map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]}))),
       generationConfig: {temperature: 0.1, maxOutputTokens: 3000}
     })
   })
@@ -1363,8 +1360,7 @@ async function callGroq(question, history) {
   var enrichedQ = corrSections ? corrSections + '\n\n' + question : question;
   contents.push({role:'user', parts:[{text:enrichedQ}]});
   var body = {
-    system_instruction:{parts:[{text:SYS}]},
-    contents:contents,
+    contents:[{role:'user',parts:[{text:'[SYSTEM]\n'+SYS}]},{role:'model',parts:[{text:'Ready.'}]}].concat(contents),
     generationConfig:{temperature:0.1, maxOutputTokens:3000}
   };
   var res = await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key='+getGeminiKey(), {
@@ -1934,8 +1930,11 @@ async function aiCallKB(userPrompt, outputId, loadingMsg) {
     var corrections = searchCorrections(userPrompt);
     var enrichedPrompt = corrections ? corrections+'\n\n'+userPrompt : userPrompt;
     var body = {
-      system_instruction:{parts:[{text:SYS}]},
-      contents:[{role:'user',parts:[{text:enrichedPrompt}]}],
+      contents:[
+        {role:'user',parts:[{text:'[SYSTEM]\n'+SYS}]},
+        {role:'model',parts:[{text:'Ready.'}]},
+        {role:'user',parts:[{text:enrichedPrompt}]}
+      ],
       generationConfig:{temperature:0.1,maxOutputTokens:3000}
     };
     var res = await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key='+getGeminiKey(), {
