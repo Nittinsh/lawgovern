@@ -53,7 +53,7 @@
   </div>
   <div>
     <div class="htitle">LawGovern Compliance Intelligence</div>
-    <div class="hsub">Companies Act · SEBI LODR · PIT · IEPF · ICDR · Powered by Groq AI · Feb 2026</div>
+    <div class="hsub">Companies Act · SEBI LODR · PIT · IEPF · ICDR · Powered by Google Gemini · Feb 2026</div>
   </div>
   <div class="hright">
     <div id="modebadge" class="hbadge">● AI + Offline</div>
@@ -919,7 +919,7 @@ async function draftRes() {
   var messages = [{role:'system', content: RES_SYS}, {role:'user', content: prompt}];
 
   try {
-    var GROQ_KEY = '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';
+    // Groq replaced by Gemini
     var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
@@ -1008,7 +1008,7 @@ async function draftCustomRes() {
   var RES_SYS = 'You are an expert Indian corporate law drafter. Draft complete, professionally worded board/shareholder resolutions under Companies Act 2013. Use proper legal language with RESOLVED THAT, RESOLVED FURTHER THAT, authorization clauses. Mention relevant section numbers. Leave [COMPANY NAME], [DATE], [DIN] as placeholders. State which MCA form to file and within what deadline.';
   var prompt = 'Draft a complete resolution for: ' + input + '. Include all necessary RESOLVED THAT clauses, statutory references, and compliance requirements.';
   try {
-    var GROQ_KEY = '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';
+    // Groq replaced by Gemini
     var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
       body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:RES_SYS},{role:'user',content:prompt}],max_tokens:2000,temperature:0.1})
@@ -1118,7 +1118,7 @@ async function draftDoc() {
     ' Requirements: (1) Include ALL mandatory contents as per SS-1/SS-2 and Companies Act. (2) For notices: include proper heading, date, venue, agenda items with notes, attendance/proxy instructions, statutory notes. (3) For agendas: include all agenda items with item numbers, proposer, supporting documents required. (4) For minutes: include proper format with attendance, quorum confirmation, discussions, resolutions passed, action items. (5) Mention any filing requirements (MGT-14, DIR-12, ADT-1 etc.) and deadlines at the end.';
 
   try {
-    var GROQ_KEY = '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';
+    // Groq replaced by Gemini
     var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
       body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:DOC_SYS},{role:'user',content:prompt}],max_tokens:3000,temperature:0.1})
@@ -1320,28 +1320,25 @@ function searchKB(query,maxSections){
 
 
 async function callGroq(question, history) {
-  var GROQ_KEY = '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';
-  if (!GROQ_KEY) throw new Error('No Groq key found. Please refresh and log in again.');
-  var messages = [{role: 'system', content: SYS}];
-  history.forEach(function(h) { messages.push({role: h.role, content: h.content}); });
-  // Inject corrections only (SYS has all legal knowledge)
+  var GEMINI_KEY = 'AIzaSyBx6roF3493PoSqwSfVbvxbJsSpgLJkLjw';
+  var contents = [];
+  history.forEach(function(h) {
+    contents.push({role: h.role==='assistant'?'model':'user', parts:[{text:h.content}]});
+  });
   var corrSections = searchCorrections(question);
   var enrichedQ = corrSections ? corrSections + '\n\n' + question : question;
-  messages.push({role: 'user', content: enrichedQ});
-  var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + GROQ_KEY },
-    body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
-      messages: messages,
-      max_tokens: 4096,
-      temperature: 0.2
-    })
+  contents.push({role:'user', parts:[{text:enrichedQ}]});
+  var body = {
+    system_instruction:{parts:[{text:SYS}]},
+    contents:contents,
+    generationConfig:{temperature:0.1, maxOutputTokens:3000}
+  };
+  var res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+GEMINI_KEY, {
+    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)
   });
   var data = await res.json();
-  if (data.error) throw new Error(data.error.message || 'Groq API error');
-  if (!data.choices || !data.choices[0]) throw new Error('No response from AI');
-  return {text: data.choices[0].message.content};
+  if (data.error) throw new Error(data.error.message);
+  return {text: data.candidates[0].content.parts[0].text};
 }
 
 // ═══════════════════════════════════════════════════
@@ -1897,30 +1894,24 @@ function getCurated(src){
 // Enhanced AI call that injects relevant KB sections into every prompt
 async function aiCallKB(userPrompt, outputId, loadingMsg) {
   var outEl = document.getElementById(outputId);
-  outEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--slate);"><div class="dots"><span></span><span></span><span></span></div><div style="margin-top:12px;font-size:13px;color:var(--slate2);">' + loadingMsg + '</div></div>';
-  
+  outEl.innerHTML = '<div style="text-align:center;padding:40px;"><div class="dots"><span></span><span></span><span></span></div><div style="margin-top:12px;font-size:13px;color:var(--slate2);">'+loadingMsg+'</div></div>';
   try {
-    // Inject corrections only (no KB - SYS prompt has all knowledge)
+    var GEMINI_KEY = 'AIzaSyBx6roF3493PoSqwSfVbvxbJsSpgLJkLjw';
     var corrections = searchCorrections(userPrompt);
-    var enrichedPrompt = userPrompt;
-    if (corrections) enrichedPrompt = corrections + '\n\n' + enrichedPrompt;
-    
-    var GROQ_KEY = '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';
-    var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + GROQ_KEY},
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        messages: [{role: 'system', content: SYS}, {role: 'user', content: enrichedPrompt}],
-        max_tokens: 3000,
-        temperature: 0.1
-      })
+    var enrichedPrompt = corrections ? corrections+'\n\n'+userPrompt : userPrompt;
+    var body = {
+      system_instruction:{parts:[{text:SYS}]},
+      contents:[{role:'user',parts:[{text:enrichedPrompt}]}],
+      generationConfig:{temperature:0.1,maxOutputTokens:3000}
+    };
+    var res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+GEMINI_KEY, {
+      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)
     });
     var data = await res.json();
     if (data.error) throw new Error(data.error.message);
-    return data.choices[0].message.content;
+    return data.candidates[0].content.parts[0].text;
   } catch(e) {
-    document.getElementById(outputId).innerHTML = '<div style="color:var(--red);padding:20px;font-size:13px;">&#9888; Error: ' + e.message + '</div>';
+    document.getElementById(outputId).innerHTML = '<div style="color:var(--red);padding:20px;font-size:13px;">&#9888; Error: '+e.message+'</div>';
     return null;
   }
 }
@@ -1928,37 +1919,29 @@ async function aiCallKB(userPrompt, outputId, loadingMsg) {
 // Web search version that also injects KB
 async function aiCallWebKB(systemExtra, userPrompt, outputId, loadingMsg) {
   var outEl = document.getElementById(outputId);
-  outEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--slate);"><div class="dots"><span></span><span></span><span></span></div><div style="margin-top:12px;font-size:13px;color:var(--slate2);">' + loadingMsg + '</div><div style="font-size:11px;color:var(--slate);margin-top:5px;">Searching live legal sources + consulting full Acts database...</div></div>';
-  
+  outEl.innerHTML = '<div style="text-align:center;padding:40px;"><div class="dots"><span></span><span></span><span></span></div><div style="margin-top:12px;font-size:13px;color:var(--slate2);">'+loadingMsg+'</div><div style="font-size:11px;color:var(--slate);margin-top:5px;">Searching live legal sources...</div></div>';
   try {
-    var relevantSections = searchKB(userPrompt, 10);
     var corrections = searchCorrections(userPrompt);
-    var enrichedPrompt = userPrompt;
-    if (corrections) enrichedPrompt = corrections + '\n\n' + enrichedPrompt;
-    if (relevantSections) {
-      enrichedPrompt = enrichedPrompt + '\n\n[RELEVANT PROVISIONS FROM PRIMARY SOURCE DATABASE — Companies Act 2013 + LODR + ICDR]\n' + relevantSections;
-    }
-    
+    var enrichedPrompt = corrections ? corrections+'\n\n'+userPrompt : userPrompt;
     var r = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 5000,
-        tools: [{type: 'web_search_20250305', name: 'web_search'}],
-        system: SYS + (systemExtra || ''),
-        messages: [{role: 'user', content: enrichedPrompt}]
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:4000,
+        tools:[{type:'web_search_20250305',name:'web_search'}],
+        system:SYS+(systemExtra||''),
+        messages:[{role:'user',content:enrichedPrompt}]
       })
     });
     var d = await r.json();
-    if (d.error) throw new Error(d.error.message || JSON.stringify(d.error));
+    if (d.error) throw new Error(d.error.message||JSON.stringify(d.error));
     var txt = '';
-    (d.content || []).forEach(function(b) { if (b.type === 'text') txt += b.text + '\n'; });
+    (d.content||[]).forEach(function(b){if(b.type==='text')txt+=b.text+'\n';});
     if (!txt.trim()) throw new Error('Empty response');
     return txt;
   } catch(e) {
-    console.warn('Web search failed, falling back to KB-enriched Groq:', e.message);
-    return await aiCallKB(userPrompt, outputId, loadingMsg + ' (offline)');
+    console.warn('Web search failed, using Gemini:', e.message);
+    return await aiCallKB(userPrompt, outputId, loadingMsg);
   }
 }
 
