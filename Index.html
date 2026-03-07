@@ -78,7 +78,7 @@
   <div class="tab" onclick="sw('compound')" id="t-compound" style="display:none;">🤝 Compounding</div>
   <div class="tab" onclick="sw('deeplaw')" id="t-deeplaw" style="display:none;">🔬 Deep Law</div>
   <div class="tab" onclick="sw('opinion')" id="t-opinion" style="display:none;">📜 Legal Opinion</div>
-  <div class="tab" onclick="sw('admin');setTimeout(renderCorrectionsPanel,100)" id="t-admin">⚙️ Admin</div>
+  <div class="tab" onclick="sw('admin');setTimeout(function(){renderCorrectionsPanel();loadGeminiKeyToAdmin();},100)" id="t-admin">⚙️ Admin</div>
 </div>
 
 <div class="panels">
@@ -623,6 +623,26 @@
     </div>
     <div style="background:var(--ink3);border:1px solid var(--ink4);border-radius:10px;padding:12px 16px;margin-top:12px;font-size:11px;color:var(--slate);">
       &#128274; Your code <strong style="color:var(--gold2)">NITTIN01</strong> is protected and cannot be deleted.
+    </div>
+
+    
+    <!-- GEMINI API KEY PANEL -->
+    <div style="background:linear-gradient(135deg,var(--ink3),var(--ink4));border:1px solid var(--ink4);border-radius:14px;padding:20px;margin-bottom:16px;margin-top:16px;">
+      <div style="font-family:serif;font-size:18px;color:var(--gold2);margin-bottom:4px;">🔑 Gemini API Key</div>
+      <div style="font-size:12px;color:var(--slate);">Stored privately in your browser only. Never put in the file. Get free key from aistudio.google.com</div>
+    </div>
+    <div style="background:var(--ink2);border:1px solid var(--ink4);border-radius:12px;padding:16px;margin-bottom:16px;">
+      <div style="font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Enter Your Gemini API Key</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input id="gemini-key-input" type="password" placeholder="AIzaSy..."
+          style="flex:1;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:10px 13px;font-size:13px;outline:none;font-family:monospace;">
+        <button onclick="saveGeminiKeyFromAdmin()"
+          style="background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);font-weight:700;font-size:13px;border:none;border-radius:9px;padding:0 18px;height:40px;cursor:pointer;">Save ✓</button>
+      </div>
+      <div id="gemini-key-status" style="font-size:11px;margin-top:8px;color:var(--slate);"></div>
+      <div style="font-size:11px;color:var(--slate2);margin-top:8px;">
+        Get free key → <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--gold2);">aistudio.google.com/apikey</a> → Sign in with Google → Create API Key → Copy → Paste above
+      </div>
     </div>
 
     <!-- CORRECTION MEMORY PANEL -->
@@ -2332,6 +2352,34 @@ function hideLoader(){
 }
 // Auto-hide after 1.8s regardless
 window.addEventListener('load',function(){setTimeout(hideLoader,800);});
+
+function getGeminiKey() {
+  return localStorage.getItem('lg_gemini_key') || '';
+}
+function setGeminiKey(k) {
+  localStorage.setItem('lg_gemini_key', k.trim());
+}
+function saveGeminiKeyFromAdmin() {
+  var k = document.getElementById('gemini-key-input').value.trim();
+  if (!k || k.length < 15) {
+    document.getElementById('gemini-key-status').innerHTML = '<span style="color:#e05555;">Please enter a valid key (starts with AIzaSy...)</span>';
+    return;
+  }
+  setGeminiKey(k);
+  document.getElementById('gemini-key-status').innerHTML = '<span style="color:#5cb85c;">✓ Key saved! AI features are now active.</span>';
+}
+function loadGeminiKeyToAdmin() {
+  var k = getGeminiKey();
+  var inp = document.getElementById('gemini-key-input');
+  var sts = document.getElementById('gemini-key-status');
+  if (!inp) return;
+  if (k) {
+    inp.value = k;
+    sts.innerHTML = '<span style="color:#5cb85c;">✓ Key is active — AI features working</span>';
+  } else {
+    sts.innerHTML = '<span style="color:#e05555;">⚠ No key set — enter your Gemini key above to enable AI</span>';
+  }
+}
 </script>
 </body>
 </html>
