@@ -920,7 +920,7 @@ async function draftRes() {
 
   try {
     // Groq replaced by Gemini
-    var res = await await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyBx6roF3493PoSqwSfVbvxbJsSpgLJkLjw', {
+    var res = await await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyBx6roF3493PoSqwSfVbvxbJsSpgLJkLjw', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
@@ -1013,7 +1013,7 @@ async function draftCustomRes() {
   var prompt = 'Draft a complete resolution for: ' + input + '. Include all necessary RESOLVED THAT clauses, statutory references, and compliance requirements.';
   try {
     // Groq replaced by Gemini
-    var res = await await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyBx6roF3493PoSqwSfVbvxbJsSpgLJkLjw', {
+    var res = await await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyBx6roF3493PoSqwSfVbvxbJsSpgLJkLjw', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
@@ -1128,7 +1128,7 @@ async function draftDoc() {
 
   try {
     // Groq replaced by Gemini
-    var res = await await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyBx6roF3493PoSqwSfVbvxbJsSpgLJkLjw', {
+    var res = await await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyBx6roF3493PoSqwSfVbvxbJsSpgLJkLjw', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
@@ -1347,7 +1347,7 @@ async function callGroq(question, history) {
     contents:contents,
     generationConfig:{temperature:0.1, maxOutputTokens:3000}
   };
-  var res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+GEMINI_KEY, {
+  var res = await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key='+GEMINI_KEY, {
     method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)
   });
   var data = await res.json();
@@ -1918,7 +1918,7 @@ async function aiCallKB(userPrompt, outputId, loadingMsg) {
       contents:[{role:'user',parts:[{text:enrichedPrompt}]}],
       generationConfig:{temperature:0.1,maxOutputTokens:3000}
     };
-    var res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+GEMINI_KEY, {
+    var res = await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key='+GEMINI_KEY, {
       method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)
     });
     var data = await res.json();
