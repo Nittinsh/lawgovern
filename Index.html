@@ -940,11 +940,12 @@ async function draftRes() {
 
   try {
     // Groq replaced by Gemini
-    var res = await await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key='+getGeminiKey(), {
+    var res = await await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+getGeminiKey(), {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
-      contents: [{role:'user',parts:[{text:'[SYSTEM]\n'+SYS}]},{role:'model',parts:[{text:'Ready.'}]}].concat(messages.filter(m=>m.role!=='system').map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]}))),
+      system_instruction: {parts:[{text:SYS}]},
+      contents: messages.filter(m=>m.role!=='system').map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]})),
       generationConfig: {temperature: 0.1, maxOutputTokens: 3000}
     })
   })
@@ -1032,11 +1033,12 @@ async function draftCustomRes() {
   var prompt = 'Draft a complete resolution for: ' + input + '. Include all necessary RESOLVED THAT clauses, statutory references, and compliance requirements.';
   try {
     // Groq replaced by Gemini
-    var res = await await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key='+getGeminiKey(), {
+    var res = await await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+getGeminiKey(), {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
-      contents: [{role:'user',parts:[{text:'[SYSTEM]\n'+SYS}]},{role:'model',parts:[{text:'Ready.'}]}].concat(messages.filter(m=>m.role!=='system').map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]}))),
+      system_instruction: {parts:[{text:SYS}]},
+      contents: messages.filter(m=>m.role!=='system').map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]})),
       generationConfig: {temperature: 0.1, maxOutputTokens: 3000}
     })
   })
@@ -1146,11 +1148,12 @@ async function draftDoc() {
 
   try {
     // Groq replaced by Gemini
-    var res = await await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key='+getGeminiKey(), {
+    var res = await await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+getGeminiKey(), {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
-      contents: [{role:'user',parts:[{text:'[SYSTEM]\n'+SYS}]},{role:'model',parts:[{text:'Ready.'}]}].concat(messages.filter(m=>m.role!=='system').map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]}))),
+      system_instruction: {parts:[{text:SYS}]},
+      contents: messages.filter(m=>m.role!=='system').map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]})),
       generationConfig: {temperature: 0.1, maxOutputTokens: 3000}
     })
   })
@@ -1360,10 +1363,11 @@ async function callGroq(question, history) {
   var enrichedQ = corrSections ? corrSections + '\n\n' + question : question;
   contents.push({role:'user', parts:[{text:enrichedQ}]});
   var body = {
-    contents:[{role:'user',parts:[{text:'[SYSTEM]\n'+SYS}]},{role:'model',parts:[{text:'Ready.'}]}].concat(contents),
+    system_instruction:{parts:[{text:SYS}]},
+    contents:contents,
     generationConfig:{temperature:0.1, maxOutputTokens:3000}
   };
-  var res = await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key='+getGeminiKey(), {
+  var res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+getGeminiKey(), {
     method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)
   });
   var data = await res.json();
@@ -1930,14 +1934,11 @@ async function aiCallKB(userPrompt, outputId, loadingMsg) {
     var corrections = searchCorrections(userPrompt);
     var enrichedPrompt = corrections ? corrections+'\n\n'+userPrompt : userPrompt;
     var body = {
-      contents:[
-        {role:'user',parts:[{text:'[SYSTEM]\n'+SYS}]},
-        {role:'model',parts:[{text:'Ready.'}]},
-        {role:'user',parts:[{text:enrichedPrompt}]}
-      ],
+      system_instruction:{parts:[{text:SYS}]},
+      contents:[{role:'user',parts:[{text:enrichedPrompt}]}],
       generationConfig:{temperature:0.1,maxOutputTokens:3000}
     };
-    var res = await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key='+getGeminiKey(), {
+    var res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+getGeminiKey(), {
       method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)
     });
     var data = await res.json();
