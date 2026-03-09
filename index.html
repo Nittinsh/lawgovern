@@ -952,7 +952,7 @@ async function draftRes() {
       },
       body: JSON.stringify({
         model: 'openrouter/auto',
-        messages: [{role:'system', content: DOC_SYS || SYS}, {role:'user', content: prompt}],
+        messages: [{role:'system', content: SYS}, {role:'user', content: prompt}],
         max_tokens: 3000,
         temperature: 0.1
       })
@@ -1053,7 +1053,7 @@ async function draftCustomRes() {
       },
       body: JSON.stringify({
         model: 'openrouter/auto',
-        messages: [{role:'system', content: DOC_SYS || SYS}, {role:'user', content: prompt}],
+        messages: [{role:'system', content: SYS}, {role:'user', content: prompt}],
         max_tokens: 3000,
         temperature: 0.1
       })
@@ -1176,7 +1176,7 @@ async function draftDoc() {
       },
       body: JSON.stringify({
         model: 'openrouter/auto',
-        messages: [{role:'system', content: DOC_SYS || SYS}, {role:'user', content: prompt}],
+        messages: [{role:'system', content: SYS}, {role:'user', content: prompt}],
         max_tokens: 3000,
         temperature: 0.1
       })
