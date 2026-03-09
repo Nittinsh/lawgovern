@@ -940,13 +940,25 @@ async function draftRes() {
 
   try {
     // Groq replaced by Gemini
-    var res = await await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer '+getGeminiKey()},
-    body: JSON.stringify({model:'google/gemini-2.0-flash-exp:free', messages:[{role:'system',content:SYS}].concat(messages.filter(m=>m.role!=='system').map(m=>({role:m.role==='assistant'?'assistant':'user',content:m.content}))), max_tokens:3000, temperature:0.1})
-  })
+    var _apiKey = getGeminiKey();
+    if (!_apiKey) throw new Error('No API key. Go to Admin tab and enter your OpenRouter key.');
+    var res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + _apiKey,
+        'HTTP-Referer': 'https://nittinsh.github.io/lawgovern',
+        'X-Title': 'LawGovern'
+      },
+      body: JSON.stringify({
+        model: 'openrouter/auto',
+        messages: [{role:'system', content: DOC_SYS || SYS}, {role:'user', content: prompt}],
+        max_tokens: 3000,
+        temperature: 0.1
+      })
+    });
     var data = await res.json();
-    if (data.error) throw new Error(data.error.message);
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
     var text = data.choices[0].message.content;
 
     outEl.innerHTML = '<div class="resbody">' +
@@ -1029,13 +1041,25 @@ async function draftCustomRes() {
   var prompt = 'Draft a complete resolution for: ' + input + '. Include all necessary RESOLVED THAT clauses, statutory references, and compliance requirements.';
   try {
     // Groq replaced by Gemini
-    var res = await await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer '+getGeminiKey()},
-    body: JSON.stringify({model:'google/gemini-2.0-flash-exp:free', messages:[{role:'system',content:SYS}].concat(messages.filter(m=>m.role!=='system').map(m=>({role:m.role==='assistant'?'assistant':'user',content:m.content}))), max_tokens:3000, temperature:0.1})
-  })
+    var _apiKey = getGeminiKey();
+    if (!_apiKey) throw new Error('No API key. Go to Admin tab and enter your OpenRouter key.');
+    var res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + _apiKey,
+        'HTTP-Referer': 'https://nittinsh.github.io/lawgovern',
+        'X-Title': 'LawGovern'
+      },
+      body: JSON.stringify({
+        model: 'openrouter/auto',
+        messages: [{role:'system', content: DOC_SYS || SYS}, {role:'user', content: prompt}],
+        max_tokens: 3000,
+        temperature: 0.1
+      })
+    });
     var data = await res.json();
-    if (data.error) throw new Error(data.error.message);
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
     var text = data.choices[0].message.content;
     outEl.innerHTML = '<div class="resbody"><div class="reshead"><div><div style="font-size:14px;color:var(--gold2);">Custom Resolution</div><div style="font-size:11px;color:var(--slate);">' + input.slice(0,60) + (input.length>60?'...':'') + '</div></div><button class="rescopy" onclick="copyResOut()">&#128203; Copy</button></div><div class="rescontent" id="rescontent">' + formatAI(text) + '</div></div><div style="font-size:11px;color:var(--slate);padding:4px 2px;">&#10003; Replace all [PLACEHOLDER] items before use.</div>';
   } catch(e) {
@@ -1140,13 +1164,25 @@ async function draftDoc() {
 
   try {
     // Groq replaced by Gemini
-    var res = await await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer '+getGeminiKey()},
-    body: JSON.stringify({model:'google/gemini-2.0-flash-exp:free', messages:[{role:'system',content:SYS}].concat(messages.filter(m=>m.role!=='system').map(m=>({role:m.role==='assistant'?'assistant':'user',content:m.content}))), max_tokens:3000, temperature:0.1})
-  })
+    var _apiKey = getGeminiKey();
+    if (!_apiKey) throw new Error('No API key. Go to Admin tab and enter your OpenRouter key.');
+    var res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + _apiKey,
+        'HTTP-Referer': 'https://nittinsh.github.io/lawgovern',
+        'X-Title': 'LawGovern'
+      },
+      body: JSON.stringify({
+        model: 'openrouter/auto',
+        messages: [{role:'system', content: DOC_SYS || SYS}, {role:'user', content: prompt}],
+        max_tokens: 3000,
+        temperature: 0.1
+      })
+    });
     var data = await res.json();
-    if (data.error) throw new Error(data.error.message);
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
     var text = data.choices[0].message.content;
     outEl.innerHTML = '<div class="resbody"><div class="reshead"><div><div style="font-size:14px;color:var(--gold2);">' + catLabel + '</div><div style="font-size:11px;color:var(--slate);">' + typeLabel + (isListed ? ' · Listed' : '') + '</div></div><button class="rescopy" onclick="copyDocOut()">&#128203; Copy</button></div><div class="rescontent" id="doccontent">' + formatAI(text) + '</div></div><div style="font-size:11px;color:var(--slate);padding:4px 2px;">&#10003; Replace all [PLACEHOLDER] items before finalising. Have your CS review before dispatch.</div>';
   } catch(e) {
