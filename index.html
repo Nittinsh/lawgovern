@@ -1380,12 +1380,9 @@ function initDocs() {
 }
 
 window.addEventListener('DOMContentLoaded', function() {
-  var sc = sessionStorage.getItem('lg_code');
-  if (sc && VALID_CODES.includes(sc)) {
-    ACCESS_CODE = sc;
-    document.getElementById('akovl').style.display = 'none';
-    updateMode();
-  }
+  // Supabase (checkSession) now handles authentication - old access code overlay disabled
+  var ak = document.getElementById('akovl');
+  if(ak) ak.style.display = 'none';
   rc();
   initRes();
   initDocs();
