@@ -119,6 +119,9 @@ function enterApp(){
   window.ACCESS_CODE = CURRENT_USER ? CURRENT_USER.email : 'user';
   var hu = document.getElementById('header-username');
   if(hu && CURRENT_USER) hu.textContent = CURRENT_USER.email;
+  // Show Admin tab ONLY for admins
+  var adminTab = document.getElementById('t-admin');
+  if(adminTab) adminTab.style.display = (CURRENT_USER && CURRENT_USER.is_admin) ? '' : 'none';
   if(typeof updateMode === 'function') updateMode();
   // Load cloud data
   if(typeof loadCloudClients === 'function') loadCloudClients();
@@ -327,7 +330,7 @@ input[type="text"], input[type="password"], textarea, select {
 <div class="navitem" onclick="sw('compound')" id="t-compound"><span class="nic">⚖</span>Compounding</div>
 <div class="navitem" onclick="sw('deeplaw')" id="t-deeplaw"><span class="nic">◈</span>Deep Law</div>
 <div class="navhead">Manage</div>
-<div class="navitem" onclick="sw('admin');setTimeout(function(){renderCorrectionsPanel();if(CURRENT_USER&&CURRENT_USER.is_admin){document.getElementById('admin-user-section').style.display='block';loadAdminUsers();}},100)" id="t-admin"><span class="nic">⚙</span>Admin</div>
+<div class="navitem" onclick="sw('admin');setTimeout(function(){renderCorrectionsPanel();if(CURRENT_USER&&CURRENT_USER.is_admin){document.getElementById('admin-user-section').style.display='block';loadAdminUsers();}},100)" id="t-admin" style="display:none;"><span class="nic">⚙</span>Admin</div>
 </aside>
 <div class="appmain">
 <div class="panels">
