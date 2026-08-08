@@ -925,10 +925,10 @@ function updateMode() {
   b.style.cssText = 'background:#c9a84c20;border:1px solid var(--gold);color:var(--gold2);font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;';
   var ind = document.getElementById('modeind');
   if (ind) { ind.textContent = '● AI Active'; ind.className = 'aimode'; }
-  // Show Admin tab ONLY for NITTIN01
+  // Show Admin tab ONLY for logged-in admins (Supabase)
   var adminTab = document.getElementById('t-admin');
   if (adminTab) {
-    adminTab.style.display = (ACCESS_CODE === 'NITTIN01') ? '' : 'none';
+    adminTab.style.display = (CURRENT_USER && CURRENT_USER.is_admin) ? '' : 'none';
   }
   var docsTab = document.getElementById('t-docs');
   if (docsTab) docsTab.style.display = '';
