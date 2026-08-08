@@ -3878,15 +3878,20 @@ async function adminApprove(userId, status){
 }
 
 async function adminDeleteUser(userId, email){
-  if(!confirm('Delete user '+email+'? This removes their account and all their data permanently.')) return;
+  if(!confirm('Permanently DELETE '+email+'?\n\nThis removes their login and ALL their data. This cannot be undone.')) return;
   try{
-    // Delete their profile (auth deletion needs service role, so we revoke + remove profile)
-    var res = await supaClient.rpc('admin_set_approval', {target_id:userId, new_status:false});
-    // Note: full auth deletion requires Supabase dashboard or service role
-    alert('User access revoked. To fully delete the login, remove from Supabase → Authentication → Users.');
+    var session = await supaClient.auth.getSession();
+    var token = session.data.session ? session.data.session.access_token : '';
+    var res = await fetch(SUPA_URL+'/functions/v1/admin-actions', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify({target_id:userId})
+    });
+    var data = await res.json();
+    if(data.error) throw new Error(data.error);
     loadAdminUsers();
   }catch(e){
-    alert('Error: '+e.message);
+    alert('Error deleting user: '+e.message);
   }
 }
 
