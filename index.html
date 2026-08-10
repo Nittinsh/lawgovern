@@ -367,7 +367,7 @@ input[type="text"], input[type="password"], textarea, select {
   <div class="cbar">
     <span id="modeind" class="offmode">● Offline</span>
     <input class="ci" id="ci" placeholder="Ask any compliance question — forms, penalties, deadlines, amendments..." onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendMsg()">
-    <button class="sb" id="sendbtn" onclick="sendMsg()">➤</button>
+    <button class="sb" id="checksrcbtn" onclick="sendMsgLive()" title="Check latest official sources (MCA/SEBI/RBI) before answering" style="margin-right:6px;background:var(--gold);font-size:12px;padding:0 12px;">◉ Sources</button><button class="sb" id="sendbtn" onclick="sendMsg()">➤</button>
   </div>
 </div>
 
@@ -1156,6 +1156,13 @@ async function draftRes() {
   outEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--slate);"><div class="dots"><span></span><span></span><span></span></div><div style="margin-top:10px;font-size:12px;">Drafting resolution...</div></div>';
 
   var catLabel = {board:'Board Resolution', ordinary:'Ordinary Resolution (Members)', special:'Special Resolution (Members)', circular:'Circular Resolution'}[cat] || cat;
+  var _tplKey = makeTemplateKey(cat, typeLabel);
+  // Check for vetted template first
+  var _vetted = await getVettedTemplate('resolution', _tplKey);
+  if(_vetted && (!CURRENT_USER || !CURRENT_USER.is_admin)){
+    outEl.innerHTML = '<div class="resbody"><div class="reshead"><div><div style="font-family:IBM Plex Serif,serif;font-size:14px;color:var(--gold);">' + catLabel + '</div><div style="font-size:11px;color:var(--slate);">' + typeLabel + '</div></div><button class="rescopy" onclick="copyRes()">📋 Copy</button></div><div class="rescontent" id="rescontent">' + formatAI(_vetted) + '</div></div><div style="font-size:11px;color:var(--slate);padding:4px 2px;">✅ Replace all [PLACEHOLDER] items before use.</div>';
+    return;
+  }
 
   var prompt = 'Draft a complete, professionally worded ' + catLabel + ' for: ' + typeLabel + '.' +
     (details ? ' Specific details: ' + details + '.' : '') +
@@ -1178,6 +1185,12 @@ async function draftRes() {
       '<div class="rescontent" id="rescontent">' + formatAI(text) + '</div>' +
     '</div>' +
     '<div style="font-size:11px;color:var(--slate);padding:4px 2px;">✅ Review and replace all [PLACEHOLDER] items before use. Consult your CS for execution formalities.</div>';
+    if(CURRENT_USER && CURRENT_USER.is_admin){
+      var _vb = renderVetBox('resolution', _tplKey, catLabel + ' — ' + typeLabel, 'resout');
+      outEl.insertAdjacentHTML('beforeend', _vb);
+      var _vbTa = outEl.querySelector('textarea[id$="_text"]');
+      if(_vbTa) _vbTa.value = text;
+    }
 
   } catch(e) {
     outEl.innerHTML = '<div style="color:var(--red);padding:20px;font-size:13px;">⚠ Error: ' + e.message + '</div>';
@@ -1351,6 +1364,12 @@ async function draftDoc() {
     // Groq replaced by Gemini
     var text = await callAIProxy([{role:'system', content: (typeof RES_SYS !== 'undefined' ? RES_SYS : SYS)}, {role:'user', content: prompt}], 3000);
     outEl.innerHTML = '<div class="resbody"><div class="reshead"><div><div style="font-size:14px;color:var(--gold2);">' + catLabel + '</div><div style="font-size:11px;color:var(--slate);">' + typeLabel + (isListed ? ' · Listed' : '') + '</div></div><button class="rescopy" onclick="copyDocOut()">&#128203; Copy</button></div><div class="rescontent" id="doccontent">' + formatAI(text) + '</div></div><div style="font-size:11px;color:var(--slate);padding:4px 2px;">&#10003; Replace all [PLACEHOLDER] items before finalising. Have your CS review before dispatch.</div>';
+    if(CURRENT_USER && CURRENT_USER.is_admin){
+      var _dvb = renderVetBox(DOC_CAT, _docTplKey, catLabel + ' — ' + typeLabel, 'docout');
+      outEl.insertAdjacentHTML('beforeend', _dvb);
+      var _dvbTa = outEl.querySelector('textarea[id$="_text"]');
+      if(_dvbTa) _dvbTa.value = text;
+    }
   } catch(e) {
     outEl.innerHTML = '<div style="color:var(--red);padding:20px;font-size:13px;">&#9888; Error: ' + e.message + '</div>';
   }
@@ -1584,6 +1603,8 @@ var QA = [
 {k:["inc-20a","commencement of business","start business","20a"],a:"<strong>INC-20A — Declaration for Commencement of Business</strong><br><br><strong>Due:</strong> Within 180 days of incorporation (one-time)<br><strong>Who:</strong> Every company with share capital incorporated on/after November 2, 2018<br><strong>CRITICAL:</strong> Cannot commence business or borrow money until INC-20A is filed.<br><strong>Requires:</strong> Bank statement showing paid-up capital deposited by subscribers<br><strong>Penalty:</strong> Company Rs.50,000; each director Rs.1,000/day; ROC may initiate removal."},
 {k:["penalty list","all penalties","key penalties","penalties quick reference","common penalties","list of penalties","sec 454"],a:"<strong>Key Penalties — Quick Reference</strong><br><br><ul><li><strong>Not appointing CS (Sec 203):</strong> Rs.1 Lakh–Rs.5 Lakh + Rs.500/day continuing</li><li><strong>MGT-7:</strong> Rs.50,000 + Rs.100/day</li><li><strong>AOC-4:</strong> Rs.1,000/day (max Rs.10 Lakh)</li><li><strong>AGM failure:</strong> Rs.1 Lakh + Rs.5,000/day</li><li><strong>Board meeting default:</strong> Rs.25,000 per director</li><li><strong>DIR-12:</strong> Rs.50,000 + Rs.500/day</li><li><strong>INC-20A:</strong> Company Rs.50,000; director Rs.1,000/day</li><li><strong>CHG-1 (Charge):</strong> Rs.5,000 + Rs.500/day</li><li><strong>MGT-14 (SR):</strong> Company Rs.5 Lakh; officer Rs.1 Lakh</li><li><strong>BEN-2 (SBO):</strong> Rs.1 Lakh + Rs.1,000/day</li><li><strong>DPT-3:</strong> Rs.5,000–Rs.25,000/day</li><li><strong>DIN KYC default:</strong> DIN deactivated; Rs.5,000 to reactivate</li><li><strong>IEPF default:</strong> 2× amount + imprisonment ≤2 years</li><li><strong>Insider trading (PIT):</strong> Rs.10 Lakh–Rs.25 Crore or 3× profit</li></ul>"},
 ];
+
+var FORM_MASTER = [{"category":"1. Incorporation Forms","form":"INC-1","desc":"Application to reserve the name of the company","type":"e-Form"},{"category":"1. Incorporation Forms","form":"INC-3","desc":"Consent of Nominee as regards One Person Company (OPC)","type":"e-Form"},{"category":"1. Incorporation Forms","form":"INC-4","desc":"Changes of nominee as regards One Person Company","type":"e-Form"},{"category":"1. Incorporation Forms","form":"INC-5","desc":"Intimation of OPC for exceeding the prescribed threshold of more than Rs 50 lakh of the share capital or Rs 2 crore turnover.","type":"e-Form"},{"category":"1. Incorporation Forms","form":"INC-6","desc":"Conversion of a private limited company into an OPC or vice versa","type":"e-Form"},{"category":"1. Incorporation Forms","form":"INC-8","desc":"Declaration by an advocate, CA (chartered accountant, cost accountant, or CS (company secretary) in practice that all provisions of the Companies Act and rules related to incorporation have been complied with.","type":"Physical"},{"category":"1. Incorporation Forms","form":"INC-9","desc":"Declaration by every subscriber of the memorandum and each of the first directors named in the articles that he/she has not been convicted of any offense for the preceding 5 years, and that all the documents filed with the Registrar are right.","type":"Physical"},{"category":"1. Incorporation Forms","form":"INC-11","desc":"Certificate Of Incorporation","type":"Physical"},{"category":"1. Incorporation Forms","form":"INC-11A","desc":"Certificate of incorporation on conversion from an unlimited company to a limited company.","type":"Physical"},{"category":"1. Incorporation Forms","form":"INC-11B","desc":"Certificate of incorporation on conversion from a company limited by guarantee to a company limited by shares.","type":"Physical"},{"category":"1. Incorporation Forms","form":"INC 13","desc":"Memorandum Of Association","type":"Physical"},{"category":"1. Incorporation Forms","form":"INC 14","desc":"Declaration by a CA, CS, cost accountant, advocate in practice that the provisions of the association have been drawn up in conformity with the provisions of Section 8 and rules made thereunder and that all the requisites of the Act and the rules made in association to registration of the company under the Section 8 and matters incidental or supplemental thereto have been complied with.","type":"Physical"},{"category":"1. Incorporation Forms","form":"INC 15","desc":"Declaration by each of the persons making the application (Section 8 companies)","type":"Physical"},{"category":"1. Incorporation Forms","form":"INC 16/17","desc":"License issued under Section 8","type":"Physical"},{"category":"1. Incorporation Forms","form":"INC 20A","desc":"A declaration given by the director for the commencement of business for a company.","type":"e-Form"},{"category":"1. Incorporation Forms","form":"INC 22","desc":"A notice of the change in the company's registered office and its verification.","type":"e-Form"},{"category":"1. Incorporation Forms","form":"INC 22A","desc":"Active company tagging identities and verification (Active)","type":"e-Form"},{"category":"1. Incorporation Forms","form":"INC 24","desc":"Application to the Central Government for approval for a change in the name of the company.","type":"e-Form"},{"category":"1. Incorporation Forms","form":"INC 25","desc":"A new incorporation certificate following a change in name.","type":"Physical"},{"category":"1. Incorporation Forms","form":"INC 25A","desc":"An advertisement to publish in the newspaper when a company is converted into a private company.","type":"Physical"},{"category":"1. Incorporation Forms","form":"INC 26","desc":"Advertisement to be published in the newspaper upon changing the company's registered office in the registry office from one state or Union territory to another.","type":"Physical"},{"category":"1. Incorporation Forms","form":"INC 27","desc":"Conversion of a public company into a private company and vice versa, including the conversion of a company limited by guarantee to a company limited by shares.","type":"e-Form"},{"category":"1. Incorporation Forms","form":"INC 28","desc":"The notice of the order of the court or any other competent authority.","type":"e-Form"},{"category":"1. Incorporation Forms","form":"INC 32","desc":"SPICe+ (INC-32) is now an integrated web-based form for company incorporation.","type":"e-Form"},{"category":"1. Incorporation Forms","form":"INC 33","desc":"e-MOA (Memorandum of Association)","type":"e-Form"},{"category":"1. Incorporation Forms","form":"INC 34","desc":"e-AOA (Articles of Association)","type":"e-Form"},{"category":"1. Incorporation Forms","form":"INC 35","desc":"An application for Goods and Service Tax (GST) identification number, Employees' State Insurance Corporation registration, plus Employees provided fund organization registration (AGILE-PRO)","type":"e-Form"},{"category":"2. Director-Related Forms","form":"DIR 2","desc":"This is the consent given by the person appointed as the company director.","type":"Physical"},{"category":"2. Director-Related Forms","form":"DIR 3","desc":"This is the application for the allotment of the Director Identification Number (DIN) before being appointed as a director in an existing company.","type":"e-Form"},{"category":"2. Director-Related Forms","form":"DIR 3 KYC","desc":"An application for filing the director's KYC.","type":"e-Form"},{"category":"2. Director-Related Forms","form":"DIR 3C","desc":"An intimation by the company to the Registrar on the DIN.","type":"e-Form,"},{"category":"2. Director-Related Forms","form":"DIR 3A","desc":"The declaration provided by the individual applying as a director, if he does not have a last name, and uses only his first name.","type":"Physical"},{"category":"2. Director-Related Forms","form":"DIR 3B","desc":"The intimation of the DIN to the company/companies in which an individual is a director.","type":"Physical"},{"category":"2. Director-Related Forms","form":"DIR 5","desc":"An Application to surrender the DIN","type":"e-Form"},{"category":"2. Director-Related Forms","form":"DIR 6","desc":"An intimation of changes in the particulars specified in the DIN application.","type":"e-Form"},{"category":"2. Director-Related Forms","form":"DIR 8","desc":"An intimation by the director to the respective company about his/her disqualification.","type":"Physical"},{"category":"2. Director-Related Forms","form":"DIR 9","desc":"The form for the company to disclose directors' disqualifications to the Registrar.","type":"Physical"},{"category":"2. Director-Related Forms","form":"DIR 10","desc":"An application to remove disqualified directors from the company.","type":"Physical"},{"category":"2. Director-Related Forms","form":"DIR 11","desc":"A notice of resignation by the director to the Registrar.","type":"e-Form"},{"category":"2. Director-Related Forms","form":"DIR 12","desc":"The particulars of the directors and the key managerial personnel appointment, and any changes.","type":"e-Form"},{"category":"3. Annual Compliance Forms","form":"AOC 4","desc":"The form for filing the company's annual financial statement and other relevant documents with the Registrar.","type":"e-Form"},{"category":"3. Annual Compliance Forms","form":"AOC 4 (XBRL)","desc":"XBRL is the document for the financial statement and other documents to be filed with the Registrar.","type":"e-Form"},{"category":"3. Annual Compliance Forms","form":"AOC-4 NBFC","desc":"The form is for NBFCs to file the financial statements and other relevant documents with the registrar.","type":"e-form"},{"category":"3. Annual Compliance Forms","form":"AO4- CGS","desc":"The form is to file the consolidated financial statements and other relevant documents with the Registrar","type":"e-Form"},{"category":"3. Annual Compliance Forms","form":"AOC 5","desc":"The notice to declare the address of the location in the company's book of accounts is well maintained.","type":"e-Form"},{"category":"3. Annual Compliance Forms","form":"MGT 14","desc":"Filing the company resolutions and agreements with the registrar","type":"e-Form"},{"category":"3. Annual Compliance Forms","form":"MGT 15","desc":"Form for filing a report on the AGM (Annual General Meeting )","type":"Physical"},{"category":"3. Annual Compliance Forms","form":"DPT 3","desc":"Return of deposits","type":"e-Form"},{"category":"3. Annual Compliance Forms","form":"MSME Form 1","desc":"The half-yearly returns are filed with the Registrar of Companies for any outstanding payment to the Micro or Small enterprise.","type":"e-Form"},{"category":"4. Share Capital & Charges Forms","form":"SH 10","desc":"The register of shares or securities bought back","type":"Physical"},{"category":"4. Share Capital & Charges Forms","form":"CHG 1","desc":"Application to register the modification or creation of a charge","type":"e-Form"},{"category":"4. Share Capital & Charges Forms","form":"CHG 2","desc":"Registration of the charge certificate","type":"Physical"},{"category":"4. Share Capital & Charges Forms","form":"CHG 3","desc":"Modification of the charge certificate","type":"Physical"},{"category":"5. Audit & Financial Forms","form":"ADT 1","desc":"This form is to inform the registrar of the company's appointment of an auditor.","type":"e-Form"},{"category":"5. Audit & Financial Forms","form":"ADT 2","desc":"This is the application to remove the company auditor before their term expiry.","type":"e-Form"},{"category":"5. Audit & Financial Forms","form":"ADT 3","desc":"The notice of the auditor's resignation","type":"e-Form"},{"category":"5. Audit & Financial Forms","form":"ADT 4","desc":"The Form to report any suspected fraud made by the auditor to the central government.","type":"Physical"},{"category":"5. Audit & Financial Forms","form":"CRA 1","desc":"The maintenance of the cost records by some companies.","type":"Physical"},{"category":"5. Audit & Financial Forms","form":"CRA 2","desc":"The form for the intimation of appointment of the cost auditor.","type":"e-Form"},{"category":"5. Audit & Financial Forms","form":"CRA 3","desc":"Format of the cost audit report","type":"Physical"},{"category":"5. Audit & Financial Forms","form":"CRA 4","desc":"The form for filing the cost audit report with the Government","type":"e-Form"},{"category":"5. Audit & Financial Forms","form":"MR 1","desc":"A return of appointment of a Managing Director, Manager, or Whole Time Director.","type":"e-Form"},{"category":"5. Audit & Financial Forms","form":"MR 2","desc":"This form is for the application to the Central Government for approval of remuneration/reappointment/appointment of the Director, Managing Director, or the Manager.","type":"e-Form"},{"category":"5. Audit & Financial Forms","form":"MR 3","desc":"The format for the Secretarial Audit Report","type":"Physical"},{"category":"6. Event-Based Forms","form":"RD-1","desc":"An application to the regional directors in order to change a financial year or transform a public company into a private company.","type":"e-Form"},{"category":"6. Event-Based Forms","form":"RD GNL-5","desc":"A form for rectification of mistakes related to a change in a financial year or for converting a public company into a private company.","type":"e-Form"},{"category":"6. Event-Based Forms","form":"BEN 1","desc":"In the case of an individual, a declaration by the significant beneficial owner.","type":"Physical"},{"category":"6. Event-Based Forms","form":"MGT 1","desc":"Register of members of the company","type":"Physical"},{"category":"6. Event-Based Forms","form":"MGT 2","desc":"Register of Debenture holders or any security holders","type":"Physical"},{"category":"6. Event-Based Forms","form":"MGT 3","desc":"Notice of the change in the situation or discontinuation of a location where a foreign register is kept.","type":">Physical"},{"category":"6. Event-Based Forms","form":"MGT 9","desc":"Extract of the annual return","type":"Physical"},{"category":"6. Event-Based Forms","form":"MGT 11","desc":"The appointment of a proxy for a meeting","type":"Physical"},{"category":"6. Event-Based Forms","form":"MGT 12","desc":"Polling paper in the meeting","type":"Physical"},{"category":"6. Event-Based Forms","form":"MGT 13","desc":"The scrutinizers report to the chairman on the meeting poll.","type":"Physical"},{"category":"6. Event-Based Forms","form":"CAA 1","desc":"The creditors' responsibility statement related to Section 230- Powers to either compromise or make arrangements with the creditors and the members.","type":"Physical"},{"category":"6. Event-Based Forms","form":"CAA 2","desc":"The notice of a meeting of any class or classes of the members or the creditors.","type":"Physical"},{"category":"6. Event-Based Forms","form":"CAA 10","desc":"The solvency declaration","type":"Physical"},{"category":"6. Event-Based Forms","form":"CAA 11","desc":"The approval notice for a scheme of merger","type":"Physical"},{"category":"6. Event-Based Forms","form":"STK 1","desc":"A notice by the Registrar of Companies for removing the name of the company from the Registrar of Companies.","type":"Physical"},{"category":"7. Foreign Company Forms","form":"FC 1","desc":"The information to be filed by a foreign company","type":"e-Form"},{"category":"7. Foreign Company Forms","form":"FC 2","desc":"The return of the alteration in the documents filed for the registration of a foreign company.","type":"e-Form"},{"category":"7. Foreign Company Forms","form":"FC 3","desc":"Annual accounts and the list of all the principal places of the business that are established in India by a foreign company.","type":"e-Form"},{"category":"7. Foreign Company Forms","form":"FC 4","desc":"Annual Return of a Foreign Company","type":"e-Form"},{"category":"7. Foreign Company Forms","form":"FC 5","desc":"Nomination for the Indian depository receipts","type":"Physical"},{"category":"8. Other Forms","form":"DPT 4","desc":"A statement on the existing deposits as on the date of commencement of the Companies Act","type":"Physical"},{"category":"8. Other Forms","form":"AOC 1","desc":"Statement including salient features of the financial statement of associates/ subsidiaries/ joint ventures.","type":"Physical"},{"category":"8. Other Forms","form":"AOC 2","desc":"","type":""},{"category":"8. Other Forms","form":"Physical","desc":"","type":""},{"category":"8. Other Forms","form":"AOC 3","desc":"The statements encapsulate the salient features of the audited financial statements.","type":"Physical"},{"category":"8. Other Forms","form":"AOC 3A","desc":"A Detailed statement on the annual financial statements to be filed by the company in accordance with the Companies Rules 2015.","type":""},{"category":"8. Other Forms","form":"RSC 1","desc":"The application was sent to the Tribunal to confirm the reduction of the share capital","type":"Physical"}];
 
 var FORMS = {
 "MR-1":{title:"Return of Appointment of MD/WTD/Manager/CEO/CFO/CS",status:"Substituted",portal:"MCA V3 (January 23, 2023)",updated:"Jan 23 2023 — Companies (Appointment & Remuneration) Amendment Rules 2023",applies:"PUBLIC COMPANIES and PRIVATE COMPANIES that are SUBSIDIARIES of Public Companies ONLY. Independent private companies EXEMPT.",timeline:"Within 60 days of appointment",section:"Sec 196 r/w Rule 3",penalty:"Rs.50,000 + Rs.500/day continuing",linked:"MR-2 (if remuneration exceeds Schedule V limits)",notes:"Certified by practising CA/CS/Cost Accountant. Independent private companies do NOT file MR-1.",steps:["Board approves appointment","Obtain DIR-2 consent + DIR-8 from appointee","Verify remuneration against Schedule V","Get CA/CS/Cost Accountant certification","File MR-1 on MCA V3 within 60 days","File MR-2 separately if excess remuneration"]},
@@ -1955,12 +1976,32 @@ function sf(){
   if(!q) return;
   var fk=Object.keys(FORMS).find(function(k){return k.toUpperCase()===q||k.replace('-','').toUpperCase()===q.replace('-','');});
   if(!fk){
-    document.getElementById('ffr').innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--slate)"><div style="font-size:26px;margin-bottom:8px">❓</div><div style="font-size:13px;margin-bottom:6px">Form "<strong style="color:var(--gold2)">'+q+'</strong>" not in database.</div><div style="font-size:11px">Available: '+Object.keys(FORMS).join(' · ')+'</div><div style="font-size:11px;margin-top:8px;color:var(--gold)">💬 Ask the AI Assistant for any other form</div></div>';
+    // Fall back to the 91-form master list
+    var qn = q.replace(/[-\s]/g,'').toUpperCase();
+    var m = FORM_MASTER.find(function(f){return f.form.replace(/[-\s]/g,'').toUpperCase()===qn;});
+    if(m){
+      document.getElementById('ffr').innerHTML =
+        '<div style="background:var(--ink2);border:1px solid var(--ink4);border-radius:12px;padding:22px;">'+
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">'+
+        '<div><div style="font-family:IBM Plex Serif,serif;font-size:22px;color:var(--navy);font-weight:700;">'+m.form+'</div>'+
+        '<div style="font-size:12px;color:var(--gold);margin-top:2px;">'+m.category+'</div></div>'+
+        '<span style="font-family:IBM Plex Mono,monospace;font-size:11px;background:var(--ink3);border:1px solid var(--ink4);padding:4px 10px;border-radius:5px;color:var(--slate2);">'+(m.type||'e-Form')+'</span></div>'+
+        '<div style="font-size:15px;color:var(--ink);line-height:1.6;padding:14px 0;border-top:1px solid var(--ink4);">'+m.desc+'</div>'+
+        '<div style="margin-top:14px;"><button onclick="getFormDetail(\''+m.form+'\')" style="background:var(--navy);color:#fff;border:none;border-radius:8px;padding:11px 22px;font-size:14px;font-weight:600;cursor:pointer;">📋 Get Full Filing Details →</button></div>'+
+        '</div>';
+      // Auto-load full details immediately
+      getFormDetail(m.form);
+      return;
+    }
+    document.getElementById('ffr').innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--slate)"><div style="font-size:26px;margin-bottom:8px">❓</div><div style="font-size:13px;margin-bottom:6px">Form "<strong style="color:var(--gold2)">'+q+'</strong>" not found.</div><div style="font-size:11px;margin-top:8px;color:var(--gold)">💬 Ask the AI Assistant for any form</div></div>';
     return;
   }
   var f=FORMS[fk],sc=f.status==='Abolished'?'sx':f.status==='Substituted'?'sc':'sa';
   var rows=[{l:'Portal',v:f.portal},{l:'Last Updated',v:f.updated,h:1},{l:'Applicable To',v:f.applies,h:1},{l:'Filing Timeline',v:f.timeline},{l:'Section / Rule',v:f.section},{l:'Penalty',v:f.penalty},{l:'Linked Forms',v:f.linked},{l:'Key Notes',v:f.notes,h:1}];
-  document.getElementById('ffr').innerHTML='<div class="frc"><div class="frh"><div><div class="frn">'+fk+'</div><div class="frt">'+f.title+'</div></div><span class="stb '+sc+'">'+f.status+'</span></div>'+rows.filter(function(r){return r.v;}).map(function(r){return '<div class="fr"><div class="frl">'+r.l+'</div><div class="frv'+(r.h?' hl':'')+'">'+ r.v+'</div></div>';}).join('')+'<div class="fr"><div class="frl">Filing Steps</div><div class="frv">'+f.steps.map(function(s,i){return '<div class="sp"><div class="sn">'+(i+1)+'</div><div>'+s+'</div></div>';}).join('')+'</div></div></div>';
+  document.getElementById('ffr').innerHTML='<div class="frc"><div class="frh"><div><div class="frn">'+fk+'</div><div class="frt">'+f.title+'</div></div><span class="stb '+sc+'">'+f.status+'</span></div>'+rows.filter(function(r){return r.v;
+  var _fdBtn = document.createElement('div'); _fdBtn.style.marginTop='14px';
+  _fdBtn.innerHTML = '<button onclick="getFormDetail(\''+fk+'\')" style="background:var(--navy);color:#fff;border:none;border-radius:8px;padding:11px 22px;font-size:14px;font-weight:600;cursor:pointer;">📋 Get Full AI Filing Guide →</button>';
+  var _ffr = document.getElementById('ffr'); if(_ffr) _ffr.appendChild(_fdBtn);}).map(function(r){return '<div class="fr"><div class="frl">'+r.l+'</div><div class="frv'+(r.h?' hl':'')+'">'+ r.v+'</div></div>';}).join('')+'<div class="fr"><div class="frl">Filing Steps</div><div class="frv">'+f.steps.map(function(s,i){return '<div class="sp"><div class="sn">'+(i+1)+'</div><div>'+s+'</div></div>';}).join('')+'</div></div></div>';
 }
 
 rc();
@@ -1972,7 +2013,9 @@ var TRK_CFG={
   sebi:{officialUrl:'https://www.sebi.gov.in/sebiweb/home/HomeAction.do?doListing=yes&sid=1&ssid=7&smid=0',rssUrl:'https://www.sebi.gov.in/sebirss.xml',label:'SEBI Circulars'},
   mca:{officialUrl:'https://www.mca.gov.in/content/mca/global/en/acts-rules/ebooks/notifications.html',rssUrl:'https://www.mca.gov.in/mca/html/mcav2_en/home/home/more/newsandupdates/rssfeeds/rss.html',label:'MCA Notifications'},
   'sebi-reg':{officialUrl:'https://www.sebi.gov.in/legal/regulations.html',rssUrl:'https://www.sebi.gov.in/sebirss.xml',label:'SEBI Regulations'},
-  ibbi:{officialUrl:'https://ibbi.gov.in/home/latestnews',rssUrl:'https://ibbi.gov.in/uploads/rss/rss.xml',label:'IBBI Updates'}
+  ibbi:{officialUrl:'https://ibbi.gov.in/home/latestnews',rssUrl:'https://ibbi.gov.in/uploads/rss/rss.xml',label:'IBBI Updates'},
+  rbi:{officialUrl:'https://www.rbi.org.in/Scripts/NotificationUser.aspx',rssUrl:'https://www.rbi.org.in/notifications_rss.xml',label:'RBI Notifications'},
+  incometax:{officialUrl:'https://incometaxindia.gov.in/Pages/communications/notifications.aspx',rssUrl:'https://incometaxindia.gov.in/_layouts/15/dit/pages/rssfeed.aspx',label:'Income Tax'}
 }
 
 function fetchSource(src,btn){
@@ -2002,18 +2045,46 @@ async function doFetchCirculars(cfg){
     if(cached&&Date.now()-cached.ts<3*60*60*1000){renderCirculars(cached.items,cfg.label,true);return;}
   }catch(e){}
 
-  try{
-    // rss2json proxy handles CORS
-    var rssApi='https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(cfg.rssUrl)+'&count=15';
-    var r=await fetch(rssApi);
-    var data=await r.json();
-    if(data.status!=='ok') throw new Error(data.message||'Feed error');
-    var items=(data.items||[]).slice(0,15).map(function(it){
-      return{title:it.title||'',link:it.link||'',date:(it.pubDate||'').substring(0,10),desc:(it.description||it.content||'').replace(/<[^>]+>/g,'').substring(0,250)};
+  var items=null, lastErr='';
+  // Try multiple free proxies in order for reliability
+  var proxies=[
+    function(u){return 'https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(u)+'&count=15';},
+    function(u){return 'https://api.allorigins.win/get?url='+encodeURIComponent(u);}
+  ];
+  for(var pi=0; pi<proxies.length && !items; pi++){
+    try{
+      if(st)st.textContent='Fetching (source '+(pi+1)+')...';
+      var r=await fetch(proxies[pi](cfg.rssUrl));
+      if(pi===0){
+        var data=await r.json();
+        if(data.status!=='ok') throw new Error(data.message||'Feed error');
+        items=(data.items||[]).slice(0,15).map(function(it){
+          return{title:it.title||'',link:it.link||'',date:(it.pubDate||'').substring(0,10),desc:(it.description||it.content||'').replace(/<[^>]+>/g,'').substring(0,250)};
+        });
+      } else {
+        // allorigins returns raw XML in .contents - parse it
+        var wrap=await r.json();
+        var xml=new DOMParser().parseFromString(wrap.contents,'text/xml');
+        var nodes=xml.querySelectorAll('item');
+        items=Array.prototype.slice.call(nodes,0,15).map(function(n){
+          function g(t){var e=n.querySelector(t);return e?e.textContent:'';}
+          return{title:g('title'),link:g('link'),date:(g('pubDate')||'').substring(0,16),desc:g('description').replace(/<[^>]+>/g,'').substring(0,250)};
+        });
+      }
+      if(!items||items.length===0){items=null;throw new Error('No items');}
+    }catch(e){lastErr=e.message;items=null;}
+  }
+  if(items){
+    // Mark items from last 7 days as NEW
+    var now=Date.now();
+    items.forEach(function(it){
+      var d=new Date(it.date); it.isNew=(!isNaN(d)&&(now-d.getTime())<7*24*60*60*1000);
     });
     localStorage.setItem(ckey,JSON.stringify({ts:Date.now(),items:items}));
-    await aiSummarizeCirculars(items,cfg.label);
-  }catch(e){
+    try{ await aiSummarizeCirculars(items,cfg.label); }
+    catch(e){ renderCirculars(items,cfg.label,false); }
+  } else {
+    var e={message:lastErr||'All sources unavailable'};
     out.innerHTML='<div style="padding:20px;"><div style="color:var(--red);font-size:13px;margin-bottom:12px;">⚠ Live feed unavailable: '+e.message+'</div>'+
       '<div style="background:var(--ink2);border-radius:10px;padding:14px;"><div style="font-size:12px;color:var(--slate2);margin-bottom:8px;">View directly on official portal:</div>'+
       '<a href="'+cfg.officialUrl+'" target="_blank" style="color:var(--gold);font-size:13px;">'+cfg.officialUrl+'</a></div></div>';
@@ -3937,6 +4008,235 @@ async function adminDeleteUser(userId, email){
     loadAdminUsers();
   }catch(e){
     alert('Error deleting user: '+e.message);
+  }
+}
+
+
+// ══════════════════════════════════════════════════════════
+// VETTED TEMPLATE LIBRARY
+// Admin drafts → reviews → saves. Users get the vetted version.
+// ══════════════════════════════════════════════════════════
+
+// Check Supabase for a vetted template; returns body text or null
+async function getVettedTemplate(category, templateKey){
+  if(!supaClient) return null;
+  try{
+    var res = await supaClient.from('templates')
+      .select('body')
+      .eq('category', category)
+      .eq('template_key', templateKey)
+      .maybeSingle();
+    if(res.data && res.data.body) return res.data.body;
+  }catch(e){ /* fall through to AI */ }
+  return null;
+}
+
+// Save a vetted template (admin only)
+async function saveVettedTemplate(category, templateKey, title, body){
+  if(!supaClient || !CURRENT_USER){ alert('Not logged in.'); return false; }
+  if(!CURRENT_USER.is_admin){ alert('Only admins can vet templates.'); return false; }
+  try{
+    var res = await supaClient.from('templates').upsert({
+      category: category,
+      template_key: templateKey,
+      title: title,
+      body: body,
+      vetted_by: CURRENT_USER.email,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'category,template_key' });
+    if(res.error) throw res.error;
+    return true;
+  }catch(e){
+    alert('Error saving template: ' + e.message);
+    return false;
+  }
+}
+
+// Build a stable template key from a label
+function makeTemplateKey(category, label){
+  return category + '_' + label.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'').substring(0,60);
+}
+
+// Render the admin "Vet & Save" box under a drafted output
+function renderVetBox(category, templateKey, title, outputElId){
+  if(!CURRENT_USER || !CURRENT_USER.is_admin) return '';
+  var boxId = 'vetbox_' + Math.random().toString(36).substring(2,8);
+  setTimeout(function(){
+    var box = document.getElementById(boxId);
+    if(box){
+      box.querySelector('.vet-save-btn').onclick = async function(){
+        var edited = document.getElementById(boxId + '_text').value;
+        var okBtn = this;
+        okBtn.textContent = 'Saving...'; okBtn.disabled = true;
+        var ok = await saveVettedTemplate(category, templateKey, title, edited);
+        if(ok){
+          okBtn.textContent = '✓ Saved as Vetted';
+          okBtn.style.background = 'var(--green)';
+          okBtn.style.color = '#fff';
+        } else {
+          okBtn.textContent = 'Save as Vetted Template';
+          okBtn.disabled = false;
+        }
+      };
+    }
+  }, 100);
+  return '<div id="'+boxId+'" style="margin-top:16px;border:1px solid var(--gold);border-radius:9px;padding:16px;background:var(--ink3);">' +
+    '<div style="font-size:12px;color:var(--gold);font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">⚖ Admin — Review &amp; Vet This Template</div>' +
+    '<div style="font-size:12px;color:var(--slate2);margin-bottom:10px;">Edit the draft to your professional standard, then save it. Users will get your vetted version.</div>' +
+    '<textarea id="'+boxId+'_text" style="width:100%;min-height:220px;background:var(--paper);border:1px solid var(--ink4);border-radius:7px;padding:12px;font-family:IBM Plex Sans,sans-serif;font-size:14px;line-height:1.6;color:var(--ink);resize:vertical;box-sizing:border-box;"></textarea>' +
+    '<button class="vet-save-btn" style="margin-top:10px;background:var(--navy);color:#fff;border:none;border-radius:7px;padding:11px 20px;font-weight:600;font-size:14px;cursor:pointer;">Save as Vetted Template</button>' +
+    '</div>';
+}
+
+
+// ══════════════════════════════════════════════════════════
+// FREE OFFICIAL-SOURCE FETCHING FOR ANSWERS
+// Fetches relevant government pages (free proxy) → grounds AI answer
+// ══════════════════════════════════════════════════════════
+
+// Map keywords in a question to the right official source page
+function pickSourceUrl(q){
+  var ql = q.toLowerCase();
+  if(/sebi|lodr|listing|takeover|sast|insider|pit|icdr|delisting|buyback|reg\s?\d/.test(ql))
+    return {url:'https://www.sebi.gov.in/sebirss.xml', label:'SEBI'};
+  if(/rbi|fema|fdi|foreign|ecb|odi|liberalised|remittance|fc-gpr|fc-trs/.test(ql))
+    return {url:'https://www.rbi.org.in/notifications_rss.xml', label:'RBI'};
+  if(/income tax|tds|itr|44ab|tax audit|section 80|advance tax/.test(ql))
+    return {url:'https://incometaxindia.gov.in/_layouts/15/dit/pages/rssfeed.aspx', label:'Income Tax'};
+  if(/ibc|insolvency|liquidation|cirp|resolution professional|nclt|ibbi/.test(ql))
+    return {url:'https://ibbi.gov.in/uploads/rss/rss.xml', label:'IBBI'};
+  // default: MCA (Companies Act matters)
+  return {url:'https://www.mca.gov.in/mca/html/mcav2_en/home/home/more/newsandupdates/rssfeeds/rss.html', label:'MCA'};
+}
+
+// Fetch recent official items via free proxy
+async function fetchOfficialContext(q){
+  var src = pickSourceUrl(q);
+  var proxies=[
+    function(u){return 'https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(u)+'&count=10';},
+    function(u){return 'https://api.allorigins.win/get?url='+encodeURIComponent(u);}
+  ];
+  for(var pi=0; pi<proxies.length; pi++){
+    try{
+      var r=await fetch(proxies[pi](src.url));
+      var items=[];
+      if(pi===0){
+        var data=await r.json();
+        if(data.status!=='ok') continue;
+        items=(data.items||[]).slice(0,10).map(function(it){return {t:it.title||'',d:(it.pubDate||'').substring(0,10),x:(it.description||'').replace(/<[^>]+>/g,'').substring(0,200)};});
+      } else {
+        var wrap=await r.json();
+        var xml=new DOMParser().parseFromString(wrap.contents,'text/xml');
+        var nodes=xml.querySelectorAll('item');
+        items=Array.prototype.slice.call(nodes,0,10).map(function(n){function g(t){var e=n.querySelector(t);return e?e.textContent:'';}return {t:g('title'),d:(g('pubDate')||'').substring(0,10),x:g('description').replace(/<[^>]+>/g,'').substring(0,200)};});
+      }
+      if(items.length){
+        var ctx='RECENT OFFICIAL UPDATES FROM '+src.label+' (use these to ensure your answer reflects current position; mention if any update is relevant):\n';
+        items.forEach(function(it){ctx+='- ['+it.d+'] '+it.t+(it.x?' — '+it.x:'')+'\n';});
+        return {context:ctx, label:src.label};
+      }
+    }catch(e){}
+  }
+  return null;
+}
+
+// Send with live source-checking
+async function sendMsgLive(){
+  var ci = document.getElementById('ci');
+  var q = ci.value.trim();
+  if (!q) return;
+  ci.value = '';
+  document.getElementById('qps').style.display = 'none';
+  var sb = document.getElementById('sendbtn'); if(sb) sb.disabled = true;
+
+  addMsg('u', q + ' <span style="font-size:10px;color:var(--gold);">[checking official sources]</span>');
+  var tid = addTyping();
+
+  try{
+    var oc = await fetchOfficialContext(q);
+    var messages = [{role:'system', content: SYS}];
+    chatHistory.slice(-6).forEach(function(h){ messages.push({role:h.role==='assistant'?'assistant':'user', content:h.content}); });
+    var userMsg = q;
+    if(oc){ userMsg = oc.context + '\n\nQUESTION: ' + q; }
+    messages.push({role:'user', content: userMsg});
+    var text = await callAIProxy(messages, 3000);
+    rmTyping(tid);
+    var srcTag = oc ? '<span class="src-tag" style="background:var(--gold);color:#fff;font-size:9px;padding:1px 6px;border-radius:4px;">✦ '+oc.label+' checked</span> ' : '<span class="src-tag src-ai">✦ AI</span> ';
+    addMsg('b', srcTag + formatAI(text), q);
+    chatHistory.push({role:'user', content:q});
+    chatHistory.push({role:'assistant', content:text});
+  }catch(e){
+    rmTyping(tid);
+    addMsg('b', '⚠ Could not check sources: '+e.message+'. Try the normal Ask button.');
+  }
+  if(sb) sb.disabled = false;
+}
+
+
+// ══════════════════════════════════════════════════════════
+// DETAILED FORM ANSWER — full structured breakdown per form
+// AI-generated, anchored to the verified form master + current sources
+// ══════════════════════════════════════════════════════════
+
+async function getFormDetail(formNo){
+  var out = document.getElementById('ffr');
+  // Find the form in the master (verified anchor data)
+  var qn = formNo.replace(/[-\s]/g,'').toUpperCase();
+  var m = (typeof FORM_MASTER!=='undefined') ? FORM_MASTER.find(function(f){return f.form.replace(/[-\s]/g,'').toUpperCase()===qn;}) : null;
+  var detailedFallback = (typeof FORMS!=='undefined') ? FORMS[formNo] : null;
+
+  out.innerHTML = '<div style="text-align:center;padding:40px;color:var(--slate)"><div class="dots"><span></span><span></span><span></span></div><div style="margin-top:12px;font-size:13px;color:var(--slate2);">Preparing detailed breakdown for '+formNo+'...</div></div>';
+
+  // Build the anchored prompt using verified data
+  var anchor = '';
+  if(m){ anchor = 'VERIFIED FORM DATA (use as the authoritative base):\nForm: '+m.form+'\nCategory: '+m.category+'\nOfficial description: '+m.desc+'\nType: '+m.type+'\n\n'; }
+
+  var prompt = anchor +
+    'Provide a COMPLETE, ACCURATE filing guide for Companies Act 2013 form "'+formNo+'" for a practising Company Secretary in India. ' +
+    'Use ONLY the current position as per Companies Act 2013 and the latest rules/amendments. Be precise and practical. ' +
+    'Structure your answer in EXACTLY these sections with these headings:\n\n' +
+    '## Purpose\n(What this form is for, 1-2 lines)\n\n' +
+    '## Applicability\n(Which companies must file it; any exemptions)\n\n' +
+    '## Timeline / Due Date\n(Exact filing deadline / trigger event)\n\n' +
+    '## Governing Section & Rule\n(Precise section and rule references)\n\n' +
+    '## Penalty for Default\n(Exact penalty amounts, per-day continuing fees, officer liability)\n\n' +
+    '## Filing Steps\n(Numbered step-by-step procedure on MCA V3 portal)\n\n' +
+    '## Attachments Required\n(List of documents to attach)\n\n' +
+    'If any requirement recently changed, note it. Be specific with numbers, sections and days. Do not invent facts you are unsure of — if genuinely uncertain about a specific figure, say "verify current figure on MCA portal".';
+
+  try{
+    // Try to fetch recent MCA context (free) to ground currency
+    var mcaCtx = '';
+    try{
+      if(typeof fetchOfficialContext==='function'){
+        var oc = await fetchOfficialContext('MCA form '+formNo+' Companies Act');
+        if(oc && oc.context) mcaCtx = '\n\n'+oc.context;
+      }
+    }catch(e){}
+
+    var messages = [
+      {role:'system', content: (typeof SYS!=='undefined'?SYS:'You are an expert Indian Company Secretary.')},
+      {role:'user', content: prompt + mcaCtx}
+    ];
+    var text = await callAIProxy(messages, 3000);
+
+    var typeBadge = m ? m.type : (detailedFallback?'e-Form':'');
+    var catLine = m ? m.category : '';
+
+    var html2 = '<div style="background:var(--ink2);border:1px solid var(--ink4);border-radius:12px;padding:24px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">' +
+      '<div><div style="font-family:IBM Plex Serif,serif;font-size:24px;color:var(--navy);font-weight:700;">'+formNo+'</div>' +
+      (catLine?'<div style="font-size:12px;color:var(--gold);margin-top:2px;">'+catLine+'</div>':'') + '</div>' +
+      (typeBadge?'<span style="font-family:IBM Plex Mono,monospace;font-size:11px;background:var(--ink3);border:1px solid var(--ink4);padding:4px 10px;border-radius:5px;color:var(--slate2);">'+typeBadge+'</span>':'') +
+      '</div>' +
+      '<div style="border-top:1px solid var(--ink4);margin:14px 0;"></div>' +
+      '<div class="form-detail-body" style="font-size:14.5px;line-height:1.7;color:var(--ink);">' + formatAI(text) + '</div>' +
+      '<div style="margin-top:16px;padding:11px 14px;background:var(--amber-bg);border:1px solid #EFE3C6;border-radius:8px;font-size:12px;color:var(--amber);">⚠ AI-generated guidance. Verify the current form version, fees and timeline on the MCA V3 portal before filing.</div>' +
+      '</div>';
+
+    out.innerHTML = html2;
+  }catch(e){
+    out.innerHTML = '<div style="padding:24px;color:var(--red);font-size:13px;">Could not generate details: '+e.message+'. Please try again.</div>';
   }
 }
 
