@@ -1175,7 +1175,9 @@ async function draftRes() {
     (details ? ' Specific details: ' + details + '.' : '') +
     ' Format it as a proper resolution with: (1) Recitals/Whereas clauses where needed, (2) RESOLVED THAT clause (bold the RESOLVED THAT), (3) RESOLVED FURTHER THAT for any additional resolutions, (4) Authorization clause for filing/signing, (5) Note which MCA form must be filed and within what deadline. Use proper legal language. Leave [COMPANY NAME], [DATE], [DIRECTOR NAME], [DIN: XXXXXX] as placeholders where specific details are unknown.';
 
-  var RES_SYS = `You are a Senior Company Secretary in India with 20+ years drafting board and general meeting resolutions for listed and unlisted companies. You draft resolutions to the exact standard of a practising CS — precise, exhaustive, and ready for execution.
+  var RES_SYS = `CRITICAL OUTPUT RULE: Output ONLY the final, clean resolution document. Do NOT show any reasoning, thinking, analysis, planning, or meta-commentary. Do NOT write things like "We need to..." or "Let me recall..." or "Actually...". Do NOT discuss which sections might apply — just cite the correct ones directly in the resolution. Start your response immediately with the resolution heading. If you are a reasoning model, do all reasoning silently and output only the finished document.
+
+You are a Senior Company Secretary in India with 20+ years drafting board and general meeting resolutions for listed and unlisted companies. You draft resolutions to the exact standard of a practising CS — precise, exhaustive, and ready for execution.
 
 MANDATORY DRAFTING STANDARD — follow every point:
 
@@ -1288,7 +1290,9 @@ async function draftCustomRes() {
   if (!input) { alert('Please describe the resolution you need.'); return; }
   var outEl = document.getElementById('resout');
   outEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--slate);"><div class="dots"><span></span><span></span><span></span></div><div style="margin-top:10px;font-size:12px;">Drafting resolution...</div></div>';
-  var RES_SYS = `You are a Senior Company Secretary in India with 20+ years drafting board and general meeting resolutions for listed and unlisted companies. You draft resolutions to the exact standard of a practising CS — precise, exhaustive, and ready for execution.
+  var RES_SYS = `CRITICAL OUTPUT RULE: Output ONLY the final, clean resolution document. Do NOT show any reasoning, thinking, analysis, planning, or meta-commentary. Do NOT write things like "We need to..." or "Let me recall..." or "Actually...". Do NOT discuss which sections might apply — just cite the correct ones directly in the resolution. Start your response immediately with the resolution heading. If you are a reasoning model, do all reasoning silently and output only the finished document.
+
+You are a Senior Company Secretary in India with 20+ years drafting board and general meeting resolutions for listed and unlisted companies. You draft resolutions to the exact standard of a practising CS — precise, exhaustive, and ready for execution.
 
 MANDATORY DRAFTING STANDARD — follow every point:
 
@@ -1416,7 +1420,9 @@ async function draftDoc() {
   var catLabel = {notice:'Notice', agenda:'Agenda', minutes:'Minutes'}[DOC_CAT];
   var listedNote = isListed ? ' The company is a LISTED entity — apply SEBI LODR 2015 requirements in addition (Reg 29 exchange intimation, Reg 30 disclosure, Reg 33 financial results timeline). Include all LODR-specific requirements.' : ' The company is UNLISTED.';
 
-  var DOC_SYS = `You are a Senior Company Secretary in India drafting board/general meeting documents to execution standard, fully compliant with the Companies Act 2013, Secretarial Standard SS-1 (Board Meetings) and SS-2 (General Meetings), and SEBI (LODR) Regulations 2015 for listed companies.
+  var DOC_SYS = `CRITICAL OUTPUT RULE: Output ONLY the final, clean resolution document. Do NOT show any reasoning, thinking, analysis, planning, or meta-commentary. Do NOT write things like "We need to..." or "Let me recall..." or "Actually...". Do NOT discuss which sections might apply — just cite the correct ones directly in the resolution. Start your response immediately with the resolution heading. If you are a reasoning model, do all reasoning silently and output only the finished document.
+
+You are a Senior Company Secretary in India drafting board/general meeting documents to execution standard, fully compliant with the Companies Act 2013, Secretarial Standard SS-1 (Board Meetings) and SS-2 (General Meetings), and SEBI (LODR) Regulations 2015 for listed companies.
 
 MANDATORY STANDARD:
 
@@ -1867,7 +1873,40 @@ function findOffline(q) {
   return null;
 }
 
+function stripReasoning(text){
+  if(!text) return text;
+  // Remove <think>...</think> blocks (reasoning models)
+  text = text.replace(/<think>[\s\S]*?<\/think>/gi, '');
+  text = text.replace(/<thinking>[\s\S]*?<\/thinking>/gi, '');
+  // If the model leaked reasoning, try to find where the actual document starts.
+  // Common document anchors for our resolutions/notices:
+  var anchors = [
+    /CERTIFIED TRUE COPY/i,
+    /RESOLUTION TO /i,
+    /ITEM NO\.?\s*\d/i,
+    /NOTICE IS HEREBY GIVEN/i,
+    /\bRESOLVED THAT\b/i,
+    /^#{1,3}\s/m,
+    /\bNOTICE\b/i,
+    /\bAGENDA\b/i,
+    /\bMINUTES\b/i
+  ];
+  // Detect reasoning leak: phrases the model uses when thinking out loud
+  var leakSigns = /(we need to|let me recall|let me think|actually,|but they said|the instruction says|i think|wait:|let's verify|let's check|thus the|thus we will|so we can|maybe we should)/i;
+  if(leakSigns.test(text.substring(0, 600))){
+    // Find the earliest real document anchor and cut everything before it
+    var best = -1;
+    for(var i=0;i<anchors.length;i++){
+      var m = text.match(anchors[i]);
+      if(m){ var pos = text.indexOf(m[0]); if(pos>-1 && (best===-1 || pos<best)) best = pos; }
+    }
+    if(best > 0) text = text.substring(best);
+  }
+  return text.trim();
+}
+
 function formatAI(text) {
+  text = stripReasoning(text);
   return text
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
