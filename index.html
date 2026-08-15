@@ -4179,6 +4179,7 @@ function makeTemplateKey(category, label){
 
 // Render the admin "Vet & Save" box under a drafted output
 function renderVetBox(category, templateKey, title, outputElId){
+  return '';  // Admin vet box disabled
   if(!CURRENT_USER || !CURRENT_USER.is_admin) return '';
   var boxId = 'vetbox_' + Math.random().toString(36).substring(2,8);
   setTimeout(function(){
