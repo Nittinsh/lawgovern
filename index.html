@@ -83,6 +83,270 @@
 .appmain{padding:26px;overflow-x:hidden;background:var(--bg);}
 @media(max-width:900px){.appshell{grid-template-columns:1fr;}.appside{position:static;height:auto;}}
 /* ===== end Command Center re-skin ===== */
+
+/* ===== COMMAND CENTER DASHBOARD ===== */
+#p-home{padding:0;background:transparent;}
+.cc-pagehead{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:14px;}
+.cc-crumb{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-soft);font-weight:700;margin-bottom:8px;}
+.cc-h1{font-size:27px;font-weight:800;letter-spacing:-.7px;color:var(--navy);}
+.cc-sub{color:var(--ink-soft);font-size:13.5px;margin-top:3px;}
+.cc-headbtns{display:flex;gap:9px;}
+.cc-btn,.cc-btn-primary{display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border-radius:9px;font-family:'Manrope';font-weight:600;font-size:13px;cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--ink-mid);transition:.14s;}
+.cc-btn:hover{border-color:var(--blue);color:var(--blue);}
+.cc-btn-primary{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,.24);}
+.cc-btn-primary:hover{background:#1D4FD8;transform:translateY(-1px);}
+
+.cc-topgrid{display:grid;grid-template-columns:340px 1fr;gap:18px;margin-bottom:18px;}
+@media(max-width:1100px){.cc-topgrid{grid-template-columns:1fr;}}
+
+.cc-card{background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 3px rgba(11,18,32,.05),0 8px 24px rgba(11,18,32,.04);}
+.cc-health{display:flex;flex-direction:column;align-items:center;padding:26px 18px 20px;}
+.cc-gauge{position:relative;width:220px;height:220px;}
+.cc-gauge-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.cc-gauge-score{font-size:52px;font-weight:800;letter-spacing:-2px;line-height:1;}
+.cc-gauge-max{font-size:13px;color:var(--slate);margin-top:2px;}
+.cc-gauge-label{margin-top:5px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
+.cc-legend{display:flex;gap:16px;margin-top:16px;flex-wrap:wrap;justify-content:center;}
+.cc-hl{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink-soft);font-weight:500;}
+.cc-hl i{width:9px;height:9px;border-radius:3px;display:block;}
+
+.cc-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-content:start;}
+@media(max-width:640px){.cc-metrics{grid-template-columns:1fr 1fr;}}
+.cc-metric{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:0 1px 2px rgba(11,18,32,.04);transition:.15s;}
+.cc-metric:hover{box-shadow:0 8px 24px rgba(11,18,32,.06);transform:translateY(-2px);}
+.cc-metric-top{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.cc-chip{width:28px;height:28px;border-radius:8px;flex-shrink:0;}
+.cc-chip.blue{background:var(--blue-wash);} .cc-chip.cyan{background:var(--cyan-wash);}
+.cc-chip.ok{background:var(--ok-wash);} .cc-chip.warn{background:var(--warn-wash);} .cc-chip.crit{background:var(--crit-wash);}
+.cc-metric-k{font-size:11.5px;color:var(--ink-soft);font-weight:600;}
+.cc-metric-v{font-size:30px;font-weight:800;letter-spacing:-1.2px;line-height:1;color:var(--navy);}
+.cc-metric-v.crit{color:var(--crit);} .cc-metric-v.warn{color:var(--warn);} .cc-metric-v.ok{color:var(--ok);}
+.cc-metric-sub{font-size:11px;color:var(--slate);margin-top:5px;}
+
+.cc-card-h{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line-soft);}
+.cc-card-h h3{font-size:14px;font-weight:700;letter-spacing:-.2px;display:flex;align-items:center;gap:9px;color:var(--navy);}
+.cc-card-h h3 svg{width:16px;height:16px;color:var(--ink-soft);}
+.cc-link{font-size:12px;color:var(--blue);font-weight:600;cursor:pointer;}
+.cc-card-b{padding:8px 18px 18px;}
+
+.cc-att-row{display:flex;align-items:center;gap:13px;padding:13px 0;border-bottom:1px solid var(--line-soft);}
+.cc-att-row:last-child{border-bottom:none;}
+.cc-sig{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.cc-sig.crit{background:var(--crit);box-shadow:0 0 0 4px var(--crit-wash);}
+.cc-sig.warn{background:var(--warn);box-shadow:0 0 0 4px var(--warn-wash);}
+.cc-sig.blue{background:var(--blue);box-shadow:0 0 0 4px var(--blue-wash);}
+.cc-att-main{min-width:0;flex:1;}
+.cc-att-title{font-weight:600;font-size:13.5px;color:var(--navy);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.cc-att-code{font-size:11px;color:var(--ink-mid);background:var(--bg);border:1px solid var(--line);padding:1px 6px;border-radius:5px;}
+.cc-att-meta{font-size:12px;color:var(--ink-soft);margin-top:2px;}
+.cc-att-right{text-align:right;flex-shrink:0;}
+.cc-att-due{font-size:12.5px;font-weight:600;color:var(--ink-mid);}
+.cc-att-tag{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:6px;display:inline-block;margin-top:3px;}
+.cc-att-tag.over{background:var(--crit-wash);color:var(--crit);}
+.cc-att-tag.soon{background:var(--warn-wash);color:var(--warn);}
+.cc-att-tag.due{background:var(--blue-wash);color:var(--blue);}
+
+.cc-empty{text-align:center;padding:70px 20px;}
+.cc-empty-icon{width:60px;height:60px;margin:0 auto 18px;border-radius:14px;background:var(--blue-wash);display:flex;align-items:center;justify-content:center;color:var(--blue);}
+.cc-empty-icon svg{width:30px;height:30px;}
+.cc-empty h2{font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-.5px;margin-bottom:8px;}
+.cc-empty p{font-size:14px;color:var(--ink-soft);max-width:420px;margin:0 auto 22px;}
+/* ===== end dashboard ===== */
+
+/* ===== COMPLIANCE UNIVERSE ===== */
+#p-universe{padding:0;background:transparent;}
+.cu-summary{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+.cu-sum-chip{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 16px;font-size:13px;color:var(--ink-soft);cursor:pointer;transition:.14s;font-weight:500;}
+.cu-sum-chip:hover{border-color:var(--blue);transform:translateY(-1px);}
+.cu-sum-chip b{font-size:18px;font-weight:800;color:var(--navy);margin-right:5px;font-family:'IBM Plex Mono';}
+.cu-sum-chip.crit b{color:var(--crit);} .cu-sum-chip.warn b{color:var(--warn);} .cu-sum-chip.ok b{color:var(--ok);}
+
+.cu-filters{display:flex;gap:9px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+.cu-search{flex:1;min-width:220px;display:flex;align-items:center;gap:8px;background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:8px 12px;color:var(--ink-soft);}
+.cu-search svg{width:15px;height:15px;flex-shrink:0;}
+.cu-search input{border:none;background:none;outline:none;font-family:'Manrope';font-size:13px;color:var(--ink);width:100%;}
+.cu-filters select{font-family:'Manrope';font-size:12.5px;font-weight:500;color:var(--ink-mid);background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:8px 11px;cursor:pointer;outline:none;}
+.cu-filters select:hover{border-color:var(--blue);}
+.cu-clear{font-family:'Manrope';font-size:12.5px;font-weight:600;color:var(--red);background:var(--rose-bg);border:1px solid transparent;border-radius:9px;padding:8px 12px;cursor:pointer;}
+
+.cu-tablewrap{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(11,18,32,.05),0 8px 24px rgba(11,18,32,.04);}
+.cu-table{width:100%;border-collapse:collapse;font-size:13px;}
+.cu-table thead th{text-align:left;padding:12px 14px;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);font-weight:700;background:var(--bg);border-bottom:1px solid var(--line);cursor:pointer;white-space:nowrap;user-select:none;}
+.cu-table thead th:hover{color:var(--blue);}
+.cu-table tbody tr{border-bottom:1px solid var(--line-soft);cursor:pointer;transition:.1s;}
+.cu-table tbody tr:hover{background:var(--blue-wash);}
+.cu-table tbody tr:last-child{border-bottom:none;}
+.cu-table td{padding:12px 14px;vertical-align:middle;color:var(--ink-mid);}
+.cu-oblig{font-weight:600;color:var(--navy);font-size:13.5px;}
+.cu-oblig-sub{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+.cu-oblig-sub .mono{color:var(--blue);}
+.cu-law{font-size:11.5px;font-weight:600;color:var(--ink-mid);background:var(--bg);border:1px solid var(--line);padding:3px 8px;border-radius:6px;white-space:nowrap;}
+.cu-sec{color:var(--ink-mid);font-size:12px;white-space:nowrap;}
+.cu-due{color:var(--ink-mid);white-space:nowrap;font-size:12.5px;}
+.cu-pill{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:6px;white-space:nowrap;}
+.cu-pill.over{background:var(--crit-wash);color:var(--crit);}
+.cu-pill.soon{background:var(--warn-wash);color:var(--warn);}
+.cu-pill.due{background:var(--blue-wash);color:var(--blue);}
+.cu-pill.sched{background:var(--bg);color:var(--ink-soft);}
+.cu-pill.done{background:var(--ok-wash);color:var(--ok);}
+.cu-risk{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;white-space:nowrap;}
+.cu-risk i{width:7px;height:7px;border-radius:50%;display:block;}
+.cu-risk.crit{color:var(--crit);} .cu-risk.crit i{background:var(--crit);}
+.cu-risk.warn{color:var(--warn);} .cu-risk.warn i{background:var(--warn);}
+.cu-risk.low{color:var(--ink-soft);} .cu-risk.low i{background:var(--slate);}
+.cu-act button{font-family:'Manrope';font-size:12px;font-weight:600;color:var(--blue);background:none;border:none;cursor:pointer;white-space:nowrap;}
+.cu-foot{padding:12px 4px;font-size:12px;color:var(--ink-soft);}
+.cu-foot b{color:var(--navy);}
+
+/* detail modal */
+.cu-modal{display:none;position:fixed;inset:0;background:rgba(11,18,32,.5);z-index:500;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px);}
+.cu-modal-inner{background:var(--paper);border-radius:16px;max-width:560px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.3);}
+.cud-body{padding:24px;}
+.cud-h{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:18px;}
+.cud-oblig{font-size:20px;font-weight:800;color:var(--navy);letter-spacing:-.4px;}
+.cud-entity{font-size:13px;color:var(--ink-soft);margin-top:3px;}
+.cud-form{font-size:12px;font-weight:600;color:var(--blue);background:var(--blue-wash);padding:4px 10px;border-radius:6px;white-space:nowrap;}
+.cud-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:16px;}
+.cud-f{background:var(--paper);padding:11px 14px;}
+.cud-f-l{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);font-weight:700;margin-bottom:4px;}
+.cud-f-v{font-size:13px;color:var(--navy);font-weight:500;}
+.cud-why{background:var(--blue-wash);border:1px solid #D5E3FB;border-radius:10px;padding:14px;margin-bottom:16px;}
+.cud-why-h{font-size:12px;font-weight:700;color:var(--blue);margin-bottom:5px;}
+.cud-why-b{font-size:12.5px;color:var(--ink-mid);line-height:1.6;}
+.cud-actions{display:flex;gap:9px;flex-wrap:wrap;}
+/* ===== end universe ===== */
+#p-universe{display:none;height:auto;overflow:visible;padding:0;} #p-universe.on{display:block;} #p-home{height:auto;overflow:visible;}
+.cc-metric-click{cursor:pointer;}
+.cc-metric-click:hover{border-color:var(--blue);box-shadow:0 8px 24px rgba(37,99,235,.12);}
+.cc-metric-go{color:var(--blue);font-weight:700;margin-left:6px;opacity:0;transition:.14s;}
+.cc-metric-click:hover .cc-metric-go{opacity:1;}
+
+/* ===== MY WORK ===== */
+#p-mywork{display:none;height:auto;overflow:visible;padding:0;}
+#p-mywork.on{display:block;}
+.mw-tabs{display:flex;gap:6px;margin-bottom:18px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+.mw-tab{display:flex;align-items:center;gap:8px;padding:10px 16px;font-size:13.5px;font-weight:600;color:var(--ink-soft);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:.14s;}
+.mw-tab:hover{color:var(--navy);}
+.mw-tab.on{color:var(--blue);border-bottom-color:var(--blue);}
+.mw-tab-count{font-size:11px;font-weight:700;font-family:'IBM Plex Mono';padding:1px 7px;border-radius:10px;background:var(--bg);color:var(--ink-soft);}
+.mw-tab-count.crit{background:var(--crit-wash);color:var(--crit);}
+.mw-tab-count.warn{background:var(--warn-wash);color:var(--warn);}
+.mw-tab-count.blue{background:var(--blue-wash);color:var(--blue);}
+.mw-tab-count.ok{background:var(--ok-wash);color:var(--ok);}
+
+.mw-list{display:flex;flex-direction:column;gap:10px;}
+.mw-item{display:flex;align-items:center;gap:14px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:0 1px 2px rgba(11,18,32,.04);transition:.14s;}
+.mw-item:hover{box-shadow:0 6px 18px rgba(11,18,32,.07);border-color:var(--line);}
+.mw-item-sig{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.mw-item-sig.crit{background:var(--crit);box-shadow:0 0 0 4px var(--crit-wash);}
+.mw-item-sig.warn{background:var(--warn);box-shadow:0 0 0 4px var(--warn-wash);}
+.mw-item-sig.blue{background:var(--blue);box-shadow:0 0 0 4px var(--blue-wash);}
+.mw-item-sig.ok{background:var(--ok);box-shadow:0 0 0 4px var(--ok-wash);}
+.mw-item-main{flex:1;min-width:0;}
+.mw-item-title{font-weight:600;font-size:14px;color:var(--navy);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.mw-code{font-size:11px;color:var(--blue);background:var(--blue-wash);padding:1px 7px;border-radius:5px;}
+.mw-item-meta{font-size:12px;color:var(--ink-soft);margin-top:3px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.mw-legal{color:var(--ink-mid);}
+.mw-dot{color:var(--ink-4);}
+.mw-item-side{text-align:right;flex-shrink:0;min-width:110px;}
+.mw-risk{font-size:10.5px;font-weight:700;text-transform:capitalize;display:inline-block;padding:2px 8px;border-radius:5px;margin-bottom:3px;}
+.mw-risk.crit{background:var(--crit-wash);color:var(--crit);}
+.mw-risk.warn{background:var(--warn-wash);color:var(--warn);}
+.mw-risk.low{background:var(--bg);color:var(--ink-soft);}
+.mw-due{font-size:12px;color:var(--ink-mid);}
+.mw-days{font-size:11px;color:var(--ink-soft);margin-top:1px;}
+.mw-days.crit{color:var(--crit);font-weight:600;}
+.mw-item-actions{display:flex;gap:6px;flex-shrink:0;}
+.mw-act{font-family:'Manrope';font-size:12.5px;font-weight:600;padding:7px 14px;border-radius:8px;cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--ink-mid);transition:.14s;}
+.mw-act:hover{border-color:var(--blue);color:var(--blue);}
+.mw-act.primary{background:var(--blue);border-color:var(--blue);color:#fff;}
+.mw-act.primary:hover{background:#1D4FD8;color:#fff;}
+.mw-act.crit{background:var(--crit);border-color:var(--crit);color:#fff;}
+.mw-act.crit:hover{background:#DC2626;color:#fff;}
+.mw-act.ghost{color:var(--ink-soft);padding:7px 11px;}
+.mw-empty{text-align:center;padding:50px;color:var(--ink-soft);font-size:14px;background:var(--paper);border:1px dashed var(--line);border-radius:12px;}
+/* ===== end my work ===== */
+
+/* ===== COMPLIANCE DETAIL WORKSPACE ===== */
+.cd-modal{display:none;position:fixed;inset:0;background:rgba(11,18,32,.55);z-index:600;align-items:flex-start;justify-content:center;padding:40px 20px;backdrop-filter:blur(4px);overflow-y:auto;}
+.cd-inner{background:var(--paper);border-radius:18px;max-width:680px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.35);margin:auto;}
+.cd-body{padding:26px 28px;}
+.cd-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:14px;}
+.cd-oblig{font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-.5px;line-height:1.2;}
+.cd-entity{font-size:13px;color:var(--ink-soft);margin-top:4px;}
+.cd-close{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);cursor:pointer;font-size:15px;flex-shrink:0;transition:.14s;}
+.cd-close:hover{border-color:var(--crit);color:var(--crit);}
+.cd-tags{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:22px;}
+.cd-form{font-size:11px;font-weight:600;color:var(--blue);background:var(--blue-wash);padding:3px 9px;border-radius:6px;}
+.cd-prog{font-size:11.5px;font-weight:600;color:var(--ink-soft);margin-left:auto;}
+
+.cd-section{margin-bottom:22px;}
+.cd-sec-h{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:12px;display:flex;align-items:center;gap:10px;}
+.cd-sec-count{font-family:'IBM Plex Mono';font-size:11px;color:var(--blue);background:var(--blue-wash);padding:1px 8px;border-radius:10px;letter-spacing:0;}
+
+.cd-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;}
+.cd-f{background:var(--paper);padding:11px 14px;}
+.cd-f-l{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);font-weight:700;margin-bottom:3px;}
+.cd-f-v{font-size:13px;color:var(--navy);font-weight:500;text-transform:capitalize;}
+
+.cd-legal{display:flex;flex-direction:column;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:14px 16px;}
+.cd-legal>div{display:flex;justify-content:space-between;align-items:center;gap:12px;}
+.cd-legal-l{font-size:12px;color:var(--ink-soft);}
+.cd-legal-v{font-size:13px;color:var(--navy);font-weight:600;text-align:right;}
+
+.cd-why{font-size:13.5px;color:var(--ink-mid);line-height:1.65;background:var(--blue-wash);border:1px solid #D5E3FB;border-radius:10px;padding:14px 16px;}
+.cd-why-verify{color:var(--warn);font-weight:500;}
+.cd-ai-btn{margin-top:10px;font-family:'Manrope';font-size:12.5px;font-weight:600;color:var(--blue);background:none;border:1px solid var(--blue);border-radius:8px;padding:8px 14px;cursor:pointer;transition:.14s;}
+.cd-ai-btn:hover{background:var(--blue);color:#fff;}
+
+.cd-progress-bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:12px;}
+.cd-progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--cyan));border-radius:3px;transition:width .3s;}
+.cd-steps{display:flex;flex-direction:column;gap:6px;}
+.cd-step{display:flex;align-items:center;gap:12px;padding:11px 14px;border:1px solid var(--line);border-radius:9px;cursor:pointer;transition:.14s;background:var(--paper);}
+.cd-step:hover{border-color:var(--blue);}
+.cd-step.done{background:var(--ok-wash);border-color:#BDE9D5;}
+.cd-step-check{width:24px;height:24px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono';font-size:12px;font-weight:600;border:1.5px solid var(--line);color:var(--ink-soft);background:var(--bg);}
+.cd-step.done .cd-step-check{background:var(--ok);border-color:var(--ok);color:#fff;}
+.cd-step-txt{font-size:13.5px;color:var(--navy);font-weight:500;}
+.cd-step.done .cd-step-txt{color:var(--ink-mid);}
+
+.cd-docs{display:flex;gap:8px;flex-wrap:wrap;}
+.cd-doc{font-size:12.5px;font-weight:600;padding:8px 14px;border-radius:8px;border:1px solid var(--line);color:var(--ink-soft);cursor:pointer;background:var(--paper);transition:.14s;position:relative;}
+.cd-doc:hover{border-color:var(--blue);}
+.cd-doc.active{background:var(--blue);border-color:var(--blue);color:#fff;}
+
+.cd-approvals{display:flex;align-items:center;flex-wrap:wrap;gap:0;margin-bottom:12px;}
+.cd-appr{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.cd-appr-node{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono';font-size:14px;font-weight:600;border:1.5px solid var(--line);background:var(--paper);color:var(--ink-soft);}
+.cd-appr.done .cd-appr-node{background:var(--ok);border-color:var(--ok);color:#fff;}
+.cd-appr.active .cd-appr-node{border-color:var(--blue);color:var(--blue);box-shadow:0 0 0 4px var(--blue-wash);}
+.cd-appr-role{font-size:11.5px;font-weight:600;color:var(--ink-mid);}
+.cd-appr.done .cd-appr-role{color:var(--ok);}
+.cd-appr-line{flex:1;height:2px;background:var(--line);min-width:24px;margin:0 4px;margin-bottom:22px;}
+.cd-appr-line.done{background:var(--ok);}
+.cd-appr-btn{font-family:'Manrope';font-size:12.5px;font-weight:600;color:var(--blue);background:var(--blue-wash);border:none;border-radius:8px;padding:8px 14px;cursor:pointer;}
+.cd-appr-btn:hover{background:var(--blue);color:#fff;}
+
+.cd-evidence{display:flex;flex-direction:column;gap:7px;margin-bottom:10px;}
+.cd-ev-item{display:flex;align-items:center;gap:10px;padding:10px 13px;background:var(--bg);border:1px solid var(--line);border-radius:9px;}
+.cd-ev-icon{font-size:14px;}
+.cd-ev-name{flex:1;font-size:13px;color:var(--navy);font-weight:500;}
+.cd-ev-date{font-size:11px;color:var(--ink-soft);}
+.cd-ev-del{background:none;border:none;color:var(--ink-4);cursor:pointer;font-size:13px;}
+.cd-ev-del:hover{color:var(--crit);}
+.cd-ev-empty{font-size:12.5px;color:var(--ink-soft);padding:14px;background:var(--bg);border:1px dashed var(--line);border-radius:9px;text-align:center;}
+.cd-ev-add{font-family:'Manrope';font-size:12.5px;font-weight:600;color:var(--blue);background:none;border:1px dashed var(--blue);border-radius:8px;padding:8px 14px;cursor:pointer;width:100%;}
+.cd-ev-add:hover{background:var(--blue-wash);}
+
+.cd-audit{display:flex;flex-direction:column;gap:0;}
+.cd-audit-row{display:flex;gap:12px;padding:8px 0;position:relative;}
+.cd-audit-dot{width:9px;height:9px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:4px;box-shadow:0 0 0 3px var(--blue-wash);}
+.cd-audit-main{display:flex;flex-direction:column;gap:1px;}
+.cd-audit-main b{font-size:13px;color:var(--navy);font-weight:600;}
+.cd-audit-meta{font-size:11px;color:var(--ink-soft);}
+
+.cd-foot{display:flex;gap:10px;padding-top:8px;border-top:1px solid var(--line);margin-top:4px;padding-top:18px;}
+/* ===== end detail workspace ===== */
 </style>
 </head>
 <body>
@@ -171,10 +435,19 @@ function enterApp(){
   if(hu && CURRENT_USER) hu.textContent = CURRENT_USER.email;
   // Show Admin tab ONLY for admins
   var adminTab = document.getElementById('t-admin');
-  if(adminTab) adminTab.style.display = (CURRENT_USER && CURRENT_USER.is_admin) ? '' : 'none';
+  var adminHead = document.getElementById('admin-nav-head');
+  var showAdmin = (CURRENT_USER && CURRENT_USER.is_admin) ? '' : 'none';
+  if(adminTab) adminTab.style.display = showAdmin;
+  if(adminHead) adminHead.style.display = showAdmin;
   if(typeof updateMode === 'function') updateMode();
-  // Load cloud data
-  if(typeof loadCloudClients === 'function') loadCloudClients();
+  // Render the Command Center dashboard immediately
+  if(typeof renderCommandCenter === 'function') renderCommandCenter();
+  // Load cloud data, then re-render dashboard with real numbers
+  if(typeof loadCloudClients === 'function'){
+    Promise.resolve(loadCloudClients()).then(function(){
+      if(typeof renderCommandCenter === 'function') renderCommandCenter();
+    }).catch(function(){});
+  }
 }
 
 // Check existing session on load
@@ -368,11 +641,14 @@ input[type="text"], input[type="password"], textarea, select {
 <div class="appshell">
 <aside class="appside">
 <div class="navhead">Intelligence</div>
-<div class="navitem on" onclick="sw('chat')" id="t-chat"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3.2"/></svg><span>AI Compliance</span></div>
+<div class="navitem on" onclick="sw('home')" id="t-home"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span>Command Center</span></div>
+<div class="navitem" onclick="sw('universe')" id="t-universe"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg><span>Compliance Universe</span></div>
+<div class="navitem" onclick="sw('chat')" id="t-chat"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3.2"/></svg><span>AI Compliance</span></div>
 <div class="navitem" onclick="sw('ff')" id="t-ff"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><span>Form Finder</span></div>
 <div class="navitem" onclick="sw('xlaw')" id="t-xlaw"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/><path d="M9 12h6"/></svg><span>Cross-Law</span></div>
 <div class="navitem" onclick="sw('tracker')" id="t-tracker"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v3M12 18v3"/></svg><span>Regulatory Radar</span></div>
 <div class="navhead">Operate</div>
+<div class="navitem" onclick="sw('mywork')" id="t-mywork"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3 8-8M20 12v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h9"/></svg><span>My Work</span></div>
 <div class="navitem" onclick="sw('cal')" id="t-cal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Calendar</span></div>
 <div class="navitem" onclick="sw('cl')" id="t-cl"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3 8-8M20 12v7H4V5h11"/></svg><span>Checklist</span></div>
 <div class="navhead">Document Studio</div>
@@ -389,10 +665,29 @@ input[type="text"], input[type="password"], textarea, select {
 <div class="navitem" onclick="sw('admin')" id="t-admin" style="display:none"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.3l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2.2-1.3L14 2h-4l-.3 2.2a7 7 0 0 0-2.2 1.3l-2.3-1-2 3.4 2 1.5A7 7 0 0 0 5 12a7 7 0 0 0 .1 1.3l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2.2 1.3L10 22h4l.3-2.2a7 7 0 0 0 2.2-1.3l2.3 1 2-3.4-2-1.5z"/></svg><span>Administration</span></div>
 </aside>
 <div class="appmain">
-<div class="panels">
 
+<div class="panel on" id="p-home">
+  <div id="cc-dash-root">
+    <div style="text-align:center;padding:60px;color:var(--ink-soft);">
+      <div class="dots"><span></span><span></span><span></span></div>
+      <div style="margin-top:12px;font-size:13px;">Loading your compliance command center…</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel" id="p-universe">
+  <div id="cu-root"></div>
+</div>
+
+<div class="panel" id="p-mywork">
+  <div id="mw-root"></div>
+</div>
+
+
+
+<div class="panels">
 <!-- CHAT PANEL -->
-<div class="panel on" id="p-chat">
+<div class="panel" id="p-chat">
   <div class="msgs" id="msgs">
     <div class="msg b">
       <div class="av" style="background:transparent;padding:1px;"><img src="data:image/png;base64,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" style="width:100%;height:100%;object-fit:contain;border-radius:6px;" alt="LG"></div>
@@ -2052,6 +2347,9 @@ function sw(id) {
   var nav=document.getElementById('t-'+id); if(nav) nav.classList.add('on');
   var pan=document.getElementById('p-'+id); if(pan) pan.classList.add('on');
   if (id==='cal') rc();
+  if (id==='home' && typeof renderCommandCenter==='function') renderCommandCenter();
+  if (id==='universe' && typeof renderUniverse==='function') renderUniverse();
+  if (id==='mywork' && typeof renderMyWork==='function') renderMyWork();
 }
 
 // ═══════════════════════════════════════════════════
@@ -4410,6 +4708,768 @@ async function getFormDetail(formNo){
   }
 }
 
+
+// ══════════════════════════════════════════════════════════
+// COMMAND CENTER DASHBOARD — live stats from real client data
+// ══════════════════════════════════════════════════════════
+function ccDaysUntil(dateStr){
+  var d = new Date(dateStr); var now = new Date();
+  now.setHours(0,0,0,0); d.setHours(0,0,0,0);
+  return Math.round((d - now) / 86400000);
+}
+
+function ccComputeStats(){
+  var stats = {
+    totalObligations:0, dueThisWeek:0, overdue:0, upcoming:0,
+    entities: (typeof CLIENTS!=='undefined'?CLIENTS.length:0),
+    compliant:0, atRisk:0, breach:0, items:[]
+  };
+  if(typeof CLIENTS==='undefined' || !CLIENTS.length) return stats;
+  CLIENTS.forEach(function(c){
+    var rows = [];
+    try{ rows = getComplianceChart(c); }catch(e){ return; }
+    rows.forEach(function(r){
+      if(r.applicable===false) return;
+      stats.totalObligations++;
+      var chart = c.chart||{};
+      var done = chart[r.key] && (chart[r.key].done || chart[r.key].status==='done');
+      var days = ccDaysUntil(r.due);
+      if(done){ stats.compliant++; return; }
+      if(days < 0){ stats.overdue++; stats.breach++; }
+      else if(days <= 7){ stats.dueThisWeek++; stats.atRisk++; }
+      else if(days <= 30){ stats.upcoming++; }
+      else { stats.compliant++; }
+      // collect for attention list (not done)
+      if(days <= 45){
+        stats.items.push({
+          company:c.name, obligation:r.obligation, form:r.form, section:r.section,
+          law:r.law, owner:r.owner, due:r.due, days:days, risk:r.risk, penalty:r.penalty
+        });
+      }
+    });
+  });
+  // health score: weighted
+  var t = stats.totalObligations || 1;
+  var score = Math.round(100 * (stats.compliant + stats.upcoming*0.6) / t);
+  // penalise overdue heavily
+  score = Math.max(0, Math.min(100, score - stats.overdue*3));
+  stats.health = t>0 ? score : 100;
+  // percentages for the gauge
+  var done = stats.compliant, risk = stats.atRisk+stats.upcoming, breach = stats.breach;
+  var sum = done+risk+breach || 1;
+  stats.pctCompliant = done/sum; stats.pctRisk = risk/sum; stats.pctBreach = breach/sum;
+  // sort items: overdue first, then soonest
+  stats.items.sort(function(a,b){ return a.days - b.days; });
+  return stats;
+}
+
+function ccHealthLabel(score){
+  if(score>=90) return 'Strong Standing';
+  if(score>=75) return 'Good Standing';
+  if(score>=55) return 'Needs Attention';
+  if(score>=35) return 'At Risk';
+  return 'Critical';
+}
+function ccHealthColor(score){
+  if(score>=75) return 'var(--ok)';
+  if(score>=55) return 'var(--warn)';
+  return 'var(--crit)';
+}
+
+function ccRenderGauge(stats){
+  var cx=110, cy=110, mid=80, width=24, NS='http://www.w3.org/2000/svg';
+  var circ = 2*Math.PI*mid;
+  var segs = [
+    {frac:stats.pctCompliant, color:'#10B981'},
+    {frac:stats.pctRisk, color:'#F59E0B'},
+    {frac:stats.pctBreach, color:'#EF4444'}
+  ];
+  var ticks='';
+  for(var t=0;t<60;t++){
+    var a=(t/60)*2*Math.PI;
+    var x1=cx+Math.cos(a)*86, y1=cy+Math.sin(a)*86;
+    var big=(t%5===0);
+    var x2=cx+Math.cos(a)*(big?98:95), y2=cy+Math.sin(a)*(big?98:95);
+    ticks += '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+(big?'#CBD5E1':'#E2E8F0')+'" stroke-width="'+(big?1.5:1)+'"/>';
+  }
+  var arcs='', acc=0, gap=0.02;
+  segs.forEach(function(s){
+    if(s.frac<=0) { acc+=s.frac; return; }
+    var f=Math.max(s.frac-gap,0.001);
+    var dash=f*circ;
+    arcs += '<circle cx="'+cx+'" cy="'+cy+'" r="'+mid+'" fill="none" stroke="'+s.color+'" stroke-width="'+width+'" stroke-linecap="round" stroke-dasharray="'+dash+' '+(circ-dash)+'" stroke-dashoffset="'+(-acc*circ)+'"/>';
+    acc+=s.frac;
+  });
+  return '<svg width="220" height="220" viewBox="0 0 220 220" style="transform:rotate(-90deg)">'+
+    ticks+
+    '<circle cx="'+cx+'" cy="'+cy+'" r="'+mid+'" fill="none" stroke="var(--line-soft)" stroke-width="'+width+'"/>'+
+    arcs+'</svg>';
+}
+
+function ccTag(days){
+  if(days<0) return '<span class="cc-att-tag over">'+Math.abs(days)+'d overdue</span>';
+  if(days===0) return '<span class="cc-att-tag soon">Due today</span>';
+  if(days<=7) return '<span class="cc-att-tag soon">Due in '+days+'d</span>';
+  return '<span class="cc-att-tag due">Due in '+days+'d</span>';
+}
+function ccSig(risk,days){
+  var cls = days<0?'crit':(days<=7?'warn':'blue');
+  return '<div class="cc-sig '+cls+'"></div>';
+}
+
+function renderCommandCenter(){
+  var root = document.getElementById('cc-dash-root');
+  if(!root) return;
+  var s = ccComputeStats();
+
+  if(s.entities === 0){
+    root.innerHTML = '<div class="cc-empty">'+
+      '<div class="cc-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>'+
+      '<h2>Welcome to your Command Center</h2>'+
+      '<p>Add your client companies to see live compliance health, deadlines, and obligations across your whole portfolio.</p>'+
+      '<button class="cc-btn-primary" onclick="sw(\'cl\')">+ Add your first company</button>'+
+      '</div>';
+    return;
+  }
+
+  var uname = (typeof CURRENT_USER!=='undefined' && CURRENT_USER) ? (CURRENT_USER.email||'') : '';
+  var health = s.health;
+  var hLabel = ccHealthLabel(health), hColor = ccHealthColor(health);
+
+  // Attention items (max 6)
+  var attHtml = '';
+  s.items.slice(0,6).forEach(function(it){
+    attHtml += '<div class="cc-att-row">'+
+      ccSig(it.risk,it.days)+
+      '<div class="cc-att-main">'+
+        '<div class="cc-att-title">'+it.obligation+(it.form&&it.form!=='—'?' <span class="cc-att-code mono">'+it.form+'</span>':'')+'</div>'+
+        '<div class="cc-att-meta">'+it.company+' · '+it.section+' · Owner: '+it.owner+'</div>'+
+      '</div>'+
+      '<div class="cc-att-right"><div class="cc-att-due mono">'+ccFmtDate(it.due)+'</div>'+ccTag(it.days)+'</div>'+
+    '</div>';
+  });
+  if(!attHtml) attHtml = '<div style="text-align:center;padding:30px;color:var(--ink-soft);font-size:13px;">✓ Nothing urgent in the next 45 days. You\'re in good shape.</div>';
+
+  root.innerHTML =
+  '<div class="cc-pagehead">'+
+    '<div><div class="cc-crumb">Intelligence › Command Center</div>'+
+    '<h1 class="cc-h1">Compliance Command Center</h1>'+
+    '<p class="cc-sub">Know what applies · what\'s due · what changed · what to do — across all '+s.entities+' entities.</p></div>'+
+    '<div class="cc-headbtns"><button class="cc-btn" onclick="sw(\'cl\')">Manage entities</button>'+
+    '<button class="cc-btn-primary" onclick="sw(\'chat\')">◈ Ask AI</button></div>'+
+  '</div>'+
+
+  '<div class="cc-topgrid">'+
+    '<div class="cc-card cc-health">'+
+      '<div class="cc-gauge">'+ccRenderGauge(s)+
+        '<div class="cc-gauge-center"><div class="cc-gauge-score" style="color:'+hColor+'">'+health+'</div><div class="cc-gauge-max mono">/ 100</div><div class="cc-gauge-label" style="color:'+hColor+'">'+hLabel+'</div></div>'+
+      '</div>'+
+      '<div class="cc-legend">'+
+        '<div class="cc-hl"><i style="background:var(--ok)"></i>Compliant '+Math.round(s.pctCompliant*100)+'%</div>'+
+        '<div class="cc-hl"><i style="background:var(--warn)"></i>At risk '+Math.round(s.pctRisk*100)+'%</div>'+
+        '<div class="cc-hl"><i style="background:var(--crit)"></i>Breach '+Math.round(s.pctBreach*100)+'%</div>'+
+      '</div>'+
+    '</div>'+
+
+    '<div class="cc-metrics">'+
+      ccMetric('blue','Applicable obligations',s.totalObligations,'across '+s.entities+' entities','',"ccGo('','')")+
+      ccMetric('warn','Due this week',s.dueThisWeek,'next 7 days','warn',"ccGo('status','due-soon')")+
+      ccMetric('crit','Overdue',s.overdue,(s.overdue>0?'Immediate action':'All clear'),'crit',"ccGo('status','overdue')")+
+      ccMetric('cyan','Upcoming (30d)',s.upcoming,'plan ahead','',"ccGo('status','upcoming')")+
+      ccMetric('ok','In good standing',s.compliant,'filed / on track','ok',"ccGo('status','completed')")+
+      ccMetric('blue','Entities',s.entities,'companies managed','',"sw('cl')")+
+    '</div>'+
+  '</div>'+
+
+  '<div class="cc-card cc-attention">'+
+    '<div class="cc-card-h"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3L12 3z"/><path d="M12 10v4" stroke-linecap="round"/></svg>Requires your attention</h3>'+
+    '<span class="cc-link" onclick="sw(\'cl\')">View all</span></div>'+
+    '<div class="cc-card-b">'+attHtml+'</div>'+
+  '</div>';
+}
+
+function ccMetric(color,label,value,sub,vClass,action){
+  var clickable = action ? ' cc-metric-click" onclick="'+action+'"' : '"';
+  var arrow = action ? '<span class="cc-metric-go">Open →</span>' : '';
+  return '<div class="cc-metric'+clickable+'>'+
+    '<div class="cc-metric-top"><div class="cc-chip '+color+'"></div><div class="cc-metric-k">'+label+'</div></div>'+
+    '<div class="cc-metric-v '+(vClass||'')+' mono">'+value+'</div>'+
+    '<div class="cc-metric-sub">'+sub+arrow+'</div>'+
+  '</div>';
+}
+// Jump into filtered Compliance Universe from a dashboard metric
+function ccGo(filterKey,filterVal){
+  if(typeof CU_FILTERS!=='undefined'){
+    CU_FILTERS={entity:'',law:'',risk:'',status:'',freq:'',q:''};
+    if(filterKey) CU_FILTERS[filterKey]=filterVal;
+  }
+  sw('universe');
+  if(typeof renderUniverse==='function') renderUniverse();
+}
+
+function ccFmtDate(d){
+  try{ var dt=new Date(d); return dt.getDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()]+' '+dt.getFullYear(); }
+  catch(e){ return d; }
+}
+
+
+// ══════════════════════════════════════════════════════════
+// COMPLIANCE UNIVERSE — master table of all obligations
+// ══════════════════════════════════════════════════════════
+var CU_FILTERS = { entity:'', law:'', risk:'', status:'', freq:'', q:'' };
+var CU_SORT = { col:'due', dir:1 };
+
+function cuBuildRows(){
+  var all = [];
+  if(typeof CLIENTS==='undefined' || !CLIENTS.length) return all;
+  CLIENTS.forEach(function(c){
+    var rows=[]; try{ rows=getComplianceChart(c); }catch(e){ return; }
+    rows.forEach(function(r){
+      if(r.applicable===false) return;
+      var chart=c.chart||{};
+      var done = chart[r.key] && (chart[r.key].done || chart[r.key].status==='done');
+      var days = ccDaysUntil(r.due);
+      var status = done?'completed':(days<0?'overdue':(days<=7?'due-soon':(days<=30?'upcoming':'scheduled')));
+      all.push({
+        entityId:c.id, entity:c.name, entityType:c.type,
+        key:r.key, obligation:r.obligation, law:r.law, section:r.section,
+        form:r.form, owner:r.owner, due:r.due, days:days, risk:r.risk,
+        penalty:r.penalty, status:status, done:done,
+        freq: cuFreq(r.key)
+      });
+    });
+  });
+  return all;
+}
+
+function cuFreq(key){
+  var annual=['agm','aoc4','mgt7','adt1','dir3kyc','dpt3','fla','secrpt','cgcc','mr3','csr','shp'];
+  var quarterly=['q1','q2','q3','iepf2'];
+  var eventBased=['iepf1'];
+  if(quarterly.indexOf(key)>-1) return 'Quarterly';
+  if(eventBased.indexOf(key)>-1) return 'Event-based';
+  if(key==='bm') return 'Quarterly';
+  return 'Annual';
+}
+
+function cuLawShort(law){
+  if(/SEBI/i.test(law)) return 'SEBI';
+  if(/Companies Act/i.test(law)) return 'Companies Act';
+  if(/FEMA/i.test(law)) return 'FEMA';
+  if(/Depositor|Deposit/i.test(law)) return law;
+  return law;
+}
+
+function cuStatusPill(status,days){
+  var map={
+    'overdue':['over','Overdue'],
+    'due-soon':['soon','Due soon'],
+    'upcoming':['due','Upcoming'],
+    'scheduled':['sched','Scheduled'],
+    'completed':['done','Completed']
+  };
+  var m=map[status]||['sched','—'];
+  return '<span class="cu-pill '+m[0]+'">'+m[1]+'</span>';
+}
+function cuRiskPill(risk){
+  var m={critical:['crit','Critical'],high:['crit','High'],medium:['warn','Medium'],low:['low','Low']};
+  var x=m[risk]||['low','—'];
+  return '<span class="cu-risk '+x[0]+'"><i></i>'+x[1]+'</span>';
+}
+
+function renderUniverse(){
+  var root=document.getElementById('cu-root');
+  if(!root) return;
+  var all = cuBuildRows();
+
+  if(!all.length){
+    root.innerHTML='<div class="cc-empty"><div class="cc-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg></div><h2>Your Compliance Universe</h2><p>Add client companies to populate the master register of every applicable obligation across your portfolio.</p><button class="cc-btn-primary" onclick="sw(\'cl\')">+ Add a company</button></div>';
+    return;
+  }
+
+  // Build filter option sets
+  var entities={}, laws={};
+  all.forEach(function(r){ entities[r.entity]=1; laws[cuLawShort(r.law)]=1; });
+
+  // Apply filters
+  var f=CU_FILTERS;
+  var rows=all.filter(function(r){
+    if(f.entity && r.entity!==f.entity) return false;
+    if(f.law && cuLawShort(r.law)!==f.law) return false;
+    if(f.risk && !(r.risk===f.risk || (f.risk==='high'&&(r.risk==='critical'||r.risk==='high')))) return false;
+    if(f.status && r.status!==f.status) return false;
+    if(f.freq && r.freq!==f.freq) return false;
+    if(f.q){
+      var q=f.q.toLowerCase();
+      if((r.obligation+r.law+r.section+r.form+r.entity+r.owner).toLowerCase().indexOf(q)<0) return false;
+    }
+    return true;
+  });
+
+  // Sort
+  rows.sort(function(a,b){
+    var c=CU_SORT.col, d=CU_SORT.dir;
+    if(c==='due') return (a.days-b.days)*d;
+    if(c==='risk'){var o={critical:0,high:1,medium:2,low:3};return ((o[a.risk]||9)-(o[b.risk]||9))*d;}
+    var av=(a[c]||'')+'',bv=(b[c]||'')+''; return av.localeCompare(bv)*d;
+  });
+
+  // Summary counts
+  var cOver=all.filter(function(r){return r.status==='overdue';}).length;
+  var cSoon=all.filter(function(r){return r.status==='due-soon';}).length;
+  var cDone=all.filter(function(r){return r.status==='completed';}).length;
+
+  var opts=function(obj,sel){var s='<option value="">All</option>';Object.keys(obj).sort().forEach(function(k){s+='<option value="'+k+'"'+(sel===k?' selected':'')+'>'+k+'</option>';});return s;};
+
+  var head=
+    '<div class="cc-pagehead">'+
+      '<div><div class="cc-crumb">Intelligence › Compliance Universe</div>'+
+      '<h1 class="cc-h1">Compliance Universe</h1>'+
+      '<p class="cc-sub">Master register of <b>'+all.length+'</b> applicable obligations across <b>'+Object.keys(entities).length+'</b> entities.</p></div>'+
+      '<div class="cc-headbtns"><button class="cc-btn" onclick="cuExport()">↓ Export CSV</button></div>'+
+    '</div>'+
+    '<div class="cu-summary">'+
+      '<div class="cu-sum-chip crit" onclick="cuQuick(\'status\',\'overdue\')"><b>'+cOver+'</b> Overdue</div>'+
+      '<div class="cu-sum-chip warn" onclick="cuQuick(\'status\',\'due-soon\')"><b>'+cSoon+'</b> Due soon</div>'+
+      '<div class="cu-sum-chip ok" onclick="cuQuick(\'status\',\'completed\')"><b>'+cDone+'</b> Completed</div>'+
+      '<div class="cu-sum-chip" onclick="cuQuick(\'status\',\'\')"><b>'+all.length+'</b> Total</div>'+
+    '</div>';
+
+  var filters=
+    '<div class="cu-filters">'+
+      '<div class="cu-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><input id="cu-q" placeholder="Search obligations, sections, forms…" value="'+(f.q||'')+'" oninput="cuSetFilter(\'q\',this.value)"></div>'+
+      '<select onchange="cuSetFilter(\'entity\',this.value)"><optgroup label="Entity">'+opts(entities,f.entity)+'</optgroup></select>'+
+      '<select onchange="cuSetFilter(\'law\',this.value)"><optgroup label="Law">'+opts(laws,f.law)+'</optgroup></select>'+
+      '<select onchange="cuSetFilter(\'risk\',this.value)"><option value="">Any risk</option><option value="high"'+(f.risk==='high'?' selected':'')+'>High/Critical</option><option value="medium"'+(f.risk==='medium'?' selected':'')+'>Medium</option><option value="low"'+(f.risk==='low'?' selected':'')+'>Low</option></select>'+
+      '<select onchange="cuSetFilter(\'status\',this.value)"><option value="">Any status</option>'+
+        ['overdue','due-soon','upcoming','scheduled','completed'].map(function(s){var lbl={'overdue':'Overdue','due-soon':'Due soon','upcoming':'Upcoming','scheduled':'Scheduled','completed':'Completed'}[s];return '<option value="'+s+'"'+(f.status===s?' selected':'')+'>'+lbl+'</option>';}).join('')+'</select>'+
+      '<select onchange="cuSetFilter(\'freq\',this.value)"><option value="">Any frequency</option><option value="Annual"'+(f.freq==='Annual'?' selected':'')+'>Annual</option><option value="Quarterly"'+(f.freq==='Quarterly'?' selected':'')+'>Quarterly</option><option value="Event-based"'+(f.freq==='Event-based'?' selected':'')+'>Event-based</option></select>'+
+      (f.entity||f.law||f.risk||f.status||f.freq||f.q?'<button class="cu-clear" onclick="cuClear()">✕ Clear</button>':'')+
+    '</div>';
+
+  var th=function(label,col,cls){var arrow=CU_SORT.col===col?(CU_SORT.dir>0?' ▲':' ▼'):'';return '<th class="'+(cls||'')+'" onclick="cuSort(\''+col+'\')">'+label+arrow+'</th>';};
+
+  var body='';
+  if(!rows.length){
+    body='<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--ink-soft);">No obligations match these filters. <a onclick="cuClear()" style="color:var(--blue);cursor:pointer;">Clear filters</a></td></tr>';
+  } else {
+    rows.forEach(function(r){
+      body+='<tr onclick="cuOpenDetail(\''+r.entityId+'\',\''+r.key+'\')">'+
+        '<td><div class="cu-oblig">'+r.obligation+'</div><div class="cu-oblig-sub">'+(r.form&&r.form!=='—'?'<span class="mono">'+r.form+'</span> · ':'')+r.owner+'</div></td>'+
+        '<td><span class="cu-law">'+cuLawShort(r.law)+'</span></td>'+
+        '<td class="mono cu-sec">'+r.section+'</td>'+
+        '<td>'+r.entity+'</td>'+
+        '<td>'+r.freq+'</td>'+
+        '<td class="mono cu-due">'+ccFmtDate(r.due)+'</td>'+
+        '<td>'+cuRiskPill(r.risk)+'</td>'+
+        '<td>'+cuStatusPill(r.status,r.days)+'</td>'+
+        '<td class="cu-act"><button onclick="event.stopPropagation();cuOpenDetail(\''+r.entityId+'\',\''+r.key+'\')">Open →</button></td>'+
+      '</tr>';
+    });
+  }
+
+  var table=
+    '<div class="cu-tablewrap"><table class="cu-table"><thead><tr>'+
+      th('Compliance','obligation')+th('Law','law')+th('Section / Reg','section')+
+      th('Entity','entity')+th('Frequency','freq')+th('Due Date','due')+
+      th('Risk','risk')+th('Status','status')+'<th></th>'+
+    '</tr></thead><tbody>'+body+'</tbody></table></div>'+
+    '<div class="cu-foot">Showing <b>'+rows.length+'</b> of '+all.length+' obligations</div>';
+
+  root.innerHTML = head + filters + table;
+}
+
+function cuSetFilter(k,v){ CU_FILTERS[k]=v; if(k==='q'){ // keep focus
+    var all=cuBuildRows(); renderUniverse();
+    var qi=document.getElementById('cu-q'); if(qi){qi.focus();qi.setSelectionRange(qi.value.length,qi.value.length);}
+  } else renderUniverse();
+}
+function cuQuick(k,v){ CU_FILTERS[k]=v; renderUniverse(); }
+function cuClear(){ CU_FILTERS={entity:'',law:'',risk:'',status:'',freq:'',q:''}; renderUniverse(); }
+function cuSort(col){ if(CU_SORT.col===col) CU_SORT.dir*=-1; else {CU_SORT.col=col;CU_SORT.dir=1;} renderUniverse(); }
+
+function cuOpenDetail(entityId,key){
+  // Placeholder: will open full compliance detail page (next module)
+  var c=(CLIENTS||[]).find(function(x){return x.id===entityId;});
+  if(!c) return;
+  var rows=getComplianceChart(c); var r=rows.find(function(x){return x.key===key;});
+  if(!r) return;
+  var days=ccDaysUntil(r.due);
+  var m=document.getElementById('cu-detail-modal');
+  document.getElementById('cu-detail-body').innerHTML=
+    '<div class="cud-h"><div><div class="cud-oblig">'+r.obligation+'</div><div class="cud-entity">'+c.name+'</div></div>'+
+    (r.form&&r.form!=='—'?'<span class="cud-form mono">'+r.form+'</span>':'')+'</div>'+
+    '<div class="cud-grid">'+
+      cudField('Status',cuStatusPill(days<0?'overdue':(days<=7?'due-soon':'upcoming'),days))+
+      cudField('Due date','<span class="mono">'+ccFmtDate(r.due)+'</span> ('+(days<0?Math.abs(days)+'d overdue':days+'d left')+')')+
+      cudField('Risk',cuRiskPill(r.risk))+
+      cudField('Owner',r.owner)+
+      cudField('Law',r.law)+
+      cudField('Section','<span class="mono">'+r.section+'</span>')+
+      cudField('Penalty on default',r.penalty)+
+      cudField('Frequency',cuFreq(r.key))+
+    '</div>'+
+    '<div class="cud-why"><div class="cud-why-h">Why this applies</div><div class="cud-why-b">This obligation applies to <b>'+c.name+'</b> as a '+(c.type||'company')+' under <b>'+r.law+', '+r.section+'</b>. Based on the entity profile (type, capital, turnover), this filing is mandatory. Verify current thresholds on the MCA/SEBI portal before filing.</div></div>'+
+    '<div class="cud-actions">'+
+      '<button class="cc-btn-primary" onclick="cuAskAI(\''+r.obligation.replace(/'/g,"")+'\')">◈ Ask AI about this</button>'+
+      '<button class="cc-btn" onclick="cuGenDoc(\''+key+'\')">Generate document</button>'+
+      '<button class="cc-btn" onclick="cuCloseDetail()">Close</button>'+
+    '</div>';
+  m.style.display='flex';
+}
+function cudField(label,val){ return '<div class="cud-f"><div class="cud-f-l">'+label+'</div><div class="cud-f-v">'+val+'</div></div>'; }
+function cuCloseDetail(){ var m=document.getElementById('cu-detail-modal'); if(m) m.style.display='none'; }
+function cuAskAI(q){ cuCloseDetail(); sw('chat'); setTimeout(function(){var ci=document.getElementById('ci'); if(ci){ci.value='Explain the compliance requirement and steps for: '+q; }},300); }
+function cuGenDoc(key){ cuCloseDetail(); sw('res'); }
+
+function cuExport(){
+  var rows=cuBuildRows();
+  var csv='Compliance,Law,Section,Entity,Frequency,Due Date,Owner,Risk,Status,Penalty\n';
+  rows.forEach(function(r){
+    csv+='"'+[r.obligation,cuLawShort(r.law),r.section,r.entity,r.freq,r.due,r.owner,r.risk,r.status,r.penalty].join('","')+'"\n';
+  });
+  var a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='compliance_universe_'+new Date().toISOString().substring(0,10)+'.csv';
+  a.click();
+}
+
+
+// ══════════════════════════════════════════════════════════
+// MY WORK — personal task center (filters obligations by state)
+// ══════════════════════════════════════════════════════════
+var MW_TAB = 'today';
+
+function mwGetTasks(){
+  if(typeof cuBuildRows!=='function') return [];
+  return cuBuildRows();
+}
+
+function mwBucket(t){
+  // returns which tab a task belongs to
+  if(t.done) return 'completed';
+  if(t.days < 0) return 'overdue';
+  if(t.days === 0) return 'today';
+  if(t.days <= 7) return 'duesoon';
+  return 'assigned';
+}
+
+function renderMyWork(){
+  var root = document.getElementById('mw-root');
+  if(!root) return;
+  var all = mwGetTasks();
+
+  if(!all.length){
+    root.innerHTML = '<div class="cc-empty"><div class="cc-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3 8-8M20 12v7H4V5h11"/></svg></div><h2>My Work</h2><p>Your personal compliance task list appears here once companies and obligations exist.</p><button class="cc-btn-primary" onclick="sw(\'cl\')">+ Add a company</button></div>';
+    return;
+  }
+
+  // Bucket counts
+  var buckets = {today:[],duesoon:[],overdue:[],assigned:[],completed:[]};
+  all.forEach(function(t){ buckets[mwBucket(t)].push(t); });
+  // sort each by urgency
+  Object.keys(buckets).forEach(function(k){ buckets[k].sort(function(a,b){return a.days-b.days;}); });
+
+  var tabs = [
+    {id:'today',label:'Today',count:buckets.today.length,color:'warn'},
+    {id:'overdue',label:'Overdue',count:buckets.overdue.length,color:'crit'},
+    {id:'duesoon',label:'Due Soon',count:buckets.duesoon.length,color:'warn'},
+    {id:'assigned',label:'Assigned to Me',count:buckets.assigned.length,color:'blue'},
+    {id:'completed',label:'Completed',count:buckets.completed.length,color:'ok'}
+  ];
+
+  var head =
+    '<div class="cc-pagehead">'+
+      '<div><div class="cc-crumb">Operate › My Work</div>'+
+      '<h1 class="cc-h1">My Work</h1>'+
+      '<p class="cc-sub">Your personal compliance queue — <b>'+(buckets.overdue.length+buckets.today.length)+'</b> items need action now.</p></div>'+
+    '</div>';
+
+  var tabBar = '<div class="mw-tabs">';
+  tabs.forEach(function(t){
+    tabBar += '<div class="mw-tab '+(MW_TAB===t.id?'on':'')+'" onclick="mwSetTab(\''+t.id+'\')">'+
+      t.label+'<span class="mw-tab-count '+t.color+'">'+t.count+'</span></div>';
+  });
+  tabBar += '</div>';
+
+  var list = buckets[MW_TAB];
+  var body = '';
+  if(!list.length){
+    body = '<div class="mw-empty">✓ Nothing here. You\'re all caught up in this bucket.</div>';
+  } else {
+    list.forEach(function(t){
+      var nextAction = t.done ? 'View' : (t.days<0?'Resolve now':(t.days<=7?'Start':'Review'));
+      var actionClass = t.done ? 'ghost' : (t.days<0?'crit':'primary');
+      body += '<div class="mw-item">'+
+        '<div class="mw-item-sig '+(t.done?'ok':(t.days<0?'crit':(t.days<=7?'warn':'blue')))+'"></div>'+
+        '<div class="mw-item-main">'+
+          '<div class="mw-item-title">'+t.obligation+(t.form&&t.form!=='—'?' <span class="mw-code mono">'+t.form+'</span>':'')+'</div>'+
+          '<div class="mw-item-meta">'+
+            '<span class="mw-legal mono">'+t.law+' · '+t.section+'</span>'+
+            '<span class="mw-dot">·</span>'+t.entity+
+            '<span class="mw-dot">·</span>Owner: '+t.owner+
+          '</div>'+
+        '</div>'+
+        '<div class="mw-item-side">'+
+          '<div class="mw-risk '+(t.risk==='critical'||t.risk==='high'?'crit':(t.risk==='medium'?'warn':'low'))+'">'+(t.risk||'—')+'</div>'+
+          '<div class="mw-due mono">'+ccFmtDate(t.due)+'</div>'+
+          '<div class="mw-days '+(t.days<0?'crit':'')+'">'+(t.done?'Filed':(t.days<0?Math.abs(t.days)+'d overdue':(t.days===0?'Due today':t.days+'d left')))+'</div>'+
+        '</div>'+
+        '<div class="mw-item-actions">'+
+          '<button class="mw-act '+actionClass+'" onclick="cuOpenDetail(\''+t.entityId+'\',\''+t.key+'\')">'+nextAction+'</button>'+
+          '<button class="mw-act ghost" onclick="mwMenu(event,\''+t.entityId+'\',\''+t.key+'\')">⋯</button>'+
+        '</div>'+
+      '</div>';
+    });
+  }
+
+  root.innerHTML = head + tabBar + '<div class="mw-list">'+body+'</div>';
+}
+
+function mwSetTab(id){ MW_TAB=id; renderMyWork(); }
+function mwMenu(e,entityId,key){
+  e.stopPropagation();
+  // simple action set — reuse the detail modal for now
+  cuOpenDetail(entityId,key);
+}
+
+
+// ══════════════════════════════════════════════════════════
+// COMPLIANCE DETAIL WORKSPACE — full §10 workspace per obligation
+// ══════════════════════════════════════════════════════════
+
+// Execution checklists per obligation type (defensible, standard CS steps)
+var CD_STEPS = {
+  aoc4:['Finalise audited financial statements','Board approval of accounts & Board Report','Hold AGM & adopt accounts','Prepare Form AOC-4 with attachments','Certify by CS/CA','File AOC-4 with ROC within 30 days of AGM','Archive filing acknowledgement (SRN)'],
+  mgt7:['Prepare annual return as on FY end','Verify shareholding & director details','Board review','Certify MGT-7/MGT-7A','File with ROC within 60 days of AGM','Archive SRN acknowledgement'],
+  dir3kyc:['Confirm DIN active status','Collect director KYC details & DSC','File DIR-3 KYC / web KYC','Archive acknowledgement'],
+  dpt3:['Compile deposit / non-deposit particulars as on 31 March','Obtain auditor certificate','Board note','File DPT-3 by 30 June','Archive SRN'],
+  adt1:['Pass Board/AGM resolution for auditor','Obtain auditor consent & eligibility','File ADT-1 within 15 days','Archive acknowledgement'],
+  agm:['Fix date, time & venue (Board resolution)','Issue notice with explanatory statement (21 clear days)','Conduct AGM & pass resolutions','Prepare minutes within 30 days','File resolutions (MGT-14 where applicable)'],
+  fla:['Compile foreign liabilities & assets data','Reconcile with audited figures','File FLA return with RBI by 15 July','Archive acknowledgement'],
+  iepf2:['Identify unclaimed/unpaid amounts','Prepare investor-wise statement','File IEPF-2','Archive acknowledgement'],
+  secrpt:['Appoint Secretarial Auditor (if applicable)','Conduct secretarial audit','Obtain MR-3 / Annual Secretarial Compliance Report','Place before Board','Submit to Stock Exchange within 60 days of FY end'],
+  shp:['Compile shareholding pattern as on quarter end','Board/CS review','File with Stock Exchange within 21 days of quarter end','Archive acknowledgement'],
+  results:['Prepare financial results','Audit Committee review','Board approval','Disclose to Stock Exchange within prescribed timeline','Publish in newspapers','Archive acknowledgement']
+};
+var CD_DEFAULT_STEPS = ['Prepare required documents','Internal review','Committee/Board approval','Regulatory filing','Update statutory registers','Archive evidence & acknowledgement'];
+
+function cdSteps(key){
+  for(var k in CD_STEPS){ if(key && key.indexOf(k)>-1) return CD_STEPS[k]; }
+  return CD_STEPS[key] || CD_DEFAULT_STEPS;
+}
+
+function cdApprovalChain(risk,law){
+  // higher risk / listed → longer chain
+  if(/SEBI/i.test(law)) return ['CS','CFO','Audit Committee','Board'];
+  if(risk==='critical'||risk==='high') return ['CS','CFO','Board'];
+  return ['CS','CFO'];
+}
+
+// Persisted per-obligation state (evidence, step ticks) in localStorage
+function cdStateKey(entityId,key){ return 'lg_cd_'+entityId+'_'+key; }
+function cdGetState(entityId,key){
+  try{ return JSON.parse(localStorage.getItem(cdStateKey(entityId,key))||'{}'); }catch(e){ return {}; }
+}
+function cdSaveState(entityId,key,st){ try{ localStorage.setItem(cdStateKey(entityId,key),JSON.stringify(st)); }catch(e){} }
+
+var CD_CURRENT = null;
+
+function openComplianceDetail(entityId,key){
+  var c=(CLIENTS||[]).find(function(x){return x.id===entityId;});
+  if(!c) return;
+  var rows=getComplianceChart(c); var r=rows.find(function(x){return x.key===key;});
+  if(!r) return;
+  CD_CURRENT={entityId:entityId,key:key,c:c,r:r};
+  var days=ccDaysUntil(r.due);
+  var st=cdGetState(entityId,key);
+  var steps=cdSteps(key);
+  var chain=cdApprovalChain(r.risk,r.law);
+  var doneSteps=st.steps||{};
+  var stepCount=steps.length, doneCount=Object.keys(doneSteps).filter(function(k){return doneSteps[k];}).length;
+  var progress=Math.round(100*doneCount/stepCount);
+
+  var statusPill = days<0?'<span class="cu-pill over">Overdue</span>':(days<=7?'<span class="cu-pill soon">Due soon</span>':'<span class="cu-pill due">Upcoming</span>');
+  var riskPill = cuRiskPill(r.risk);
+
+  // Steps HTML
+  var stepsHtml='';
+  steps.forEach(function(s,i){
+    var done=doneSteps[i];
+    stepsHtml+='<div class="cd-step '+(done?'done':'')+'" onclick="cdToggleStep('+i+')">'+
+      '<div class="cd-step-check">'+(done?'✓':(i+1))+'</div>'+
+      '<div class="cd-step-txt">'+s+'</div>'+
+    '</div>';
+  });
+
+  // Documents (state machine)
+  var docStates=st.docs||{required:true,draft:false,uploaded:false,approved:false,final:false};
+  var docHtml='';
+  [['required','Required'],['draft','Draft'],['uploaded','Uploaded'],['approved','Approved'],['final','Final']].forEach(function(d){
+    var active=docStates[d[0]];
+    docHtml+='<div class="cd-doc '+(active?'active':'')+'" onclick="cdToggleDoc(\''+d[0]+'\')">'+d[1]+'</div>';
+  });
+
+  // Approval chain
+  var apprState=st.approvals||{};
+  var chainHtml='';
+  chain.forEach(function(role,i){
+    var approved=apprState[i];
+    chainHtml+='<div class="cd-appr '+(approved?'done':(i===0||apprState[i-1]?'active':'wait'))+'">'+
+      '<div class="cd-appr-node">'+(approved?'✓':i+1)+'</div>'+
+      '<div class="cd-appr-role">'+role+'</div>'+
+    '</div>';
+    if(i<chain.length-1) chainHtml+='<div class="cd-appr-line '+(approved?'done':'')+'"></div>';
+  });
+
+  // Evidence
+  var evidence=st.evidence||[];
+  var evHtml='';
+  if(evidence.length){
+    evidence.forEach(function(e,i){
+      evHtml+='<div class="cd-ev-item"><span class="cd-ev-icon">📎</span><span class="cd-ev-name">'+e.name+'</span><span class="cd-ev-date mono">'+e.date+'</span><button class="cd-ev-del" onclick="cdDelEvidence('+i+')">✕</button></div>';
+    });
+  } else {
+    evHtml='<div class="cd-ev-empty">No evidence attached yet. Add filing acknowledgements, SRN receipts, or approval records.</div>';
+  }
+
+  // Audit trail
+  var audit=st.audit||[{action:'Obligation identified',user:'System',ts:'On profile setup'}];
+  var auditHtml='';
+  audit.slice().reverse().forEach(function(a){
+    auditHtml+='<div class="cd-audit-row"><div class="cd-audit-dot"></div><div class="cd-audit-main"><b>'+a.action+'</b><span class="cd-audit-meta mono">'+a.user+' · '+a.ts+'</span></div></div>';
+  });
+
+  var body=
+    '<div class="cd-head">'+
+      '<div><div class="cd-oblig">'+r.obligation+'</div>'+
+      '<div class="cd-entity">'+c.name+' · <span class="mono">'+(c.cin||'')+'</span></div></div>'+
+      '<button class="cd-close" onclick="cdClose()">✕</button>'+
+    '</div>'+
+
+    '<div class="cd-tags">'+statusPill+riskPill+
+      (r.form&&r.form!=='—'?'<span class="cd-form mono">'+r.form+'</span>':'')+
+      '<span class="cd-prog mono">'+progress+'% complete</span>'+
+    '</div>'+
+
+    // Overview grid
+    '<div class="cd-section"><div class="cd-sec-h">Compliance Overview</div>'+
+      '<div class="cd-grid">'+
+        cdF('Due date','<span class="mono">'+ccFmtDate(r.due)+'</span> · '+(days<0?Math.abs(days)+'d overdue':days+'d left'))+
+        cdF('Owner',r.owner)+
+        cdF('Risk',r.risk)+
+        cdF('Entity',c.name)+
+      '</div></div>'+
+
+    // Legal basis
+    '<div class="cd-section"><div class="cd-sec-h">Legal Basis</div>'+
+      '<div class="cd-legal"><div><span class="cd-legal-l">Act / Regulation</span><span class="cd-legal-v">'+r.law+'</span></div>'+
+      '<div><span class="cd-legal-l">Section / Rule</span><span class="cd-legal-v mono">'+r.section+'</span></div>'+
+      '<div><span class="cd-legal-l">Penalty on default</span><span class="cd-legal-v">'+r.penalty+'</span></div></div></div>'+
+
+    // Why applies
+    '<div class="cd-section"><div class="cd-sec-h">Why This Applies</div>'+
+      '<div class="cd-why">This obligation applies to <b>'+c.name+'</b> as a <b>'+(c.type||'company')+'</b> under '+r.law+', '+r.section+'. The requirement is triggered by the entity\'s profile (type, capital, turnover). <span class="cd-why-verify">Verify current thresholds and form version on the MCA/SEBI portal before filing.</span></div>'+
+      '<button class="cd-ai-btn" onclick="cdAskAI()">◈ Ask AI to explain this in detail</button></div>'+
+
+    // Execution steps
+    '<div class="cd-section"><div class="cd-sec-h">What Needs To Be Done <span class="cd-sec-count">'+doneCount+'/'+stepCount+'</span></div>'+
+      '<div class="cd-progress-bar"><div class="cd-progress-fill" style="width:'+progress+'%"></div></div>'+
+      '<div class="cd-steps">'+stepsHtml+'</div></div>'+
+
+    // Documents
+    '<div class="cd-section"><div class="cd-sec-h">Documents</div><div class="cd-docs">'+docHtml+'</div></div>'+
+
+    // Approvals
+    '<div class="cd-section"><div class="cd-sec-h">Approval Chain</div><div class="cd-approvals">'+chainHtml+'</div>'+
+      '<button class="cd-appr-btn" onclick="cdAdvanceApproval()">Advance approval →</button></div>'+
+
+    // Evidence
+    '<div class="cd-section"><div class="cd-sec-h">Evidence &amp; Acknowledgements</div><div class="cd-evidence">'+evHtml+'</div>'+
+      '<button class="cd-ev-add" onclick="cdAddEvidence()">+ Add evidence</button></div>'+
+
+    // Audit trail
+    '<div class="cd-section"><div class="cd-sec-h">Audit Trail</div><div class="cd-audit">'+auditHtml+'</div></div>'+
+
+    // Footer actions
+    '<div class="cd-foot">'+
+      '<button class="cc-btn-primary" onclick="cdGenerateDoc()">Generate document</button>'+
+      '<button class="cc-btn" onclick="cdMarkComplete()">Mark complete</button>'+
+    '</div>';
+
+  document.getElementById('cd-body').innerHTML=body;
+  document.getElementById('cd-modal').style.display='flex';
+}
+
+function cdF(l,v){ return '<div class="cd-f"><div class="cd-f-l">'+l+'</div><div class="cd-f-v">'+v+'</div></div>'; }
+function cdClose(){ document.getElementById('cd-modal').style.display='none'; }
+
+function cdToggleStep(i){
+  var st=cdGetState(CD_CURRENT.entityId,CD_CURRENT.key);
+  st.steps=st.steps||{}; st.steps[i]=!st.steps[i];
+  cdLog(st,(st.steps[i]?'Completed':'Reopened')+' step '+(i+1));
+  cdSaveState(CD_CURRENT.entityId,CD_CURRENT.key,st);
+  openComplianceDetail(CD_CURRENT.entityId,CD_CURRENT.key);
+}
+function cdToggleDoc(d){
+  var st=cdGetState(CD_CURRENT.entityId,CD_CURRENT.key);
+  st.docs=st.docs||{required:true}; st.docs[d]=!st.docs[d];
+  cdSaveState(CD_CURRENT.entityId,CD_CURRENT.key,st);
+  openComplianceDetail(CD_CURRENT.entityId,CD_CURRENT.key);
+}
+function cdAdvanceApproval(){
+  var st=cdGetState(CD_CURRENT.entityId,CD_CURRENT.key);
+  st.approvals=st.approvals||{};
+  var chain=cdApprovalChain(CD_CURRENT.r.risk,CD_CURRENT.r.law);
+  for(var i=0;i<chain.length;i++){ if(!st.approvals[i]){ st.approvals[i]=true; cdLog(st,'Approved by '+chain[i]); break; } }
+  cdSaveState(CD_CURRENT.entityId,CD_CURRENT.key,st);
+  openComplianceDetail(CD_CURRENT.entityId,CD_CURRENT.key);
+}
+function cdAddEvidence(){
+  var name=prompt('Evidence description (e.g. "SRN R12345678 acknowledgement"):');
+  if(!name) return;
+  var st=cdGetState(CD_CURRENT.entityId,CD_CURRENT.key);
+  st.evidence=st.evidence||[];
+  st.evidence.push({name:name,date:new Date().toISOString().substring(0,10)});
+  cdLog(st,'Evidence added: '+name);
+  cdSaveState(CD_CURRENT.entityId,CD_CURRENT.key,st);
+  openComplianceDetail(CD_CURRENT.entityId,CD_CURRENT.key);
+}
+function cdDelEvidence(i){
+  var st=cdGetState(CD_CURRENT.entityId,CD_CURRENT.key);
+  if(st.evidence){ st.evidence.splice(i,1); cdSaveState(CD_CURRENT.entityId,CD_CURRENT.key,st); openComplianceDetail(CD_CURRENT.entityId,CD_CURRENT.key); }
+}
+function cdMarkComplete(){
+  var st=cdGetState(CD_CURRENT.entityId,CD_CURRENT.key);
+  var steps=cdSteps(CD_CURRENT.key); st.steps={};
+  for(var i=0;i<steps.length;i++) st.steps[i]=true;
+  st.completed=true; cdLog(st,'Marked complete');
+  cdSaveState(CD_CURRENT.entityId,CD_CURRENT.key,st);
+  openComplianceDetail(CD_CURRENT.entityId,CD_CURRENT.key);
+}
+function cdLog(st,action){
+  st.audit=st.audit||[{action:'Obligation identified',user:'System',ts:'On profile setup'}];
+  var u=(typeof CURRENT_USER!=='undefined'&&CURRENT_USER)?CURRENT_USER.email:'user';
+  var now=new Date();
+  st.audit.push({action:action,user:u,ts:now.toISOString().substring(0,10)+' '+now.toTimeString().substring(0,5)});
+}
+function cdAskAI(){
+  cdClose(); sw('chat');
+  setTimeout(function(){var ci=document.getElementById('ci'); if(ci){ci.value='Explain in detail the compliance requirement, applicability, timeline, procedure and penalty for: '+CD_CURRENT.r.obligation+' ('+CD_CURRENT.r.law+', '+CD_CURRENT.r.section+') for a '+(CD_CURRENT.c.type||'company')+'.';}},300);
+}
+function cdGenerateDoc(){ cdClose(); sw('res'); }
+
+// Redirect the old popup to the new full workspace
+function cuOpenDetail(entityId,key){ openComplianceDetail(entityId,key); }
+
 </script>
+
+<div class="cu-modal" id="cu-detail-modal" onclick="if(event.target===this)cuCloseDetail()">
+  <div class="cu-modal-inner"><div class="cud-body" id="cu-detail-body"></div></div>
+</div>
+
+<div class="cd-modal" id="cd-modal" onclick="if(event.target===this)cdClose()">
+  <div class="cd-inner"><div class="cd-body" id="cd-body"></div></div>
+</div>
 </body>
 </html>
