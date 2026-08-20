@@ -732,7 +732,7 @@ input[type="text"], input[type="password"], textarea, select {
     </div>
     <div>
       <div class="n">LawGovern</div>
-      <div class="t">Compliance OS · v6</div>
+      <div class="t">Compliance OS · v7</div>
     </div>
   </div>
   <div class="cc-search">
@@ -4966,7 +4966,7 @@ function renderCommandCenter(){
 
   root.innerHTML =
   '<div class="cc-pagehead">'+
-    '<div><div class="cc-crumb">Intelligence › Command Center</div>'+
+    '<div><div class="cc-crumb" style="color:#2563EB;font-weight:800">◆ DASHBOARD · Intelligence › Command Center</div>'+
     '<h1 class="cc-h1">Compliance Command Center</h1>'+
     '<p class="cc-sub">Know what applies · what\'s due · what changed · what to do — across all '+s.entities+' entities.</p></div>'+
     '<div class="cc-headbtns"><button class="cc-btn" onclick="sw(\'cl\')">Manage entities</button>'+
@@ -5138,7 +5138,7 @@ function renderUniverse(){
   var head=
     '<div class="cc-pagehead">'+
       '<div><div class="cc-crumb">Intelligence › Compliance Universe</div>'+
-      '<h1 class="cc-h1">Compliance Universe</h1>'+
+      '<h1 class="cc-h1">▦ TABLE · Compliance Universe</h1>'+
       '<p class="cc-sub">Master register of <b>'+all.length+'</b> applicable obligations across <b>'+Object.keys(entities).length+'</b> entities.</p></div>'+
       '<div class="cc-headbtns"><button class="cc-btn" onclick="cuExport()">↓ Export CSV</button></div>'+
     '</div>'+
@@ -5294,7 +5294,7 @@ function renderMyWork(){
 
   var head =
     '<div class="cc-pagehead">'+
-      '<div><div class="cc-crumb">Operate › My Work</div>'+
+      '<div><div class="cc-crumb" style="color:#F59E0B;font-weight:800">✓ TASKS · Operate › My Work</div>'+
       '<h1 class="cc-h1">My Work</h1>'+
       '<p class="cc-sub">Your personal compliance queue — <b>'+(buckets.overdue.length+buckets.today.length)+'</b> items need action now.</p></div>'+
     '</div>';
