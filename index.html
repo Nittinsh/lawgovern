@@ -444,6 +444,13 @@ body.nav-locked{overflow:hidden;}
   .cc-metrics{grid-template-columns:1fr;}
   .cu-sum-chip{font-size:10px;}
 }
+
+/* Tablet: let the wide table scroll horizontally inside its card (640-900px) */
+@media(min-width:641px) and (max-width:900px){
+  .cu-tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .cu-table{min-width:820px;}
+}
+
 /* ═══════════════════════════════════════════════════ */
 </style>
 </head>
