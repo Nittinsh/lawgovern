@@ -532,6 +532,10 @@ async function lgSignOut(){
 
 function enterApp(){
   document.getElementById('auth-overlay').style.display='none';
+  // Ensure a clean panel state on entry — hide all, show only Command Center
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('on');p.style.display='none';});
+  var home=document.getElementById('p-home'); if(home){home.classList.add('on');home.style.display='';}
+  var homeNav=document.getElementById('t-home'); if(homeNav){document.querySelectorAll('.navitem').forEach(function(t){t.classList.remove('on');});homeNav.classList.add('on');}
   var oldOverlay = document.getElementById('akovl');
   if(oldOverlay) oldOverlay.style.display='none';
   // Set access code for legacy compatibility
@@ -728,7 +732,7 @@ input[type="text"], input[type="password"], textarea, select {
     </div>
     <div>
       <div class="n">LawGovern</div>
-      <div class="t">Compliance OS · v5</div>
+      <div class="t">Compliance OS · v6</div>
     </div>
   </div>
   <div class="cc-search">
@@ -2452,9 +2456,10 @@ function rmTyping(id) { var e = document.getElementById(id); if(e) e.remove(); }
 // ═══════════════════════════════════════════════════
 function sw(id) {
   document.querySelectorAll('.navitem').forEach(function(t){t.classList.remove('on');});
-  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('on');});
+  // Force EVERY panel hidden (inline style beats any CSS conflict), then show only target
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('on');p.style.display='none';});
   var nav=document.getElementById('t-'+id); if(nav) nav.classList.add('on');
-  var pan=document.getElementById('p-'+id); if(pan) pan.classList.add('on');
+  var pan=document.getElementById('p-'+id); if(pan){ pan.classList.add('on'); pan.style.display=''; }
   if (id==='cal') rc();
   if (id==='home' && typeof renderCommandCenter==='function') renderCommandCenter();
   if (id==='universe' && typeof renderUniverse==='function') renderUniverse();
