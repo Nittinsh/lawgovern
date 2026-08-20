@@ -347,6 +347,104 @@
 
 .cd-foot{display:flex;gap:10px;padding-top:8px;border-top:1px solid var(--line);margin-top:4px;padding-top:18px;}
 /* ===== end detail workspace ===== */
+
+/* ═══════════════════════════════════════════════════
+   MOBILE RESPONSIVE — full phone/tablet support
+   ═══════════════════════════════════════════════════ */
+.mobile-menu-btn{display:none;width:38px;height:38px;border-radius:9px;border:1px solid var(--line);background:var(--paper);color:var(--navy);cursor:pointer;flex-shrink:0;align-items:center;justify-content:center;}
+.mobile-menu-btn svg{width:20px;height:20px;}
+.mobile-nav-overlay{display:none;position:fixed;inset:0;background:rgba(11,18,32,.5);z-index:190;backdrop-filter:blur(2px);}
+.mobile-nav-overlay.show{display:block;}
+body.nav-locked{overflow:hidden;}
+
+/* ===== TABLET (≤900px) ===== */
+@media(max-width:900px){
+  .mobile-menu-btn{display:flex;}
+  .appshell{grid-template-columns:1fr;}
+  .appside{position:fixed;left:0;top:0;bottom:0;width:270px;height:100vh;z-index:200;transform:translateX(-100%);transition:transform .25s ease;box-shadow:4px 0 24px rgba(0,0,0,.2);padding-top:16px;}
+  .appside.mobile-open{transform:translateX(0);}
+  .appmain{height:auto;min-height:calc(100vh - 60px);}
+  .cc-topgrid{grid-template-columns:1fr;}
+  /* header tightening */
+  .appheader{gap:10px;padding:0 14px;height:60px;}
+  .cc-search{display:none;} /* hide the big header search on tablet */
+  .appbrand .t{display:none;}
+  .appbrand .n{font-size:16px;}
+  .cc-logo-mark{width:32px;height:32px;}
+  .appuser .greet{display:none;}
+  .applogout span{display:inline;}
+}
+
+/* ===== PHONE (≤640px) ===== */
+@media(max-width:640px){
+  .appmain{padding:16px 14px 40px;}
+  .cc-h1{font-size:21px;}
+  .cc-sub{font-size:12.5px;}
+  .cc-pagehead{flex-direction:column;align-items:stretch;gap:12px;}
+  .cc-headbtns{width:100%;}
+  .cc-headbtns .cc-btn,.cc-headbtns .cc-btn-primary{flex:1;justify-content:center;}
+  .cc-metrics{grid-template-columns:1fr 1fr;gap:10px;}
+  .cc-metric{padding:13px;}
+  .cc-metric-v{font-size:24px;}
+  .cc-gauge{width:180px;height:180px;}
+  .cc-gauge svg{width:180px;height:180px;}
+  .cc-gauge-score{font-size:42px;}
+
+  /* Attention rows stack */
+  .cc-att-row{flex-wrap:wrap;gap:8px;}
+  .cc-att-right{text-align:left;width:100%;display:flex;align-items:center;gap:10px;margin-top:2px;}
+
+  /* ===== Compliance Universe → card layout on phone ===== */
+  .cu-summary{gap:8px;}
+  .cu-sum-chip{flex:1;text-align:center;padding:9px 8px;font-size:11px;min-width:0;}
+  .cu-sum-chip b{font-size:15px;display:block;margin:0 0 2px;}
+  .cu-filters{gap:7px;}
+  .cu-search{min-width:100%;order:-1;}
+  .cu-filters select{flex:1;min-width:calc(50% - 4px);font-size:12px;padding:8px;}
+  .cu-tablewrap{border:none;background:transparent;box-shadow:none;overflow:visible;}
+  .cu-table thead{display:none;}
+  .cu-table,.cu-table tbody,.cu-table tr,.cu-table td{display:block;width:100%;}
+  .cu-table tr{background:var(--paper);border:1px solid var(--line);border-radius:12px;margin-bottom:10px;padding:14px;box-shadow:0 1px 3px rgba(11,18,32,.05);}
+  .cu-table tr:hover{background:var(--paper);}
+  .cu-table td{padding:3px 0;border:none;display:flex;justify-content:space-between;align-items:center;gap:10px;}
+  .cu-table td:first-child{border-bottom:1px solid var(--line-soft);padding-bottom:8px;margin-bottom:6px;display:block;}
+  .cu-table td::before{content:attr(data-label);font-size:11px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.03em;}
+  .cu-table td:first-child::before{display:none;}
+  .cu-oblig{font-size:14px;}
+  .cu-act{justify-content:flex-end;}
+
+  /* ===== My Work → stack cards ===== */
+  .mw-tabs{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .mw-tabs::-webkit-scrollbar{display:none;}
+  .mw-tab{white-space:nowrap;padding:10px 12px;font-size:12.5px;flex-shrink:0;}
+  .mw-item{flex-wrap:wrap;gap:10px;padding:13px;}
+  .mw-item-main{flex-basis:calc(100% - 22px);}
+  .mw-item-side{text-align:left;min-width:0;display:flex;gap:10px;align-items:center;flex-basis:100%;padding-left:22px;}
+  .mw-item-actions{flex-basis:100%;padding-left:22px;}
+  .mw-act{flex:1;text-align:center;}
+  .mw-item-meta{font-size:11.5px;}
+
+  /* ===== Detail workspace → full-screen on phone ===== */
+  .cd-modal{padding:0;align-items:stretch;}
+  .cd-inner{border-radius:0;max-width:100%;min-height:100vh;}
+  .cd-body{padding:20px 16px 40px;}
+  .cd-oblig{font-size:19px;}
+  .cd-grid{grid-template-columns:1fr;}
+  .cd-approvals{overflow-x:auto;padding-bottom:6px;}
+  .cd-foot{flex-direction:column;}
+  .cd-foot button{width:100%;}
+
+  /* Compliance detail small-popup variant */
+  .cu-modal{padding:0;align-items:stretch;}
+  .cu-modal-inner{border-radius:0;max-width:100%;min-height:100vh;}
+}
+
+/* ===== very small phones ===== */
+@media(max-width:380px){
+  .cc-metrics{grid-template-columns:1fr;}
+  .cu-sum-chip{font-size:10px;}
+}
+/* ═══════════════════════════════════════════════════ */
 </style>
 </head>
 <body>
@@ -614,13 +712,16 @@ input[type="text"], input[type="password"], textarea, select {
 
 <!-- HEADER -->
 <div class="appheader">
+  <button class="mobile-menu-btn" onclick="toggleMobileNav()" aria-label="Menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
   <div class="appbrand">
     <div class="cc-logo-mark">
       <svg viewBox="0 0 24 24" fill="none"><path d="M4 7l8-4 8 4v6c0 4.5-3.5 7.5-8 9-4.5-1.5-8-4.5-8-9V7z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <div>
       <div class="n">LawGovern</div>
-      <div class="t">Compliance OS</div>
+      <div class="t">Compliance OS · v5</div>
     </div>
   </div>
   <div class="cc-search">
@@ -638,6 +739,7 @@ input[type="text"], input[type="password"], textarea, select {
     </button>
   </div>
 </div>
+<div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="closeMobileNav()"></div>
 <div class="appshell">
 <aside class="appside">
 <div class="navhead">Intelligence</div>
@@ -5055,15 +5157,15 @@ function renderUniverse(){
   } else {
     rows.forEach(function(r){
       body+='<tr onclick="cuOpenDetail(\''+r.entityId+'\',\''+r.key+'\')">'+
-        '<td><div class="cu-oblig">'+r.obligation+'</div><div class="cu-oblig-sub">'+(r.form&&r.form!=='—'?'<span class="mono">'+r.form+'</span> · ':'')+r.owner+'</div></td>'+
-        '<td><span class="cu-law">'+cuLawShort(r.law)+'</span></td>'+
-        '<td class="mono cu-sec">'+r.section+'</td>'+
-        '<td>'+r.entity+'</td>'+
-        '<td>'+r.freq+'</td>'+
-        '<td class="mono cu-due">'+ccFmtDate(r.due)+'</td>'+
-        '<td>'+cuRiskPill(r.risk)+'</td>'+
-        '<td>'+cuStatusPill(r.status,r.days)+'</td>'+
-        '<td class="cu-act"><button onclick="event.stopPropagation();cuOpenDetail(\''+r.entityId+'\',\''+r.key+'\')">Open →</button></td>'+
+        '<td data-label="Compliance"><div class="cu-oblig">'+r.obligation+'</div><div class="cu-oblig-sub">'+(r.form&&r.form!=='—'?'<span class="mono">'+r.form+'</span> · ':'')+r.owner+'</div></td>'+
+        '<td data-label="Law"><span class="cu-law">'+cuLawShort(r.law)+'</span></td>'+
+        '<td data-label="Section" class="mono cu-sec">'+r.section+'</td>'+
+        '<td data-label="Entity">'+r.entity+'</td>'+
+        '<td data-label="Frequency">'+r.freq+'</td>'+
+        '<td data-label="Due" class="mono cu-due">'+ccFmtDate(r.due)+'</td>'+
+        '<td data-label="Risk">'+cuRiskPill(r.risk)+'</td>'+
+        '<td data-label="Status">'+cuStatusPill(r.status,r.days)+'</td>'+
+        '<td data-label="" class="cu-act"><button onclick="event.stopPropagation();cuOpenDetail(\''+r.entityId+'\',\''+r.key+'\')">Open →</button></td>'+
       '</tr>';
     });
   }
@@ -5462,6 +5564,24 @@ function cdGenerateDoc(){ cdClose(); sw('res'); }
 // Redirect the old popup to the new full workspace
 function cuOpenDetail(entityId,key){ openComplianceDetail(entityId,key); }
 
+
+// ===== Mobile navigation =====
+function toggleMobileNav(){
+  document.querySelector('.appside').classList.toggle('mobile-open');
+  document.getElementById('mobileNavOverlay').classList.toggle('show');
+  document.body.classList.toggle('nav-locked');
+}
+function closeMobileNav(){
+  document.querySelector('.appside').classList.remove('mobile-open');
+  document.getElementById('mobileNavOverlay').classList.remove('show');
+  document.body.classList.remove('nav-locked');
+}
+// Close mobile nav when a nav item is tapped
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('.navitem').forEach(function(n){
+    n.addEventListener('click', function(){ if(window.innerWidth<=900) closeMobileNav(); });
+  });
+});
 </script>
 
 <div class="cu-modal" id="cu-detail-modal" onclick="if(event.target===this)cuCloseDetail()">
