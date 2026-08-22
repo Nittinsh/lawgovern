@@ -242,12 +242,28 @@ def main():
     ev, ev_need = [], 0
     for m in mat:
         tl = (m.get('Disclosure Timeline') or '').lower()
-        d = re.search(r'(\d+)\s*(working\s*)?(hours|days)', tl)
-        if d:
-            n = int(d.group(1))
-            unit = d.group(3)
-            timing = {'type': 'hours' if unit == 'hours' else 'days',
-                      'value': n, 'workingDays': bool(d.group(2))}
+        # Reg 30 has a layered clock: 30 minutes from the close of a board
+        # meeting, 12 hours for events arising inside the entity, 24 hours for
+        # events arising outside it. Capture each limb that is present.
+        limbs = []
+        if re.search(r'30\s*min', tl):
+            limbs.append({'minutes': 30, 'from': 'close of board meeting'})
+        for mm in re.finditer(r'within\s+(\d+)\s*(working\s*)?(hours|days)', tl):
+            limbs.append({'value': int(mm.group(1)),
+                          'unit': 'hours' if mm.group(3) == 'hours' else 'days',
+                          'workingDays': bool(mm.group(2)),
+                          'from': ('within the entity' if 'within the listed entity' in tl
+                                   else ('outside the entity' if 'not emanating' in tl else 'event'))})
+        if not limbs:
+            d = re.search(r'(\d+)\s*(working\s*)?(hours|days)', tl)
+            if d:
+                limbs.append({'value': int(d.group(1)),
+                              'unit': 'hours' if d.group(3) == 'hours' else 'days',
+                              'workingDays': bool(d.group(2)), 'from': 'event'})
+        if limbs:
+            fastest = min([l.get('minutes', l.get('value', 9999) * (60 if l.get('unit') == 'hours' else 1440))
+                           for l in limbs])
+            timing = {'type': 'deadline', 'limbs': limbs, 'fastestMinutes': fastest}
             r = False
         else:
             timing = {'type': 'review'}
@@ -256,7 +272,8 @@ def main():
         # Materiality is a judgement the Company Secretary makes. That is not a
         # parsing failure, so it does not count as "needs review" — the app lists
         # the event and the test, and the CS decides.
-        auto = mt.lower() in ('', 'deemed material', 'always material', 'n/a')
+        mtl = mt.lower()
+        auto = ('deemed material' in mtl) or mtl in ('', 'always material', 'n/a')
         if r:
             ev_need += 1
         ev.append({
@@ -287,6 +304,7 @@ def main():
     print()
     print(f'events   : {len(ev)} events, {ev_need} with unclear timing')
     print('  timings   :', dict(Counter(e['timing']['type'] for e in ev)))
+    print('  limbs     :', dict(Counter(len(e['timing'].get('limbs',[])) for e in ev)))
     print('  materiality automatic:', sum(1 for e in ev if e['materialityIsAutomatic']),
           '| needs CS judgement:', sum(1 for e in ev if not e['materialityIsAutomatic']))
 

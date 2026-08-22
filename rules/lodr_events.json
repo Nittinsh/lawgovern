@@ -13,12 +13,23 @@
    "item": "1",
    "event": "Acquisition(s) (including agreement to acquire); Scheme of Arrangement (amalgamation, merger, demerger or restructuring); sale or disposal of any unit(s), division(s), whole or substantially the whole of the undertaking(s) or subsidiary of the listed entity; sale of stake in an associate company; or any other restructuring.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "30 min from close of board meeting (or 3 hrs if it closed after trading hours and >3 hrs before next day's open) / Within 12 hours - event emanating from WITHIN the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 12,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "minutes": 30,
+      "from": "close of board meeting"
+     },
+     {
+      "value": 12,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 30
    },
    "regulation": "Reg 30(2)",
    "appliesToText": "Equity (specified securities)",
@@ -34,12 +45,23 @@
    "item": "2",
    "event": "Issuance or forfeiture of securities; split or consolidation of shares; buyback of securities; any restriction on transferability of securities; or alteration in terms or structure of existing securities including forfeiture, reissue of forfeited securities, alteration of calls, redemption of securities etc.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "30 min from close of board meeting (or 3 hrs if it closed after trading hours and >3 hrs before next day's open) / Within 12 hours - event emanating from WITHIN the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 12,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "minutes": 30,
+      "from": "close of board meeting"
+     },
+     {
+      "value": 12,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 30
    },
    "regulation": "Reg 30(2)",
    "appliesToText": "Equity (specified securities)",
@@ -55,12 +77,19 @@
    "item": "3",
    "event": "New Rating(s) or Revision in Rating(s).",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours - event NOT emanating from within the listed entity (rating action originates outside the LE)",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 30(2)",
    "appliesToText": "Equity (specified securities)",
@@ -76,15 +105,22 @@
    "item": "4",
    "event": "OUTCOME OF BOARD MEETINGS held to consider: (a) dividends recommended/declared or decision to pass any dividend + date of payment/dispatch; (b) cancellation of dividend with reasons; (c) decision on buyback; (d) decision on fund raising - by issue of securities (excluding security receipts, securitised debt instruments or RBI-regulated money market instruments) through FPO, rights issue, ADR/GDR/FCCB, QIP, debt issue, preferential issue or any other method; (e) increase in capital by bonus issue through capitalisation + credit/dispatch date; (f) reissue of forfeited shares/securities, issue of shares/securities held in reserve, or creation of new shares/securities or rights/privileges/benefits to subscribe; (g) short particulars of any other alterations of capital, including calls; (h) financial results; (i) decision on voluntary delisting from stock exchange(s).",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "30 min from close of board meeting (or 3 hrs if it closed after trading hours and >3 hrs before next day's open)",
    "timing": {
-    "type": "review"
+    "type": "deadline",
+    "limbs": [
+     {
+      "minutes": 30,
+      "from": "close of board meeting"
+     }
+    ],
+    "fastestMinutes": 30
    },
    "regulation": "Reg 30(2), Reg 30(6)(i)",
    "appliesToText": "Equity (specified securities)",
    "notes": "For multi-day board meetings, financial results are disclosed within 30 min / 3 hrs from close of the session on the day they were considered.",
-   "needsReview": true
+   "needsReview": false
   },
   {
    "id": "LODR-SCH3-Part A-A-5",
@@ -95,12 +131,19 @@
    "item": "5",
    "event": "Agreements - shareholder agreement(s), joint venture agreement(s), family settlement agreement(s) (to the extent they impact management and control of the LE), agreement(s)/treaty(ies)/contract(s) with media companies - which are BINDING and NOT in the normal course of business; and revision(s), amendment(s) and termination(s) thereof.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 12 hours - event emanating from WITHIN the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 12,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 12,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 720
    },
    "regulation": "Reg 30(2)",
    "appliesToText": "Equity (specified securities)",
@@ -116,12 +159,19 @@
    "item": "5A",
    "event": "Agreements entered into by shareholders, promoters, promoter group entities, related parties, directors, KMP or employees of the LE or of its holding / subsidiary / associate company - among themselves, or with the LE, or with a third party, solely or jointly - which directly, indirectly or potentially (or whose purpose and effect is to) impact the management or control of the LE, or impose any restriction or create any liability upon the LE. Includes any rescission, amendment or alteration, WHETHER OR NOT THE LISTED ENTITY IS A PARTY.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours - event NOT emanating from within the listed entity (or within 12 hrs where the LE is a party)",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 30(2), Reg 30(6A)",
    "appliesToText": "Equity (specified securities)",
@@ -137,12 +187,19 @@
    "item": "6",
    "event": "FRAUD OR DEFAULTS by the listed entity, its promoter, director, KMP, senior management or subsidiary; OR arrest of KMP, senior management, promoter or director of the LE - whether occurring within India or abroad.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours - event NOT emanating from within the listed entity (or 12 hrs if emanating from within the LE)",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 30(2)",
    "appliesToText": "Equity (specified securities)",
@@ -158,12 +215,19 @@
    "item": "7",
    "event": "Change in directors, KMP (Managing Director, CEO, CFO, Company Secretary etc.), SENIOR MANAGEMENT, Auditor and Compliance Officer.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 12 hours - event emanating from WITHIN the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 12,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 12,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 720
    },
    "regulation": "Reg 30(2)",
    "appliesToText": "Equity (specified securities)",
@@ -179,12 +243,19 @@
    "item": "7A",
    "event": "Resignation of the AUDITOR - detailed reasons for resignation as given by the said auditor.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours of receipt of such reasons from the auditor",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 30(2)",
    "appliesToText": "Equity (specified securities)",
@@ -200,12 +271,19 @@
    "item": "7B",
    "event": "Resignation of an INDEPENDENT DIRECTOR - (i) the letter of resignation along with detailed reasons as given by the director; (ia) names of listed entities where the resigning director holds directorships, with category of directorship and committee memberships; (ii) confirmation from the ID that there is no other material reason other than those provided; (iii) that confirmation to be disclosed by the LE along with (i) and (ii).",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 7 days from the date of resignation",
    "timing": {
-    "type": "days",
-    "value": 7,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 7,
+      "unit": "days",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 10080
    },
    "regulation": "Reg 30(2)",
    "appliesToText": "Equity (specified securities)",
@@ -221,12 +299,19 @@
    "item": "7C",
    "event": "Resignation of KMP, senior management, Compliance Officer, or a director OTHER THAN an independent director - the letter of resignation along with detailed reasons as given by such person.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 7 days from the date the resignation comes into effect",
    "timing": {
-    "type": "days",
-    "value": 7,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 7,
+      "unit": "days",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 10080
    },
    "regulation": "Reg 30(2)",
    "appliesToText": "Equity (specified securities)",
@@ -242,12 +327,19 @@
    "item": "7D",
    "event": "Where the Managing Director or CEO was indisposed or unavailable to fulfil the requirements of the role in a regular manner for more than 45 days in any rolling period of 90 days - the fact, along with reasons for such indisposition or unavailability.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 12 hours - event emanating from WITHIN the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 12,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 12,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 720
    },
    "regulation": "Reg 30(2)",
    "appliesToText": "Equity (specified securities)",
@@ -263,12 +355,19 @@
    "item": "8",
    "event": "Appointment or discontinuation of the Registrar to an Issue and Share Transfer Agent (RTA).",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 12 hours - event emanating from WITHIN the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 12,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 12,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 720
    },
    "regulation": "Reg 30(2)",
    "appliesToText": "Equity (specified securities)",
@@ -284,12 +383,19 @@
    "item": "9",
    "event": "RESOLUTION PLAN / RESTRUCTURING in relation to loans/borrowings from banks/financial institutions, including: (i) decision to initiate resolution of loans/borrowings; (ii) signing of Inter-Creditors Agreement (ICA) by lenders; (iii) finalisation of the Resolution Plan; (iv) implementation of the Resolution Plan; (v) salient features (not involving commercial secrets) of the resolution/restructuring plan as decided by lenders.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours - event NOT emanating from within the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 30(2)",
    "appliesToText": "Equity (specified securities)",
@@ -305,12 +411,19 @@
    "item": "10",
    "event": "One-time settlement with a bank.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours - event NOT emanating from within the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 30(2)",
    "appliesToText": "Equity (specified securities)",
@@ -326,12 +439,19 @@
    "item": "11",
    "event": "Winding-up petition filed by any party / creditors.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours - event NOT emanating from within the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 30(2)",
    "appliesToText": "Equity (specified securities)",
@@ -347,12 +467,19 @@
    "item": "12",
    "event": "Issuance of notices, call letters, resolutions and circulars sent to shareholders, debenture holders or creditors or any class of them, or advertised in the media by the listed entity.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 12 hours - event emanating from WITHIN the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 12,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 12,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 720
    },
    "regulation": "Reg 30(2)",
    "appliesToText": "Equity (specified securities)",
@@ -368,12 +495,19 @@
    "item": "13",
    "event": "Proceedings of Annual and Extraordinary General Meetings of the listed entity.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 12 hours - event emanating from WITHIN the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 12,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 12,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 720
    },
    "regulation": "Reg 30(2)",
    "appliesToText": "Equity (specified securities)",
@@ -389,12 +523,19 @@
    "item": "14",
    "event": "Amendments to the Memorandum and Articles of Association of the listed entity, in brief.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 12 hours - event emanating from WITHIN the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 12,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 12,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 720
    },
    "regulation": "Reg 30(2)",
    "appliesToText": "Equity (specified securities)",
@@ -410,12 +551,19 @@
    "item": "15(a)(i)",
    "event": "Schedule of analysts' or institutional investors' meet.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "At least 2 working days in advance (excluding the date of intimation and the date of the meet)",
    "timing": {
-    "type": "days",
-    "value": 2,
-    "workingDays": true
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 2,
+      "unit": "days",
+      "workingDays": true,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 2880
    },
    "regulation": "Reg 30(2)",
    "appliesToText": "Equity (specified securities)",
@@ -431,7 +579,7 @@
    "item": "15(a)(ii)",
    "event": "Presentations prepared by the listed entity for analysts' or institutional investors' meets, post-earnings or quarterly calls.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Prior to the beginning of such events",
    "timing": {
     "type": "review"
@@ -450,12 +598,19 @@
    "item": "15(b)(i)",
    "event": "AUDIO RECORDINGS of post-earnings / quarterly calls (physical or digital).",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Promptly, and in any case before the next trading day OR within 24 hours from conclusion of the call, whichever is EARLIER",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 30(2), Reg 46(2)(oa)",
    "appliesToText": "Equity (specified securities)",
@@ -471,12 +626,19 @@
    "item": "15(b)(ii)",
    "event": "VIDEO RECORDINGS (if any) of post-earnings / quarterly calls.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 48 hours from conclusion of the call",
    "timing": {
-    "type": "hours",
-    "value": 48,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 48,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 2880
    },
    "regulation": "Reg 30(2), Reg 46(2)(oa)",
    "appliesToText": "Equity (specified securities)",
@@ -492,12 +654,19 @@
    "item": "15(b)(iii)",
    "event": "TRANSCRIPTS of post-earnings / quarterly calls.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 5 working days of conclusion of the call - on the website WITH simultaneous submission to the stock exchange(s)",
    "timing": {
-    "type": "days",
-    "value": 5,
-    "workingDays": true
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 5,
+      "unit": "days",
+      "workingDays": true,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 7200
    },
    "regulation": "Reg 30(2), Reg 46(2)(oa)",
    "appliesToText": "Equity (specified securities)",
@@ -513,12 +682,19 @@
    "item": "16",
    "event": "CORPORATE INSOLVENCY RESOLUTION PROCESS (CIRP) of a listed corporate debtor under the Insolvency Code: (a) filing of application by the corporate applicant, specifying the amount of default; (b) filing of application by financial creditors, specifying the amount of default; (c) admission of the application by the Tribunal with the amount of default, or rejection / withdrawal; (d) public announcement pursuant to the Tribunal's order u/s 13 IBC; (e) list of creditors displayed under Reg 13(2)(c) IBBI (CIRP) Regulations, 2016; (f) appointment / replacement of the Resolution Professional; (g) prior or post-facto intimation of CoC meetings; (h) brief particulars of invitation of resolution plans u/s 25(2)(h) IBC in the Form under Reg 36A(5) IBBI (CIRP) Regulations; (i) number of resolution plans received by the RP; (j) filing of the resolution plan with the Tribunal; (k) approval of the resolution plan by the Tribunal, or rejection; (l) specific features and details of the approved resolution plan (not involving commercial secrets) - pre/post net worth; assets post CIRP; securities continuing to be imposed on assets; other material liabilities; detailed pre/post shareholding pattern assuming 100% conversion of convertibles; funds infused and creditors paid off; additional liability on incoming investors and source of funding; impact on the investor (revised P/E, RONW); names of new promoters and KMP with past experience (and, where promoters are companies, their history and natural persons in control); brief description of business strategy; (m) any other material information not involving commercial secrets; (n) proposed steps by the incoming investor/acquirer for achieving MPS; (o) QUARTERLY disclosure of status of achieving MPS; (p) details of delisting plans, if any, approved in the resolution plan.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours - event NOT emanating from within the listed entity (or 12 hrs where the event emanates from within the LE); item (o) is QUARTERLY",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 30(2)",
    "appliesToText": "Equity (specified securities)",
@@ -534,12 +710,19 @@
    "item": "17",
    "event": "INITIATION OF FORENSIC AUDIT (by whatever name called): (a) the fact of initiation, along with the name of the entity initiating the audit and reasons, if available; (b) the final forensic audit report (other than for audits initiated by regulatory / enforcement agencies), on receipt by the LE, along with management comments, if any.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours - event NOT emanating from within the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 30(2)",
    "appliesToText": "Equity (specified securities)",
@@ -555,12 +738,19 @@
    "item": "18",
    "event": "Announcement or communication through SOCIAL MEDIA INTERMEDIARIES or MAINSTREAM MEDIA by directors, promoters, KMP or senior management of the LE, in relation to any event or information which is material for the LE under Reg 30 and is not already available in the public domain.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours - event NOT emanating from within the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 30(2)",
    "appliesToText": "Equity (specified securities)",
@@ -576,12 +766,19 @@
    "item": "19",
    "event": "Action(s) INITIATED or ORDERS PASSED by any regulatory, statutory, enforcement authority or judicial body against the LE, or its directors, KMP, senior management, promoter or subsidiary (in relation to the LE), in respect of: (a) search or seizure; (b) re-opening of accounts u/s 130 Companies Act 2013; (c) investigation under Chapter XIV Companies Act 2013. To be disclosed with: (i) name of the authority; (ii) nature and details of the action/order; (iii) date of receipt of the direction/order, including any ad-interim or interim order or other communication; (iv) details of the violation(s)/contravention(s) committed or alleged; (v) impact on financial, operational or other activities, quantified in monetary terms to the extent possible.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours - event NOT emanating from within the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 30(2)",
    "appliesToText": "Equity (specified securities)",
@@ -597,12 +794,25 @@
    "item": "20",
    "event": "Action(s) TAKEN or ORDERS PASSED by any regulatory, statutory, enforcement authority or judicial body against the LE, or its directors, KMP, senior management, promoter or subsidiary (in relation to the LE), in respect of: (a) suspension; (b) imposition of fine or penalty; (c) settlement of proceedings; (d) debarment; (e) disqualification; (f) closure of operations; (g) sanctions imposed; (h) warning or caution; or (i) any other similar action by whatever name called. Same five details as item 19 apply.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 HOURS where fine/penalty crosses the threshold; QUARTERLY (specified format) where below the threshold. Other actions: Within 24 hours - event NOT emanating from within the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     },
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 30(2)",
    "appliesToText": "Equity (specified securities)",
@@ -618,12 +828,19 @@
    "item": "21",
    "event": "Voluntary revision of financial statements or of the report of the board of directors of the listed entity u/s 131 Companies Act, 2013.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 12 hours - event emanating from WITHIN the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 12,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 12,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 720
    },
    "regulation": "Reg 30(2)",
    "appliesToText": "Equity (specified securities)",
@@ -642,9 +859,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 12 hours - event emanating from WITHIN the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 12,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 12,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 720
    },
    "regulation": "Reg 30(3), 30(4)",
    "appliesToText": "Equity (specified securities)",
@@ -663,9 +887,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 12 hours - event emanating from WITHIN the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 12,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 12,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 720
    },
    "regulation": "Reg 30(3), 30(4)",
    "appliesToText": "Equity (specified securities)",
@@ -684,9 +915,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 12 hours - event emanating from WITHIN the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 12,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 12,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 720
    },
    "regulation": "Reg 30(3), 30(4)",
    "appliesToText": "Equity (specified securities)",
@@ -705,9 +943,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 12 hours - event emanating from WITHIN the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 12,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 12,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 720
    },
    "regulation": "Reg 30(3), 30(4)",
    "appliesToText": "Equity (specified securities)",
@@ -726,9 +971,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 12 hours - event emanating from WITHIN the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 12,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 12,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 720
    },
    "regulation": "Reg 30(3), 30(4)",
    "appliesToText": "Equity (specified securities)",
@@ -747,9 +999,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 12 hours - event emanating from WITHIN the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 12,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 12,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 720
    },
    "regulation": "Reg 30(3), 30(4)",
    "appliesToText": "Equity (specified securities)",
@@ -768,9 +1027,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 12 hours - event emanating from WITHIN the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 12,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 12,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 720
    },
    "regulation": "Reg 30(3), 30(4)",
    "appliesToText": "Equity (specified securities)",
@@ -789,9 +1055,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours - event NOT emanating from within the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 30(3), 30(4)",
    "appliesToText": "Equity (specified securities)",
@@ -810,9 +1083,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 12 hours - event emanating from WITHIN the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 12,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 12,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 720
    },
    "regulation": "Reg 30(3), 30(4)",
    "appliesToText": "Equity (specified securities)",
@@ -831,9 +1111,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 12 hours - event emanating from WITHIN the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 12,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 12,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 720
    },
    "regulation": "Reg 30(3), 30(4)",
    "appliesToText": "Equity (specified securities)",
@@ -852,9 +1139,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 12 hours - event emanating from WITHIN the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 12,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 12,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 720
    },
    "regulation": "Reg 30(3), 30(4)",
    "appliesToText": "Equity (specified securities)",
@@ -873,9 +1167,22 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 12 hours - event emanating from WITHIN the listed entity / Within 24 hours - event NOT emanating from within the listed entity (depending on whether the event emanates from within the LE)",
    "timing": {
-    "type": "hours",
-    "value": 12,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 12,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     },
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 720
    },
    "regulation": "Reg 30(3), 30(4)",
    "appliesToText": "Equity (specified securities)",
@@ -894,9 +1201,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 12 hours - event emanating from WITHIN the listed entity",
    "timing": {
-    "type": "hours",
-    "value": 12,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 12,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 720
    },
    "regulation": "Reg 30(3), 30(4)",
    "appliesToText": "Equity (specified securities)",
@@ -915,9 +1229,22 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 12 hours - event emanating from WITHIN the listed entity / Within 24 hours - event NOT emanating from within the listed entity as applicable",
    "timing": {
-    "type": "hours",
-    "value": 12,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 12,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     },
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "within the entity"
+     }
+    ],
+    "fastestMinutes": 720
    },
    "regulation": "Reg 30(3), 30(4)",
    "appliesToText": "Equity (specified securities)",
@@ -933,7 +1260,7 @@
    "item": null,
    "event": "Without prejudice to the generality of Paras A, B and C, the listed entity MAY make disclosures of event/information as specified by SEBI from time to time.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "As specified by SEBI",
    "timing": {
     "type": "review"
@@ -955,9 +1282,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "AS SOON AS THE SAME BECOMES APPARENT (and in any case within 24 hours)",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -976,9 +1310,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -997,9 +1338,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -1018,9 +1366,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -1039,9 +1394,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -1060,9 +1422,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -1081,9 +1450,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -1102,9 +1478,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -1123,9 +1506,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -1144,9 +1534,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -1165,9 +1562,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -1186,9 +1590,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -1207,9 +1618,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -1228,9 +1646,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -1249,9 +1674,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -1270,12 +1702,19 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "WITHIN 30 MINUTES of the closure of the meeting",
    "timing": {
-    "type": "review"
+    "type": "deadline",
+    "limbs": [
+     {
+      "minutes": 30,
+      "from": "close of board meeting"
+     }
+    ],
+    "fastestMinutes": 30
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
    "notes": "For board meetings held over more than one day, financial results are disclosed within 30 minutes of the end of the meeting for the day on which they were considered.",
-   "needsReview": true
+   "needsReview": false
   },
   {
    "id": "LODR-SCH3-Part B-A-17",
@@ -1289,9 +1728,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -1310,9 +1756,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -1331,9 +1784,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "As soon as possible, but not later than 24 hours of receipt of such reasons from the auditor",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -1352,9 +1812,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -1373,9 +1840,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -1394,9 +1868,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -1415,9 +1896,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -1436,9 +1924,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -1457,9 +1952,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -1478,9 +1980,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -1499,9 +2008,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -1520,9 +2036,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -1541,9 +2064,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -1562,9 +2092,16 @@
    "materialityIsAutomatic": false,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 51(2)",
    "appliesToText": "NCS-listed",
@@ -2055,12 +2592,19 @@
    "item": "1",
    "event": "Any delay or expected delay in cash flows from the due date or pre-agreed date, if any.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "NOT LATER THAN 24 HOURS from occurrence of the event or information",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 87B(1)",
    "appliesToText": "SR-listed (ARCs)",
@@ -2076,12 +2620,19 @@
    "item": "2",
    "event": "Any change in the value of cash flows as disclosed, if any.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 87B(1)",
    "appliesToText": "SR-listed",
@@ -2097,12 +2648,19 @@
    "item": "3",
    "event": "Any receipt of cash flow or expected cash flow, along with the quantum so received.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 87B(1)",
    "appliesToText": "SR-listed",
@@ -2118,12 +2676,19 @@
    "item": "4",
    "event": "Any change in credit enhancement measures.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 87B(1)",
    "appliesToText": "SR-listed",
@@ -2139,12 +2704,19 @@
    "item": "5",
    "event": "Periodic rating obtained from a credit rating agency, or any revision in the rating, or any expected revision in rating.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 87B(1)",
    "appliesToText": "SR-listed",
@@ -2160,12 +2732,19 @@
    "item": "6",
    "event": "Periodic Net Asset Value.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 87B(1)",
    "appliesToText": "SR-listed",
@@ -2181,12 +2760,19 @@
    "item": "7",
    "event": "Any proposal to change, or change of, the credit rating agency or Valuer.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 87B(1)",
    "appliesToText": "SR-listed",
@@ -2202,12 +2788,19 @@
    "item": "8",
    "event": "Any change in the profile of the assets by way of accretion to, or realisation of assets from, the existing pool.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 87B(1)",
    "appliesToText": "SR-listed",
@@ -2223,12 +2816,19 @@
    "item": "9",
    "event": "Any proposal for acquisition of assets, including terms of acquisition.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 87B(1)",
    "appliesToText": "SR-listed",
@@ -2244,12 +2844,19 @@
    "item": "10",
    "event": "Any expected non-realisation or non-realisation of the financial assets, and remedial measures proposed to be undertaken.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 87B(1)",
    "appliesToText": "SR-listed",
@@ -2265,12 +2872,19 @@
    "item": "11",
    "event": "Any change in the nature of charge on the underlying assets.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 87B(1)",
    "appliesToText": "SR-listed",
@@ -2286,12 +2900,19 @@
    "item": "12",
    "event": "Any proposal to change, or any change in, the terms of security receipts - including rights, privileges, nature or form.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 87B(1)",
    "appliesToText": "SR-listed",
@@ -2307,12 +2928,19 @@
    "item": "13",
    "event": "Any proposal or action with respect to exercising a call/put option (right to redeem) or any similar option by the listed entity.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 87B(1)",
    "appliesToText": "SR-listed",
@@ -2328,12 +2956,19 @@
    "item": "14",
    "event": "Any breach of covenant(s) under the terms of security receipts.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 87B(1)",
    "appliesToText": "SR-listed",
@@ -2349,12 +2984,19 @@
    "item": "15",
    "event": "Any proposal or action for forfeiture of unclaimed cash flow, or forfeiture of any security receipts.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 87B(1)",
    "appliesToText": "SR-listed",
@@ -2370,12 +3012,19 @@
    "item": "16",
    "event": "Any change in the resolution plan.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 87B(1)",
    "appliesToText": "SR-listed",
@@ -2391,12 +3040,19 @@
    "item": "17",
    "event": "Any change in percentage holding of non-performing loans across other banks.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 87B(1)",
    "appliesToText": "SR-listed",
@@ -2412,12 +3068,19 @@
    "item": "18",
    "event": "Any change in the general character or nature of business / activities; disruption of operation due to natural calamity etc. of the listed entity.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 87B(1)",
    "appliesToText": "SR-listed",
@@ -2433,12 +3096,19 @@
    "item": "19",
    "event": "Any attachment or prohibitory orders restraining the listed entity from transferring security receipts.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 87B(1)",
    "appliesToText": "SR-listed",
@@ -2454,12 +3124,19 @@
    "item": "20",
    "event": "Initiation or status update with respect to a reference to the NCLT under the Insolvency and Bankruptcy Code, 2016 of any underlying assets.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 87B(1)",
    "appliesToText": "SR-listed",
@@ -2475,12 +3152,19 @@
    "item": "21",
    "event": "Intimation in advance of the meeting of the board of directors at which the recommendation or declaration of issue of security receipts, or any other matter affecting the rights or interests of holders of security receipts, is proposed to be considered - AND the outcome of such meetings.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Advance intimation; outcome within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 87B(1)",
    "appliesToText": "SR-listed",
@@ -2496,12 +3180,19 @@
    "item": "22",
    "event": "Fraud or defaults by the sponsor or KMP; or arrest of KMP or sponsor.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 87B(1)",
    "appliesToText": "SR-listed",
@@ -2517,12 +3208,19 @@
    "item": "23",
    "event": "Change in directors, KMP (Managing Director, CEO, CFO, Company Secretary etc.), Auditor and Compliance Officer OF THE SPONSOR.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 87B(1)",
    "appliesToText": "SR-listed",
@@ -2538,12 +3236,19 @@
    "item": "24",
    "event": "All such disclosures to the stock exchange(s) as the LE is required to make before the Reserve Bank of India per extant requirements, and/or any other disclosure(s) prescribed by the RBI from time to time.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 87B(1)",
    "appliesToText": "SR-listed",
@@ -2559,12 +3264,19 @@
    "item": "25",
    "event": "Where an event occurs or information is available with the LE which is not indicated in these regulations but which may be material - adequate disclosures in this regard.",
    "materialityTest": "DEEMED MATERIAL - no application of materiality guidelines",
-   "materialityIsAutomatic": false,
+   "materialityIsAutomatic": true,
    "disclosureTimelineText": "Within 24 hours",
    "timing": {
-    "type": "hours",
-    "value": 24,
-    "workingDays": false
+    "type": "deadline",
+    "limbs": [
+     {
+      "value": 24,
+      "unit": "hours",
+      "workingDays": false,
+      "from": "event"
+     }
+    ],
+    "fastestMinutes": 1440
    },
    "regulation": "Reg 87B(1)",
    "appliesToText": "SR-listed",
