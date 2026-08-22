@@ -46,6 +46,61 @@ serve(async (req) => {
     if (!key) {
       return json({ error: 'Server not configured: set OGD_API_KEY.' }, 500);
     }
+
+    // Diagnostic: {"sample":true} returns the dataset's real column names and a
+    // couple of rows, without filtering. Used to work out how CIN is stored.
+    if (body?.sample === true) {
+      const ids0 = (Deno.env.get('OGD_RESOURCE_IDS') || '')
+        .split(',').map((s) => s.trim()).filter(Boolean);
+      const id0 = (ids0.length ? ids0 : DEFAULT_RESOURCES)[0];
+      const u = `https://api.data.gov.in/resource/${id0}` +
+        `?api-key=${encodeURIComponent(key)}&format=json&limit=2`;
+      const rr = await fetch(u);
+      const dd = await rr.json().catch(() => null);
+      return json({
+        sample: true,
+        resourceId: id0,
+        httpStatus: rr.status,
+        total: dd?.total ?? null,
+        count: dd?.count ?? null,
+        fieldMeta: dd?.field ?? null,
+        columnNames: dd?.records?.[0] ? Object.keys(dd.records[0]) : null,
+        firstRecord: dd?.records?.[0] ?? null,
+        message: dd?.message ?? null,
+      });
+    }
+
+    // Diagnostic: {"selftest":true} pulls one real record, then filters on that
+    // record's own CIN. If the round trip fails, filtering itself is the problem
+    // rather than the CIN we were given.
+    if (body?.selftest === true) {
+      const id0 = DEFAULT_RESOURCES[0];
+      const base = `https://api.data.gov.in/resource/${id0}?api-key=${encodeURIComponent(key)}&format=json`;
+      const one = await (await fetch(`${base}&limit=1&offset=5`)).json().catch(() => null);
+      const seed = one?.records?.[0]?.CIN;
+      if (!seed) return json({ selftest: true, error: 'could not read a seed record' });
+
+      const attempts: Record<string, unknown> = {};
+      const variants: [string, string][] = [
+        ['filters[CIN]',        `${base}&limit=1&filters[CIN]=${encodeURIComponent(seed)}`],
+        ['filters%5BCIN%5D',    `${base}&limit=1&filters%5BCIN%5D=${encodeURIComponent(seed)}`],
+        ['q',                   `${base}&limit=1&q=${encodeURIComponent(seed)}`],
+        ['search[CIN]',         `${base}&limit=1&search[CIN]=${encodeURIComponent(seed)}`],
+      ];
+      for (const [label, u] of variants) {
+        try {
+          const rr = await fetch(u);
+          const dd = await rr.json().catch(() => null);
+          attempts[label] = {
+            http: rr.status,
+            count: dd?.count ?? null,
+            got: dd?.records?.[0]?.CIN ?? null,
+            matched: dd?.records?.[0]?.CIN === seed,
+          };
+        } catch (e) { attempts[label] = { error: String(e) }; }
+      }
+      return json({ selftest: true, seedCin: seed, attempts });
+    }
     const ids = (Deno.env.get('OGD_RESOURCE_IDS') || '')
       .split(',').map((s) => s.trim()).filter(Boolean);
     const resources = ids.length ? ids : DEFAULT_RESOURCES;
