@@ -908,7 +908,7 @@ input[type="text"], input[type="password"], textarea, select {
     </div>
     <div>
       <div class="n">LawGovern</div>
-      <div class="t">Compliance OS · v43</div>
+      <div class="t">Compliance OS · v44</div>
     </div>
   </div>
   <div class="cc-search">
@@ -5497,13 +5497,45 @@ function cuBuildRows(){
         vmethod:(st.verification && st.verification.method) || 'None',
         vsource:(st.verification && st.verification.source) || null,
         listing:(c.type==='listed' ? 'listed' : 'unlisted'),
-        freq: cuFreq(r.key)
+        // Generated rules carry their own frequency; cuFreq only knows the old
+        // hardcoded keys and would label every one of them Annual.
+        // Structural fallback: an obligation with no due date that matched no
+        // cadence wording is trigger-driven by definition. Better than chasing
+        // every phrasing the source sheets use.
+        freq: (function(){
+          var b = cuFreqBucket(r.frequency);
+          if(b && b !== 'Other') return b;
+          if(!r.due) return 'Event-based';
+          return b || cuFreq(r.key);
+        })(),
+        freqRaw: r.frequency || null
       });
     });
   });
   return all;
 }
 
+// Fold the many wordings used across the source sheets ("Continuous / event",
+// "Annual / threshold", "Event / 7 days") into a handful of usable buckets.
+function cuFreqBucket(raw){
+  var t = String(raw||'').toLowerCase().trim();
+  if(!t) return null;
+  if(t.indexOf('quarter') >= 0)  return 'Quarterly';
+  if(t.indexOf('half') >= 0)     return 'Half-yearly';
+  if(t.indexOf('month') >= 0)    return 'Monthly';
+  if(t.indexOf('annual') >= 0 || t.indexOf('yearly') >= 0) return 'Annual';
+  if(t.indexOf('continuous') >= 0 || t.indexOf('ongoing') >= 0) return 'Continuous';
+  if(t.indexOf('event') >= 0 || t.indexOf('trigger') >= 0 || t.indexOf('recurring') >= 0) return 'Event-based';
+  if(t.indexOf('biennial') >= 0) return 'Multi-year';
+  // PIT controls are phrased by their trigger rather than a cadence:
+  // "Any sharing of UPSI", "Every trade", "Onboarding; role changes".
+  if(/^(any|every|each|per)/.test(t)) return 'Event-based';
+  if(/(onboarding|appointment|adoption|amendment|request|receipt|sharing|trade|trading|disclosure|creation|execution|access change|breach|closure|designation)/.test(t)) return 'Event-based';
+  if(t.indexOf('periodic') >= 0) return 'Periodic review';
+  return 'Other';
+}
+
+// Legacy key-based fallback, for rows not produced from the sheets.
 function cuFreq(key){
   var annual=['agm','aoc4','mgt7','adt1','dir3kyc','dpt3','fla','secrpt','cgcc','mr3','csr','shp'];
   var quarterly=['q1','q2','q3','iepf2'];
@@ -5622,7 +5654,15 @@ function renderUniverse(){
         '<option value="">Listed &amp; unlisted</option>'+
         '<option value="listed"'+(f.listing==='listed'?' selected':'')+'>Listed only</option>'+
         '<option value="unlisted"'+(f.listing==='unlisted'?' selected':'')+'>Unlisted only</option></select>'+
-      '<select onchange="cuSetFilter(\'freq\',this.value)"><option value="">Any frequency</option><option value="Annual"'+(f.freq==='Annual'?' selected':'')+'>Annual</option><option value="Quarterly"'+(f.freq==='Quarterly'?' selected':'')+'>Quarterly</option><option value="Event-based"'+(f.freq==='Event-based'?' selected':'')+'>Event-based</option></select>'+
+      '<select onchange="cuSetFilter(\'freq\',this.value)"><option value="">Any frequency</option>'+
+        (function(){
+          var counts = {};
+          all.forEach(function(r){ if(r.freq) counts[r.freq] = (counts[r.freq]||0)+1; });
+          return Object.keys(counts).sort().map(function(k){
+            return '<option value="'+k+'"'+(f.freq===k?' selected':'')+'>'+k+' ('+counts[k]+')</option>';
+          }).join('');
+        })()+
+      '</select>'+
       (f.entity||f.law||f.risk||f.status||f.freq||f.q?'<button class="cu-clear" onclick="cuClear()">✕ Clear</button>':'')+
     '</div>';
 
