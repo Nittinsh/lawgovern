@@ -6,3 +6,6 @@ reference/
 # Local dev
 .claude/
 lawgovern-diagnostic.js
+
+# Intermediate extraction from the LODR spreadsheet — regenerate with build_lodr.py
+rules/_raw_*.json

@@ -1,0 +1,3686 @@
+{
+ "meta": {
+  "source": "LODR Compliance Calendar and Material Events.xlsx",
+  "fyEnd": {
+   "month": 3,
+   "day": 31
+  },
+  "quarterEnds": [
+   {
+    "q": "Q1",
+    "covers": "Apr-Jun",
+    "month": 6,
+    "day": 30
+   },
+   {
+    "q": "Q2",
+    "covers": "Jul-Sep",
+    "month": 9,
+    "day": 30
+   },
+   {
+    "q": "Q3",
+    "covers": "Oct-Dec",
+    "month": 12,
+    "day": 31
+   },
+   {
+    "q": "Q4",
+    "covers": "Jan-Mar",
+    "month": 3,
+    "day": 31
+   }
+  ],
+  "halfYearEnds": [
+   {
+    "h": "H1",
+    "covers": "Apr-Sep",
+    "month": 9,
+    "day": 30
+   },
+   {
+    "h": "H2",
+    "covers": "Oct-Mar",
+    "month": 3,
+    "day": 31
+   }
+  ],
+  "count": 106
+ },
+ "rules": [
+  {
+   "id": "LODR-REG-10-1",
+   "sourceRow": "1",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 10(1)",
+   "chapter": "III",
+   "title": "File all reports, statements, documents, filings and information with stock exchange(s) on the electronic platform specified by SEBI / the exchange.",
+   "frequency": "Continuous",
+   "timelineText": "Ongoing",
+   "due": {
+    "type": "continuous",
+    "confidence": "none"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity",
+     "ncs",
+     "hvdle"
+    ]
+   },
+   "appliesToText": "All listed entities",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "Compliance Officer",
+   "notes": "NEAPS / BSE Listing Centre.",
+   "needsReview": false,
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-REG-10-1A",
+   "sourceRow": "2",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 10(1A)",
+   "chapter": "III",
+   "title": "Comply with Integrated Filing framework where enabled by SEBI - integrated filing of periodic reports, statements, documents and other information, in the format and within the timelines specified.",
+   "frequency": "Continuous",
+   "timelineText": "As specified by SEBI",
+   "due": {
+    "type": "review",
+    "confidence": "unknown"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity",
+     "ncs",
+     "hvdle"
+    ]
+   },
+   "appliesToText": "All listed entities",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "Compliance Officer",
+   "notes": "Inserted by 3rd Amdt 2024 w.e.f. 13.12.2024. Integrated Filing (Governance) & (Financial) now replace several separate filings - check the operative SEBI circular.",
+   "needsReview": true,
+   "dueConfidence": "unknown"
+  },
+  {
+   "id": "LODR-REG-11",
+   "sourceRow": "3",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 11",
+   "chapter": "III",
+   "title": "Ensure any scheme of arrangement / amalgamation / merger / reconstruction / reduction of capital presented to any Court or Tribunal does not violate, override or limit securities laws or stock exchange requirements.",
+   "frequency": "Continuous",
+   "timelineText": "Ongoing",
+   "due": {
+    "type": "continuous",
+    "confidence": "none"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity",
+     "ncs",
+     "hvdle"
+    ],
+    "excludes": [
+     "mutual_fund"
+    ]
+   },
+   "appliesToText": "All listed entities (except MF units)",
+   "submitTo": "Court / NCLT",
+   "signedBy": "Board of Directors",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-REG-12",
+   "sourceRow": "4",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 12",
+   "chapter": "III",
+   "title": "Use RBI-approved electronic mode of payment (per Schedule I) for payment of (a) dividends; (b) interest; (c) redemption or repayment amounts.",
+   "frequency": "Continuous",
+   "timelineText": "Ongoing",
+   "due": {
+    "type": "continuous",
+    "confidence": "none"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity",
+     "ncs",
+     "hvdle"
+    ]
+   },
+   "appliesToText": "All listed entities",
+   "submitTo": null,
+   "signedBy": "CFO / Compliance Officer",
+   "notes": "Provisos requiring 'payable-at-par' warrants/cheques OMITTED by 5th Amdt 2025 w.e.f. 19.11.2025 - electronic mode is now the only route.",
+   "needsReview": false,
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-REG-13-1",
+   "sourceRow": "5",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 13(1)",
+   "chapter": "III",
+   "title": "Redress investor grievances promptly and in the manner specified by SEBI.",
+   "frequency": "Continuous",
+   "timelineText": "Not later than 21 calendar days from date of receipt of the grievance",
+   "due": {
+    "type": "event_offset",
+    "days": 21,
+    "workingDays": false,
+    "trigger": "receipt",
+    "confidence": "exact"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity",
+     "ncs",
+     "hvdle"
+    ]
+   },
+   "appliesToText": "All listed entities",
+   "submitTo": null,
+   "signedBy": "Compliance Officer",
+   "notes": "Substituted - the timeline is now hard-coded into the regulation.",
+   "needsReview": false,
+   "dueConfidence": "exact"
+  },
+  {
+   "id": "LODR-REG-13-2",
+   "sourceRow": "6",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 13(2)",
+   "chapter": "III",
+   "title": "Ensure registration on the SCORES platform (or such other SEBI platform) to handle investor complaints electronically. For securitised debt instruments, SCORES registration may be taken at Trustee level.",
+   "frequency": "Continuous",
+   "timelineText": "Ongoing",
+   "due": {
+    "type": "continuous",
+    "confidence": "none"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity",
+     "ncs",
+     "hvdle"
+    ]
+   },
+   "appliesToText": "All listed entities",
+   "submitTo": "SEBI (SCORES)",
+   "signedBy": "Compliance Officer",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-REG-17-1",
+   "sourceRow": "7",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 17(1)",
+   "chapter": "IV",
+   "title": "Maintain prescribed board composition - optimum combination of executive & non-executive directors, at least one woman director (top 1000: at least one independent woman director), not less than 50% non-executive directors; ID proportion per chairperson status.",
+   "frequency": "Continuous",
+   "timelineText": "Ongoing",
+   "due": {
+    "type": "continuous",
+    "confidence": "none"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed (subject to Reg 15(2) exemption)",
+   "submitTo": null,
+   "signedBy": "Board / NRC",
+   "notes": null,
+   "needsReview": true,
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-REG-17A",
+   "sourceRow": "8",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 17A",
+   "chapter": "IV",
+   "title": "Maximum directorships - a person shall not be a director in more than 7 listed entities; a WTD/MD shall not serve as an ID in more than 3 listed entities.",
+   "frequency": "Continuous",
+   "timelineText": "Ongoing",
+   "due": {
+    "type": "continuous",
+    "confidence": "none"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": null,
+   "signedBy": "NRC",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-REG-22",
+   "sourceRow": "9",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 22",
+   "chapter": "IV",
+   "title": "Establish and maintain a vigil mechanism / whistle-blower policy for directors and employees, with adequate safeguards and direct access to the AC chairperson.",
+   "frequency": "Continuous",
+   "timelineText": "Ongoing",
+   "due": {
+    "type": "continuous",
+    "confidence": "none"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity",
+     "hvdle"
+    ]
+   },
+   "appliesToText": "Equity-listed; HVDLE (Reg 62J)",
+   "submitTo": null,
+   "signedBy": "Audit Committee",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-REG-23-1",
+   "sourceRow": "10",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 23(1)",
+   "chapter": "IV",
+   "title": "Maintain a board-approved Policy on materiality of RPTs and on dealing with RPTs, including clear threshold limits. Review by the board at least once every three years and update accordingly.",
+   "frequency": "Continuous",
+   "timelineText": "Review at least once every 3 years",
+   "due": {
+    "type": "multi_year",
+    "years": 3,
+    "confidence": "derived"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ],
+    "note": "SME inclusion/exclusion — check effective date"
+   },
+   "appliesToText": "Equity-listed (incl. SME from 01.04.2025)",
+   "submitTo": null,
+   "signedBy": "Board of Directors",
+   "notes": "MATERIALITY NOW PER NEW SCHEDULE XII (slabs; hard cap Rs.5,000 cr) w.e.f. 19.12.2025 - every RPT policy needs recomputation.",
+   "needsReview": true,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-24-1",
+   "sourceRow": "11",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 24(1)",
+   "chapter": "IV",
+   "title": "Appoint at least one independent director of the listed entity on the board of each unlisted material subsidiary incorporated in India.",
+   "frequency": "Continuous",
+   "timelineText": "Ongoing",
+   "due": {
+    "type": "continuous",
+    "confidence": "none"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": null,
+   "signedBy": "Board / NRC",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-REG-26-6",
+   "sourceRow": "12",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 26(6)",
+   "chapter": "IV",
+   "title": "Ensure no employee (incl. KMP), director or promoter enters into any agreement with any shareholder or third party regarding compensation or profit sharing in connection with dealings in the securities of the LE, without prior board approval and approval of public shareholders by ordinary resolution.",
+   "frequency": "Continuous",
+   "timelineText": "Ongoing",
+   "due": {
+    "type": "continuous",
+    "confidence": "none"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Board / Shareholders",
+   "signedBy": "Compliance Officer",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-REG-30-4-II",
+   "sourceRow": "13",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 30(4)(ii)",
+   "chapter": "IV",
+   "title": "Maintain a board-approved Policy for Determination of Materiality of events/information, disclosed on the website. Must not dilute any LODR requirement and must assist relevant employees in identifying and escalating potential material events to the authorised KMP.",
+   "frequency": "Continuous",
+   "timelineText": "Ongoing",
+   "due": {
+    "type": "continuous",
+    "confidence": "none"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Website",
+   "signedBy": "Board of Directors",
+   "notes": "Provisos inserted by 2nd Amdt 2023 w.e.f. 15.07.2023. Boilerplate policies will not survive audit.",
+   "needsReview": false,
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-REG-30-5",
+   "sourceRow": "14",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 30(5)",
+   "chapter": "IV",
+   "title": "Board to authorise one or more KMP for determining materiality and making disclosures; contact details of such KMP to be disclosed to the stock exchange(s) AND on the LE's website.",
+   "frequency": "Continuous",
+   "timelineText": "Ongoing; update on any change",
+   "due": {
+    "type": "continuous",
+    "confidence": "none"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Stock Exchange(s) + Website",
+   "signedBy": "Board of Directors",
+   "notes": "Common audit finding - details go stale after a KMP change. Cross-check with Reg 46(2)(v).",
+   "needsReview": false,
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-REG-31-2",
+   "sourceRow": "15",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 31(2)",
+   "chapter": "IV",
+   "title": "Ensure 100% of promoter & promoter group shareholding is in dematerialised form and maintained on a continuous basis.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous",
+    "confidence": "none"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": null,
+   "signedBy": "Compliance Officer",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-REG-38",
+   "sourceRow": "16",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 38",
+   "chapter": "IV",
+   "title": "Comply with Minimum Public Shareholding requirements under Rule 19(2) and Rule 19A of SCRR, 1957.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous",
+    "confidence": "none"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed (not applicable to IGP entities listed without a public issue)",
+   "submitTo": null,
+   "signedBy": "Compliance Officer",
+   "notes": null,
+   "needsReview": true,
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-REG-39-2A",
+   "sourceRow": "17",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 39(2A)",
+   "chapter": "IV",
+   "title": "Issue securities pursuant to any Scheme of Arrangement or any sub-division / split / consolidation ONLY in dematerialised form. Open a separate demat account for securities of investors not having a demat account.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous",
+    "confidence": "none"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": null,
+   "signedBy": "RTA / Compliance Officer",
+   "notes": "Inserted by 3rd Amdt 2025 w.e.f. 08.09.2025.",
+   "needsReview": false,
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-REG-40-1",
+   "sourceRow": "18",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 40(1)",
+   "chapter": "IV",
+   "title": "Transfer requests not to be processed unless securities are held in dematerialised form. Transmission or transposition (physical or demat) to be effected ONLY in dematerialised form. Registration of transfers executed before 01.04.2019 and still in physical form is preserved subject to SEBI conditions.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous",
+    "confidence": "none"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": null,
+   "signedBy": "RTA / Compliance Officer",
+   "notes": "Reg 40(1) SUBSTITUTED by LODR (Amdt) Regs 2026 w.e.f. 22.01.2026. Reg 40(2),(3),(6),(8),(9),(10) already OMITTED w.e.f. 13.12.2024 - the PCS transfer certificate & annual RTA audit certificate are gone.",
+   "needsReview": false,
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-REG-46-3-A",
+   "sourceRow": "19",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 46(3)(a)",
+   "chapter": "IV",
+   "title": "Ensure website contents are CORRECT; update any change in website content within two working days from the date of such change.",
+   "frequency": "Continuous",
+   "timelineText": "Within 2 working days of the change",
+   "due": {
+    "type": "event_offset",
+    "days": 2,
+    "workingDays": true,
+    "trigger": "change",
+    "confidence": "exact"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Website",
+   "signedBy": "Compliance Officer",
+   "notes": "High-frequency audit finding. Maintain a website-change log with timestamps.",
+   "needsReview": false,
+   "dueConfidence": "exact"
+  },
+  {
+   "id": "LODR-REG-48",
+   "sourceRow": "20",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 48",
+   "chapter": "IV",
+   "title": "Comply with all applicable Accounting Standards notified from time to time.",
+   "frequency": "Continuous",
+   "timelineText": "Ongoing",
+   "due": {
+    "type": "continuous",
+    "confidence": "none"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": null,
+   "signedBy": "CFO / Statutory Auditor",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-REG-5",
+   "sourceRow": "21",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 5",
+   "chapter": "III",
+   "title": "Ensure KMP, directors, promoters & any other person dealing with the listed entity comply with obligations assigned under LODR. Such persons must disclose to the LE all information relevant and necessary for the LE to ensure compliance with applicable laws.",
+   "frequency": "Continuous",
+   "timelineText": "Ongoing",
+   "due": {
+    "type": "continuous",
+    "confidence": "none"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity",
+     "ncs",
+     "hvdle"
+    ]
+   },
+   "appliesToText": "All listed entities",
+   "submitTo": null,
+   "signedBy": "Compliance Officer",
+   "notes": "Proviso (disclosure by KMP/promoter group to the LE) inserted by 3rd Amdt 2024 w.e.f. 13.12.2024.",
+   "needsReview": false,
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-REG-54-1",
+   "sourceRow": "22",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 54(1)",
+   "chapter": "V",
+   "title": "Maintain 100% security cover (or higher, per the offer document / IM / DTD) for SECURED listed NCDs, sufficient to discharge principal and interest at all times.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous",
+    "confidence": "none"
+   },
+   "appliesTo": {
+    "listingType": [
+     "ncs"
+    ],
+    "requires": [
+     "secured_ncds"
+    ]
+   },
+   "appliesToText": "NCS-listed (secured NCDs)",
+   "submitTo": null,
+   "signedBy": "CFO / Debenture Trustee",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-REG-6-1",
+   "sourceRow": "23",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 6(1)",
+   "chapter": "III",
+   "title": "Appoint a qualified Company Secretary as Compliance Officer - must be a whole-time employee, not more than one level below the board, and designated as KMP.",
+   "frequency": "Continuous",
+   "timelineText": "Ongoing",
+   "due": {
+    "type": "continuous",
+    "confidence": "none"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity",
+     "ncs",
+     "hvdle"
+    ],
+    "excludes": [
+     "mutual_fund"
+    ]
+   },
+   "appliesToText": "All listed entities (except MF units)",
+   "submitTo": null,
+   "signedBy": "Board of Directors",
+   "notes": "Proviso inserted by 3rd Amdt 2024 w.e.f. 13.12.2024. CO is now a statutory KMP.",
+   "needsReview": false,
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-REG-61A-1",
+   "sourceRow": "24",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 61A(1)",
+   "chapter": "V",
+   "title": "Do NOT forfeit unclaimed interest / dividend / redemption amount.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous",
+    "confidence": "none"
+   },
+   "appliesTo": {
+    "listingType": [
+     "ncs"
+    ]
+   },
+   "appliesToText": "NCS-listed",
+   "submitTo": null,
+   "signedBy": "Compliance Officer",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-REG-61A-3",
+   "sourceRow": "25",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 61A(3)",
+   "chapter": "V",
+   "title": "Transfer amounts in the escrow account that remain unclaimed for seven years to the IEPF / IPEF (as applicable). Amounts transferred to SEBI's IPEF do not carry interest.",
+   "frequency": "Continuous / 7 yrs",
+   "timelineText": "On expiry of 7 years",
+   "due": {
+    "type": "multi_year",
+    "years": 7,
+    "confidence": "derived"
+   },
+   "appliesTo": {
+    "listingType": [
+     "ncs"
+    ]
+   },
+   "appliesToText": "NCS-listed",
+   "submitTo": "IEPF / IPEF",
+   "signedBy": "CFO",
+   "notes": "SUBSTITUTED w.e.f. 22.01.2026 to align with Companies Act timelines.",
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-62-3-4",
+   "sourceRow": "26",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 62(3)/(4)",
+   "chapter": "V",
+   "title": "Ensure website contents are correct and updated at any given point of time; update any change in website content within two working days.",
+   "frequency": "Continuous",
+   "timelineText": "Within 2 working days of the change",
+   "due": {
+    "type": "event_offset",
+    "days": 2,
+    "workingDays": true,
+    "trigger": "change",
+    "confidence": "exact"
+   },
+   "appliesTo": {
+    "listingType": [
+     "ncs"
+    ]
+   },
+   "appliesToText": "NCS-listed",
+   "submitTo": "Website",
+   "signedBy": "Compliance Officer",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "exact"
+  },
+  {
+   "id": "LODR-REG-62A",
+   "sourceRow": "27",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 62A",
+   "chapter": "V",
+   "title": "List ALL non-convertible debt securities proposed to be issued on or after 01.01.2024 on the stock exchange(s).",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous",
+    "confidence": "none"
+   },
+   "appliesTo": {
+    "listingType": [
+     "ncs"
+    ]
+   },
+   "appliesToText": "NCS-listed",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "Compliance Officer",
+   "notes": "The 'listed stays listed' rule - no parallel unlisted private placements.",
+   "needsReview": false,
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-REG-7-1",
+   "sourceRow": "28",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 7(1)",
+   "chapter": "III",
+   "title": "Appoint a Registrar to an Issue and Share Transfer Agent (RTA) or manage share transfer facility in-house. If holders of securities exceed 1 lakh - mandatorily register with SEBI as RTA or appoint a SEBI-registered RTA.",
+   "frequency": "Continuous",
+   "timelineText": "Ongoing",
+   "due": {
+    "type": "continuous",
+    "confidence": "none"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity",
+     "ncs",
+     "hvdle"
+    ],
+    "excludes": [
+     "mutual_fund"
+    ]
+   },
+   "appliesToText": "All listed entities (except MF units)",
+   "submitTo": null,
+   "signedBy": "Board of Directors",
+   "notes": "Nomenclature substituted by 6th Amdt 2025 w.e.f. 16.12.2025 - update all templates.",
+   "needsReview": false,
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-REG-8",
+   "sourceRow": "29",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 8",
+   "chapter": "III",
+   "title": "Co-operate with and submit correct & adequate information to SEBI-registered intermediaries (CRAs, RTAs, Debenture Trustees etc.) within specified timelines.",
+   "frequency": "Continuous",
+   "timelineText": "Ongoing",
+   "due": {
+    "type": "continuous",
+    "confidence": "none"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity",
+     "ncs",
+     "hvdle"
+    ],
+    "excludes": [
+     "mutual_fund"
+    ]
+   },
+   "appliesToText": "All listed entities (except MF units)",
+   "submitTo": "Intermediaries",
+   "signedBy": "Compliance Officer",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-REG-9",
+   "sourceRow": "30",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 9",
+   "chapter": "III",
+   "title": "Maintain a board-approved Policy for Preservation of Documents classifying documents into at least two categories - (a) permanent preservation; (b) preservation for not less than 8 years after completion of the relevant transactions. May be kept in electronic mode.",
+   "frequency": "Continuous",
+   "timelineText": "Ongoing",
+   "due": {
+    "type": "continuous",
+    "confidence": "none"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity",
+     "ncs",
+     "hvdle"
+    ]
+   },
+   "appliesToText": "All listed entities",
+   "submitTo": null,
+   "signedBy": "Board of Directors",
+   "notes": "Cross-links to Reg 46(2)(oa) - audio/video 2 yrs, transcripts 5 yrs minimum.",
+   "needsReview": false,
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-REG-30-R-W-SCH-III-PART-A-A-1-PROVISO",
+   "sourceRow": "31",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 30 r/w Sch III Part A A(1) proviso",
+   "chapter": "IV",
+   "title": "Quarterly (not monthly) disclosure of acquisition of >=5% shares/voting rights in an UNLISTED company and any change in holding exceeding 2% since the last such disclosure, in the specified format.",
+   "frequency": "Monthly",
+   "timelineText": "Quarterly, in the specified format",
+   "due": {
+    "type": "quarterly",
+    "anchor": "quarter_end",
+    "confidence": "derived",
+    "anchorDates": [
+     {
+      "q": "Q1",
+      "covers": "Apr-Jun",
+      "month": 6,
+      "day": 30
+     },
+     {
+      "q": "Q2",
+      "covers": "Jul-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "q": "Q3",
+      "covers": "Oct-Dec",
+      "month": 12,
+      "day": 31
+     },
+     {
+      "q": "Q4",
+      "covers": "Jan-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "Compliance Officer",
+   "notes": "Listed here for completeness - LODR itself prescribes no purely monthly filing; monthly obligations (e.g. Integrated Filing, NCS ISIN/SDD) arise from SEBI circulars and depository/exchange requirements, not from LODR text.",
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-13-3",
+   "sourceRow": "32",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 13(3)",
+   "chapter": "III",
+   "title": "File a statement detailing the redressal of investor grievances, in such form and within such timelines as specified by SEBI.",
+   "frequency": "Quarterly",
+   "timelineText": "Quarterly - form & timeline as specified by SEBI",
+   "due": {
+    "type": "quarterly",
+    "anchor": "quarter_end",
+    "confidence": "derived",
+    "anchorDates": [
+     {
+      "q": "Q1",
+      "covers": "Apr-Jun",
+      "month": 6,
+      "day": 30
+     },
+     {
+      "q": "Q2",
+      "covers": "Jul-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "q": "Q3",
+      "covers": "Oct-Dec",
+      "month": 12,
+      "day": 31
+     },
+     {
+      "q": "Q4",
+      "covers": "Jan-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity",
+     "ncs",
+     "hvdle"
+    ]
+   },
+   "appliesToText": "All listed entities",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "Compliance Officer",
+   "notes": "SUBSTITUTED by 3rd Amdt 2024 w.e.f. 13.12.2024 - the earlier hard '21 days from end of quarter' is now circular-driven (now part of Integrated Filing (Governance)).",
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-13-4",
+   "sourceRow": "33",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 13(4)",
+   "chapter": "III",
+   "title": "Place the investor grievance redressal statement (Reg 13(3)) before the board of directors.",
+   "frequency": "Quarterly",
+   "timelineText": "Quarterly",
+   "due": {
+    "type": "quarterly",
+    "anchor": "quarter_end",
+    "confidence": "derived",
+    "anchorDates": [
+     {
+      "q": "Q1",
+      "covers": "Apr-Jun",
+      "month": 6,
+      "day": 30
+     },
+     {
+      "q": "Q2",
+      "covers": "Jul-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "q": "Q3",
+      "covers": "Oct-Dec",
+      "month": 12,
+      "day": 31
+     },
+     {
+      "q": "Q4",
+      "covers": "Jan-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity",
+     "ncs",
+     "hvdle"
+    ]
+   },
+   "appliesToText": "All listed entities",
+   "submitTo": "Board of Directors",
+   "signedBy": "Compliance Officer",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-17-2",
+   "sourceRow": "34",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 17(2)",
+   "chapter": "IV",
+   "title": "Board of directors to meet at least four times a FINANCIAL year, with a maximum time gap of 120 days between any two consecutive meetings.",
+   "frequency": "Quarterly",
+   "timelineText": "Min. 4 per FY; max gap 120 days",
+   "due": {
+    "type": "cadence",
+    "minPerYear": 4,
+    "maxGapDays": 120,
+    "confidence": "exact"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": null,
+   "signedBy": "Board of Directors",
+   "notes": "'Financial year' basis clarified by LODR (Amdt) Regs 2026 w.e.f. 22.01.2026 (previously read as calendar year).",
+   "needsReview": false,
+   "dueConfidence": "exact"
+  },
+  {
+   "id": "LODR-REG-17-3",
+   "sourceRow": "35",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 17(3)",
+   "chapter": "IV",
+   "title": "Board to periodically review compliance reports pertaining to ALL laws applicable to the LE, prepared by the LE, and the steps taken to rectify instances of non-compliance.",
+   "frequency": "Quarterly",
+   "timelineText": "Periodically (in practice, quarterly)",
+   "due": {
+    "type": "quarterly",
+    "anchor": "quarter_end",
+    "confidence": "derived",
+    "anchorDates": [
+     {
+      "q": "Q1",
+      "covers": "Apr-Jun",
+      "month": 6,
+      "day": 30
+     },
+     {
+      "q": "Q2",
+      "covers": "Jul-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "q": "Q3",
+      "covers": "Oct-Dec",
+      "month": 12,
+      "day": 31
+     },
+     {
+      "q": "Q4",
+      "covers": "Jan-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Board of Directors",
+   "signedBy": "Compliance Officer",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-17-8",
+   "sourceRow": "36",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 17(8)",
+   "chapter": "IV",
+   "title": "CEO & CFO compliance certificate (Part B of Schedule II) to the board.",
+   "frequency": "Quarterly",
+   "timelineText": "Quarterly / Annually per Part B Sch II",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Board of Directors",
+   "signedBy": "CEO & CFO",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-18-2-A",
+   "sourceRow": "37",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 18(2)(a)",
+   "chapter": "IV",
+   "title": "Audit Committee to meet at least four times in a FINANCIAL year, with not more than 120 days elapsing between two consecutive meetings.",
+   "frequency": "Quarterly",
+   "timelineText": "Min. 4 per FY; max gap 120 days",
+   "due": {
+    "type": "cadence",
+    "minPerYear": 4,
+    "maxGapDays": 120,
+    "confidence": "exact"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": null,
+   "signedBy": "Audit Committee",
+   "notes": "Quorum: 2 members or 1/3rd of members, whichever greater, with at least 2 independent directors.",
+   "needsReview": false,
+   "dueConfidence": "exact"
+  },
+  {
+   "id": "LODR-REG-23-2",
+   "sourceRow": "38",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 23(2)",
+   "chapter": "IV",
+   "title": "Obtain PRIOR approval of the Audit Committee for all RPTs and subsequent material modifications. Only independent director members of the AC may approve.",
+   "frequency": "Quarterly",
+   "timelineText": "Prior to the transaction",
+   "due": {
+    "type": "quarterly",
+    "anchor": "quarter_end",
+    "confidence": "derived",
+    "anchorDates": [
+     {
+      "q": "Q1",
+      "covers": "Apr-Jun",
+      "month": 6,
+      "day": 30
+     },
+     {
+      "q": "Q2",
+      "covers": "Jul-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "q": "Q3",
+      "covers": "Oct-Dec",
+      "month": 12,
+      "day": 31
+     },
+     {
+      "q": "Q4",
+      "covers": "Jan-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ],
+    "note": "SME inclusion/exclusion — check effective date"
+   },
+   "appliesToText": "Equity-listed (incl. SME from 01.04.2025)",
+   "submitTo": "Audit Committee",
+   "signedBy": "Audit Committee (IDs only)",
+   "notes": "Ratification window (Reg 23(2)(f)): within 3 months or the next AC meeting, whichever earlier - cap Rs.1 cr per FY, non-material, rationale recorded. Failure to ratify makes the transaction VOIDABLE.",
+   "needsReview": true,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-23-3",
+   "sourceRow": "39",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 23(3)",
+   "chapter": "IV",
+   "title": "Omnibus approval by the Audit Committee for repetitive RPTs - valid for one year; to be reviewed at least once every quarter.",
+   "frequency": "Quarterly",
+   "timelineText": "Valid 1 year; quarterly review",
+   "due": {
+    "type": "quarterly",
+    "anchor": "quarter_end",
+    "confidence": "derived",
+    "anchorDates": [
+     {
+      "q": "Q1",
+      "covers": "Apr-Jun",
+      "month": 6,
+      "day": 30
+     },
+     {
+      "q": "Q2",
+      "covers": "Jul-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "q": "Q3",
+      "covers": "Oct-Dec",
+      "month": 12,
+      "day": 31
+     },
+     {
+      "q": "Q4",
+      "covers": "Jan-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Audit Committee",
+   "signedBy": "Audit Committee",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-27-2-A",
+   "sourceRow": "40",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 27(2)(a)",
+   "chapter": "IV",
+   "title": "Submit a quarterly compliance report on Corporate Governance in the format and within the timelines as specified by SEBI.",
+   "frequency": "Quarterly",
+   "timelineText": "Quarterly - format & timeline as specified by SEBI",
+   "due": {
+    "type": "quarterly",
+    "anchor": "quarter_end",
+    "confidence": "derived",
+    "anchorDates": [
+     {
+      "q": "Q1",
+      "covers": "Apr-Jun",
+      "month": 6,
+      "day": 30
+     },
+     {
+      "q": "Q2",
+      "covers": "Jul-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "q": "Q3",
+      "covers": "Oct-Dec",
+      "month": 12,
+      "day": 31
+     },
+     {
+      "q": "Q4",
+      "covers": "Jan-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "Compliance Officer OR CEO",
+   "notes": "SUBSTITUTED - the earlier 'within 21 days from end of quarter' is now circular-driven (Integrated Filing (Governance)).",
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-27-2-BA",
+   "sourceRow": "41",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 27(2)(ba)",
+   "chapter": "IV",
+   "title": "Disclose details of cyber security incidents / breaches / loss of data or documents along with the quarterly CG report.",
+   "frequency": "Quarterly",
+   "timelineText": "Along with the quarterly CG report",
+   "due": {
+    "type": "quarterly",
+    "anchor": "quarter_end",
+    "confidence": "derived",
+    "anchorDates": [
+     {
+      "q": "Q1",
+      "covers": "Apr-Jun",
+      "month": 6,
+      "day": 30
+     },
+     {
+      "q": "Q2",
+      "covers": "Jul-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "q": "Q3",
+      "covers": "Oct-Dec",
+      "month": 12,
+      "day": 31
+     },
+     {
+      "q": "Q4",
+      "covers": "Jan-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "Compliance Officer",
+   "notes": "Inserted by 3rd Amdt 2024 w.e.f. 13.12.2024.",
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-30-R-W-SCH-III-A-16-O",
+   "sourceRow": "42",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 30 r/w Sch III A(16)(o)",
+   "chapter": "IV",
+   "title": "Quarterly disclosure of the status of achieving Minimum Public Shareholding, where a resolution plan has been implemented.",
+   "frequency": "Quarterly",
+   "timelineText": "Quarterly",
+   "due": {
+    "type": "quarterly",
+    "anchor": "quarter_end",
+    "confidence": "derived",
+    "anchorDates": [
+     {
+      "q": "Q1",
+      "covers": "Apr-Jun",
+      "month": 6,
+      "day": 30
+     },
+     {
+      "q": "Q2",
+      "covers": "Jul-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "q": "Q3",
+      "covers": "Oct-Dec",
+      "month": 12,
+      "day": 31
+     },
+     {
+      "q": "Q4",
+      "covers": "Jan-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed under CIRP/implemented plan",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "Compliance Officer",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-30-R-W-SCH-III-A-20-EXPL",
+   "sourceRow": "43",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 30 r/w Sch III A(20) Expl.",
+   "chapter": "IV",
+   "title": "Disclose fines / penalties BELOW the monetary thresholds (i.e. below Rs.1 lakh from a sectoral regulator/enforcement agency, or below Rs.10 lakh from any other authority / judicial body) on a quarterly basis in the specified format.",
+   "frequency": "Quarterly",
+   "timelineText": "Quarterly, in the specified format",
+   "due": {
+    "type": "quarterly",
+    "anchor": "quarter_end",
+    "confidence": "derived",
+    "anchorDates": [
+     {
+      "q": "Q1",
+      "covers": "Apr-Jun",
+      "month": 6,
+      "day": 30
+     },
+     {
+      "q": "Q2",
+      "covers": "Jul-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "q": "Q3",
+      "covers": "Oct-Dec",
+      "month": 12,
+      "day": 31
+     },
+     {
+      "q": "Q4",
+      "covers": "Jan-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "Compliance Officer",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-31-1-B",
+   "sourceRow": "44",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 31(1)(b)",
+   "chapter": "IV",
+   "title": "Submit a statement showing holding of securities and shareholding pattern, separately for each class of securities, in the SEBI-specified format.",
+   "frequency": "Quarterly",
+   "timelineText": "Within 21 days from the end of each quarter",
+   "due": {
+    "type": "quarter_end_offset",
+    "days": 21,
+    "workingDays": false,
+    "confidence": "exact",
+    "anchorDates": [
+     {
+      "q": "Q1",
+      "covers": "Apr-Jun",
+      "month": 6,
+      "day": 30
+     },
+     {
+      "q": "Q2",
+      "covers": "Jul-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "q": "Q3",
+      "covers": "Oct-Dec",
+      "month": 12,
+      "day": 31
+     },
+     {
+      "q": "Q4",
+      "covers": "Jan-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "Compliance Officer",
+   "notes": "SME Exchange: HALF-YEARLY within 21 days from end of each half-year.",
+   "needsReview": false,
+   "dueConfidence": "exact"
+  },
+  {
+   "id": "LODR-REG-32-1",
+   "sourceRow": "45",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 32(1)",
+   "chapter": "IV",
+   "title": "Submit statement(s) of deviation(s) / variation(s) in the use of proceeds of a public / rights / preferential issue etc., indicating deviations and category-wise variation between projected and actual utilisation.",
+   "frequency": "Quarterly",
+   "timelineText": "Quarterly, until proceeds fully utilised or purpose achieved",
+   "due": {
+    "type": "quarterly",
+    "anchor": "quarter_end",
+    "confidence": "derived",
+    "anchorDates": [
+     {
+      "q": "Q1",
+      "covers": "Apr-Jun",
+      "month": 6,
+      "day": 30
+     },
+     {
+      "q": "Q2",
+      "covers": "Jul-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "q": "Q3",
+      "covers": "Oct-Dec",
+      "month": 12,
+      "day": 31
+     },
+     {
+      "q": "Q4",
+      "covers": "Jan-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ],
+    "requires": [
+     "unutilised_issue_proceeds"
+    ]
+   },
+   "appliesToText": "Equity-listed with unutilised issue proceeds",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "Audit Committee then Compliance Officer",
+   "notes": "Must be reviewed by the Audit Committee BEFORE submission (Reg 32(3)).",
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-32-6",
+   "sourceRow": "46",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 32(6)",
+   "chapter": "IV",
+   "title": "Submit comments / report received from the Monitoring Agency (where appointed) to the stock exchange(s).",
+   "frequency": "Quarterly",
+   "timelineText": "Within 45 days from the end of each quarter",
+   "due": {
+    "type": "quarter_end_offset",
+    "days": 45,
+    "workingDays": false,
+    "confidence": "exact",
+    "anchorDates": [
+     {
+      "q": "Q1",
+      "covers": "Apr-Jun",
+      "month": 6,
+      "day": 30
+     },
+     {
+      "q": "Q2",
+      "covers": "Jul-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "q": "Q3",
+      "covers": "Oct-Dec",
+      "month": 12,
+      "day": 31
+     },
+     {
+      "q": "Q4",
+      "covers": "Jan-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ],
+    "requires": [
+     "monitoring_agency"
+    ]
+   },
+   "appliesToText": "Equity-listed with a monitoring agency",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "Compliance Officer",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "exact"
+  },
+  {
+   "id": "LODR-REG-32-7",
+   "sourceRow": "47",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 32(7)",
+   "chapter": "IV",
+   "title": "Place the Monitoring Agency report before the Audit Committee promptly upon receipt.",
+   "frequency": "Quarterly",
+   "timelineText": "Quarterly, promptly on receipt",
+   "due": {
+    "type": "quarterly",
+    "anchor": "quarter_end",
+    "confidence": "derived",
+    "anchorDates": [
+     {
+      "q": "Q1",
+      "covers": "Apr-Jun",
+      "month": 6,
+      "day": 30
+     },
+     {
+      "q": "Q2",
+      "covers": "Jul-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "q": "Q3",
+      "covers": "Oct-Dec",
+      "month": 12,
+      "day": 31
+     },
+     {
+      "q": "Q4",
+      "covers": "Jan-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ],
+    "requires": [
+     "monitoring_agency"
+    ]
+   },
+   "appliesToText": "Equity-listed with a monitoring agency",
+   "submitTo": "Audit Committee",
+   "signedBy": "Compliance Officer",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-33-3-A",
+   "sourceRow": "48",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 33(3)(a)",
+   "chapter": "IV",
+   "title": "Submit quarterly and year-to-date STANDALONE financial results (audited or unaudited; if unaudited, accompanied by a limited review report).",
+   "frequency": "Quarterly",
+   "timelineText": "Within 45 days from end of each quarter (other than the last quarter)",
+   "due": {
+    "type": "quarter_end_offset",
+    "days": 45,
+    "workingDays": false,
+    "confidence": "exact",
+    "anchorDates": [
+     {
+      "q": "Q1",
+      "covers": "Apr-Jun",
+      "month": 6,
+      "day": 30
+     },
+     {
+      "q": "Q2",
+      "covers": "Jul-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "q": "Q3",
+      "covers": "Oct-Dec",
+      "month": 12,
+      "day": 31
+     },
+     {
+      "q": "Q4",
+      "covers": "Jan-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "Board / authorised signatory",
+   "notes": "IBC exception: LE under an approved resolution plan - within 90 days from end of the quarter in which the plan was approved (except if approved in Q4).",
+   "needsReview": false,
+   "dueConfidence": "exact"
+  },
+  {
+   "id": "LODR-REG-33-3-B",
+   "sourceRow": "49",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 33(3)(b)",
+   "chapter": "IV",
+   "title": "Where the LE has subsidiaries - also submit quarterly / year-to-date CONSOLIDATED financial results.",
+   "frequency": "Quarterly",
+   "timelineText": "Along with standalone results (45 days)",
+   "due": {
+    "type": "quarterly",
+    "anchor": "quarter_end",
+    "confidence": "derived",
+    "anchorDates": [
+     {
+      "q": "Q1",
+      "covers": "Apr-Jun",
+      "month": 6,
+      "day": 30
+     },
+     {
+      "q": "Q2",
+      "covers": "Jul-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "q": "Q3",
+      "covers": "Oct-Dec",
+      "month": 12,
+      "day": 31
+     },
+     {
+      "q": "Q4",
+      "covers": "Jan-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ],
+    "requires": [
+     "has_subsidiary"
+    ]
+   },
+   "appliesToText": "Equity-listed with subsidiaries",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "Board / authorised signatory",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-47-1",
+   "sourceRow": "50",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 47(1)",
+   "chapter": "IV",
+   "title": "Publish a newspaper advertisement containing a QR code and details of the webpage where complete financial results (Reg 33) with modified opinions / reservations are accessible.",
+   "frequency": "Quarterly",
+   "timelineText": "Within 48 hours of conclusion of the board meeting at which results were approved",
+   "due": {
+    "type": "quarterly",
+    "anchor": "quarter_end",
+    "confidence": "derived",
+    "anchorDates": [
+     {
+      "q": "Q1",
+      "covers": "Apr-Jun",
+      "month": 6,
+      "day": 30
+     },
+     {
+      "q": "Q2",
+      "covers": "Jul-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "q": "Q3",
+      "covers": "Oct-Dec",
+      "month": 12,
+      "day": 31
+     },
+     {
+      "q": "Q4",
+      "covers": "Jan-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Newspapers",
+   "signedBy": "Compliance Officer",
+   "notes": "At least one English national daily circulating in the whole or substantially the whole of India, AND one daily newspaper in the regional language of the region of the registered office.",
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-52-1",
+   "sourceRow": "51",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 52(1)",
+   "chapter": "V",
+   "title": "Prepare and submit un-audited or audited quarterly and year-to-date STANDALONE financial results in the SEBI-specified format. A copy to be provided to the Debenture Trustee on the same day.",
+   "frequency": "Quarterly",
+   "timelineText": "Within 45 days from end of the quarter (other than last quarter); within 60 days for the last quarter",
+   "due": {
+    "type": "quarter_end_offset",
+    "days": 45,
+    "workingDays": false,
+    "confidence": "exact",
+    "anchorDates": [
+     {
+      "q": "Q1",
+      "covers": "Apr-Jun",
+      "month": 6,
+      "day": 30
+     },
+     {
+      "q": "Q2",
+      "covers": "Jul-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "q": "Q3",
+      "covers": "Oct-Dec",
+      "month": 12,
+      "day": 31
+     },
+     {
+      "q": "Q4",
+      "covers": "Jan-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "ncs"
+    ]
+   },
+   "appliesToText": "NCS-listed",
+   "submitTo": "Stock Exchange(s) + Debenture Trustee",
+   "signedBy": "Chairperson / MD / WTD / authorised director",
+   "notes": "Quarterly un-audited results must carry a limited review report by the statutory auditors.",
+   "needsReview": false,
+   "dueConfidence": "exact"
+  },
+  {
+   "id": "LODR-REG-52-4",
+   "sourceRow": "52",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 52(4)",
+   "chapter": "V",
+   "title": "Disclose the prescribed line items (debt-equity ratio, DSCR, ISCR, current ratio, net worth, net profit, EPS, outstanding redeemable preference shares, capital redemption/debenture redemption reserve, etc.) along with the financial results.",
+   "frequency": "Quarterly",
+   "timelineText": "Along with financial results",
+   "due": {
+    "type": "quarterly",
+    "anchor": "quarter_end",
+    "confidence": "derived",
+    "anchorDates": [
+     {
+      "q": "Q1",
+      "covers": "Apr-Jun",
+      "month": 6,
+      "day": 30
+     },
+     {
+      "q": "Q2",
+      "covers": "Jul-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "q": "Q3",
+      "covers": "Oct-Dec",
+      "month": 12,
+      "day": 31
+     },
+     {
+      "q": "Q4",
+      "covers": "Jan-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "ncs"
+    ]
+   },
+   "appliesToText": "NCS-listed",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "CFO",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-52-7-7A",
+   "sourceRow": "53",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 52(7)/(7A)",
+   "chapter": "V",
+   "title": "Submit statement of deviation / variation in the use of proceeds of an issue of non-convertible securities, and statement of utilisation of issue proceeds.",
+   "frequency": "Quarterly",
+   "timelineText": "Along with quarterly financial results, per SEBI-specified format",
+   "due": {
+    "type": "quarterly",
+    "anchor": "quarter_end",
+    "confidence": "derived",
+    "anchorDates": [
+     {
+      "q": "Q1",
+      "covers": "Apr-Jun",
+      "month": 6,
+      "day": 30
+     },
+     {
+      "q": "Q2",
+      "covers": "Jul-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "q": "Q3",
+      "covers": "Oct-Dec",
+      "month": 12,
+      "day": 31
+     },
+     {
+      "q": "Q4",
+      "covers": "Jan-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "ncs"
+    ]
+   },
+   "appliesToText": "NCS-listed",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "Audit Committee then Compliance Officer",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-52-8",
+   "sourceRow": "54",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 52(8)",
+   "chapter": "V",
+   "title": "Publish financial results and the Reg 52(4) line items in newspaper(s).",
+   "frequency": "Quarterly",
+   "timelineText": "Within 2 working days of conclusion of the board meeting",
+   "due": {
+    "type": "quarterly",
+    "anchor": "quarter_end",
+    "confidence": "derived",
+    "anchorDates": [
+     {
+      "q": "Q1",
+      "covers": "Apr-Jun",
+      "month": 6,
+      "day": 30
+     },
+     {
+      "q": "Q2",
+      "covers": "Jul-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "q": "Q3",
+      "covers": "Oct-Dec",
+      "month": 12,
+      "day": 31
+     },
+     {
+      "q": "Q4",
+      "covers": "Jan-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "ncs"
+    ]
+   },
+   "appliesToText": "NCS-listed",
+   "submitTo": "Newspapers",
+   "signedBy": "Compliance Officer",
+   "notes": "At least one English national daily circulating in the whole or substantially the whole of India. Window advertisement with QR code + website link is permitted.",
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-54-2-3",
+   "sourceRow": "55",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 54(2)/(3)",
+   "chapter": "V",
+   "title": "Disclose to the stock exchange, in the quarterly / half-yearly / YTD / annual financial statements, the extent and nature of security created and maintained for secured listed NCDs, and the security cover available in the SEBI-specified format.",
+   "frequency": "Quarterly",
+   "timelineText": "Along with financial results",
+   "due": {
+    "type": "quarterly",
+    "anchor": "quarter_end",
+    "confidence": "derived",
+    "anchorDates": [
+     {
+      "q": "Q1",
+      "covers": "Apr-Jun",
+      "month": 6,
+      "day": 30
+     },
+     {
+      "q": "Q2",
+      "covers": "Jul-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "q": "Q3",
+      "covers": "Oct-Dec",
+      "month": 12,
+      "day": 31
+     },
+     {
+      "q": "Q4",
+      "covers": "Jan-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "ncs"
+    ],
+    "requires": [
+     "secured_ncds"
+    ]
+   },
+   "appliesToText": "NCS-listed (secured NCDs)",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "CFO + Debenture Trustee",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-62Q-2-A",
+   "sourceRow": "56",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 62Q(2)(a)",
+   "chapter": "VA",
+   "title": "Submit a periodic compliance report on corporate governance in the format and within the timelines specified by SEBI.",
+   "frequency": "Quarterly",
+   "timelineText": "As specified by SEBI",
+   "due": {
+    "type": "quarterly",
+    "anchor": "quarter_end",
+    "confidence": "derived",
+    "anchorDates": [
+     {
+      "q": "Q1",
+      "covers": "Apr-Jun",
+      "month": 6,
+      "day": 30
+     },
+     {
+      "q": "Q2",
+      "covers": "Jul-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "q": "Q3",
+      "covers": "Oct-Dec",
+      "month": 12,
+      "day": 31
+     },
+     {
+      "q": "Q4",
+      "covers": "Jan-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "hvdle"
+    ]
+   },
+   "appliesToText": "HVDLE (Rs.5,000 cr+)",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "Compliance Officer / CEO",
+   "notes": "SUBSTITUTED w.e.f. 22.01.2026 (was: within 21 days from end of quarter). Reg 62Q(2)(b) (separate material RPT details) OMITTED.",
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-21-3A-3C",
+   "sourceRow": "57",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 21(3A)/(3C)",
+   "chapter": "IV",
+   "title": "Risk Management Committee to meet at least TWICE in a financial year, with not more than 210 days elapsing between any two consecutive meetings.",
+   "frequency": "Half-Yearly",
+   "timelineText": "Min. 2 per FY; max gap 210 days",
+   "due": {
+    "type": "half_yearly",
+    "anchor": "half_year_end",
+    "confidence": "derived",
+    "anchorDates": [
+     {
+      "h": "H1",
+      "covers": "Apr-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "h": "H2",
+      "covers": "Oct-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "hvdle"
+    ],
+    "marketCapRank": {
+     "atMost": 1000
+    }
+   },
+   "appliesToText": "Top 1000 listed entities; HVDLE",
+   "submitTo": null,
+   "signedBy": "RMC",
+   "notes": "Gap extended from 180 to 210 days. Quorum: 2 members or 1/3rd, whichever higher, incl. at least 1 board member. Role must specifically cover CYBER SECURITY.",
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-23-9",
+   "sourceRow": "58",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 23(9)",
+   "chapter": "IV",
+   "title": "Submit disclosures of RELATED PARTY TRANSACTIONS in the SEBI-specified format and publish the same on the website.",
+   "frequency": "Half-Yearly",
+   "timelineText": "Every six months, ON THE DATE of publication of standalone and consolidated financial results (w.e.f. 01.04.2023)",
+   "due": {
+    "type": "half_yearly",
+    "anchor": "half_year_end",
+    "confidence": "derived",
+    "anchorDates": [
+     {
+      "h": "H1",
+      "covers": "Apr-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "h": "H2",
+      "covers": "Oct-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Stock Exchange(s) + Website",
+   "signedBy": "Compliance Officer",
+   "notes": "HVDLE: submit along with standalone financial results for the half year. Remuneration & sitting fees to directors/KMP/SM (other than promoter group) are EXEMPT if not material - inserted by 3rd Amdt 2024 w.e.f. 13.12.2024.",
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-24-2-3-4",
+   "sourceRow": "59",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 24(2)/(3)/(4)",
+   "chapter": "IV",
+   "title": "Audit committee of the listed holding company to review the financial statements (in particular, investments) of the unlisted subsidiary; board of the listed holding company to review the minutes of board meetings of the unlisted subsidiary; statement of all significant transactions and arrangements of the unlisted subsidiary to be placed before the board.",
+   "frequency": "Half-Yearly",
+   "timelineText": "Half-yearly (minutes / significant transactions)",
+   "due": {
+    "type": "half_yearly",
+    "anchor": "half_year_end",
+    "confidence": "derived",
+    "anchorDates": [
+     {
+      "h": "H1",
+      "covers": "Apr-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "h": "H2",
+      "covers": "Oct-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed with unlisted subsidiaries",
+   "submitTo": "Audit Committee / Board",
+   "signedBy": "Compliance Officer",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-31-1-B-PROVISO",
+   "sourceRow": "60",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 31(1)(b) proviso",
+   "chapter": "IV",
+   "title": "SME Exchange entities - submit the shareholding pattern on a half-yearly basis.",
+   "frequency": "Half-Yearly",
+   "timelineText": "Within 21 days from the end of each half year",
+   "due": {
+    "type": "half_yearly",
+    "anchor": "half_year_end",
+    "confidence": "derived",
+    "anchorDates": [
+     {
+      "h": "H1",
+      "covers": "Apr-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "h": "H2",
+      "covers": "Oct-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "note": "SME inclusion/exclusion — check effective date"
+   },
+   "appliesToText": "SME-listed entities",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "Compliance Officer",
+   "notes": null,
+   "needsReview": true,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-33-3-A-PROVISO-REG-52-1",
+   "sourceRow": "61",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 33(3)(a) proviso / Reg 52(1)",
+   "chapter": "IV/V",
+   "title": "Ensure limited review / audit coverage of subsidiaries and the last-quarter balancing note (Reg 33(3)(e)).",
+   "frequency": "Half-Yearly",
+   "timelineText": "Along with annual results",
+   "due": {
+    "type": "half_yearly",
+    "anchor": "half_year_end",
+    "confidence": "derived",
+    "anchorDates": [
+     {
+      "h": "H1",
+      "covers": "Apr-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "h": "H2",
+      "covers": "Oct-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed / NCS-listed",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "Statutory Auditor",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-62L",
+   "sourceRow": "62",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 62L",
+   "chapter": "VA",
+   "title": "Review of material subsidiary financials / minutes by the HVDLE's audit committee and board.",
+   "frequency": "Half-Yearly",
+   "timelineText": "Half-yearly",
+   "due": {
+    "type": "half_yearly",
+    "anchor": "half_year_end",
+    "confidence": "derived",
+    "anchorDates": [
+     {
+      "h": "H1",
+      "covers": "Apr-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "h": "H2",
+      "covers": "Oct-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "appliesTo": {
+    "listingType": [
+     "hvdle"
+    ]
+   },
+   "appliesToText": "HVDLE",
+   "submitTo": "Audit Committee / Board",
+   "signedBy": "Compliance Officer",
+   "notes": "Materiality test changed from 'income or net worth' to 'TURNOVER or net worth' w.e.f. 22.01.2026; WOS-to-WOS asset transfers now exempt.",
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-14",
+   "sourceRow": "63",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 14",
+   "chapter": "III",
+   "title": "Pay all applicable listing fees / charges to the recognised stock exchange(s) in the manner specified.",
+   "frequency": "Annual",
+   "timelineText": "As specified by SEBI / the exchange (typically by 30 April)",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity",
+     "ncs",
+     "hvdle"
+    ]
+   },
+   "appliesToText": "All listed entities",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "CFO / Compliance Officer",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-17-10",
+   "sourceRow": "64",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 17(10)",
+   "chapter": "IV",
+   "title": "Performance evaluation of independent directors by the entire board of directors (excluding the director being evaluated).",
+   "frequency": "Annual",
+   "timelineText": "Annually",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Board of Directors",
+   "signedBy": "NRC / Board",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-19-3A",
+   "sourceRow": "65",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 19(3A)",
+   "chapter": "IV",
+   "title": "Nomination & Remuneration Committee to meet at least once in a FINANCIAL year.",
+   "frequency": "Annual",
+   "timelineText": "At least once per FY",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": null,
+   "signedBy": "NRC",
+   "notes": "'Financial year' clarified w.e.f. 22.01.2026.",
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-20-3",
+   "sourceRow": "66",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 20(3)",
+   "chapter": "IV",
+   "title": "Chairperson of the Stakeholders Relationship Committee to be present at the AGM to answer queries of security holders.",
+   "frequency": "Annual",
+   "timelineText": "At every AGM",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "AGM",
+   "signedBy": "SRC Chairperson",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-20-3A",
+   "sourceRow": "67",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 20(3A)",
+   "chapter": "IV",
+   "title": "Stakeholders Relationship Committee to meet at least once in a FINANCIAL year.",
+   "frequency": "Annual",
+   "timelineText": "At least once per FY",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": null,
+   "signedBy": "SRC",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-24A-1-A",
+   "sourceRow": "68",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 24A(1)(a)",
+   "chapter": "IV",
+   "title": "Undertake SECRETARIAL AUDIT by a Peer Reviewed Company Secretary (LE and its material unlisted subsidiaries incorporated in India) and annex the Secretarial Audit Report in the specified form with the annual report.",
+   "frequency": "Annual",
+   "timelineText": "Annexed to the annual report",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed + material unlisted Indian subsidiaries",
+   "submitTo": "Annual Report",
+   "signedBy": "Peer Reviewed PCS (Secretarial Auditor)",
+   "notes": "Substituted w.e.f. 13.12.2024. 'Peer Reviewed Company Secretary' now defined in the regulation itself.",
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-24A-1-B",
+   "sourceRow": "69",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 24A(1)(b)",
+   "chapter": "IV",
+   "title": "Appoint / re-appoint the Secretarial Auditor on the board's recommendation with SHAREHOLDER APPROVAL at the AGM - individual: max one term of 5 consecutive years; firm: max two terms of 5 consecutive years. 5-year cooling-off thereafter.",
+   "frequency": "Annual",
+   "timelineText": "At the AGM",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "AGM",
+   "signedBy": "Board + Shareholders",
+   "notes": "Major 3rd Amdt 2024 change (13.12.2024). Cooling-off and common-partner restrictions apply. Check tenure of every incumbent.",
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-24A-2",
+   "sourceRow": "70",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 24A(2)",
+   "chapter": "IV",
+   "title": "Submit the SECRETARIAL COMPLIANCE REPORT in the specified form to the stock exchange(s).",
+   "frequency": "Annual",
+   "timelineText": "Within 60 days from the end of each financial year",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "Secretarial Auditor / Peer Reviewed CS",
+   "notes": "W.e.f. 01.04.2025 the ASCR must be signed ONLY by the Secretarial Auditor or a Peer Reviewed CS satisfying Reg 24A(1A)/(1B). NOTE: the equivalent HVDLE obligation (Reg 62M(2)) was OMITTED w.e.f. 22.01.2026 - do not cross-apply.",
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-25-3",
+   "sourceRow": "71",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 25(3)",
+   "chapter": "IV",
+   "title": "Independent directors to hold at least ONE meeting in a financial year, without the presence of non-independent directors and members of management.",
+   "frequency": "Annual",
+   "timelineText": "At least once per FY",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": null,
+   "signedBy": "Independent Directors",
+   "notes": "Agenda must cover Reg 25(4)(a)-(c): performance of non-IDs and the board, performance of the chairperson, and quality/quantity/timeliness of information flow.",
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-25-7",
+   "sourceRow": "72",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 25(7)",
+   "chapter": "IV",
+   "title": "Familiarisation programmes for independent directors - nature of the industry, business model, roles/rights/responsibilities. Details to be disclosed on the website (Reg 46(2)(i)).",
+   "frequency": "Annual",
+   "timelineText": "Annually",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Website",
+   "signedBy": "Compliance Officer",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-26-3",
+   "sourceRow": "73",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 26(3)",
+   "chapter": "IV",
+   "title": "All members of the board of directors and senior management personnel to AFFIRM COMPLIANCE with the code of conduct.",
+   "frequency": "Annual",
+   "timelineText": "Annually",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Board / Annual Report",
+   "signedBy": "Directors & Senior Management",
+   "notes": "Declaration signed by CEO to be annexed to the annual report (Sch V Part D).",
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-32-4",
+   "sourceRow": "74",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 32(4)",
+   "chapter": "IV",
+   "title": "Furnish an explanation for any variation in the use of proceeds in the DIRECTORS' REPORT in the annual report.",
+   "frequency": "Annual",
+   "timelineText": "With the annual report",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed with variation",
+   "submitTo": "Annual Report",
+   "signedBy": "Board of Directors",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-32-5",
+   "sourceRow": "75",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 32(5)",
+   "chapter": "IV",
+   "title": "Prepare an annual statement of funds utilised for purposes OTHER than those stated in the offer document / prospectus / notice, certified by the statutory auditors, and place it before the Audit Committee.",
+   "frequency": "Annual",
+   "timelineText": "Annually, until issue proceeds are fully utilised",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ],
+    "requires": [
+     "unutilised_issue_proceeds"
+    ]
+   },
+   "appliesToText": "Equity-listed with unutilised issue proceeds",
+   "submitTo": "Audit Committee",
+   "signedBy": "Statutory Auditor",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-33-3-D",
+   "sourceRow": "76",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 33(3)(d)",
+   "chapter": "IV",
+   "title": "Submit ANNUAL AUDITED STANDALONE financial results along with the audit report and, where the audit report carries a modified opinion, the Statement on Impact of Audit Qualifications. Where the LE has subsidiaries, also submit annual audited CONSOLIDATED results with the audit report / Statement on Impact.",
+   "frequency": "Annual",
+   "timelineText": "Within 60 days from the end of the financial year",
+   "due": {
+    "type": "fy_end_offset",
+    "days": 60,
+    "workingDays": false,
+    "confidence": "exact",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "Board / authorised signatory",
+   "notes": "IBC exception: resolution plan approved in Q4 - within 120 days from end of that FY. For UNMODIFIED opinions a declaration to that effect must be furnished.",
+   "needsReview": false,
+   "dueConfidence": "exact"
+  },
+  {
+   "id": "LODR-REG-33-3-E",
+   "sourceRow": "77",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 33(3)(e)",
+   "chapter": "IV",
+   "title": "Submit audited / limited-reviewed last-quarter results along with the full-year results, with a note stating that Q4 figures are the balancing figures between the audited full-year figures and the published YTD figures up to Q3.",
+   "frequency": "Annual",
+   "timelineText": "With the annual results",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "Board / authorised signatory",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-34-1-A",
+   "sourceRow": "78",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 34(1)(a)",
+   "chapter": "IV",
+   "title": "Submit to the stock exchange and publish on the website a copy of the ANNUAL REPORT sent to shareholders along with the AGM notice.",
+   "frequency": "Annual",
+   "timelineText": "On or before the commencement of dispatch to shareholders",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Stock Exchange(s) + Website",
+   "signedBy": "Compliance Officer",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-34-1-B",
+   "sourceRow": "79",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 34(1)(b)",
+   "chapter": "IV",
+   "title": "In the event of any changes to the annual report, send the revised copy along with details of and explanation for the changes.",
+   "frequency": "Annual",
+   "timelineText": "Not later than 48 hours after the AGM",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "Compliance Officer",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-34-2",
+   "sourceRow": "80",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 34(2)",
+   "chapter": "IV",
+   "title": "Annual report to contain: audited standalone & consolidated financial statements; cash flow statement (indirect method); Management Discussion & Analysis; and, for the specified class, the Business Responsibility and Sustainability Report (BRSR).",
+   "frequency": "Annual",
+   "timelineText": "With the annual report",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Annual Report",
+   "signedBy": "Board of Directors",
+   "notes": "BRSR / BRSR Core applicability is market-capitalisation based - Reg 3(2) ranking mechanics apply, with a 3-month/next-FY transition window.",
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-34-3-R-W-SCH-V",
+   "sourceRow": "81",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 34(3) r/w Sch V",
+   "chapter": "IV",
+   "title": "Annual report to include the Corporate Governance Report (Sch V Para C), the CEO declaration on code of conduct (Para D), and the PCS Compliance Certificate on Corporate Governance (Para E).",
+   "frequency": "Annual",
+   "timelineText": "With the annual report",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Annual Report",
+   "signedBy": "PCS / Statutory Auditor",
+   "notes": "Reg 15(2)-exempt entities are OUT of Paras C, D and E.",
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-36-1",
+   "sourceRow": "82",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 36(1)",
+   "chapter": "IV",
+   "title": "Send the annual report - soft copies to shareholders with registered email addresses (with the LE or any depository); a letter with the exact web-link to others; hard copies to those who request.",
+   "frequency": "Annual",
+   "timelineText": "Along with the AGM notice, per Companies Act timelines",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Shareholders",
+   "signedBy": "Compliance Officer",
+   "notes": "Provisos requiring proof of delivery OMITTED by 3rd Amdt 2025 w.e.f. 08.09.2025.",
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-36-3",
+   "sourceRow": "83",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 36(3)",
+   "chapter": "IV",
+   "title": "On appointment / re-appointment of a director, provide shareholders with: brief resume; nature of expertise; inter-se relationships between directors; names of listed entities where the person holds directorship and committee memberships, INCLUDING listed entities from which the person has resigned in the past three years; and shareholding of non-executive directors.",
+   "frequency": "Annual",
+   "timelineText": "In the AGM/EGM notice",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Shareholders",
+   "signedBy": "Compliance Officer",
+   "notes": "The 'resigned in the past three years' limb is frequently missed in notices.",
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-43A-1",
+   "sourceRow": "84",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 43A(1)",
+   "chapter": "IV",
+   "title": "Formulate a DIVIDEND DISTRIBUTION POLICY, disclosed on the website with a web-link in the annual report.",
+   "frequency": "Annual",
+   "timelineText": "Ongoing; disclose annually",
+   "due": {
+    "type": "continuous",
+    "confidence": "none"
+   },
+   "appliesTo": {
+    "marketCapRank": {
+     "atMost": 1000
+    }
+   },
+   "appliesToText": "Top 1000 listed entities by market cap",
+   "submitTo": "Website + Annual Report",
+   "signedBy": "Board of Directors",
+   "notes": "Must cover Reg 43A(2)(a)-(e). Voluntary for others.",
+   "needsReview": true,
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-REG-44-5",
+   "sourceRow": "85",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 44(5)",
+   "chapter": "IV",
+   "title": "Hold the Annual General Meeting within five months from the date of closing of the financial year.",
+   "frequency": "Annual",
+   "timelineText": "Within 5 months of FY close (i.e. by 31 August for a 31 March FY end)",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "marketCapRank": {
+     "atMost": 100
+    }
+   },
+   "appliesToText": "Top 100 listed entities by market cap",
+   "submitTo": "AGM",
+   "signedBy": "Board of Directors",
+   "notes": "Tighter than s.96 Companies Act (6 months). Others: s.96 timeline.",
+   "needsReview": true,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-44-6",
+   "sourceRow": "86",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 44(6)",
+   "chapter": "IV",
+   "title": "Provide one-way live webcast of the proceedings of the AGM.",
+   "frequency": "Annual",
+   "timelineText": "At the AGM",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "marketCapRank": {
+     "atMost": 100
+    }
+   },
+   "appliesToText": "Top 100 listed entities by market cap",
+   "submitTo": null,
+   "signedBy": "Compliance Officer",
+   "notes": null,
+   "needsReview": true,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-46-2-S",
+   "sourceRow": "87",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 46(2)(s)",
+   "chapter": "IV",
+   "title": "Upload separate AUDITED FINANCIAL STATEMENTS of each subsidiary on the website.",
+   "frequency": "Annual",
+   "timelineText": "At least 21 days prior to the AGM which considers the accounts of that FY",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ],
+    "requires": [
+     "has_subsidiary"
+    ]
+   },
+   "appliesToText": "Equity-listed with subsidiaries",
+   "submitTo": "Website",
+   "signedBy": "Compliance Officer",
+   "notes": "Relaxations available for foreign subsidiaries in specified circumstances.",
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-46-2-T",
+   "sourceRow": "88",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 46(2)(t)",
+   "chapter": "IV",
+   "title": "Host the ANNUAL SECRETARIAL COMPLIANCE REPORT (Reg 24A(2)) on the website.",
+   "frequency": "Annual",
+   "timelineText": "Annually",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Website",
+   "signedBy": "Compliance Officer",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-46-2-Z",
+   "sourceRow": "89",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 46(2)(z)",
+   "chapter": "IV",
+   "title": "Host the ANNUAL RETURN (s.92, Companies Act 2013) on the website.",
+   "frequency": "Annual",
+   "timelineText": "Annually",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Website",
+   "signedBy": "Compliance Officer",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-53",
+   "sourceRow": "90",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 53",
+   "chapter": "V",
+   "title": "Annual report of the NCS-listed entity to contain disclosures per the Companies Act 2013 (or the statute under which the LE is constituted), audited financial statements, cash flow statement, auditors' report, directors' report, name & contact details of the debenture trustees, and RPT disclosures per Para A of Schedule V.",
+   "frequency": "Annual",
+   "timelineText": "With the annual report",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "ncs"
+    ]
+   },
+   "appliesToText": "NCS-listed",
+   "submitTo": "Annual Report",
+   "signedBy": "Board of Directors",
+   "notes": "Reg 53(1) widened to cover statutory corporations by 5th Amdt 2025 w.e.f. 19.11.2025.",
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-55",
+   "sourceRow": "91",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 55",
+   "chapter": "V",
+   "title": "Ensure each rating obtained for non-convertible securities is REVIEWED at least once a year by a SEBI-registered credit rating agency.",
+   "frequency": "Annual",
+   "timelineText": "At least once a year",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "ncs"
+    ]
+   },
+   "appliesToText": "NCS-listed",
+   "submitTo": "Credit Rating Agency",
+   "signedBy": "Compliance Officer",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-56-1-A",
+   "sourceRow": "92",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 56(1)(a)",
+   "chapter": "V",
+   "title": "Forward to the Debenture Trustee a copy of the annual report at the same time as it is issued, along with an auditor's certificate on utilisation of funds during the project implementation period.",
+   "frequency": "Annual",
+   "timelineText": "At the time the annual report is issued",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "ncs"
+    ]
+   },
+   "appliesToText": "NCS-listed (debentures)",
+   "submitTo": "Debenture Trustee",
+   "signedBy": "Compliance Officer",
+   "notes": "For working capital / general corporate / capital raising purposes, the auditor's certificate may be submitted at the end of each FY until funds are fully utilised. Reg 56(1) opening words SUBSTITUTED by 4th Amdt 2025 w.e.f. 27.10.2025 - now a hard 24-hour outer limit.",
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-58-1",
+   "sourceRow": "93",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 58(1)",
+   "chapter": "V",
+   "title": "Send soft copies of the full annual report to holders of non-convertible securities with registered email addresses; a letter with the exact web-link (optionally with a QR code) to others; hard copies on request.",
+   "frequency": "Annual",
+   "timelineText": "Along with the notice of the general meeting",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "ncs"
+    ]
+   },
+   "appliesToText": "NCS-listed",
+   "submitTo": "NCS holders",
+   "signedBy": "Compliance Officer",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-62D-2",
+   "sourceRow": "94",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 62D(2)",
+   "chapter": "VA",
+   "title": "HVDLE board of directors to meet at least four times a FINANCIAL year with a maximum gap of 120 days; committees per Reg 62F-62I.",
+   "frequency": "Annual",
+   "timelineText": "Min. 4 per FY; max gap 120 days",
+   "due": {
+    "type": "cadence",
+    "minPerYear": 4,
+    "maxGapDays": 120,
+    "confidence": "exact"
+   },
+   "appliesTo": {
+    "listingType": [
+     "hvdle"
+    ]
+   },
+   "appliesToText": "HVDLE",
+   "submitTo": null,
+   "signedBy": "Board of Directors",
+   "notes": "'Financial year' basis clarified w.e.f. 22.01.2026.",
+   "needsReview": false,
+   "dueConfidence": "exact"
+  },
+  {
+   "id": "LODR-REG-62M-1",
+   "sourceRow": "95",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 62M(1)",
+   "chapter": "VA",
+   "title": "Undertake Secretarial Audit by a Peer Reviewed Company Secretary and annex the Secretarial Audit Report with the annual report.",
+   "frequency": "Annual",
+   "timelineText": "Annexed to the annual report",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {
+    "listingType": [
+     "hvdle"
+    ]
+   },
+   "appliesToText": "HVDLE",
+   "submitTo": "Annual Report",
+   "signedBy": "Peer Reviewed PCS",
+   "notes": "Reg 62M(2) (60-day secretarial compliance report for HVDLEs) OMITTED w.e.f. 22.01.2026.",
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-87A-87E",
+   "sourceRow": "96",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 87A-87E",
+   "chapter": "VIIIA",
+   "title": "Security Receipts - periodic NAV, rating and valuation disclosures.",
+   "frequency": "Annual",
+   "timelineText": "As specified in Reg 87C",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {},
+   "appliesToText": "SR-listed (ARCs)",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "Trustee / Compliance Officer",
+   "notes": null,
+   "needsReview": true,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-91C-91E",
+   "sourceRow": "97",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 91C/91E",
+   "chapter": "IX-A",
+   "title": "Social Enterprises - annual disclosures to the Social Stock Exchange (NPO annual disclosures; annual impact report).",
+   "frequency": "Annual",
+   "timelineText": "Within the timelines specified by SEBI",
+   "due": {
+    "type": "annual",
+    "anchor": "fy_end",
+    "confidence": "derived",
+    "anchorDate": {
+     "month": 3,
+     "day": 31
+    }
+   },
+   "appliesTo": {},
+   "appliesToText": "Social Enterprises on SSE",
+   "submitTo": "Social Stock Exchange",
+   "signedBy": "Compliance Officer",
+   "notes": "Reg 91C(1) substituted by 3rd Amdt 2025 w.e.f. 08.09.2025.",
+   "needsReview": true,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-31-1-A",
+   "sourceRow": "98",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 31(1)(a)",
+   "chapter": "IV",
+   "title": "Submit shareholding pattern one day PRIOR to listing of securities.",
+   "frequency": "Event",
+   "timelineText": "1 day prior to listing",
+   "due": {
+    "type": "event",
+    "trigger": "event",
+    "confidence": "derived"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "Compliance Officer",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-31-1-C",
+   "sourceRow": "99",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 31(1)(c)",
+   "chapter": "IV",
+   "title": "Submit revised shareholding pattern within 10 days of any capital restructuring resulting in a change exceeding 2% of total paid-up share capital.",
+   "frequency": "Event / 10 days",
+   "timelineText": "Within 10 days of the restructuring",
+   "due": {
+    "type": "event_offset",
+    "days": 10,
+    "workingDays": false,
+    "trigger": "event",
+    "confidence": "exact"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "Compliance Officer",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "exact"
+  },
+  {
+   "id": "LODR-REG-39-2",
+   "sourceRow": "100",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 39(2)",
+   "chapter": "IV",
+   "title": "Effect CREDIT OF SECURITIES in dematerialised form pursuant to investor service requests relating to sub-division, split, consolidation, renewal, exchange and issuance of duplicate securities (loss / old / decrepit / worn-out certificates), along with relevant documents.",
+   "frequency": "Event / 30 days",
+   "timelineText": "Within 30 days from date of receipt of request",
+   "due": {
+    "type": "event_offset",
+    "days": 30,
+    "workingDays": false,
+    "trigger": "event",
+    "confidence": "exact"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Investor demat account",
+   "signedBy": "RTA",
+   "notes": "SUBSTITUTED by LODR (Amdt) Regs 2026 w.e.f. 22.01.2026. Letter of Confirmation (LOC) mechanism effectively RETIRED - direct demat credit is now the end-point. Re-cut RTA SOPs.",
+   "needsReview": false,
+   "dueConfidence": "exact"
+  },
+  {
+   "id": "LODR-REG-44-3",
+   "sourceRow": "101",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 44(3)",
+   "chapter": "IV",
+   "title": "Submit details regarding VOTING RESULTS of a General Meeting in the SEBI-specified format.",
+   "frequency": "Event / 2 working days",
+   "timelineText": "Within 2 working days of conclusion of the General Meeting",
+   "due": {
+    "type": "event_offset",
+    "days": 2,
+    "workingDays": true,
+    "trigger": "event",
+    "confidence": "exact"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "Compliance Officer",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "exact"
+  },
+  {
+   "id": "LODR-REG-6-1A",
+   "sourceRow": "102",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 6(1A)",
+   "chapter": "III",
+   "title": "Fill any vacancy in the office of Compliance Officer. No interim appointment unless made per the laws applicable to a fresh appointment.",
+   "frequency": "Event / 3 months",
+   "timelineText": "Not later than 3 months from date of vacancy",
+   "due": {
+    "type": "event",
+    "trigger": "event",
+    "confidence": "derived"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity",
+     "ncs",
+     "hvdle"
+    ]
+   },
+   "appliesToText": "All listed entities",
+   "submitTo": null,
+   "signedBy": "Board of Directors",
+   "notes": "Interim/officiating appointments are effectively barred.",
+   "needsReview": false,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-6-1B",
+   "sourceRow": "103",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 6(1B)",
+   "chapter": "III",
+   "title": "Fill vacancy in the office of Compliance Officer where a resolution plan u/s 31 IBC has been approved. In the interim, at least one full-time KMP must manage day-to-day affairs.",
+   "frequency": "Event / 3 months",
+   "timelineText": "Within 3 months of approval of resolution plan",
+   "due": {
+    "type": "event",
+    "trigger": "event",
+    "confidence": "derived"
+   },
+   "appliesTo": {},
+   "appliesToText": "Listed entities under approved resolution plan",
+   "submitTo": null,
+   "signedBy": "Board / RP",
+   "notes": null,
+   "needsReview": true,
+   "dueConfidence": "derived"
+  },
+  {
+   "id": "LODR-REG-61A-2",
+   "sourceRow": "104",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 61A(2)",
+   "chapter": "V",
+   "title": "Where interest / dividend / redemption amount is unclaimed for 30 days from due date, transfer the amount to an escrow account opened in a scheduled bank.",
+   "frequency": "Event / 7 days",
+   "timelineText": "Within 7 days from expiry of the 30-day period",
+   "due": {
+    "type": "event_offset",
+    "days": 7,
+    "workingDays": false,
+    "trigger": "event",
+    "confidence": "exact"
+   },
+   "appliesTo": {
+    "listingType": [
+     "ncs"
+    ]
+   },
+   "appliesToText": "NCS-listed",
+   "submitTo": "Escrow account",
+   "signedBy": "CFO",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "exact"
+  },
+  {
+   "id": "LODR-REG-7-5",
+   "sourceRow": "105",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 7(5)",
+   "chapter": "III",
+   "title": "Intimate appointment of / change in RTA (tripartite agreement) to stock exchange(s).",
+   "frequency": "Event / 7 days",
+   "timelineText": "Within 7 days of entering into the agreement",
+   "due": {
+    "type": "event_offset",
+    "days": 7,
+    "workingDays": false,
+    "trigger": "event",
+    "confidence": "exact"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity",
+     "ncs",
+     "hvdle"
+    ]
+   },
+   "appliesToText": "All listed entities",
+   "submitTo": "Stock Exchange(s)",
+   "signedBy": "Compliance Officer",
+   "notes": "Reg 7(3) (half-yearly RTA compliance certificate) was OMITTED by 3rd Amdt 2024 w.e.f. 13.12.2024.",
+   "needsReview": false,
+   "dueConfidence": "exact"
+  },
+  {
+   "id": "LODR-REG-7-6",
+   "sourceRow": "106",
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 7(6)",
+   "chapter": "III",
+   "title": "Place the RTA tripartite agreement before the board of directors.",
+   "frequency": "Event",
+   "timelineText": "Subsequent board meeting",
+   "due": {
+    "type": "event",
+    "trigger": "event",
+    "confidence": "derived"
+   },
+   "appliesTo": {
+    "listingType": [
+     "equity",
+     "ncs",
+     "hvdle"
+    ]
+   },
+   "appliesToText": "All listed entities",
+   "submitTo": "Board of Directors",
+   "signedBy": "Compliance Officer",
+   "notes": null,
+   "needsReview": false,
+   "dueConfidence": "derived"
+  }
+ ]
+}
