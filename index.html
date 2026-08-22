@@ -103,8 +103,8 @@
 .cc-health{display:flex;flex-direction:column;align-items:center;padding:26px 18px 20px;}
 .cc-gauge{position:relative;width:220px;height:220px;}
 .cc-gauge-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-.cc-gauge-score{font-size:52px;font-weight:800;letter-spacing:-2px;line-height:1;}
-.cc-gauge-max{font-size:13px;color:var(--slate);margin-top:2px;}
+.cc-gauge-score{font-size:46px;font-weight:800;letter-spacing:-1.5px;line-height:1;}
+.cc-gauge-max{font-size:12px;color:var(--ink-soft);margin-top:4px;font-weight:600;}
 .cc-gauge-label{margin-top:5px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
 .cc-legend{display:flex;gap:16px;margin-top:16px;flex-wrap:wrap;justify-content:center;}
 .cc-hl{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink-soft);font-weight:500;}
@@ -222,6 +222,22 @@
 .cc-metric-click:hover .cc-metric-go{opacity:1;}
 
 /* ===== MY WORK ===== */
+.lg-pill{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;
+  letter-spacing:.02em;white-space:nowrap;}
+.lg-ok{background:#D1FAE5;color:#047857;}
+.lg-warn{background:#FEF3C7;color:#B45309;}
+.lg-crit{background:#FEE2E2;color:#B91C1C;}
+.lg-info{background:#DBEAFE;color:#1D4ED8;}
+.lg-neutral{background:#E2E8F0;color:#475569;}
+.lg-h{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);
+  margin:20px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--line);}
+.lg-kv{display:flex;justify-content:space-between;gap:16px;font-size:13px;padding:5px 0;}
+.lg-kv span{color:var(--ink-soft);flex-shrink:0;}
+.lg-kv b{text-align:right;word-break:break-word;}
+#p-internal{display:none;height:auto;overflow:visible;padding:0;background:transparent;}
+#p-internal.on{display:block;}
+#p-entities{display:none;height:auto;overflow:visible;padding:0;background:transparent;}
+#p-entities.on{display:block;}
 #p-mywork{display:none;height:auto;overflow:visible;padding:0;}
 #p-mywork.on{display:block;}
 .mw-tabs{display:flex;gap:6px;margin-bottom:18px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
@@ -490,7 +506,153 @@ async function lgSignUp(){
     msg.style.display='block';
     msg.innerHTML='✅ Account created! Your access is pending approval. You will be able to log in once approved by the administrator.';
   }catch(e){
-    err.style.color='var(--red)'; err.style.display='block'; err.textContent='Error: '+e.message;
+    lgAuthErr(err, lgAuthMessage(e, 'Could not create the account. Please try again.'));
+  }
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// AUTH HARDENING
+// Never expose a raw provider error, a stack trace, a token or a
+// database message to the user. Every failure resolves to a
+// controlled message and a usable screen.
+// ═══════════════════════════════════════════════════════════════
+
+// Map provider errors onto something a person can act on.
+function lgAuthMessage(e, fallback){
+  var raw = String((e && (e.message || e.error_description || e.msg)) || e || '');
+  var s = raw.toLowerCase();
+  if(/invalid login|invalid credentials|invalid email or password/.test(s))
+    return 'That email or password is not correct.';
+  if(/email not confirmed/.test(s))          return 'This email address has not been confirmed yet.';
+  if(/user already registered|already exists/.test(s))
+    return 'An account already exists for this email. Try signing in instead.';
+  if(/password.*(short|least|6)/.test(s))    return 'Choose a password of at least 6 characters.';
+  if(/rate limit|too many/.test(s))          return 'Too many attempts. Please wait a minute and try again.';
+  if(/network|fetch|failed to fetch|timeout/.test(s))
+    return 'Cannot reach the server. Check your connection and try again.';
+  if(/jwt|token|expired|refresh/.test(s))    return 'Your session has expired. Please sign in again.';
+  if(/not found|no rows|pgrst116/.test(s))   return 'Your profile is not set up yet. Contact the administrator.';
+  if(/permission|policy|denied|403/.test(s)) return 'You do not have permission to do that.';
+  // Anything unrecognised is logged for us, never shown verbatim.
+  try{ console.error('[auth]', raw); }catch(_){}
+  return fallback || 'Something went wrong. Please try again.';
+}
+
+function lgAuthErr(el, text, tone){
+  if(!el) return;
+  el.style.display='block';
+  el.style.color = tone==='info' ? 'var(--slate)' : (tone==='warn' ? 'var(--gold)' : 'var(--red)');
+  el.textContent = text;
+}
+
+// Show the login screen and make protected content unreachable.
+function lgShowLogin(message){
+  CURRENT_USER = null;
+  try{ CLIENTS = []; }catch(e){}
+  var ov = document.getElementById('auth-overlay');
+  if(ov) ov.style.display='flex';
+  // Blank every panel so nothing from the previous session stays on screen,
+  // including via the browser's back button.
+  ['cc-dash-root','cu-root','mw-root','ent-root'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.innerHTML='';
+  });
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('on'); p.style.display='none'; });
+  ['lg-why-modal','lg-rec-modal','lg-reg-modal','lg-sys-modal','ent-modal','bulk-modal'].forEach(function(id){
+    var m=document.getElementById(id); if(m) m.remove();
+  });
+  if(message){
+    var err=document.getElementById('auth-err');
+    lgAuthErr(err, message, 'warn');
+  }
+}
+
+// A protected action calls this before touching data.
+function lgRequireSession(){
+  if(!CURRENT_USER){ lgShowLogin('Your session has expired. Please sign in again.'); return false; }
+  return true;
+}
+
+// Clear stale auth left behind by an older build or a half-finished sign-out.
+function lgClearStaleAuth(){
+  try{
+    for(var i=localStorage.length-1;i>=0;i--){
+      var k=localStorage.key(i);
+      if(k && /^sb-.*-auth-token$/.test(k)) localStorage.removeItem(k);
+    }
+  }catch(e){}
+}
+
+// React to expiry, refresh, and sign-out in other tabs.
+function lgWatchAuth(){
+  if(!supaClient || !supaClient.auth || !supaClient.auth.onAuthStateChange) return;
+  try{
+    supaClient.auth.onAuthStateChange(function(event, session){
+      if(event === 'SIGNED_OUT' || (!session && event !== 'INITIAL_SESSION')){
+        if(CURRENT_USER) lgShowLogin('You have been signed out.');
+        return;
+      }
+      if(event === 'TOKEN_REFRESHED') return;         // healthy, nothing to do
+      if(event === 'SIGNED_IN' && session && !CURRENT_USER){
+        // Signed in from another tab — pick the session up here too.
+        lgResumeSession().catch(function(){});
+      }
+    });
+  }catch(e){}
+}
+
+// Shared path for "we think there is a session — verify and enter".
+async function lgResumeSession(){
+  if(!supaClient) return false;
+  var res;
+  try{ res = await supaClient.auth.getSession(); }
+  catch(e){ lgShowLogin('Cannot reach the server. Please sign in again.'); return false; }
+  var session = res && res.data && res.data.session;
+  if(!session){ lgShowLogin(); return false; }
+
+  var user = session.user;
+  var prof;
+  try{
+    prof = await supaClient.from('profiles').select('approved,is_admin').eq('id', user.id).maybeSingle();
+  }catch(e){
+    lgShowLogin(lgAuthMessage(e, 'Could not load your profile. Please sign in again.'));
+    return false;
+  }
+  if(prof && prof.error){
+    lgShowLogin(lgAuthMessage(prof.error, 'Could not load your profile. Please sign in again.'));
+    return false;
+  }
+  if(!prof || !prof.data){
+    // Authenticated but no profile row — a partially configured account.
+    lgShowLogin('Your account is not fully set up yet. Please contact the administrator.');
+    return false;
+  }
+  if(!prof.data.approved){
+    try{ await supaClient.auth.signOut(); }catch(e){}
+    lgShowLogin('Your account is pending approval.');
+    return false;
+  }
+  user.is_admin = !!prof.data.is_admin;
+  CURRENT_USER = user;
+  enterApp();
+  return true;
+}
+
+// Password reset.
+async function lgResetPassword(){
+  var email = (document.getElementById('auth-email')||{}).value || '';
+  var err = document.getElementById('auth-err');
+  email = String(email).trim();
+  if(!email){ lgAuthErr(err, 'Enter your email address first, then choose Reset password.'); return; }
+  if(!supaClient){ lgAuthErr(err, 'Cannot reach the server right now.'); return; }
+  lgAuthErr(err, 'Sending reset link…', 'info');
+  try{
+    var res = await supaClient.auth.resetPasswordForEmail(email, {redirectTo: location.origin + location.pathname});
+    if(res && res.error) throw res.error;
+    // Deliberately not confirming whether the address exists.
+    lgAuthErr(err, 'If an account exists for that address, a reset link is on its way.', 'warn');
+  }catch(e){
+    lgAuthErr(err, lgAuthMessage(e, 'Could not send the reset link. Please try again.'));
   }
 }
 
@@ -504,30 +666,41 @@ async function lgSignIn(){
   }
   err.textContent='Signing in...'; err.style.display='block'; err.style.color='var(--slate)';
   try{
+    if(!supaClient) throw new Error('network');
     var res = await supaClient.auth.signInWithPassword({email:email, password:pass});
     if(res.error) throw res.error;
-    CURRENT_USER = res.data.user;
-    // Check approval
-    var prof = await supaClient.from('profiles').select('approved,is_admin').eq('id',CURRENT_USER.id).single();
-    if(prof.error) throw new Error('Could not verify account status.');
-    if(!prof.data.approved){
-      await supaClient.auth.signOut();
-      err.style.color='var(--gold)'; err.style.display='block';
-      err.textContent='⏳ Your account is pending approval. Please wait for administrator approval.';
+    if(!res.data || !res.data.user) throw new Error('invalid credentials');
+
+    var user = res.data.user;
+    var prof = await supaClient.from('profiles').select('approved,is_admin').eq('id', user.id).maybeSingle();
+    if(prof && prof.error) throw prof.error;
+    if(!prof || !prof.data){
+      try{ await supaClient.auth.signOut(); }catch(e2){}
+      lgAuthErr(err, 'Your account is not fully set up yet. Please contact the administrator.', 'warn');
       return;
     }
-    CURRENT_USER.is_admin = prof.data.is_admin;
+    if(!prof.data.approved){
+      try{ await supaClient.auth.signOut(); }catch(e2){}
+      lgAuthErr(err, 'Your account is pending approval by the administrator.', 'warn');
+      return;
+    }
+    user.is_admin = !!prof.data.is_admin;
+    CURRENT_USER = user;
     err.style.display='none';
     enterApp();
   }catch(e){
-    err.style.color='var(--red)'; err.style.display='block'; err.textContent='Error: '+e.message;
+    lgAuthErr(err, lgAuthMessage(e, 'Could not sign you in. Please try again.'));
   }
 }
 
 async function lgSignOut(){
-  if(supaClient) await supaClient.auth.signOut();
+  try{ if(supaClient) await supaClient.auth.signOut(); }catch(e){}
+  lgClearStaleAuth();
   CURRENT_USER = null;
-  location.reload();
+  try{ CLIENTS = []; }catch(e){}
+  lgShowLogin();
+  // Replace the history entry so the back button cannot return to a data screen.
+  try{ history.replaceState(null,'',location.pathname); }catch(e){}
 }
 
 function enterApp(){
@@ -548,7 +721,9 @@ function enterApp(){
   var showAdmin = (CURRENT_USER && CURRENT_USER.is_admin) ? '' : 'none';
   if(adminTab) adminTab.style.display = showAdmin;
   if(adminHead) adminHead.style.display = showAdmin;
-  if(typeof updateMode === 'function') updateMode();
+  // Cosmetic header refresh: must never abort the data load + render that follow.
+  try{ if(typeof updateMode === 'function') updateMode(); }
+  catch(err){ console.error('updateMode() failed (non-fatal):', err); }
   // Render the Command Center dashboard immediately
   if(typeof renderCommandCenter === 'function') renderCommandCenter();
   // Load cloud data, then re-render dashboard with real numbers
@@ -560,25 +735,23 @@ function enterApp(){
 }
 
 // Check existing session on load
+var LG_BOOT_TRIES = 0;
 async function checkSession(){
   if(!initSupabase()){
+    // Give the CDN a bounded number of chances, then fail visibly rather than hang.
+    if(++LG_BOOT_TRIES > 20){
+      lgShowLogin('Cannot reach the sign-in service. Check your connection and reload.');
+      return;
+    }
     setTimeout(checkSession, 300);
     return;
   }
+  lgWatchAuth();
   try{
-    var res = await supaClient.auth.getSession();
-    if(res.data.session){
-      CURRENT_USER = res.data.session.user;
-      var prof = await supaClient.from('profiles').select('approved,is_admin').eq('id',CURRENT_USER.id).single();
-      if(prof.data && prof.data.approved){
-        CURRENT_USER.is_admin = prof.data.is_admin;
-        enterApp();
-        return;
-      }
-    }
-  }catch(e){}
-  // No valid session - show login
-  document.getElementById('auth-overlay').style.display='flex';
+    await lgResumeSession();
+  }catch(e){
+    lgShowLogin(lgAuthMessage(e, 'Please sign in to continue.'));
+  }
 }
 
 document.addEventListener('DOMContentLoaded', checkSession);
@@ -607,6 +780,7 @@ document.addEventListener('DOMContentLoaded', checkSession);
 
     <button onclick="lgSignIn()" style="width:100%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);font-weight:700;font-size:14px;border:none;border-radius:10px;padding:13px;cursor:pointer;margin-bottom:10px;">Sign In →</button>
     <button onclick="lgSignUp()" style="width:100%;background:var(--ink3);color:var(--gold2);font-weight:600;font-size:13px;border:1px solid var(--ink4);border-radius:10px;padding:12px;cursor:pointer;">Create New Account</button>
+    <div style="text-align:center;margin-top:12px;"><a onclick="lgResetPassword()" style="font-size:12px;color:var(--slate);cursor:pointer;text-decoration:underline;">Forgot your password?</a></div>
 
     
   </div>
@@ -732,7 +906,7 @@ input[type="text"], input[type="password"], textarea, select {
     </div>
     <div>
       <div class="n">LawGovern</div>
-      <div class="t">Compliance OS · v7</div>
+      <div class="t">Compliance OS · v35</div>
     </div>
   </div>
   <div class="cc-search">
@@ -758,21 +932,18 @@ input[type="text"], input[type="password"], textarea, select {
 <div class="navitem" onclick="sw('universe')" id="t-universe"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg><span>Compliance Universe</span></div>
 <div class="navitem" onclick="sw('chat')" id="t-chat"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3.2"/></svg><span>AI Compliance</span></div>
 <div class="navitem" onclick="sw('ff')" id="t-ff"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><span>Form Finder</span></div>
-<div class="navitem" onclick="sw('xlaw')" id="t-xlaw"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/><path d="M9 12h6"/></svg><span>Cross-Law</span></div>
 <div class="navitem" onclick="sw('tracker')" id="t-tracker"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v3M12 18v3"/></svg><span>Regulatory Radar</span></div>
 <div class="navhead">Operate</div>
 <div class="navitem" onclick="sw('mywork')" id="t-mywork"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3 8-8M20 12v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h9"/></svg><span>My Work</span></div>
 <div class="navitem" onclick="sw('cal')" id="t-cal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Calendar</span></div>
 <div class="navitem" onclick="sw('cl')" id="t-cl"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3 8-8M20 12v7H4V5h11"/></svg><span>Checklist</span></div>
+<div class="navitem" onclick="sw('entities')" id="t-entities"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h2m-2 4h2m-2 4h2m4-8h2m-2 4h2m-2 4h2"/></svg><span>Entities</span></div>
+<div class="navitem" onclick="sw('internal')" id="t-internal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg><span>Internal Compliance</span></div>
 <div class="navhead">Document Studio</div>
 <div class="navitem" onclick="sw('res')" id="t-res"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg><span>Resolutions</span></div>
 <div class="navitem" onclick="sw('docs')" id="t-docs"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 5h16M4 12h16M4 19h10"/></svg><span>Notices &amp; Minutes</span></div>
-<div class="navitem" onclick="sw('opinion')" id="t-opinion"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3l9 5v8l-9 5-9-5V8z"/><path d="M12 12v6" stroke-linecap="round"/></svg><span>Legal Opinion</span></div>
-<div class="navitem" onclick="sw('scn')" id="t-scn"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><span>SCN Reply</span></div>
 <div class="navhead">Reference</div>
 <div class="navitem" onclick="sw('penalty')" id="t-penalty"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 3h12M6 8h12M9 3c0 6 6 6 6 11a4 4 0 0 1-8 0"/></svg><span>Penalty Calc</span></div>
-<div class="navitem" onclick="sw('cases')" id="t-cases"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 5h16M4 12h16M4 19h10"/></svg><span>NCLT Cases</span></div>
-<div class="navitem" onclick="sw('compound')" id="t-compound"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg><span>Compounding</span></div>
 <div class="navitem" onclick="sw('deeplaw')" id="t-deeplaw"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3l9 4v5c0 5-3.5 8-9 9-5.5-1-9-4-9-9V7l9-4z"/></svg><span>Deep Law</span></div>
 <div class="navhead" id="admin-nav-head" style="display:none">Administration</div>
 <div class="navitem" onclick="sw('admin')" id="t-admin" style="display:none"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.3l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2.2-1.3L14 2h-4l-.3 2.2a7 7 0 0 0-2.2 1.3l-2.3-1-2 3.4 2 1.5A7 7 0 0 0 5 12a7 7 0 0 0 .1 1.3l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2.2 1.3L10 22h4l.3-2.2a7 7 0 0 0 2.2-1.3l2.3 1 2-3.4-2-1.5z"/></svg><span>Administration</span></div>
@@ -794,6 +965,14 @@ input[type="text"], input[type="password"], textarea, select {
 
 <div class="panel" id="p-mywork">
   <div id="mw-root"></div>
+</div>
+
+<div class="panel" id="p-entities">
+  <div id="ent-root"></div>
+</div>
+
+<div class="panel" id="p-internal">
+  <div id="int-root"></div>
 </div>
 
 
@@ -1102,153 +1281,6 @@ input[type="text"], input[type="password"], textarea, select {
     <div id="trk-status" style="background:var(--ink3);border-top:1px solid var(--ink4);padding:6px 16px;font-size:11px;color:var(--slate);flex-shrink:0;display:none;text-align:center;"></div>
   </div>
 </div>
-<div class="panel" id="p-xlaw">
-  <div style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
-    <div style="background:var(--ink2);border-bottom:1px solid var(--ink4);padding:12px 16px;flex-shrink:0;">
-      <div style="font-size:11px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">⚡ Cross-Law Impact Analyser</div>
-      <div style="font-size:11px;color:var(--slate);margin-bottom:10px;">Enter any corporate action → get complete ripple effect across ALL laws (Companies Act, SEBI, FEMA, Tax, Stamp Duty, IBC)</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;" id="xlaw-examples">
-        <button class="rcatb" onclick="xlawEx(this)">Increase authorised capital</button>
-        <button class="rcatb" onclick="xlawEx(this)">Appoint a new MD</button>
-        <button class="rcatb" onclick="xlawEx(this)">Transfer shares to NRI</button>
-        <button class="rcatb" onclick="xlawEx(this)">Issue debentures (NCDs)</button>
-        <button class="rcatb" onclick="xlawEx(this)">Change registered office to another state</button>
-        <button class="rcatb" onclick="xlawEx(this)">Merger of two companies</button>
-        <button class="rcatb" onclick="xlawEx(this)">Private placement of shares</button>
-        <button class="rcatb" onclick="xlawEx(this)">Buy-back of shares</button>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <input id="xlaw-input" type="text" placeholder="Describe the corporate action... e.g. 'Company wants to give loan to its subsidiary'" style="flex:1;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 13px;font-size:13px;outline:none;">
-        <button onclick="runXLaw()" style="background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);font-weight:700;font-size:13px;border:none;border-radius:9px;padding:0 20px;cursor:pointer;white-space:nowrap;">Analyse ⚡</button>
-      </div>
-    </div>
-    <div style="flex:1;overflow-y:auto;padding:14px 16px;" id="xlaw-out">
-      <div style="text-align:center;padding:40px 20px;color:var(--slate);">
-        <div style="font-size:36px;margin-bottom:10px;">⚡</div>
-        <div style="font-size:14px;font-weight:600;color:var(--slate2);margin-bottom:8px;">Cross-Law Impact Analyser</div>
-        <div style="font-size:12px;line-height:1.9;">Describe any corporate action above<br>Get complete legal impact across Companies Act, SEBI, FEMA, Income Tax, Stamp Duty, and IBC</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="panel" id="p-scn">
-  <div style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
-    <div style="background:var(--ink2);border-bottom:1px solid var(--ink4);padding:12px 16px;flex-shrink:0;">
-      <div style="font-size:11px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">📨 Show Cause Notice Reply Drafter</div>
-      <div style="font-size:11px;color:var(--slate);margin-bottom:10px;">Describe the SCN / ROC notice → AI drafts complete legal reply with grounds of defence, case law, and compounding option</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
-        <button class="rcatb" onclick="scnEx(this)">SCN for late AOC-4 filing</button>
-        <button class="rcatb" onclick="scnEx(this)">SCN for not holding AGM</button>
-        <button class="rcatb" onclick="scnEx(this)">SCN for DPT-3 default</button>
-        <button class="rcatb" onclick="scnEx(this)">SCN for MGT-7 late filing</button>
-        <button class="rcatb" onclick="scnEx(this)">SEBI SCN for LODR violation</button>
-        <button class="rcatb" onclick="scnEx(this)">SCN for not appointing CS</button>
-      </div>
-      <div style="display:flex;gap:8px;margin-bottom:8px;">
-        <select id="scn-issuer" style="background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 12px;font-size:12px;outline:none;">
-          <option value="ROC">ROC (Registrar of Companies)</option>
-          <option value="SEBI">SEBI</option>
-          <option value="RD">Regional Director</option>
-          <option value="NCLT">NCLT</option>
-          <option value="MCA">MCA (Ministry)</option>
-        </select>
-        <select id="scn-compounding" style="background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 12px;font-size:12px;outline:none;">
-          <option value="yes">Include Compounding Option</option>
-          <option value="no">Reply Only (no compounding)</option>
-        </select>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <textarea id="scn-input" placeholder="Describe the SCN / violation in detail...&#10;E.g.: ROC issued SCN for not filing AOC-4 for FY 2023-24 and FY 2024-25. Company is a private limited company, paid-up Rs.5 Crore. AGM was held but forms not filed due to change in accounts team." style="flex:1;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 13px;font-size:12px;outline:none;resize:none;min-height:70px;font-family:inherit;box-sizing:border-box;"></textarea>
-        <button onclick="runSCN()" style="background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);font-weight:700;font-size:13px;border:none;border-radius:9px;padding:0 16px;cursor:pointer;align-self:flex-end;">Draft Reply</button>
-      </div>
-    </div>
-    <div style="flex:1;overflow-y:auto;padding:14px 16px;" id="scn-out">
-      <div style="text-align:center;padding:40px 20px;color:var(--slate);">
-        <div style="font-size:36px;margin-bottom:10px;">📨</div>
-        <div style="font-size:14px;font-weight:600;color:var(--slate2);margin-bottom:8px;">SCN Reply Drafter</div>
-        <div style="font-size:12px;line-height:1.9;">Describe the show cause notice above<br>AI drafts complete reply with legal grounds, case citations, and compounding strategy</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="panel" id="p-cases">
-  <div style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
-    <div style="background:var(--ink2);border-bottom:1px solid var(--ink4);padding:12px 16px;flex-shrink:0;">
-      <div style="font-size:11px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">⚖️ NCLT / NCLAT / SAT Case Finder</div>
-      <div style="font-size:11px;color:var(--slate);margin-bottom:10px;">Search real tribunal decisions explained in plain English — what judges decided and what it means for your compliance</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
-        <button class="rcatb" onclick="caseEx(this)">Director disqualification 164(2) relief</button>
-        <button class="rcatb" onclick="caseEx(this)">Oppression and mismanagement 50:50 JV</button>
-        <button class="rcatb" onclick="caseEx(this)">IBC CIRP against personal guarantor</button>
-        <button class="rcatb" onclick="caseEx(this)">SEBI SAT insider trading penalty reduced</button>
-        <button class="rcatb" onclick="caseEx(this)">AGM extension allowed by ROC</button>
-        <button class="rcatb" onclick="caseEx(this)">Charge registration condonation NCLT</button>
-        <button class="rcatb" onclick="caseEx(this)">RPT violation SEBI order</button>
-        <button class="rcatb" onclick="caseEx(this)">Revival of struck off company Sec 252</button>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <input id="cases-input" type="text" placeholder="Search case law... e.g. 'director disqualification relief', 'compounding application allowed', 'SEBI penalty reduced on appeal'" style="flex:1;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 13px;font-size:13px;outline:none;">
-        <select id="cases-forum" style="background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 12px;font-size:12px;outline:none;">
-          <option value="all">All Forums</option>
-          <option value="NCLT">NCLT</option>
-          <option value="NCLAT">NCLAT</option>
-          <option value="SAT">SAT (SEBI)</option>
-          <option value="HC">High Courts</option>
-          <option value="SC">Supreme Court</option>
-        </select>
-        <button onclick="runCases()" style="background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);font-weight:700;font-size:13px;border:none;border-radius:9px;padding:0 16px;cursor:pointer;">Search</button>
-      </div>
-    </div>
-    <div style="flex:1;overflow-y:auto;padding:14px 16px;" id="cases-out">
-      <div style="text-align:center;padding:40px 20px;color:var(--slate);">
-        <div style="font-size:36px;margin-bottom:10px;">⚖️</div>
-        <div style="font-size:14px;font-weight:600;color:var(--slate2);margin-bottom:8px;">NCLT / NCLAT / SAT Case Finder</div>
-        <div style="font-size:12px;line-height:1.9;">Search real judicial decisions in plain English<br>Covers NCLT, NCLAT, SAT, High Courts, Supreme Court</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="panel" id="p-compound">
-  <div style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
-    <div style="background:var(--ink2);border-bottom:1px solid var(--ink4);padding:12px 16px;flex-shrink:0;">
-      <div style="font-size:11px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">🤝 Compounding Application Drafter</div>
-      <div style="font-size:11px;color:var(--slate);margin-bottom:10px;">Describe the default → AI drafts complete compounding application under Section 441 with fees, documents checklist, and jurisdiction</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
-        <button class="rcatb" onclick="compoundEx(this)">Late filing AOC-4 multiple years</button>
-        <button class="rcatb" onclick="compoundEx(this)">AGM not held for 2 years</button>
-        <button class="rcatb" onclick="compoundEx(this)">Charge not registered within 30 days</button>
-        <button class="rcatb" onclick="compoundEx(this)">DPT-3 not filed for 3 years</button>
-        <button class="rcatb" onclick="compoundEx(this)">Director appointment without filing DIR-12</button>
-        <button class="rcatb" onclick="compoundEx(this)">MGT-14 not filed for special resolution</button>
-      </div>
-      <div style="display:flex;gap:8px;margin-bottom:8px;">
-        <input id="compound-company" placeholder="Company Name" style="flex:1;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 13px;font-size:12px;outline:none;">
-        <input id="compound-cin" placeholder="CIN (optional)" style="flex:1;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 13px;font-size:12px;outline:none;">
-        <select id="compound-type" style="background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 12px;font-size:12px;outline:none;">
-          <option value="pvt">Private Limited</option>
-          <option value="pub">Public Limited</option>
-          <option value="listed">Listed Company</option>
-          <option value="small">Small Company</option>
-        </select>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <textarea id="compound-input" placeholder="Describe the default/violation in detail...&#10;E.g.: Company did not file AOC-4 for FY 2022-23 and FY 2023-24. The delay is due to the company having financial difficulty and change in management. Both forms have now been filed with late fee." style="flex:1;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 13px;font-size:12px;outline:none;resize:none;min-height:70px;font-family:inherit;box-sizing:border-box;"></textarea>
-        <button onclick="runCompound()" style="background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);font-weight:700;font-size:13px;border:none;border-radius:9px;padding:0 16px;cursor:pointer;align-self:flex-end;">Draft Application</button>
-      </div>
-    </div>
-    <div style="flex:1;overflow-y:auto;padding:14px 16px;" id="compound-out">
-      <div style="text-align:center;padding:40px 20px;color:var(--slate);">
-        <div style="font-size:36px;margin-bottom:10px;">🤝</div>
-        <div style="font-size:14px;font-weight:600;color:var(--slate2);margin-bottom:8px;">Compounding Application Drafter</div>
-        <div style="font-size:12px;line-height:1.9;">Describe the violation above<br>AI drafts complete Section 441 compounding application with fees calculation, jurisdiction, and documents list</div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="panel" id="p-deeplaw">
   <div style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
     <div style="background:var(--ink2);border-bottom:1px solid var(--ink4);padding:12px 16px;flex-shrink:0;">
@@ -1274,42 +1306,6 @@ input[type="text"], input[type="password"], textarea, select {
         <div style="font-size:36px;margin-bottom:10px;">🔬</div>
         <div style="font-size:14px;font-weight:600;color:var(--slate2);margin-bottom:8px;">Deep Law Interpretation Engine</div>
         <div style="font-size:12px;line-height:1.9;">The questions that have no easy answer<br>Complete legal analysis: section + proviso + exception + MCA circular + case law + practical answer</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="panel" id="p-opinion">
-  <div style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
-    <div style="background:var(--ink2);border-bottom:1px solid var(--ink4);padding:12px 16px;flex-shrink:0;">
-      <div style="font-size:11px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">📜 Legal Opinion Drafter</div>
-      <div style="font-size:11px;color:var(--slate);margin-bottom:10px;">Describe the legal question → AI drafts complete structured legal opinion (Question of Law → Provisions → Analysis → Opinion)</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
-        <button class="rcatb" onclick="opinionEx(this)">Can company give loan to wholly owned subsidiary?</button>
-        <button class="rcatb" onclick="opinionEx(this)">Is this transaction a related party transaction?</button>
-        <button class="rcatb" onclick="opinionEx(this)">Does this company need secretarial audit?</button>
-        <button class="rcatb" onclick="opinionEx(this)">Can private company accept deposits from directors?</button>
-        <button class="rcatb" onclick="opinionEx(this)">Is special resolution required for this change?</button>
-        <button class="rcatb" onclick="opinionEx(this)">Does this qualify as a material subsidiary?</button>
-      </div>
-      <div style="display:flex;gap:8px;margin-bottom:8px;">
-        <input id="opinion-re" placeholder="RE: (Subject of Opinion)" style="flex:1;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 13px;font-size:12px;outline:none;">
-        <select id="opinion-format" style="background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 12px;font-size:12px;outline:none;">
-          <option value="full">Full Formal Opinion</option>
-          <option value="short">Short Note / Memo</option>
-          <option value="checklist">Checklist Format</option>
-        </select>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <textarea id="opinion-input" placeholder="Describe the facts and the legal question...&#10;E.g.: XYZ Pvt Ltd (paid-up Rs.8 Crore) wants to give an interest-free loan of Rs.50 Lakh to its wholly-owned subsidiary ABC Pvt Ltd for working capital purposes. The parent company has no outstanding bank loans. Please advise whether this is permissible and what procedure to follow." style="flex:1;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:9px 13px;font-size:12px;outline:none;resize:none;min-height:70px;font-family:inherit;box-sizing:border-box;"></textarea>
-        <button onclick="runOpinion()" style="background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);font-weight:700;font-size:13px;border:none;border-radius:9px;padding:0 16px;cursor:pointer;align-self:flex-end;">Draft Opinion</button>
-      </div>
-    </div>
-    <div style="flex:1;overflow-y:auto;padding:14px 16px;" id="opinion-out">
-      <div style="text-align:center;padding:40px 20px;color:var(--slate);">
-        <div style="font-size:36px;margin-bottom:10px;">📜</div>
-        <div style="font-size:14px;font-weight:600;color:var(--slate2);margin-bottom:8px;">Legal Opinion Drafter</div>
-        <div style="font-size:12px;line-height:1.9;">Describe the facts and legal question above<br>AI drafts complete structured legal opinion with analysis, provisions, and clear conclusion</div>
       </div>
     </div>
   </div>
@@ -1403,9 +1399,13 @@ function changeKey() {
 }
 
 function updateMode() {
+  // #modebadge was removed in the Command Center theme redesign (replaced by #modeind).
+  // Guard it: an unguarded null here threw and aborted enterApp() before it loaded any data.
   var b = document.getElementById('modebadge');
-  b.textContent = '● AI Active';
-  b.style.cssText = 'background:#c9a84c20;border:1px solid var(--gold);color:var(--gold2);font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;';
+  if (b) {
+    b.textContent = '● AI Active';
+    b.style.cssText = 'background:#c9a84c20;border:1px solid var(--gold);color:var(--gold2);font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;';
+  }
   var ind = document.getElementById('modeind');
   if (ind) { ind.textContent = '● AI Active'; ind.className = 'aimode'; }
   // Show Admin tab ONLY for logged-in admins (Supabase)
@@ -1419,7 +1419,7 @@ function updateMode() {
   if (penaltyTab) penaltyTab.style.display = '';
   var trackerTab = document.getElementById('t-tracker');
   if (trackerTab) trackerTab.style.display = '';
-  ['t-xlaw','t-scn','t-cases','t-compound','t-deeplaw','t-opinion'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display='';});
+  ['t-deeplaw'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display='';});
 }
 
 // ── ADMIN FUNCTIONS ──
@@ -2464,6 +2464,8 @@ function sw(id) {
   if (id==='home' && typeof renderCommandCenter==='function') renderCommandCenter();
   if (id==='universe' && typeof renderUniverse==='function') renderUniverse();
   if (id==='mywork' && typeof renderMyWork==='function') renderMyWork();
+  if (id==='entities' && typeof renderEntities==='function') renderEntities();
+  if (id==='internal' && typeof renderInternal==='function') renderInternal();
 }
 
 // ═══════════════════════════════════════════════════
@@ -2629,7 +2631,10 @@ async function doFetchCirculars(cfg){
   var items=null, lastErr='';
   // Try multiple free proxies in order for reliability
   var proxies=[
-    function(u){return 'https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(u)+'&count=15';},
+    // rss2json now requires a paid key for the `count` parameter — passing it made
+    // every regulator feed fail with "you need a valid api key". The default item
+    // count is fine, so we simply omit it.
+    function(u){return 'https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(u);},
     function(u){return 'https://api.allorigins.win/get?url='+encodeURIComponent(u);}
   ];
   for(var pi=0; pi<proxies.length && !items; pi++){
@@ -3680,13 +3685,35 @@ var RISK = {
 // Based on ICSI standard compliance chart structure
 function getComplianceChart(c){
   var y  = new Date().getFullYear();
-  var fym = parseInt((c.fyend||'03-31').split('-')[0]);
-  var agmM = fym+6; var agmY = y; if(agmM>12){agmM-=12;agmY++;}
-  function dt(yr,m,d){ return new Date(yr,m-1,d).toISOString().substring(0,10); }
-  function plus(base,days){ var x=new Date(base); x.setDate(x.getDate()+days); return x.toISOString().substring(0,10); }
-  var agm = dt(agmY,agmM,30);
+
+  // fyend arrives either as 'MM-DD' (legacy) or 'YYYY-MM-DD' (Supabase date column).
+  // Reading split('-')[0] as the month sent every AGM-derived deadline ~170 years out.
+  var fyRaw   = String(c.fyend||'').trim().split('-').map(function(n){ return parseInt(n,10); });
+  var fyMonth = 3, fyDay = 31;                                  // default: 31 March
+  if(fyRaw.length===3 && fyRaw[1]>=1 && fyRaw[1]<=12){ fyMonth=fyRaw[1]; fyDay=fyRaw[2]; }        // YYYY-MM-DD
+  else if(fyRaw.length===2 && fyRaw[0]>=1 && fyRaw[0]<=12){ fyMonth=fyRaw[0]; fyDay=fyRaw[1]; }   // MM-DD
+
+  // AGM: within 6 months of FY end (Sec 96). Wrap across the year boundary properly.
+  var agmM = ((fyMonth + 6 - 1) % 12) + 1;
+  var agmY = (fyMonth + 6) > 12 ? y + 1 : y;
+
+  // Format from local date parts. toISOString() converts to UTC, which shifts every
+  // date back a day in IST (UTC+5:30) -- 30 Sep was being emitted as 29 Sep.
+  function dt(yr,m,d){ return yr + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0'); }
+  function plus(base,days){
+    var p = base.split('-').map(Number);
+    var x = new Date(p[0], p[1]-1, p[2]);
+    x.setDate(x.getDate()+days);
+    return dt(x.getFullYear(), x.getMonth()+1, x.getDate());
+  }
+  function lastDayOf(yr,m){ return new Date(yr, m, 0).getDate(); }
+  var agm = dt(agmY, agmM, lastDayOf(agmY, agmM));
+
   var cap = parseFloat(c.capital||0), tur = parseFloat(c.turnover||0);
-  var isListed=c.type==='listed', isOPC=c.type==='opc';
+  var isListed=c.type==='listed', isOPC=c.type==='opc', isPublic=c.type==='public';
+  // Optional -- evaluated only once the companies table carries these columns.
+  var borrowings = parseFloat(c.borrowings||0), netWorth = parseFloat(c.networth||0), netProfit = parseFloat(c.netprofit||0);
+  var CR = 10000000;   // Rs 1 crore, so thresholds below read as the statute states them
 
   // Each entry: {key, law, section, form, obligation, owner, due, risk, penalty, applicable}
   var rows = [
@@ -3714,11 +3741,17 @@ function getComplianceChart(c){
   }
 
   // Secretarial Audit
-  if(isListed||cap>=50000000||tur>=250000000)
+  // Sec 204 r/w Rule 9: every listed company; every PUBLIC company with paid-up capital
+  // >= Rs 50 cr or turnover >= Rs 250 cr; any company with borrowings >= Rs 100 cr.
+  // Previous thresholds were 10x low and ignored the public-company restriction.
+  if(isListed || (isPublic && (cap>=50*CR || tur>=250*CR)) || borrowings>=100*CR)
     rows.push({key:'mr3',law:'Companies Act 2013',section:'Sec 204',form:'MR-3',obligation:'Secretarial Audit by PCS',owner:'CS+PCS',due:plus(agm,60),risk:'critical',penalty:'₹1L company + ₹25K officer',applicable:true});
 
   // CSR
-  if(cap>=500000000||tur>=1000000000)
+  // Sec 135: net worth >= Rs 500 cr, turnover >= Rs 1000 cr, or net profit >= Rs 5 cr.
+  // NOTE: netWorth and netProfit are not yet stored, so only the turnover limb can be
+  // evaluated today -- CSR will UNDER-report until those columns exist. See CLAUDE.md.
+  if(netWorth>=500*CR || tur>=1000*CR || netProfit>=5*CR)
     rows.push({key:'csr',law:'Companies Act 2013',section:'Sec 135',form:'CSR Report',obligation:'CSR Spending & Annual Report',owner:'CS+Board',due:plus(agm,60),risk:'high',penalty:'₹50K-₹25L',applicable:true});
 
   // Mark applicable=false for OPC where not needed
@@ -4406,13 +4439,31 @@ async function loadCloudClients(){
     if(statusRes.data){
       statusRes.data.forEach(function(s){
         if(!statusMap[s.company_id]) statusMap[s.company_id]={};
-        statusMap[s.company_id][s.compliance_key]={status:s.status,owner:s.owner,notes:s.notes,completedOn:s.completed_on};
+        statusMap[s.company_id][s.compliance_key]={
+          status:s.status, owner:s.owner, notes:s.notes, completedOn:s.completed_on,
+          // Evidence trail — absent until db/003_evidence_trail.sql runs.
+          filedOn:s.completed_on||null, filingRef:s.filing_ref||null,
+          evidenceNote:s.evidence_note||null, evidenceSource:s.evidence_source||null,
+          verifiedBy:s.verified_by||null, verifiedAt:s.verified_at||null,
+          // Maker-checker + document (db/005). Absent until that migration runs.
+          recordedBy:s.recorded_by||null, recordedAt:s.recorded_at||null,
+          checkState:s.check_state||'unchecked', checkNote:s.check_note||null,
+          evidenceFile:s.evidence_file||null, confidence:s.confidence||null,
+          // §8/§9 document privacy (db/007). Absent until that migration runs.
+          docStorage:s.doc_storage||null, docRetention:s.doc_retention||null,
+          docExpiresAt:s.doc_expires_at||null,
+          docConsentBy:s.doc_consent_by||null, docConsentAt:s.doc_consent_at||null
+        };
       });
     }
     CLIENTS = res.data.map(function(c){
       return {
         id:c.id, name:c.name, type:c.type, fyend:c.fyend,
         capital:String(c.capital||''), turnover:String(c.turnover||''),
+        // Sec 135 (CSR) and Sec 204 r/w Rule 9 limbs. All stored in RUPEES --
+        // see db/001_add_financial_columns.sql. Absent until that migration runs.
+        networth:String(c.networth||''), netprofit:String(c.netprofit||''),
+        borrowings:String(c.borrowings||''),
         cin:c.cin||'', chart:statusMap[c.id]||{}, _activeTab:'chart'
       };
     });
@@ -4834,55 +4885,98 @@ function ccDaysUntil(dateStr){
 
 function ccComputeStats(){
   var stats = {
-    totalObligations:0, dueThisWeek:0, overdue:0, upcoming:0,
+    totalObligations:0, dueThisWeek:0, upcoming:0,
     entities: (typeof CLIENTS!=='undefined'?CLIENTS.length:0),
-    compliant:0, atRisk:0, breach:0, items:[]
+    // Evidence-based counters. "verified" is the ONLY one that claims compliance.
+    verified:0, filedLate:0, noEvidence:0, unverified:0, needsCheck:0, notApplicable:0,
+    awaitingCheck:0, rejected:0, missingDoc:0,
+    manualConfirmation:0, verificationPending:0, partiallyVerified:0,
+    dueNow:0, overdueConfirmed:0, notFound:0, unknown:0,
+    byState:{}, items:[],
+    // legacy aliases kept so older callers do not break
+    compliant:0, atRisk:0, breach:0, overdue:0
   };
   if(typeof CLIENTS==='undefined' || !CLIENTS.length) return stats;
   CLIENTS.forEach(function(c){
     var rows = [];
     try{ rows = getComplianceChart(c); }catch(e){ return; }
     rows.forEach(function(r){
-      if(r.applicable===false) return;
+      if(r.applicable===false){ stats.notApplicable++; return; }
       stats.totalObligations++;
-      var chart = c.chart||{};
-      var done = chart[r.key] && (chart[r.key].done || chart[r.key].status==='done');
-      var days = ccDaysUntil(r.due);
-      if(done){ stats.compliant++; return; }
-      if(days < 0){ stats.overdue++; stats.breach++; }
-      else if(days <= 7){ stats.dueThisWeek++; stats.atRisk++; }
-      else if(days <= 30){ stats.upcoming++; }
-      else { stats.compliant++; }
-      // collect for attention list (not done)
-      if(days <= 45){
+
+      // Single source of truth for status. Evidence decides; a date alone never does.
+      var st   = lgResolveStatus(r, c);
+      var days = st.days === null ? 9999 : st.days;
+      stats.byState[st.state] = (stats.byState[st.state]||0) + 1;
+
+      // §19 dashboard buckets
+      if(st.state==='FILED' || st.state==='PUBLISHED'){ stats.verified++; }
+      else if(st.state==='FILED_LATE'){ stats.verified++; stats.filedLate++; }
+      else if(st.state==='MANUAL_CONFIRMATION'){ stats.manualConfirmation++; }
+      else if(st.state==='FILED_PENDING'){ stats.verificationPending++; if(st.late) stats.filedLate++; if(!st.document) stats.missingDoc++; }
+      else if(st.state==='PARTIALLY_VERIFIED'){ stats.partiallyVerified++; }
+      else if(st.state==='AWAITING_CHECK'){ stats.awaitingCheck++; }
+      else if(st.state==='CHECK_REJECTED'){ stats.rejected++; }
+      else if(st.state==='UPCOMING'){ stats.upcoming++; }
+      else if(st.state==='DUE_SOON'){ stats.dueThisWeek++; }
+      else if(st.state==='DUE'){ stats.dueThisWeek++; stats.dueNow++; }
+      else if(st.state==='OVERDUE'){ stats.overdueConfirmed++; }
+      else if(st.state==='NOT_FOUND'){ stats.notFound++; }
+      else if(st.state==='VERIFICATION_UNAVAILABLE'){ stats.unverified++; }
+      else { stats.unknown++; }
+
+      // Attention list: anything past due or close to it, that we cannot vouch for.
+      var claimed = (lgStateMeta(st.state).asserts === 'compliant');
+      if(!claimed && days <= 45){
         stats.items.push({
-          company:c.name, obligation:r.obligation, form:r.form, section:r.section,
-          law:r.law, owner:r.owner, due:r.due, days:days, risk:r.risk, penalty:r.penalty
+          company:c.name, entityId:c.id, key:r.key,
+          obligation:r.obligation, form:r.form, section:r.section,
+          law:r.law, owner:r.owner, due:r.due, days:days, risk:r.risk,
+          penalty:r.penalty, state:st.state
         });
       }
     });
   });
-  // health score: weighted
+  // What the CS actually has to do something about today.
+  stats.needAction = stats.dueThisWeek + stats.notFound + stats.unverified +
+                     stats.overdueConfirmed + stats.unknown +
+                     stats.awaitingCheck + stats.rejected;
+
+  // Legacy aliases.
+  stats.compliant = stats.verified + stats.manualConfirmation + stats.verificationPending;
+  stats.atRisk    = stats.dueThisWeek;
+  stats.overdue   = stats.notFound + stats.unverified + stats.overdueConfirmed;
+  stats.noEvidence = stats.notFound;
+  stats.breach    = 0;   // the system cannot establish a breach without a source
+
+  // Coverage, not "health": what share of applicable obligations we can actually
+  // vouch for. Unverified items are neither credited nor counted against.
   var t = stats.totalObligations || 1;
-  var score = Math.round(100 * (stats.compliant + stats.upcoming*0.6) / t);
-  // penalise overdue heavily
-  score = Math.max(0, Math.min(100, score - stats.overdue*3));
-  stats.health = t>0 ? score : 100;
-  // percentages for the gauge
-  var done = stats.compliant, risk = stats.atRisk+stats.upcoming, breach = stats.breach;
-  var sum = done+risk+breach || 1;
-  stats.pctCompliant = done/sum; stats.pctRisk = risk/sum; stats.pctBreach = breach/sum;
+  stats.health = stats.totalObligations ? Math.round(100 * stats.verified / t) : 100;
+  stats.coverage = stats.health;
+
+  var verified   = stats.verified;
+  var pending    = stats.upcoming + stats.dueThisWeek;
+  var unverified = stats.noEvidence + stats.unverified + stats.needsCheck;
+  var sum = verified + pending + unverified || 1;
+  stats.pctCompliant = verified/sum;
+  stats.pctRisk      = pending/sum;
+  stats.pctBreach    = unverified/sum;
   // sort items: overdue first, then soonest
   stats.items.sort(function(a,b){ return a.days - b.days; });
   return stats;
 }
 
 function ccHealthLabel(score){
-  if(score>=90) return 'Strong Standing';
-  if(score>=75) return 'Good Standing';
-  if(score>=55) return 'Needs Attention';
-  if(score>=35) return 'At Risk';
-  return 'Critical';
+  // This is EVIDENCE COVERAGE — the share of obligations we can vouch for.
+  // It is deliberately not called compliance: the system cannot verify filings.
+  if(score>=90) return 'Well Evidenced';
+  if(score>=75) return 'Mostly Evidenced';
+  if(score>=55) return 'Partly Evidenced';
+  if(score>=35) return 'Thinly Evidenced';
+  if(score>0)   return 'Little Evidence';
+  // Zero coverage says nothing about the company — only that nothing is recorded yet.
+  return 'No Evidence Recorded';
 }
 function ccHealthColor(score){
   if(score>=75) return 'var(--ok)';
@@ -4896,7 +4990,7 @@ function ccRenderGauge(stats){
   var segs = [
     {frac:stats.pctCompliant, color:'#10B981'},
     {frac:stats.pctRisk, color:'#F59E0B'},
-    {frac:stats.pctBreach, color:'#EF4444'}
+    {frac:stats.pctBreach, color:'#CBD5E1'}
   ];
   var ticks='';
   for(var t=0;t<60;t++){
@@ -4941,7 +5035,7 @@ function renderCommandCenter(){
       '<div class="cc-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>'+
       '<h2>Welcome to your Command Center</h2>'+
       '<p>Add your client companies to see live compliance health, deadlines, and obligations across your whole portfolio.</p>'+
-      '<button class="cc-btn-primary" onclick="sw(\'cl\')">+ Add your first company</button>'+
+      '<button class="cc-btn-primary" onclick="entOpen()">+ Add your first company</button>'+
       '</div>';
     return;
   }
@@ -4957,7 +5051,9 @@ function renderCommandCenter(){
       ccSig(it.risk,it.days)+
       '<div class="cc-att-main">'+
         '<div class="cc-att-title">'+it.obligation+(it.form&&it.form!=='—'?' <span class="cc-att-code mono">'+it.form+'</span>':'')+'</div>'+
-        '<div class="cc-att-meta">'+it.company+' · '+it.section+' · Owner: '+it.owner+'</div>'+
+        '<div class="cc-att-meta">'+it.company+' · '+it.section+' · Owner: '+it.owner+
+          (it.entityId!==undefined?' · <a class="cc-link" style="cursor:pointer;" onclick="lgWhy('+
+            lgArg(it.entityId)+','+lgArg(it.key)+')">Why?</a>':'')+'</div>'+
       '</div>'+
       '<div class="cc-att-right"><div class="cc-att-due mono">'+ccFmtDate(it.due)+'</div>'+ccTag(it.days)+'</div>'+
     '</div>';
@@ -4966,32 +5062,40 @@ function renderCommandCenter(){
 
   root.innerHTML =
   '<div class="cc-pagehead">'+
-    '<div><div class="cc-crumb" style="color:#2563EB;font-weight:800">◆ DASHBOARD · Intelligence › Command Center</div>'+
+    '<div><div class="cc-crumb">Intelligence › Command Center</div>'+
     '<h1 class="cc-h1">Compliance Command Center</h1>'+
     '<p class="cc-sub">Know what applies · what\'s due · what changed · what to do — across all '+s.entities+' entities.</p></div>'+
-    '<div class="cc-headbtns"><button class="cc-btn" onclick="sw(\'cl\')">Manage entities</button>'+
+    '<div class="cc-headbtns"><button class="cc-btn" onclick="sw(\'entities\')">Manage entities</button>'+
     '<button class="cc-btn-primary" onclick="sw(\'chat\')">◈ Ask AI</button></div>'+
   '</div>'+
 
   '<div class="cc-topgrid">'+
     '<div class="cc-card cc-health">'+
       '<div class="cc-gauge">'+ccRenderGauge(s)+
-        '<div class="cc-gauge-center"><div class="cc-gauge-score" style="color:'+hColor+'">'+health+'</div><div class="cc-gauge-max mono">/ 100</div><div class="cc-gauge-label" style="color:'+hColor+'">'+hLabel+'</div></div>'+
+        '<div class="cc-gauge-center">'+
+          '<div class="cc-gauge-score" style="color:var(--navy);">'+s.needAction+'</div>'+
+          '<div class="cc-gauge-max">'+(s.needAction===1?'needs action':'need action')+'</div>'+
+          '<div class="cc-gauge-label" style="color:var(--ink-soft);">of '+s.totalObligations+' tracked</div>'+
+        '</div>'+
       '</div>'+
       '<div class="cc-legend">'+
-        '<div class="cc-hl"><i style="background:var(--ok)"></i>Compliant '+Math.round(s.pctCompliant*100)+'%</div>'+
-        '<div class="cc-hl"><i style="background:var(--warn)"></i>At risk '+Math.round(s.pctRisk*100)+'%</div>'+
-        '<div class="cc-hl"><i style="background:var(--crit)"></i>Breach '+Math.round(s.pctBreach*100)+'%</div>'+
+        '<div class="cc-hl"><i style="background:var(--ok)"></i>Filed '+s.verified+'</div>'+
+        '<div class="cc-hl"><i style="background:#93C5FD"></i>Scheduled '+s.upcoming+'</div>'+
+        '<div class="cc-hl"><i style="background:var(--warn)"></i>Due soon '+s.dueThisWeek+'</div>'+
+        '<div class="cc-hl"><i style="background:#CBD5E1"></i>To confirm '+(s.noEvidence+s.unverified+s.needsCheck)+'</div>'+
       '</div>'+
     '</div>'+
 
     '<div class="cc-metrics">'+
-      ccMetric('blue','Applicable obligations',s.totalObligations,'across '+s.entities+' entities','',"ccGo('','')")+
-      ccMetric('warn','Due this week',s.dueThisWeek,'next 7 days','warn',"ccGo('status','due-soon')")+
-      ccMetric('crit','Overdue',s.overdue,(s.overdue>0?'Immediate action':'All clear'),'crit',"ccGo('status','overdue')")+
-      ccMetric('cyan','Upcoming (30d)',s.upcoming,'plan ahead','',"ccGo('status','upcoming')")+
-      ccMetric('ok','In good standing',s.compliant,'filed / on track','ok',"ccGo('status','completed')")+
-      ccMetric('blue','Entities',s.entities,'companies managed','',"sw('cl')")+
+      ccMetric('blue','Total compliances',s.totalObligations,'across '+s.entities+' entities','',"ccGo('','')")+
+      ccMetric('ok','Filed / verified',s.verified,(s.verified>0?'confirmed by a source':'none source-confirmed'),'ok',"ccGo('vstatus','FILED')")+
+      ccMetric('warn','Verification pending',s.verificationPending,'reference recorded, unconfirmed','warn',"ccGo('vstatus','FILED_PENDING')")+
+      ccMetric('warn','Due',s.dueThisWeek,'due now or within 7 days','warn',"ccGo('vstatus','DUE_SOON')")+
+      ccMetric('crit','Overdue',s.overdueConfirmed,(s.overdueConfirmed>0?'source confirms no filing':'none confirmed'),'crit',"ccGo('vstatus','OVERDUE')")+
+      ccMetric('warn','Not found',s.notFound,'source queried, nothing returned','warn',"ccGo('vstatus','NOT_FOUND')")+
+      ccMetric('cyan','Verification unavailable',s.unverified,'no source could be queried','',"ccGo('vstatus','VERIFICATION_UNAVAILABLE')")+
+      ccMetric('ok','Manual confirmation',s.manualConfirmation,'attested by an authorised user','ok',"ccGo('vstatus','MANUAL_CONFIRMATION')")+
+      ccMetric('blue','Entities',s.entities,'companies managed','',"sw('entities')")+
     '</div>'+
   '</div>'+
 
@@ -5014,7 +5118,7 @@ function ccMetric(color,label,value,sub,vClass,action){
 // Jump into filtered Compliance Universe from a dashboard metric
 function ccGo(filterKey,filterVal){
   if(typeof CU_FILTERS!=='undefined'){
-    CU_FILTERS={entity:'',law:'',risk:'',status:'',freq:'',q:''};
+    CU_FILTERS={entity:'',law:'',risk:'',status:'',freq:'',q:'',vstatus:'', vmethod:'', listing:''};
     if(filterKey) CU_FILTERS[filterKey]=filterVal;
   }
   sw('universe');
@@ -5030,7 +5134,8 @@ function ccFmtDate(d){
 // ══════════════════════════════════════════════════════════
 // COMPLIANCE UNIVERSE — master table of all obligations
 // ══════════════════════════════════════════════════════════
-var CU_FILTERS = { entity:'', law:'', risk:'', status:'', freq:'', q:'' };
+// §19 filter set. vstatus / vmethod / listing are the verification-aware additions.
+var CU_FILTERS = { entity:'', law:'', risk:'', status:'', freq:'', q:'', vstatus:'', vmethod:'', listing:'' };
 var CU_SORT = { col:'due', dir:1 };
 
 function cuBuildRows(){
@@ -5040,15 +5145,25 @@ function cuBuildRows(){
     var rows=[]; try{ rows=getComplianceChart(c); }catch(e){ return; }
     rows.forEach(function(r){
       if(r.applicable===false) return;
-      var chart=c.chart||{};
-      var done = chart[r.key] && (chart[r.key].done || chart[r.key].status==='done');
-      var days = ccDaysUntil(r.due);
-      var status = done?'completed':(days<0?'overdue':(days<=7?'due-soon':(days<=30?'upcoming':'scheduled')));
+      // Single source of truth — the same resolver the dashboard uses, so the
+      // table can never disagree with the metric cards.
+      var st = lgResolveStatus(r, c);
+      var days = st.days === null ? 9999 : st.days;
+      var meta = lgStateMeta(st.state);
+      var done = meta.asserts === 'compliant';
+      // legacy coarse bucket, kept for the existing status filter
+      var status = done ? 'completed'
+                 : (days<0 ? 'overdue' : (days<=7 ? 'due-soon' : (days<=30 ? 'upcoming' : 'scheduled')));
       all.push({
         entityId:c.id, entity:c.name, entityType:c.type,
         key:r.key, obligation:r.obligation, law:r.law, section:r.section,
         form:r.form, owner:r.owner, due:r.due, days:days, risk:r.risk,
         penalty:r.penalty, status:status, done:done,
+        vstate:st.state, vlabel:meta.label, vtone:meta.tone,
+        sourceBacked:st.sourceBacked, confidence:st.confidence,
+        vmethod:(st.verification && st.verification.method) || 'None',
+        vsource:(st.verification && st.verification.source) || null,
+        listing:(c.type==='listed' ? 'listed' : 'unlisted'),
         freq: cuFreq(r.key)
       });
     });
@@ -5097,7 +5212,7 @@ function renderUniverse(){
   var all = cuBuildRows();
 
   if(!all.length){
-    root.innerHTML='<div class="cc-empty"><div class="cc-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg></div><h2>Your Compliance Universe</h2><p>Add client companies to populate the master register of every applicable obligation across your portfolio.</p><button class="cc-btn-primary" onclick="sw(\'cl\')">+ Add a company</button></div>';
+    root.innerHTML='<div class="cc-empty"><div class="cc-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg></div><h2>Your Compliance Universe</h2><p>Add client companies to populate the master register of every applicable obligation across your portfolio.</p><button class="cc-btn-primary" onclick="entOpen()">+ Add a company</button></div>';
     return;
   }
 
@@ -5113,6 +5228,9 @@ function renderUniverse(){
     if(f.risk && !(r.risk===f.risk || (f.risk==='high'&&(r.risk==='critical'||r.risk==='high')))) return false;
     if(f.status && r.status!==f.status) return false;
     if(f.freq && r.freq!==f.freq) return false;
+    if(f.vstatus && r.vstate!==f.vstatus) return false;
+    if(f.vmethod && r.vmethod!==f.vmethod) return false;
+    if(f.listing && r.listing!==f.listing) return false;
     if(f.q){
       var q=f.q.toLowerCase();
       if((r.obligation+r.law+r.section+r.form+r.entity+r.owner).toLowerCase().indexOf(q)<0) return false;
@@ -5138,7 +5256,7 @@ function renderUniverse(){
   var head=
     '<div class="cc-pagehead">'+
       '<div><div class="cc-crumb">Intelligence › Compliance Universe</div>'+
-      '<h1 class="cc-h1">▦ TABLE · Compliance Universe</h1>'+
+      '<h1 class="cc-h1">Compliance Universe</h1>'+
       '<p class="cc-sub">Master register of <b>'+all.length+'</b> applicable obligations across <b>'+Object.keys(entities).length+'</b> entities.</p></div>'+
       '<div class="cc-headbtns"><button class="cc-btn" onclick="cuExport()">↓ Export CSV</button></div>'+
     '</div>'+
@@ -5157,6 +5275,20 @@ function renderUniverse(){
       '<select onchange="cuSetFilter(\'risk\',this.value)"><option value="">Any risk</option><option value="high"'+(f.risk==='high'?' selected':'')+'>High/Critical</option><option value="medium"'+(f.risk==='medium'?' selected':'')+'>Medium</option><option value="low"'+(f.risk==='low'?' selected':'')+'>Low</option></select>'+
       '<select onchange="cuSetFilter(\'status\',this.value)"><option value="">Any status</option>'+
         ['overdue','due-soon','upcoming','scheduled','completed'].map(function(s){var lbl={'overdue':'Overdue','due-soon':'Due soon','upcoming':'Upcoming','scheduled':'Scheduled','completed':'Completed'}[s];return '<option value="'+s+'"'+(f.status===s?' selected':'')+'>'+lbl+'</option>';}).join('')+'</select>'+
+      '<select onchange="cuSetFilter(\'vstatus\',this.value)"><optgroup label="Verification status">'+
+        '<option value="">Any verification status</option>'+
+        Object.keys(LG_STATE).map(function(k){
+          return '<option value="'+k+'"'+(f.vstatus===k?' selected':'')+'>'+LG_STATE[k].label+'</option>';
+        }).join('')+'</optgroup></select>'+
+      '<select onchange="cuSetFilter(\'vmethod\',this.value)"><optgroup label="Verification method">'+
+        '<option value="">Any method</option>'+
+        ['None','Client-supplied reference','Manual confirmation by authorised user','Authoritative source']
+          .map(function(m){ return '<option value="'+m+'"'+(f.vmethod===m?' selected':'')+'>'+m+'</option>'; }).join('')+
+        '</optgroup></select>'+
+      '<select onchange="cuSetFilter(\'listing\',this.value)">'+
+        '<option value="">Listed &amp; unlisted</option>'+
+        '<option value="listed"'+(f.listing==='listed'?' selected':'')+'>Listed only</option>'+
+        '<option value="unlisted"'+(f.listing==='unlisted'?' selected':'')+'>Unlisted only</option></select>'+
       '<select onchange="cuSetFilter(\'freq\',this.value)"><option value="">Any frequency</option><option value="Annual"'+(f.freq==='Annual'?' selected':'')+'>Annual</option><option value="Quarterly"'+(f.freq==='Quarterly'?' selected':'')+'>Quarterly</option><option value="Event-based"'+(f.freq==='Event-based'?' selected':'')+'>Event-based</option></select>'+
       (f.entity||f.law||f.risk||f.status||f.freq||f.q?'<button class="cu-clear" onclick="cuClear()">✕ Clear</button>':'')+
     '</div>';
@@ -5199,7 +5331,7 @@ function cuSetFilter(k,v){ CU_FILTERS[k]=v; if(k==='q'){ // keep focus
   } else renderUniverse();
 }
 function cuQuick(k,v){ CU_FILTERS[k]=v; renderUniverse(); }
-function cuClear(){ CU_FILTERS={entity:'',law:'',risk:'',status:'',freq:'',q:''}; renderUniverse(); }
+function cuClear(){ CU_FILTERS={entity:'',law:'',risk:'',status:'',freq:'',q:'',vstatus:'', vmethod:'', listing:''}; renderUniverse(); }
 function cuSort(col){ if(CU_SORT.col===col) CU_SORT.dir*=-1; else {CU_SORT.col=col;CU_SORT.dir=1;} renderUniverse(); }
 
 function cuOpenDetail(entityId,key){
@@ -5274,7 +5406,7 @@ function renderMyWork(){
   var all = mwGetTasks();
 
   if(!all.length){
-    root.innerHTML = '<div class="cc-empty"><div class="cc-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3 8-8M20 12v7H4V5h11"/></svg></div><h2>My Work</h2><p>Your personal compliance task list appears here once companies and obligations exist.</p><button class="cc-btn-primary" onclick="sw(\'cl\')">+ Add a company</button></div>';
+    root.innerHTML = '<div class="cc-empty"><div class="cc-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3 8-8M20 12v7H4V5h11"/></svg></div><h2>My Work</h2><p>Your personal compliance task list appears here once companies and obligations exist.</p><button class="cc-btn-primary" onclick="entOpen()">+ Add a company</button></div>';
     return;
   }
 
@@ -5294,7 +5426,7 @@ function renderMyWork(){
 
   var head =
     '<div class="cc-pagehead">'+
-      '<div><div class="cc-crumb" style="color:#F59E0B;font-weight:800">✓ TASKS · Operate › My Work</div>'+
+      '<div><div class="cc-crumb">Operate › My Work</div>'+
       '<h1 class="cc-h1">My Work</h1>'+
       '<p class="cc-sub">Your personal compliance queue — <b>'+(buckets.overdue.length+buckets.today.length)+'</b> items need action now.</p></div>'+
     '</div>';
@@ -5341,6 +5473,2576 @@ function renderMyWork(){
 }
 
 function mwSetTab(id){ MW_TAB=id; renderMyWork(); }
+
+// ═══════════════════════════════════════════════════
+// ENTITIES — company master data (the source every module reads)
+// Money is entered in CRORE and stored in RUPEES; see db/001_add_financial_columns.sql
+// ═══════════════════════════════════════════════════
+var ENT_CR = 10000000;                 // ₹1 crore in rupees
+var ENT_EDITING = null;                // company id being edited, null = new
+
+function entToCrore(rupees){           // stored rupees -> crore, for the form
+  var n = parseFloat(rupees);
+  return (!n || isNaN(n)) ? '' : String(n / ENT_CR);
+}
+function entToRupees(crore){           // form crore -> rupees, for storage
+  var n = parseFloat(crore);
+  return isNaN(n) ? null : Math.round(n * ENT_CR);
+}
+function entFmt(rupees){               // stored rupees -> display
+  var n = parseFloat(rupees);
+  if(!n || isNaN(n)) return '—';
+  return '₹' + (n / ENT_CR).toLocaleString('en-IN',{maximumFractionDigits:2}) + ' cr';
+}
+// Quote a value for use INSIDE a double-quoted HTML onclick attribute.
+// JSON.stringify() emits double quotes, which terminate the attribute and
+// silently strip every argument -- that broke every action button.
+// Ids here are UUIDs and obligation keys, so restricting to a safe character
+// set is both sufficient and impossible to break out of.
+function lgArg(v){
+  return "'" + String(v == null ? '' : v).replace(/[^A-Za-z0-9_.:-]/g, '') + "'";
+}
+function entEsc(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+var ENT_TYPES = [
+  ['private','Private Limited'],['public','Public (Unlisted)'],['listed','Listed (BSE/NSE)'],
+  ['opc','One Person Company'],['sec8','Section 8'],['llp','LLP']
+];
+function entTypeLabel(t){
+  for(var i=0;i<ENT_TYPES.length;i++) if(ENT_TYPES[i][0]===t) return ENT_TYPES[i][1];
+  return t || '—';
+}
+
+
+// ═══════════════════════════════════════════════════
+// CIN — derive what the identifier already encodes.
+// 21 chars: [L/U][5 industry][2 state][4 year][3 ownership][6 reg no]
+// Free, offline, instant. Financial figures are NOT in the CIN — see cinLookup().
+// ═══════════════════════════════════════════════════
+var CIN_STATES = {
+  AP:'Andhra Pradesh', AR:'Arunachal Pradesh', AS:'Assam', BR:'Bihar', CH:'Chandigarh',
+  CT:'Chhattisgarh', DL:'Delhi', GA:'Goa', GJ:'Gujarat', HR:'Haryana', HP:'Himachal Pradesh',
+  JH:'Jharkhand', JK:'Jammu & Kashmir', KA:'Karnataka', KL:'Kerala', MH:'Maharashtra',
+  ML:'Meghalaya', MN:'Manipur', MP:'Madhya Pradesh', MZ:'Mizoram', NL:'Nagaland',
+  OR:'Odisha', PB:'Punjab', PY:'Puducherry', RJ:'Rajasthan', SK:'Sikkim', TG:'Telangana',
+  TN:'Tamil Nadu', TR:'Tripura', UP:'Uttar Pradesh', UT:'Uttarakhand', UK:'Uttarakhand',
+  WB:'West Bengal', AN:'Andaman & Nicobar', DN:'Dadra & Nagar Haveli', DD:'Daman & Diu', LD:'Lakshadweep'
+};
+// Ownership code -> [human label, this app's `type` value]
+var CIN_OWNERSHIP = {
+  PTC:['Private Limited Company','private'],
+  PLC:['Public Limited Company','public'],
+  OPC:['One Person Company','opc'],
+  NPL:['Not-for-Profit (Section 8)','sec8'],
+  FTC:['Subsidiary of a Foreign Company (private)','private'],
+  FLC:['Subsidiary of a Foreign Company (public)','public'],
+  GOI:['Government of India company','public'],
+  SGC:['State Government company','public'],
+  GAP:['Government / public sector','public'],
+  ULT:['Unlimited liability, public',''],
+  ULL:['Unlimited liability, private','']
+};
+
+function cinParse(raw){
+  var s = String(raw||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(!s) return {empty:true};
+  // LLPs use an LLPIN (AAA-1234), not a CIN.
+  if(/^[A-Z]{3}[0-9]{4}$/.test(s)) return {llpin:true, note:'That is an LLPIN, not a CIN. Set the type to LLP manually.'};
+  if(s.length !== 21) return {valid:false, reason:'A CIN is 21 characters — this has ' + s.length + '.'};
+
+  var m = s.match(/^([LU])(\d{5})([A-Z]{2})(\d{4})([A-Z]{3})(\d{6})$/);
+  if(!m) return {valid:false, reason:'Does not match the CIN pattern [L/U][5 digits][2 letters][4 digits][3 letters][6 digits].'};
+
+  var own  = CIN_OWNERSHIP[m[5]];
+  var year = parseInt(m[4],10);
+  var nowY = new Date().getFullYear();
+  if(year < 1850 || year > nowY) return {valid:false, reason:'Year of incorporation ' + year + ' is not plausible.'};
+
+  return {
+    valid:true, cin:s,
+    listed:      m[1]==='L',
+    industryCode:m[2],
+    stateCode:   m[3],
+    state:       CIN_STATES[m[3]] || m[3],
+    year:        year,
+    ownership:   m[5],
+    ownershipLabel: own ? own[0] : m[5],
+    appType:     m[1]==='L' ? 'listed' : (own ? own[1] : ''),
+    regNo:       m[6]
+  };
+}
+
+// Called on every keystroke in the CIN field.
+
+// ═══════════════════════════════════════════════════════════════
+// FETCH FROM CIN — MCA company master data via data.gov.in.
+// Free, but api.data.gov.in sends no CORS headers, so the call goes
+// through the mca-lookup Edge Function (functions/mca-lookup/index.ts).
+// Fills name, status, registered office and PAID-UP CAPITAL.
+// Turnover, net worth and net profit are NOT in this dataset.
+// ═══════════════════════════════════════════════════════════════
+async function entFetchFromCin(){
+  var cinEl = document.getElementById('ent-cin');
+  var out   = document.getElementById('ent-cin-info');
+  var btn   = document.getElementById('ent-fetch-btn');
+  if(!cinEl) return;
+
+  var parsed = cinParse(cinEl.value);
+  if(!parsed.valid){
+    if(out){ out.style.display='block';
+      out.innerHTML = '<span style="color:#F59E0B;">Enter a valid 21-character CIN first.</span>'; }
+    return;
+  }
+  if(!supaClient || !CURRENT_USER){
+    if(out){ out.style.display='block';
+      out.innerHTML = '<span style="color:#F59E0B;">Sign in first — the lookup runs server-side.</span>'; }
+    return;
+  }
+
+  if(btn){ btn.disabled = true; btn.textContent = 'Fetching…'; }
+  try{
+    var sess = await supaClient.auth.getSession();
+    var token = sess && sess.data && sess.data.session && sess.data.session.access_token;
+    var r = await fetch(SUPA_URL + '/functions/v1/mca-lookup', {
+      method:'POST',
+      headers:{'Content-Type':'application/json', 'Authorization':'Bearer '+token},
+      body: JSON.stringify({cin: parsed.cin})
+    });
+
+    if(r.status === 404 && !r.headers.get('content-type')){
+      throw new Error('not-deployed');
+    }
+    var data = await r.json().catch(function(){ return null; });
+    if(!data) throw new Error('not-deployed');
+
+    if(data.error && /not configured/i.test(data.error)){
+      throw new Error('not-configured');
+    }
+    if(data.error === 'rate_limited' || r.status === 429){
+      throw new Error('rate-limited');
+    }
+    if(!data.found){
+      if(out){ out.style.display='block';
+        out.innerHTML = '<span style="color:#F59E0B;">⚠ This CIN was not found in the MCA master dataset. '+
+          'Enter the details manually.</span>'; }
+      return;
+    }
+
+    // Fill only what came back, and never overwrite something already typed.
+    var setIf = function(id, val){
+      var el = document.getElementById(id);
+      if(el && val && !String(el.value||'').trim()) el.value = val;
+    };
+    setIf('ent-name', data.name);
+    if(data.paidUpCapital) setIf('ent-capital', entToCrore(data.paidUpCapital));
+
+    var bits = [];
+    if(data.name)          bits.push('<b>'+entEsc(data.name)+'</b>');
+    if(data.status)        bits.push('status: '+entEsc(data.status));
+    if(data.registeredOn)  bits.push('registered '+entEsc(data.registeredOn));
+    if(data.paidUpCapital) bits.push('paid-up '+entEsc(entFmt(data.paidUpCapital)));
+    if(out){
+      out.style.display='block';
+      out.innerHTML = '<span style="color:#10B981;">✓ Fetched from MCA master data</span> · ' + bits.join(' · ') +
+        (data.address ? '<div style="margin-top:4px;opacity:.85;">'+entEsc(data.address)+'</div>' : '') +
+        '<div style="margin-top:4px;opacity:.8;">Turnover, net worth and net profit are not published in this '+
+        'dataset — enter those from the financials.</div>';
+    }
+  }catch(e){
+    var why = String(e && e.message || e);
+    var msg;
+    if(why === 'not-deployed'){
+      msg = 'The lookup service is not deployed yet. Deploy <b>functions/mca-lookup</b> ' +
+            'and set OGD_API_KEY (free from data.gov.in).';
+    } else if(why === 'not-configured'){
+      msg = 'The lookup is deployed but has no API key. Run: '+
+            '<span class="mono">supabase secrets set OGD_API_KEY=…</span>';
+    } else if(why === 'rate-limited'){
+      msg = 'data.gov.in refused the request (rate limited). If you used the sample key '+
+            'from their documentation, register for your own free key — the sample one is '+
+            'shared by everyone and is throttled.';
+    } else {
+      msg = 'Lookup failed: ' + entEsc(why);
+    }
+    if(out){ out.style.display='block'; out.innerHTML = '<span style="color:#F59E0B;">⚠ '+msg+'</span>'; }
+  }finally{
+    if(btn){ btn.disabled = false; btn.textContent = 'Fetch details'; }
+  }
+}
+
+function entCinChanged(){
+  var el  = document.getElementById('ent-cin');
+  var out = document.getElementById('ent-cin-info');
+  if(!el || !out) return;
+  var r = cinParse(el.value);
+
+  if(r.empty){ out.style.display='none'; return; }
+  out.style.display = 'block';
+
+  if(r.llpin){
+    out.innerHTML = '<span style="color:#F59E0B;">⚠ ' + r.note + '</span>';
+    return;
+  }
+  if(!r.valid){
+    out.innerHTML = '<span style="color:#F59E0B;">⚠ ' + r.reason + '</span>';
+    return;
+  }
+
+  // Auto-set the type — the CIN is authoritative for this.
+  var sel = document.getElementById('ent-type');
+  var applied = '';
+  if(sel && r.appType){
+    for(var i=0;i<sel.options.length;i++){
+      if(sel.options[i].value === r.appType){ sel.selectedIndex = i; applied = ' · type set automatically'; break; }
+    }
+  }
+  out.innerHTML =
+    '<span style="color:#10B981;">✓ Valid CIN</span> · <b>' + entEsc(r.ownershipLabel) + '</b>' +
+    (r.listed ? ' · <b style="color:#2563EB;">Listed</b>' : ' · Unlisted') +
+    ' · incorporated <b>' + r.year + '</b> in <b>' + entEsc(r.state) + '</b>' + applied +
+    '<div style="margin-top:4px;opacity:.8;">Capital, turnover, net worth and net profit are not encoded in a CIN — ' +
+    'they come from filed financials. Enter them below.</div>';
+}
+
+
+// ═══════════════════════════════════════════════════
+// BULK IMPORT — paste straight from Excel / Google Sheets.
+// Money columns are read as CRORE and stored as RUPEES, same as the single form.
+// ═══════════════════════════════════════════════════
+var BULK_ROWS = null;   // parsed preview, awaiting confirmation
+
+// Header alias -> internal field. Matching is case/space/punctuation-insensitive.
+var BULK_FIELDS = {
+  name:      ['name','company','companyname','entity','entityname'],
+  cin:       ['cin','cinno','cinnumber','corporateidentificationnumber'],
+  type:      ['type','companytype','class','entitytype'],
+  fyend:     ['fyend','fyeend','financialyearend','yearend','fy'],
+  capital:   ['capital','paidupcapital','paidup','paidupsharecapital'],
+  turnover:  ['turnover','annualturnover','revenue','sales'],
+  networth:  ['networth','net worth'],
+  netprofit: ['netprofit','profit','pat','profitaftertax','netprofitprecedingfy'],
+  borrowings:['borrowings','loans','borrowing','outstandingloans','bankborrowings']
+};
+function bulkNorm(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,''); }
+function bulkMatchHeader(h){
+  var n = bulkNorm(h);
+  for(var f in BULK_FIELDS){
+    for(var i=0;i<BULK_FIELDS[f].length;i++){
+      if(bulkNorm(BULK_FIELDS[f][i]) === n) return f;
+    }
+  }
+  return null;
+}
+
+// Split a line on tabs (Excel paste) or commas, honouring simple quoted CSV fields.
+function bulkSplit(line){
+  if(line.indexOf('\t') >= 0) return line.split('\t');
+  var out=[], cur='', q=false;
+  for(var i=0;i<line.length;i++){
+    var ch=line[i];
+    if(ch === '"'){ if(q && line[i+1]==='"'){ cur+='"'; i++; } else q=!q; }
+    else if(ch === ',' && !q){ out.push(cur); cur=''; }
+    else cur+=ch;
+  }
+  out.push(cur);
+  return out;
+}
+
+function bulkParse(text){
+  var lines = String(text||'').split(/\r?\n/).filter(function(l){ return l.trim()!==''; });
+  if(lines.length < 2) return {error:'Need a header row plus at least one data row.'};
+
+  var raw = bulkSplit(lines[0]).map(function(h){ return h.trim(); });
+  var map = raw.map(bulkMatchHeader);
+  if(map.indexOf('name') < 0 && map.indexOf('cin') < 0)
+    return {error:'Could not find a "Name" or "CIN" column. Header row read as: ' + raw.join(' | ')};
+
+  var rows=[], problems=[];
+  for(var i=1;i<lines.length;i++){
+    var cells = bulkSplit(lines[i]);
+    var rec = {}, issues = [];
+    for(var j=0;j<map.length;j++){
+      if(!map[j]) continue;
+      var v = (cells[j]||'').trim();
+      if(v==='') continue;
+      rec[map[j]] = v;
+    }
+    if(!rec.name && !rec.cin){ continue; }
+
+    // CIN fills in type / listed status, and flags a malformed identifier.
+    if(rec.cin){
+      var p = cinParse(rec.cin);
+      if(p.valid){ rec.cin = p.cin; if(!rec.type) rec.type = p.appType; }
+      else if(!p.empty && !p.llpin) issues.push('CIN: ' + p.reason);
+    }
+    if(rec.type){
+      var t = bulkNorm(rec.type), known='';
+      for(var k=0;k<ENT_TYPES.length;k++){
+        if(bulkNorm(ENT_TYPES[k][0])===t || ENT_TYPES[k][0]===t){ known=ENT_TYPES[k][0]; break; }
+      }
+      if(known) rec.type = known;
+      else { issues.push('Unrecognised type "'+rec.type+'" — defaulting to Private Limited'); rec.type='private'; }
+    } else rec.type = 'private';
+
+    ['capital','turnover','networth','netprofit','borrowings'].forEach(function(f){
+      if(rec[f]===undefined) return;
+      var cleaned = String(rec[f]).replace(/[₹,\s]/g,'').replace(/cr(ore)?s?$/i,'');
+      var n = parseFloat(cleaned);
+      if(isNaN(n)){ issues.push(f+': "'+rec[f]+'" is not a number'); delete rec[f]; }
+      else rec[f] = n;   // still in crore at this stage
+    });
+
+    rec._issues = issues;
+    rec._line = i+1;
+    rows.push(rec);
+  }
+  if(!rows.length) return {error:'No usable data rows found.'};
+  return {rows:rows, headers:raw, map:map};
+}
+
+function bulkOpen(){
+  var m = document.createElement('div');
+  m.id='bulk-modal';
+  m.style.cssText='position:fixed;inset:0;background:rgba(11,18,32,.75);z-index:9998;display:flex;'+
+    'align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto;';
+  m.onclick=function(e){ if(e.target===m) bulkClose(); };
+  m.innerHTML =
+    '<div style="background:var(--ink2);border:1px solid var(--ink4);border-radius:14px;padding:24px;'+
+      'width:100%;max-width:760px;margin:auto;box-shadow:0 20px 60px rgba(0,0,0,.4);">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">'+
+        '<div style="font-size:17px;font-weight:700;">Import from spreadsheet</div>'+
+        '<button onclick="bulkClose()" style="background:none;border:none;color:var(--slate);cursor:pointer;font-size:24px;line-height:1;">&times;</button></div>'+
+      '<div style="font-size:12px;color:var(--ink-soft);margin-bottom:14px;line-height:1.6;">'+
+        'Copy the rows straight out of Excel or Google Sheets and paste below — include the header row. '+
+        'Money columns are read as <b>₹ crore</b>. Type and listed status are filled in from the CIN where present.</div>'+
+      '<div style="font-size:11px;color:var(--ink-soft);margin-bottom:6px;font-weight:600;">Recognised columns</div>'+
+      '<div class="mono" style="font-size:11px;color:var(--ink-soft);background:var(--ink3);border:1px solid var(--ink4);'+
+        'border-radius:7px;padding:9px 11px;margin-bottom:14px;overflow-x:auto;white-space:nowrap;">'+
+        'Name · CIN · Type · FY End · Capital · Turnover · Net Worth · Net Profit · Borrowings</div>'+
+      '<textarea id="bulk-text" placeholder="Name&#9;CIN&#9;Turnover&#9;Net Profit&#10;Acme Industries Pvt Ltd&#9;U74999MH2015PTC123456&#9;90&#9;6" '+
+        'style="width:100%;height:150px;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);'+
+        'border-radius:8px;padding:11px;font-size:12px;font-family:\'IBM Plex Mono\',monospace;outline:none;'+
+        'box-sizing:border-box;resize:vertical;"></textarea>'+
+      '<div id="bulk-preview" style="margin-top:14px;"></div>'+
+      '<div style="display:flex;gap:8px;margin-top:16px;">'+
+        '<button class="cc-btn-primary" style="flex:1;" onclick="bulkCheck()">Preview import</button>'+
+        '<button class="cc-btn" onclick="bulkClose()">Cancel</button></div>'+
+    '</div>';
+  document.body.appendChild(m);
+  var t=document.getElementById('bulk-text'); if(t) t.focus();
+}
+function bulkClose(){ var m=document.getElementById('bulk-modal'); if(m) m.remove(); BULK_ROWS=null; }
+
+function bulkCheck(){
+  var box = document.getElementById('bulk-preview');
+  var res = bulkParse(document.getElementById('bulk-text').value);
+  if(res.error){
+    box.innerHTML = '<div style="color:#EF4444;font-size:12px;">'+entEsc(res.error)+'</div>';
+    BULK_ROWS = null; return;
+  }
+  BULK_ROWS = res.rows;
+
+  var existing = {};
+  if(typeof CLIENTS!=='undefined') CLIENTS.forEach(function(c){
+    if(c.cin) existing[String(c.cin).toUpperCase()] = c;
+    existing['name:'+bulkNorm(c.name)] = c;
+  });
+
+  var nNew=0, nUpd=0, nIssue=0;
+  var rows = res.rows.map(function(r){
+    var match = (r.cin && existing[r.cin.toUpperCase()]) || existing['name:'+bulkNorm(r.name)];
+    r._match = match ? match.id : null;
+    if(match) nUpd++; else nNew++;
+    if(r._issues.length) nIssue++;
+    var money=function(v){ return v===undefined ? '<span style="opacity:.4;">—</span>' : '₹'+v+' cr'; };
+    return '<tr>'+
+      '<td>'+(match?'<span style="color:#F59E0B;">update</span>':'<span style="color:#10B981;">new</span>')+'</td>'+
+      '<td>'+entEsc(r.name||'<from CIN>')+
+        (r._issues.length?'<div style="font-size:10px;color:#F59E0B;">⚠ '+entEsc(r._issues.join('; '))+'</div>':'')+'</td>'+
+      '<td class="mono" style="font-size:11px;">'+entEsc(r.cin||'—')+'</td>'+
+      '<td>'+entTypeLabel(r.type)+'</td>'+
+      '<td class="mono">'+money(r.capital)+'</td>'+
+      '<td class="mono">'+money(r.turnover)+'</td>'+
+      '<td class="mono">'+money(r.netprofit)+'</td></tr>';
+  }).join('');
+
+  box.innerHTML =
+    '<div style="font-size:12px;margin-bottom:8px;">'+
+      '<b>'+nNew+'</b> new · <b>'+nUpd+'</b> to update'+
+      (nIssue?' · <span style="color:#F59E0B;"><b>'+nIssue+'</b> with warnings</span>':'')+'</div>'+
+    '<div class="cu-tablewrap" style="max-height:260px;overflow-y:auto;"><table class="cu-table">'+
+    '<thead><tr><th></th><th>Name</th><th>CIN</th><th>Type</th><th>Capital</th><th>Turnover</th><th>Net profit</th></tr></thead>'+
+    '<tbody>'+rows+'</tbody></table></div>'+
+    '<div id="bulk-err" style="display:none;font-size:12px;color:#EF4444;margin-top:8px;"></div>'+
+    '<button class="cc-btn-primary" style="width:100%;margin-top:12px;" onclick="bulkCommit()">'+
+      'Import '+res.rows.length+' '+(res.rows.length===1?'entity':'entities')+'</button>';
+}
+
+async function bulkCommit(){
+  if(!BULK_ROWS || !BULK_ROWS.length) return;
+  if(!supaClient || !CURRENT_USER){
+    var e=document.getElementById('bulk-err');
+    if(e){ e.textContent='Not signed in — cannot save.'; e.style.display='block'; }
+    return;
+  }
+  var toRs = function(v){ return v===undefined ? null : Math.round(v*ENT_CR); };
+  var inserts=[], updates=[], failed=[];
+
+  BULK_ROWS.forEach(function(r){
+    var p = {
+      name:r.name||r.cin, cin:r.cin||null, type:r.type, fyend:r.fyend||null,
+      capital:toRs(r.capital), turnover:toRs(r.turnover), networth:toRs(r.networth),
+      netprofit:toRs(r.netprofit), borrowings:toRs(r.borrowings)
+    };
+    // Never overwrite a stored value with null just because the sheet omitted the column.
+    Object.keys(p).forEach(function(k){ if(p[k]===null && k!=='cin' && k!=='fyend') delete p[k]; });
+    if(r._match) updates.push({id:r._match, payload:p});
+    else { p.user_id = CURRENT_USER.id; inserts.push(p); }
+  });
+
+  try{
+    if(inserts.length){
+      var ins = await supaClient.from('companies').insert(inserts).select();
+      if(ins.error) throw ins.error;
+    }
+    for(var i=0;i<updates.length;i++){
+      var up = await supaClient.from('companies').update(updates[i].payload).eq('id',updates[i].id).select();
+      if(up.error){ failed.push(updates[i].payload.name+': '+up.error.message); }
+    }
+    bulkClose();
+    await loadCloudClients();
+    renderEntities();
+    if(typeof renderCommandCenter==='function') renderCommandCenter();
+    if(failed.length) alert('Imported, but '+failed.length+' row(s) failed:\n\n'+failed.join('\n'));
+  }catch(err){
+    var msg = (err && err.message) ? err.message : String(err);
+    if(/column .* does not exist|schema cache/i.test(msg))
+      msg += '  →  Run db/001_add_financial_columns.sql in the Supabase SQL editor first.';
+    var eb=document.getElementById('bulk-err');
+    if(eb){ eb.textContent='Import failed: '+msg; eb.style.display='block'; }
+  }
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// EVIDENCE ENGINE
+// No status without a basis. The system may only assert compliance
+// or breach when it holds evidence; otherwise it reports what it
+// actually knows, which is usually "nothing was checked".
+// ═══════════════════════════════════════════════════════════════
+
+// Which primary sources are wired up. Nothing is connected yet — MCA filing
+// documents are paid, and NSE/BSE publish no official API. Kept as data so the
+// UI degrades honestly instead of pretending a check happened.
+// ── Evidence policy ──────────────────────────────────────────────
+// requireSecondCheck: when true, a filing recorded by one person must be
+// confirmed by a DIFFERENT person before it counts as verified (maker-checker).
+// Off while there is a single user, otherwise you cannot confirm your own work
+// and every entry sits queued forever. Turn it on once staff have logins.
+var LG_POLICY = {
+  requireSecondCheck: false,
+  // The attached challan / acknowledgement is what raises a filing to full
+  // confidence. Without it a filing is still recorded, just not fully evidenced.
+  documentIsTheControl: true
+};
+function lgPolicySecondCheck(){
+  try{ var v = localStorage.getItem('lg_require_check'); if(v!==null) return v === '1'; }catch(e){}
+  return LG_POLICY.requireSecondCheck;
+}
+
+var LG_SOURCES = [
+  {id:'mca',  name:'MCA',  scope:'Filing reference (AOC-4, MGT-7, DPT-3…)', connected:false,
+   why:'MCA publishes filing documents through paid "View Public Documents" only.'},
+  {id:'nse',  name:'NSE',  scope:'Corporate filings & announcements', connected:false,
+   why:'No official public API. Only unofficial scrapers exist.'},
+  {id:'bse',  name:'BSE',  scope:'Corporate filings & announcements', connected:false,
+   why:'No official public API. Only unofficial scrapers exist.'},
+  {id:'sebi', name:'SEBI', scope:'Regulations & circulars (text)', connected:false,
+   why:'Regulation text is held locally; filing reference is not published.'}
+];
+function lgConnectedSources(){ return LG_SOURCES.filter(function(s){ return s.connected; }); }
+
+// The eight states. `asserts` records what a state CLAIMS about the company —
+// only 'compliant' or 'breach' are claims; the rest are honest uncertainty.
+// §4 STATUS VOCABULARY
+//   asserts       — what the state CLAIMS: 'compliant' | 'none'. Only a state
+//                   backed by a filing record may claim compliance.
+//   sourceBacked  — true only when an authoritative source confirmed it. Nothing
+//                   is source-backed today because no connector is live.
+// Two rules the code must never break (§4):
+//   "Not Found" is never rewritten as "Not Filed".
+//   "Verification Unavailable" is never rewritten as "Pending".
+var LG_STATE = {
+  NOT_APPLICABLE:    {label:'Not Applicable',              tone:'neutral', asserts:'none',      sourceBacked:false},
+
+  // Confirmed by an authoritative source. Unreachable until a connector is live.
+  FILED:             {label:'Filed',                       tone:'ok',      asserts:'compliant', sourceBacked:true},
+  PUBLISHED:         {label:'Published',                   tone:'ok',      asserts:'compliant', sourceBacked:true},
+  FILED_LATE:        {label:'Filed (late)',                tone:'warn',    asserts:'compliant', sourceBacked:true},
+
+  // A reference was supplied but no source has confirmed it.
+  FILED_PENDING:     {label:'Filed — Verification Pending',tone:'warn',    asserts:'compliant', sourceBacked:false},
+  PARTIALLY_VERIFIED:{label:'Partially Verified',          tone:'warn',    asserts:'none',      sourceBacked:false},
+  MANUAL_CONFIRMATION:{label:'Manual Confirmation',        tone:'ok',      asserts:'compliant', sourceBacked:false},
+
+  // Not yet due.
+  UPCOMING:          {label:'Upcoming',                    tone:'info',    asserts:'none',      sourceBacked:false},
+  DUE_SOON:          {label:'Due Soon',                    tone:'warn',    asserts:'none',      sourceBacked:false},
+  DUE:               {label:'Due',                         tone:'warn',    asserts:'none',      sourceBacked:false},
+
+  // Past due. OVERDUE requires that a source was actually queried and found
+  // nothing; without a connector we can only ever say Verification Unavailable.
+  OVERDUE:           {label:'Overdue',                     tone:'crit',    asserts:'none',      sourceBacked:true},
+  NOT_FOUND:         {label:'Not Found',                   tone:'warn',    asserts:'none',      sourceBacked:true},
+  VERIFICATION_UNAVAILABLE:{label:'Verification Unavailable',tone:'neutral',asserts:'none',     sourceBacked:false},
+  UNKNOWN:           {label:'Unknown',                     tone:'neutral', asserts:'none',      sourceBacked:false},
+
+  // Maker-checker, when the policy is switched on.
+  AWAITING_CHECK:    {label:'Awaiting Check',              tone:'warn',    asserts:'none',      sourceBacked:false},
+  CHECK_REJECTED:    {label:'Check Rejected',              tone:'crit',    asserts:'none',      sourceBacked:false}
+};
+
+// §4: plain-language explanation of each state, shown in the UI so a status is
+// never a bare word the reader has to interpret.
+var LG_STATE_NOTE = {
+  NOT_FOUND: 'A source was queried and did not return this filing. That is not the same as the filing not existing.',
+  VERIFICATION_UNAVAILABLE: 'No authoritative source could be queried, so completion could not be checked either way.',
+  FILED_PENDING: 'A filing reference has been recorded but no authoritative source has confirmed it.',
+  OVERDUE: 'The due date has passed and a queried source confirmed no filing.',
+  MANUAL_CONFIRMATION: 'Confirmed manually by an authorised user because automated verification is unavailable.',
+  UNKNOWN: 'There is not enough reliable information to determine a status.'
+};
+
+function lgDays(dateStr){
+  if(!dateStr) return null;
+  var p = String(dateStr).split('-').map(Number);
+  if(p.length!==3) return null;
+  var d = new Date(p[0], p[1]-1, p[2]); d.setHours(0,0,0,0);
+  var t = new Date(); t.setHours(0,0,0,0);
+  return Math.round((d - t) / 864e5);
+}
+
+// §21 DATA MODEL
+// Four distinct concepts, deliberately not merged into one "evidence" blob:
+//
+//   Requirement        what the law demands of this entity
+//   FilingRecord       what was filed: reference, date, period
+//   VerificationRecord how (and whether) that filing was confirmed, and by what source
+//   Document           an optional supporting file, stored separately
+//
+// They are persisted in one row for now, but the code reads and writes them as
+// separate objects so a later table split is mechanical.
+function lgRequirement(row, company){
+  return {
+    complianceId: row.key,
+    name:         row.obligation,
+    act:          row.law,
+    provision:    row.section,
+    form:         row.form,
+    frequency:    row.frequency || 'annual',
+    owner:        row.savedOwner || row.owner,
+    dueDate:      row.due,
+    consequence:  row.penalty,
+    entityType:   company && company.type,
+    applicable:   row.applicable !== false
+  };
+}
+function lgFilingRecord(ev){
+  if(!ev) return null;
+  var has = ev.filedOn || ev.completedOn || ev.filingRef || ev.exchangeRef;
+  if(!has) return null;
+  return {
+    filingDate:   ev.filedOn || ev.completedOn || null,
+    reference:    ev.filingRef || null,
+    exchangeRef:  ev.exchangeRef || null,
+    period:       ev.period || null,
+    enteredBy:    ev.recordedBy || ev.verifiedBy || null,
+    enteredAt:    ev.recordedAt || null
+  };
+}
+function lgVerificationRecord(ev){
+  if(!ev) return null;
+  return {
+    method:      ev.verificationMethod || (ev.filingRef ? 'Client-supplied reference' : 'None'),
+    source:      ev.evidenceSource || null,
+    sourceUrl:   ev.sourceUrl || null,
+    verifiedBy:  ev.verifiedBy || null,
+    verifiedAt:  ev.verifiedAt || null,
+    lastChecked: ev.lastChecked || null,
+    result:      ev.checkState || 'unchecked',
+    confidence:  ev.confidence || 'unverified'
+  };
+}
+function lgDocumentRecord(ev){
+  if(!ev || !ev.evidenceFile) return null;
+  // Past its retention date: treated as gone even before the purge runs.
+  if(lgDocExpired(ev)) return null;
+  return {
+    path:        ev.evidenceFile,
+    name:        lgFileLabel(ev.evidenceFile),
+    storage:     ev.docStorage || 'Application storage (private bucket)',
+    uploadedBy:  ev.recordedBy || ev.verifiedBy || null,
+    retention:   ev.docRetention === 'temporary'
+                   ? ('Temporary — due for deletion ' + String(ev.docExpiresAt||'').slice(0,10))
+                   : 'Kept until you delete it',
+    consentBy:   ev.docConsentBy || null,
+    consentAt:   ev.docConsentAt || null,
+    expiresAt:   ev.docExpiresAt || null
+  };
+}
+
+// The single place a compliance status is decided.
+function lgResolveStatus(row, company){
+  var chart = (company && company.chart) || {};
+  var ev    = chart[row.key] || {};
+  var days  = lgDays(row.due);
+  var connected = lgConnectedSources();
+
+  // §21 — four separate records, not one blob.
+  var requirement  = lgRequirement(row, company);
+  var filing       = lgFilingRecord(ev);
+  var verification = lgVerificationRecord(ev);
+  var document     = lgDocumentRecord(ev);
+
+  var out = {
+    key: row.key, days: days, due: row.due,
+    requirement: requirement, filing: filing, verification: verification, document: document,
+    sourcesQueried: connected.map(function(s){ return s.name; }),
+    sourceBacked: false,
+    autoState: null, state: null, confidence: 'unverified', manual: false,
+    // legacy shape kept so older call sites keep working
+    evidence: null, checkState: ev.checkState || 'unchecked', late: false
+  };
+
+  if(row.applicable === false){
+    out.state = out.autoState = 'NOT_APPLICABLE';
+    out.confidence = 'high';
+    return out;
+  }
+
+  // Legacy view of the same data.
+  if(filing){
+    out.manual = true;
+    out.evidence = {
+      filedOn: filing.filingDate, filingRef: filing.reference,
+      source: verification.source || 'Entered by you', note: ev.evidenceNote || null,
+      file: document ? document.path : null,
+      recordedBy: filing.enteredBy, recordedAt: filing.enteredAt,
+      verifiedBy: verification.verifiedBy, verifiedAt: verification.verifiedAt
+    };
+  }
+
+  var filedDays = (filing && filing.filingDate) ? lgDays(filing.filingDate) : null;
+  var late = (filing && filing.filingDate && days !== null && filedDays !== null && filedDays > days);
+  out.late = !!late;
+
+  // ── 1. A filing record exists ──────────────────────────────────
+  if(filing){
+    if(out.checkState === 'rejected'){
+      out.state = out.autoState = 'CHECK_REJECTED';
+      out.confidence = 'unverified';
+      return out;
+    }
+    if(lgPolicySecondCheck() && out.checkState !== 'verified'){
+      out.state = out.autoState = 'AWAITING_CHECK';
+      out.confidence = document ? 'low' : 'unverified';
+      return out;
+    }
+
+    // §11 — only an authoritative source may produce a source-backed status.
+    var srcConfirmed = verification.source && verification.source !== 'Entered by you'
+                       && connected.length > 0;
+    if(srcConfirmed){
+      out.sourceBacked = true;
+      out.state = late ? 'FILED_LATE' : 'FILED';
+      out.confidence = 'high';
+      return out;
+    }
+
+    // Client-supplied reference, unconfirmed. §4 forbids calling this "Filed".
+    if(ev.manualConfirmation){
+      out.state = 'MANUAL_CONFIRMATION';
+      out.confidence = document ? 'medium' : 'low';
+      return out;
+    }
+    out.state = 'FILED_PENDING';
+    out.confidence = (document && filing.reference) ? 'medium'
+                   : (document || filing.reference) ? 'low' : 'unverified';
+    return out;
+  }
+
+  // ── 2. No filing record ────────────────────────────────────────
+  if(days === null){ out.state = out.autoState = 'UNKNOWN'; return out; }
+  if(days  >  7)   { out.state = out.autoState = 'UPCOMING'; return out; }
+  if(days  >  0)   { out.state = out.autoState = 'DUE_SOON'; return out; }
+  if(days === 0)   { out.state = out.autoState = 'DUE';      return out; }
+
+  // Past due. The distinction §4 insists on:
+  //   a source was queried and returned nothing  -> NOT_FOUND (never "Not Filed")
+  //   no source could be queried at all          -> VERIFICATION_UNAVAILABLE (never "Pending")
+  if(connected.length){
+    out.sourceBacked = true;
+    out.state = out.autoState = 'NOT_FOUND';
+  } else {
+    out.state = out.autoState = 'VERIFICATION_UNAVAILABLE';
+  }
+  return out;
+}
+
+function lgStateMeta(code){ return LG_STATE[code] || {label:code, tone:'neutral', asserts:'none'}; }
+function lgPill(code, extra){
+  var m = lgStateMeta(code);
+  return '<span class="lg-pill lg-'+m.tone+'">'+m.label+(extra?' · '+extra:'')+'</span>';
+}
+
+// ── Evidence panel: "Why?" / "How do you know?" ──────────────────
+function lgWhy(entityId, key){
+  var c = null, row = null;
+  if(typeof CLIENTS!=='undefined')
+    for(var i=0;i<CLIENTS.length;i++) if(String(CLIENTS[i].id)===String(entityId)) c = CLIENTS[i];
+  if(!c) return;
+  var rows = getComplianceChart(c);
+  for(var j=0;j<rows.length;j++) if(rows[j].key===key) row = rows[j];
+  if(!row) return;
+
+  var st = lgResolveStatus(row, c);
+  var m  = lgStateMeta(st.state);
+  var ev0 = (c.chart && c.chart[key]) || {};
+  var connected = lgConnectedSources();
+
+  var srcRows = LG_SOURCES.map(function(s){
+    return '<tr><td><b>'+s.name+'</b></td><td>'+entEsc(s.scope)+'</td>'+
+      '<td>'+(s.connected
+        ? '<span style="color:#10B981;">checked</span>'
+        : '<span style="color:#94A3B8;">not connected</span>')+'</td>'+
+      '<td style="font-size:11px;color:var(--ink-soft);">'+entEsc(s.why)+'</td></tr>';
+  }).join('');
+
+  var evBlock;
+  if(st.evidence){
+    var fmtTs = function(t){ return t ? String(t).replace('T',' ').slice(0,19) : ''; };
+    evBlock =
+      '<div class="lg-kv"><span>Filed on</span><b>'+entEsc(st.evidence.filedOn||'not recorded')+'</b></div>'+
+      '<div class="lg-kv"><span>Filing reference</span><b class="mono">'+entEsc(st.evidence.filingRef||'not recorded')+'</b></div>'+
+      '<div class="lg-kv"><span>Document</span><b>'+
+        (st.evidence.file
+          ? '<a class="cc-link" style="cursor:pointer;" onclick="lgOpenEvidence('+lgArg(st.evidence.file)+')">'+
+            entEsc(lgFileLabel(st.evidence.file))+'</a>'
+          : '<span style="color:var(--ink-soft);font-weight:400;">none attached</span>')+'</b></div>'+
+      '<div class="lg-kv"><span>Confidence</span><b>'+entEsc(st.confidence)+'</b></div>'+
+      (st.evidence.note?'<div class="lg-kv"><span>Note</span><b>'+entEsc(st.evidence.note)+'</b></div>':'')+
+
+      '<div class="lg-h">Maker &amp; checker</div>'+
+      '<div class="lg-kv"><span>Recorded by</span><b>'+entEsc(st.evidence.recordedBy||'—')+
+        (st.evidence.recordedAt?' <span style="font-weight:400;color:var(--ink-soft);">'+entEsc(fmtTs(st.evidence.recordedAt))+'</span>':'')+'</b></div>'+
+      '<div class="lg-kv"><span>Confirmed by</span><b>'+
+        (st.checkState==='verified'
+          ? entEsc(st.evidence.verifiedBy||'—') +
+            (st.evidence.verifiedAt?' <span style="font-weight:400;color:var(--ink-soft);">'+entEsc(fmtTs(st.evidence.verifiedAt))+'</span>':'')
+          : (st.checkState==='rejected'
+              ? '<span style="color:#EF4444;">rejected by '+entEsc(st.evidence.verifiedBy||'—')+'</span>'
+              : '<span style="color:#F59E0B;font-weight:400;">not yet confirmed</span>'))+'</b></div>'+
+      ((st.checkState==='rejected' && ev0 && ev0.checkNote)
+        ? '<div class="lg-kv"><span>Reason</span><b>'+entEsc(ev0.checkNote)+'</b></div>' : '');
+  } else {
+    evBlock = '<div style="font-size:13px;color:var(--ink-soft);">No filing reference is held for this obligation, '+
+      'and '+(connected.length?'the connected sources returned nothing.':'<b>no source was checked</b> — none is connected.')+'</div>';
+  }
+
+  var verdict = (st.state==='AWAITING_CHECK')
+    ? 'Evidence has been recorded by <b>'+entEsc(st.evidence&&st.evidence.recordedBy||'someone')+'</b> '+
+      'but <b>not yet confirmed by a second person</b>. Until it is, this is not counted as verified.'
+    : (st.state==='CHECK_REJECTED')
+    ? 'A reviewer <b>rejected</b> this entry. It is not counted as filed. '+
+      'Whoever recorded it should correct the evidence and submit it again.'
+    : (m.asserts==='compliant')
+    ? 'This is treated as done <b>because a person recorded evidence and a second person confirmed it</b> — '+
+      'not because the system verified a filing with MCA or an exchange.'
+    : (st.state==='UPCOMING'
+        ? 'This is <b>not yet due</b>. That is not the same as compliant — nothing has been verified.'
+        : (st.state==='NOT_APPLICABLE'
+            ? 'This obligation does not apply to this entity, based on its recorded attributes.'
+            : 'The due date has passed and <b>no filing has been recorded here yet</b>. '+
+              'This is a record-keeping gap, not a finding against the company — the system '+
+              'cannot see MCA or exchange filings. Confirm on the portal, then record it below.'));
+
+  var mo = document.createElement('div');
+  mo.id='lg-why-modal';
+  mo.style.cssText='position:fixed;inset:0;background:rgba(11,18,32,.75);z-index:9999;display:flex;'+
+    'align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto;';
+  mo.onclick=function(e){ if(e.target===mo) lgWhyClose(); };
+  mo.innerHTML =
+    '<div style="background:var(--ink2);border:1px solid var(--ink4);border-radius:14px;padding:24px;'+
+      'width:100%;max-width:680px;margin:auto;box-shadow:0 20px 60px rgba(0,0,0,.4);">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:4px;">'+
+        '<div><div style="font-size:17px;font-weight:700;">'+entEsc(row.obligation)+'</div>'+
+        '<div style="font-size:12px;color:var(--ink-soft);margin-top:2px;">'+entEsc(c.name)+'</div></div>'+
+        '<button onclick="lgWhyClose()" style="background:none;border:none;color:var(--slate);cursor:pointer;font-size:24px;line-height:1;">&times;</button></div>'+
+
+      '<div style="margin:14px 0;">'+lgPill(st.state)+'</div>'+
+      '<div style="font-size:13px;line-height:1.6;background:var(--ink3);border:1px solid var(--ink4);'+
+        'border-radius:9px;padding:13px 15px;margin-bottom:18px;">'+verdict+'</div>'+
+
+      '<div class="lg-h">Why this applies</div>'+
+      '<div class="lg-kv"><span>Legal basis</span><b>'+entEsc(row.law)+' · '+entEsc(row.section)+'</b></div>'+
+      (row.form&&row.form!=='—'?'<div class="lg-kv"><span>Form</span><b class="mono">'+entEsc(row.form)+'</b></div>':'')+
+      '<div class="lg-kv"><span>Entity type</span><b>'+entTypeLabel(c.type)+'</b></div>'+
+      '<div class="lg-kv"><span>Owner</span><b>'+entEsc(row.savedOwner||row.owner)+'</b></div>'+
+      '<div class="lg-kv"><span>Consequence</span><b>'+entEsc(row.penalty||'—')+'</b></div>'+
+
+      '<div class="lg-h">Due date</div>'+
+      '<div class="lg-kv"><span>Calculated due date</span><b class="mono">'+entEsc(row.due||'—')+'</b></div>'+
+      '<div class="lg-kv"><span>Days</span><b>'+(st.days===null?'—':(st.days<0?(-st.days)+' days past due':st.days+' days remaining'))+'</b></div>'+
+      '<div class="lg-kv"><span>Financial year end</span><b class="mono">'+entEsc(c.fyend||'assumed 31 March')+'</b></div>'+
+
+      '<div class="lg-h">Filing reference</div>'+ evBlock +
+
+      (LG_STATE_NOTE[st.state]
+        ? '<div style="font-size:12px;color:var(--ink-soft);background:var(--ink3);border:1px solid var(--ink4);'+
+          'border-radius:8px;padding:10px 12px;margin-top:14px;line-height:1.6;">'+entEsc(LG_STATE_NOTE[st.state])+'</div>'
+        : '')+
+      '<div class="lg-h">Verification</div>'+
+      '<div class="lg-kv"><span>Method</span><b>'+entEsc((st.verification&&st.verification.method)||'None')+'</b></div>'+
+      '<div class="lg-kv"><span>Source-backed</span><b>'+(st.sourceBacked?'Yes':'No — client-supplied')+'</b></div>'+
+      '<div class="lg-kv"><span>Last verified</span><b>'+
+        entEsc((st.verification&&st.verification.verifiedAt)?String(st.verification.verifiedAt).replace('T',' ').slice(0,19):'never')+'</b></div>'+
+
+      '<div class="lg-h">Audit trail</div>'+
+      '<div id="lg-audit-box"><div style="font-size:13px;color:var(--ink-soft);">Loading…</div></div>'+
+
+      '<div class="lg-h">Sources checked</div>'+
+      '<div class="cu-tablewrap"><table class="cu-table"><thead><tr><th>Source</th><th>Scope</th>'+
+        '<th>Status</th><th>Why</th></tr></thead><tbody>'+srcRows+'</tbody></table></div>'+
+
+      (function(){
+        var chk = lgCanCheck(st);
+        var btns = '<button class="cc-btn-primary" onclick="lgRecordOpen('+lgArg(c.id)+','+lgArg(key)+')">'+
+          (st.evidence?'Update filing reference':'Add filing reference')+'</button>';
+        if(!st.sourceBacked && (!st.filing || st.state==='VERIFICATION_UNAVAILABLE' || st.state==='NOT_FOUND')){
+          btns += '<button class="cc-btn" onclick="lgOverrideOpen('+lgArg(c.id)+','+lgArg(key)+')">Confirm manually</button>';
+        }
+        if(st.evidence && st.checkState !== 'verified'){
+          if(chk.can){
+            btns += '<button class="cc-btn-primary" style="background:var(--ok);border-color:var(--ok);" '+
+              'onclick="lgCheckApprove('+lgArg(c.id)+','+lgArg(key)+')">Confirm as checker</button>'+
+              '<button class="cc-btn" onclick="lgCheckReject('+lgArg(c.id)+','+lgArg(key)+')">Reject</button>';
+          } else {
+            btns += '<span style="font-size:12px;color:var(--ink-soft);align-self:center;">'+entEsc(chk.why)+'</span>';
+          }
+        }
+        return '<div style="display:flex;gap:8px;margin-top:20px;flex-wrap:wrap;align-items:center;">'+
+          btns + '<button class="cc-btn" onclick="lgWhyClose()">Close</button></div>';
+      })()+
+    '</div>';
+  document.body.appendChild(mo);
+  lgAuditRead(c.id, key).then(function(rows){
+    var box = document.getElementById('lg-audit-box');
+    if(box) box.innerHTML = lgAuditRows(rows);
+  }).catch(function(){
+    var box = document.getElementById('lg-audit-box');
+    if(box) box.innerHTML = '<div style="font-size:13px;color:var(--ink-soft);">Trail unavailable.</div>';
+  });
+}
+function lgWhyClose(){ var m=document.getElementById('lg-why-modal'); if(m) m.remove(); }
+
+// ── Add filing reference (manual verification) ─────────────────
+function lgRecordOpen(entityId, key){
+  lgWhyClose();
+  var c=null;
+  if(typeof CLIENTS!=='undefined')
+    for(var i=0;i<CLIENTS.length;i++) if(String(CLIENTS[i].id)===String(entityId)) c=CLIENTS[i];
+  if(!c) return;
+  var ev = (c.chart&&c.chart[key]) || {};
+
+  var mo=document.createElement('div');
+  mo.id='lg-rec-modal';
+  mo.style.cssText='position:fixed;inset:0;background:rgba(11,18,32,.75);z-index:9999;display:flex;'+
+    'align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto;';
+  mo.onclick=function(e){ if(e.target===mo) lgRecordClose(); };
+  mo.innerHTML =
+    '<div style="background:var(--ink2);border:1px solid var(--ink4);border-radius:14px;padding:24px;'+
+      'width:100%;max-width:520px;margin:auto;">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">'+
+        '<div style="font-size:17px;font-weight:700;">Add filing reference</div>'+
+        '<button onclick="lgRecordClose()" style="background:none;border:none;color:var(--slate);cursor:pointer;font-size:24px;line-height:1;">&times;</button></div>'+
+      '<div style="font-size:12px;color:var(--ink-soft);margin-bottom:16px;line-height:1.6;">'+
+        'What you record here is kept as <b>your</b> evidence. The system keeps its own '+
+        'automated conclusion separately and never overwrites it.</div>'+
+      entField('lg-filedon','Date filed / completed','',ev.filedOn||ev.completedOn||'','date')+
+      entField('lg-ref','Filing / SRN reference','(recommended — raises confidence to high)',ev.filingRef||'')+
+      entField('lg-note','Note','(optional)',ev.evidenceNote||'')+
+      '<div style="margin-bottom:12px;">'+
+        '<div style="font-size:11px;color:var(--ink-soft);font-weight:600;margin-bottom:4px;">'+
+          'Attach supporting document <span style="font-weight:400;opacity:.75;">— optional · PDF or image, max 10 MB</span></div>'+
+        lgPrivacyPanelHtml()+
+        '<input id="lg-file" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" '+
+          'style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);'+
+          'border-radius:8px;padding:8px;font-size:12px;outline:none;box-sizing:border-box;">'+
+        (ev.evidenceFile
+          ? '<div style="font-size:11px;color:var(--ink-soft);margin-top:5px;">Currently attached: '+
+            '<a class="cc-link" style="cursor:pointer;" onclick="lgOpenEvidence('+lgArg(ev.evidenceFile)+')">'+
+            entEsc(lgFileLabel(ev.evidenceFile))+'</a> — choosing a new file replaces it.</div>'
+          : '')+
+      '</div>'+
+      '<div style="font-size:11px;color:var(--ink-soft);background:var(--ink3);border:1px solid var(--ink4);'+
+        'border-radius:8px;padding:10px 12px;margin-bottom:4px;line-height:1.6;">'+
+        (lgPolicySecondCheck()
+          ? 'Saving records this as <b>entered by you</b> and marks it <b>awaiting check</b>. '+
+            'Someone else must confirm it before the system treats it as verified.'
+          : 'Attaching the acknowledgement or challan is what makes this <b>fully evidenced</b>. '+
+            'Without it the filing is still recorded, but shown as <b>Filed · no document</b>.')+
+        '</div>'+
+      '<div id="lg-rec-err" style="display:none;font-size:12px;color:#EF4444;margin:8px 0;"></div>'+
+      '<div style="display:flex;gap:8px;margin-top:18px;">'+
+        '<button class="cc-btn-primary" style="flex:1;" onclick="lgRecordSave('+lgArg(entityId)+','+lgArg(key)+')">Save filing reference</button>'+
+        (ev.filedOn||ev.filingRef||ev.status==='done'
+          ? '<button class="cc-btn" onclick="lgRecordClear('+lgArg(entityId)+','+lgArg(key)+')">Remove</button>' : '')+
+        '<button class="cc-btn" onclick="lgRecordClose()">Cancel</button></div>'+
+    '</div>';
+  document.body.appendChild(mo);
+  lgPrivacyWire();
+}
+function lgRecordClose(){ var m=document.getElementById('lg-rec-modal'); if(m) m.remove(); }
+
+async function lgRecordSave(entityId, key){
+  var g=function(id){ var e=document.getElementById(id); return e?e.value.trim():''; };
+  var existingEv = null;
+  if(typeof CLIENTS!=='undefined')
+    for(var q=0;q<CLIENTS.length;q++)
+      if(String(CLIENTS[q].id)===String(entityId)) existingEv = (CLIENTS[q].chart||{})[key] || null;
+  var filedOn=g('lg-filedon'), ref=g('lg-ref'), note=g('lg-note');
+
+  var comp=null, rw=null;
+  if(typeof CLIENTS!=='undefined')
+    for(var i=0;i<CLIENTS.length;i++) if(String(CLIENTS[i].id)===String(entityId)) comp=CLIENTS[i];
+  if(comp){ try{ getComplianceChart(comp).forEach(function(r){ if(r.key===key) rw=r; }); }catch(e){} }
+
+  var v = lgValidateEvidence(entityId, key, filedOn, ref, rw, comp);
+  var eb = document.getElementById('lg-rec-err');
+  if(eb){ eb.innerHTML = lgIssueHtml(v); eb.style.display = (v.errors.length||v.warnings.length) ? 'block' : 'none'; }
+  if(!v.ok) return;
+
+  var me = (CURRENT_USER&&CURRENT_USER.email)||'user';
+  var stamp = new Date().toISOString();
+
+  // Upload the document first — if it fails we do not want a half-recorded row.
+  var filePath = null, privacy = null;
+  var fi = document.getElementById('lg-file');
+  if(fi && fi.files && fi.files[0]){
+    // §9 — explicit consent is required before a file is accepted.
+    privacy = lgPrivacyRead();
+    if(!privacy){
+      if(eb){ eb.innerHTML = '<div style="color:#EF4444;">Tick the consent box to store this document, '+
+        'or save the filing reference on its own — the document is optional.</div>'; eb.style.display='block'; }
+      return;
+    }
+    try{ filePath = await lgUploadEvidence(entityId, key, fi.files[0]); }
+    catch(upErr){
+      if(eb){ eb.innerHTML = '<div style="color:#EF4444;">Upload failed: '+entEsc(upErr.message||upErr)+'</div>'; eb.style.display='block'; }
+      return;
+    }
+  }
+
+  await lgPersist(entityId, key, {
+    status:'done', filedOn:filedOn||null, filingRef:ref||null,
+    evidenceNote:note||null, evidenceSource:'Entered by you',
+    confidence:v.confidence,
+    evidenceFile: filePath || (existingEv && existingEv.evidenceFile) || null,
+    docStorage:   privacy ? privacy.storage   : (existingEv && existingEv.docStorage) || null,
+    docRetention: privacy ? privacy.retention : (existingEv && existingEv.docRetention) || null,
+    docExpiresAt: privacy ? privacy.expiresAt : (existingEv && existingEv.docExpiresAt) || null,
+    docConsentBy: privacy ? privacy.consentBy : (existingEv && existingEv.docConsentBy) || null,
+    docConsentAt: privacy ? privacy.consentAt : (existingEv && existingEv.docConsentAt) || null,
+    // Recording is the MAKER action. Confirming is a separate act by someone else.
+    recordedBy: me, recordedAt: stamp,
+    checkState: 'unchecked', checkNote: null,
+    verifiedBy: null, verifiedAt: null
+  });
+  lgRecordClose();
+}
+async function lgRecordClear(entityId, key){
+  if(!confirm('Remove the recorded filing reference? The obligation returns to whatever the system can determine on its own.')) return;
+  await lgPersist(entityId, key, {
+    status:'pending', filedOn:null, filingRef:null, evidenceNote:null,
+    evidenceSource:null, verifiedBy:null, verifiedAt:null
+  });
+  lgRecordClose();
+}
+
+// Write through to Supabase, then refresh every view.
+async function lgPersist(entityId, key, patch, quiet){
+  var c=null;
+  if(typeof CLIENTS!=='undefined')
+    for(var i=0;i<CLIENTS.length;i++) if(String(CLIENTS[i].id)===String(entityId)) c=CLIENTS[i];
+
+  // Capture the status BEFORE the change so the trail records a real transition.
+  var _prevState = null;
+  if(c){
+    try{
+      getComplianceChart(c).forEach(function(r){
+        if(r.key===key) _prevState = lgResolveStatus(r, c).state;
+      });
+    }catch(e){}
+  }
+
+  if(c){
+    if(!c.chart) c.chart={};
+    c.chart[key] = Object.assign({}, c.chart[key]||{}, patch);
+  }
+  if(supaClient && CURRENT_USER){
+    try{
+      var rec = Object.assign({
+        company_id:entityId, compliance_key:key,
+        user_id: CURRENT_USER.id            // NOT NULL on compliance_status
+      }, {
+        status: patch.status,
+        completed_on: patch.filedOn || null,
+        filing_ref: patch.filingRef || null,
+        evidence_note: patch.evidenceNote || null,
+        evidence_source: patch.evidenceSource || null,
+        verified_by: patch.verifiedBy || null,
+        verified_at: patch.verifiedAt || null,
+        recorded_by: patch.recordedBy || null,
+        recorded_at: patch.recordedAt || null,
+        check_state: patch.checkState || 'unchecked',
+        check_note:  patch.checkNote || null,
+        evidence_file: patch.evidenceFile || null,
+        confidence:  patch.confidence || null,
+        doc_storage:    patch.docStorage || null,
+        doc_retention:  patch.docRetention || null,
+        doc_expires_at: patch.docExpiresAt || null,
+        doc_consent_by: patch.docConsentBy || null,
+        doc_consent_at: patch.docConsentAt || null
+      });
+      var res = await supaClient.from('compliance_status').upsert(rec, {onConflict:'company_id,compliance_key'});
+      if(res.error) throw res.error;
+    }catch(err){
+      var msg=(err&&err.message)?err.message:String(err);
+      if(/column .* does not exist|schema cache/i.test(msg))
+        msg += '  →  Run db/003_evidence_trail.sql in the Supabase SQL editor.';
+      if(quiet) throw new Error(msg);
+      alert('Saved locally, but could not sync: '+msg);
+    }
+  }
+  // Write the transition, unless the caller already wrote its own audit line.
+  if(!patch.__noAudit){
+    var _newState = null;
+    if(c){
+      try{
+        getComplianceChart(c).forEach(function(r){
+          if(r.key===key) _newState = lgResolveStatus(r, c).state;
+        });
+      }catch(e){}
+    }
+    if(_newState && _newState !== _prevState){
+      lgAuditWrite(entityId, key, _prevState, _newState, {
+        source: patch.evidenceSource || null,
+        method: patch.verificationMethod || (patch.filingRef ? 'Client-supplied reference' : null),
+        reference: patch.filingRef || null,
+        filingDate: patch.filedOn || null,
+        confidence: patch.confidence || null,
+        overrideReason: patch.overrideReason || null
+      });
+    }
+  }
+
+  if(quiet) return;
+  if(typeof renderCommandCenter==='function') renderCommandCenter();
+  if(typeof renderMyWork==='function' && document.getElementById('p-mywork').classList.contains('on')) renderMyWork();
+  if(typeof renderUniverse==='function' && document.getElementById('p-universe').classList.contains('on')) renderUniverse();
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// SYSTEM CHECK — verifies the database matches what the code expects,
+// and reports which primary sources are connected. Runs in the app so
+// no developer console is needed.
+// ═══════════════════════════════════════════════════════════════
+function lgCheckRow(name, state, detail){
+  var icon = state==='ok'   ? '<span style="color:#10B981;font-weight:700;">✓</span>'
+           : state==='warn' ? '<span style="color:#F59E0B;font-weight:700;">!</span>'
+           : state==='off'  ? '<span style="color:#94A3B8;font-weight:700;">–</span>'
+           :                  '<span style="color:#EF4444;font-weight:700;">✕</span>';
+  return '<tr><td style="width:26px;">'+icon+'</td><td><b>'+entEsc(name)+'</b></td>'+
+         '<td style="font-size:12px;color:var(--ink-soft);">'+detail+'</td></tr>';
+}
+
+async function lgSystemCheck(){
+  var mo=document.createElement('div');
+  mo.id='lg-sys-modal';
+  mo.style.cssText='position:fixed;inset:0;background:rgba(11,18,32,.75);z-index:9999;display:flex;'+
+    'align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto;';
+  mo.onclick=function(e){ if(e.target===mo) lgSysClose(); };
+  mo.innerHTML='<div style="background:var(--ink2);border:1px solid var(--ink4);border-radius:14px;padding:24px;'+
+    'width:100%;max-width:660px;margin:auto;">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">'+
+    '<div style="font-size:17px;font-weight:700;">System check</div>'+
+    '<button onclick="lgSysClose()" style="background:none;border:none;color:var(--slate);cursor:pointer;font-size:24px;line-height:1;">&times;</button></div>'+
+    '<div id="lg-sys-body"><div style="font-size:13px;color:var(--ink-soft);">Running checks…</div></div></div>';
+  document.body.appendChild(mo);
+
+  var rows = [], notes = [];
+
+  // ── 1. session ──
+  if(!supaClient){ rows.push(lgCheckRow('Database connection','fail','Supabase client not initialised.')); }
+  else if(!CURRENT_USER){ rows.push(lgCheckRow('Signed in','fail','Not signed in — sign in and run this again.')); }
+  else {
+    rows.push(lgCheckRow('Signed in','ok', entEsc(CURRENT_USER.email||'')));
+
+    // ── 2. migration 001: financial columns ──
+    var comp = await supaClient.from('companies')
+      .select('id,name,type,fyend,capital,turnover,networth,netprofit,borrowings').limit(50);
+    if(comp.error){
+      var m1 = comp.error.message||'';
+      rows.push(lgCheckRow('Financial columns (001)','fail', entEsc(m1)));
+      if(/column .* does not exist|schema cache/i.test(m1))
+        notes.push('Run <b>db/001_add_financial_columns.sql</b> in the Supabase SQL editor.');
+    } else {
+      rows.push(lgCheckRow('Financial columns (001)','ok','networth, netprofit, borrowings present'));
+      var list = comp.data||[];
+      rows.push(lgCheckRow('Companies readable', list.length?'ok':'warn',
+        list.length ? list.length+' row(s) returned' : 'Query succeeded but returned 0 rows — check RLS policy.'));
+      if(!list.length) notes.push('Zero rows with a valid session usually means a row-level-security policy is filtering them out.');
+
+      // ── 3. unit audit: rupees vs crore ──
+      var cr=0, rs=0, empty=0;
+      list.forEach(function(c){
+        var v = parseFloat(c.capital);
+        if(!v || isNaN(v)) empty++;
+        else if(v < 100000) cr++;
+        else rs++;
+      });
+      if(cr && rs){
+        rows.push(lgCheckRow('Capital / turnover units','fail',
+          '<b>Mixed:</b> '+cr+' look like crore, '+rs+' look like rupees. Thresholds cannot be trusted.'));
+        notes.push('Run <b>db/002_normalise_units_IF_NEEDED.sql</b> — dry run first.');
+      } else if(cr){
+        rows.push(lgCheckRow('Capital / turnover units','fail',
+          'All '+cr+' stored in <b>crore</b>, but the engine compares <b>rupees</b> — no threshold will ever fire.'));
+        notes.push('Run <b>db/002_normalise_units_IF_NEEDED.sql</b> to convert crore → rupees.');
+      } else if(rs){
+        rows.push(lgCheckRow('Capital / turnover units','ok','All '+rs+' stored in rupees — correct.'));
+      } else {
+        rows.push(lgCheckRow('Capital / turnover units','warn','No capital figures recorded yet.'));
+      }
+
+      // ── 4. fyend format ──
+      var fmt={};
+      list.forEach(function(c){
+        var f=String(c.fyend||'').trim();
+        var k = !f ? 'missing' : (/^\d{4}-\d{2}-\d{2}$/.test(f) ? 'YYYY-MM-DD'
+              : (/^\d{2}-\d{2}$/.test(f) ? 'MM-DD' : 'other: '+f));
+        fmt[k]=(fmt[k]||0)+1;
+      });
+      var fdesc = Object.keys(fmt).map(function(k){ return k+' × '+fmt[k]; }).join(' · ');
+      var badFy = Object.keys(fmt).some(function(k){ return k==='missing' || k.indexOf('other')===0; });
+      rows.push(lgCheckRow('Financial year end format', badFy?'warn':'ok', entEsc(fdesc||'—')));
+      if(fmt['missing']) notes.push(fmt['missing']+' compan(y/ies) have no FY end — those default to 31 March.');
+
+      // ── 5. migration 003: evidence columns ──
+      var st = await supaClient.from('compliance_status')
+        .select('company_id,compliance_key,status,filing_ref,evidence_source,verified_by,verified_at').limit(1);
+      if(st.error){
+        var m3 = st.error.message||'';
+        rows.push(lgCheckRow('Filing reference columns (003)','fail', entEsc(m3)));
+        if(/column .* does not exist|schema cache/i.test(m3))
+          notes.push('Run <b>db/003_evidence_trail.sql</b> in the Supabase SQL editor.');
+      } else {
+        rows.push(lgCheckRow('Filing reference columns (003)','ok','filing_ref, evidence_source, verified_by, verified_at present'));
+
+        // ── 6. unique index (needed by the evidence upsert) ──
+        if(list.length){
+          var probe = await supaClient.from('compliance_status')
+            .upsert({company_id:list[0].id, compliance_key:'__selftest__', status:'pending',
+                     user_id:CURRENT_USER.id},
+                    {onConflict:'company_id,compliance_key'});
+          if(probe.error){
+            rows.push(lgCheckRow('Filing reference save','fail', entEsc(probe.error.message)));
+            var pm = probe.error.message||'';
+            if(/row-level security/i.test(pm))
+              notes.push('A write policy is blocking inserts — run <b>db/004_fix_compliance_status_rls.sql</b>.');
+            else if(/not-null constraint/i.test(pm))
+              notes.push('A required column is not being set. Tell Claude the exact column name in the message above.');
+            else if(/no unique|on conflict|constraint matching/i.test(pm))
+              notes.push('The unique index is missing — re-run <b>db/003_evidence_trail.sql</b>.');
+            else
+              notes.push('Evidence saving failed. Send Claude the message above.');
+          } else {
+            rows.push(lgCheckRow('Filing reference save','ok','Recording filing reference will persist.'));
+            await supaClient.from('compliance_status').delete().eq('compliance_key','__selftest__');
+          }
+        }
+      }
+    }
+  }
+
+  // ── 6b. audit trail (006) and document privacy (007) ──
+  if(supaClient && CURRENT_USER){
+    try{
+      var au = await supaClient.from('compliance_audit')
+        .select('id,company_id,compliance_key,previous_status,new_status,actor,occurred_at').limit(1);
+      if(au.error) throw au.error;
+      rows.push(lgCheckRow('Audit trail (006)','ok','compliance_audit readable, append-only'));
+    }catch(e){
+      var am=(e&&e.message)||String(e);
+      rows.push(lgCheckRow('Audit trail (006)','fail', entEsc(am)));
+      if(/does not exist|schema cache/i.test(am))
+        notes.push('Run <b>db/006_audit_trail.sql</b> in the Supabase SQL editor.');
+    }
+    try{
+      var dp = await supaClient.from('compliance_status')
+        .select('doc_storage,doc_retention,doc_expires_at,doc_consent_by').limit(1);
+      if(dp.error) throw dp.error;
+      rows.push(lgCheckRow('Document privacy (007)','ok','retention and consent columns present'));
+    }catch(e){
+      var dm=(e&&e.message)||String(e);
+      rows.push(lgCheckRow('Document privacy (007)','fail', entEsc(dm)));
+      if(/does not exist|schema cache/i.test(dm))
+        notes.push('Run <b>db/007_document_privacy.sql</b> in the Supabase SQL editor.');
+    }
+    try{
+      var pg = await supaClient.rpc('purge_expired_documents');
+      if(pg.error) throw pg.error;
+      rows.push(lgCheckRow('Document purge','ok','purge_expired_documents() callable'));
+    }catch(e){
+      var pm=(e&&e.message)||String(e);
+      if(/does not exist|schema cache/i.test(pm)){
+        rows.push(lgCheckRow('Document purge','fail','purge_expired_documents() missing'));
+        notes.push('Run <b>db/007_document_privacy.sql</b> — it creates the purge function.');
+      } else {
+        rows.push(lgCheckRow('Document purge','warn', entEsc(pm)));
+      }
+    }
+    // Storage bucket from 005
+    try{
+      var bk = await supaClient.storage.from('evidence').list('', {limit:1});
+      if(bk.error) throw bk.error;
+      rows.push(lgCheckRow('Document storage (005)','ok','evidence bucket reachable'));
+    }catch(e){
+      var bm=(e&&e.message)||String(e);
+      rows.push(lgCheckRow('Document storage (005)','fail', entEsc(bm)));
+      if(/bucket|not found/i.test(bm))
+        notes.push('Run <b>db/005_maker_checker_and_documents.sql</b> — it creates the evidence bucket.');
+    }
+  }
+
+  // ── 6c. internal compliance (008) ──
+  if(supaClient && CURRENT_USER){
+    try{
+      var ic = await supaClient.from('internal_compliances')
+        .select('id,title,category,frequency,next_due,status').limit(5);
+      if(ic.error) throw ic.error;
+      var nrec = (ic.data && ic.data.length) || 0;
+      rows.push(lgCheckRow('Internal compliance (008)','ok',
+        nrec ? (nrec + ' item(s) tracked') : 'table ready — nothing added yet'));
+    }catch(e){
+      var im=(e&&e.message)||String(e);
+      rows.push(lgCheckRow('Internal compliance (008)','fail', entEsc(im)));
+      if(/does not exist|schema cache/i.test(im))
+        notes.push('Run <b>db/008_internal_compliances.sql</b> in the Supabase SQL editor.');
+    }
+    try{
+      var il = await supaClient.from('internal_compliance_log').select('id').limit(1);
+      if(il.error) throw il.error;
+      rows.push(lgCheckRow('Completion history (008)','ok','internal_compliance_log readable'));
+    }catch(e){
+      var lm=(e&&e.message)||String(e);
+      rows.push(lgCheckRow('Completion history (008)','fail', entEsc(lm)));
+      if(/does not exist|schema cache/i.test(lm))
+        notes.push('Run <b>db/008_internal_compliances.sql</b> — it creates the log table too.');
+    }
+  }
+
+  // ── 7. primary sources ──
+  LG_SOURCES.forEach(function(s){
+    rows.push(lgCheckRow('Source: '+s.name, s.connected?'ok':'off',
+      s.connected ? entEsc(s.scope) : entEsc(s.why)));
+  });
+
+  document.getElementById('lg-sys-body').innerHTML =
+    '<div class="cu-tablewrap"><table class="cu-table"><tbody>'+rows.join('')+'</tbody></table></div>'+
+    (notes.length
+      ? '<div style="margin-top:16px;background:var(--ink3);border:1px solid var(--ink4);border-radius:9px;'+
+        'padding:14px 16px;font-size:13px;line-height:1.7;"><b>What to do</b><ul style="margin:8px 0 0;padding-left:18px;">'+
+        notes.map(function(n){ return '<li>'+n+'</li>'; }).join('')+'</ul></div>'
+      : '<div style="margin-top:16px;font-size:13px;color:#10B981;"><b>All checks passed.</b> '+
+        'No filing source is connected, so obligations without recorded evidence will read '+
+        '"Source unavailable" rather than "overdue" — that is by design.</div>');
+}
+function lgSysClose(){ var m=document.getElementById('lg-sys-modal'); if(m) m.remove(); }
+
+
+// ═══════════════════════════════════════════════════════════════
+// FILING REGISTER — one screen per company. Every applicable
+// obligation with an inline date + SRN box. Fill in what has been
+// filed, save once. This is how the evidence actually gets in.
+// ═══════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════
+// EVIDENCE INTEGRITY
+// Nothing here can prove a reference is genuine — that needs a live
+// MCA/exchange connection. What it does is block the mistakes and
+// shortcuts that are actually common, and make the rest attributable.
+//
+//   BLOCK  duplicate reference, future date, pre-incorporation date
+//   WARN   unusual format, filed before the period ended, filed very late
+//   RECORD who entered it, when, and at what confidence
+// ═══════════════════════════════════════════════════════════════
+
+// Index every reference already in use -> where it is used.
+
+// ═══════════════════════════════════════════════════════════════
+// EVIDENCE DOCUMENTS + MAKER–CHECKER
+// A filing is recorded by one person and confirmed by a different
+// one. The document (MCA challan / exchange acknowledgement) is the
+// evidence; the second signature is the control.
+// ═══════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════
+// §8/§9 DOCUMENT PRIVACY
+// Uploading is optional. Before any file is accepted we state exactly
+// where it goes, for how long, who can reach it, and how it is deleted
+// — and we only claim what the architecture actually enforces.
+// ═══════════════════════════════════════════════════════════════
+
+// Storage providers. External ones are declared but NOT connected: wiring
+// SharePoint/Drive/S3 is an OAuth integration that does not exist yet, and
+// offering it as if it worked would be the exact dishonesty §8 warns against.
+var LG_STORAGE = [
+  {id:'app', name:'Application storage', connected:true,
+   detail:'Private Supabase bucket. Encrypted at rest and in transit. Reachable only through short-lived signed links, scoped to your own companies by row-level security.'},
+  {id:'sharepoint', name:'Microsoft SharePoint / OneDrive', connected:false,
+   detail:'Not connected. Requires a Microsoft Graph OAuth integration.'},
+  {id:'gdrive', name:'Google Drive', connected:false,
+   detail:'Not connected. Requires a Google Drive OAuth integration.'},
+  {id:'s3', name:'Your own S3 / object storage', connected:false,
+   detail:'Not connected. Requires bucket credentials and a signing endpoint.'}
+];
+function lgStorageById(id){
+  for(var i=0;i<LG_STORAGE.length;i++) if(LG_STORAGE[i].id===id) return LG_STORAGE[i];
+  return LG_STORAGE[0];
+}
+
+// §20 — the client-facing explanation, used verbatim in the UI.
+var LG_PRIVACY_BLURB =
+  'Your compliance status does not require uploading confidential corporate documents in every case. ' +
+  'Wherever possible the platform records the filing reference, acknowledgement or regulatory record instead. ' +
+  'Document uploads are optional.';
+
+function lgRetentionOptions(sel){
+  var opts = [
+    ['permanent','Keep until I delete it'],
+    ['30','Delete automatically after 30 days'],
+    ['90','Delete automatically after 90 days'],
+    ['180','Delete automatically after 180 days']
+  ];
+  return opts.map(function(o){
+    return '<option value="'+o[0]+'"'+(String(sel)===o[0]?' selected':'')+'>'+o[1]+'</option>';
+  }).join('');
+}
+
+// The consent panel shown above the file input. Nothing uploads without it.
+function lgPrivacyPanelHtml(){
+  var connected = LG_STORAGE.filter(function(s){ return s.connected; });
+  var others    = LG_STORAGE.filter(function(s){ return !s.connected; });
+  return ''+
+  '<div id="lg-privacy" style="border:1px solid var(--ink4);border-radius:9px;padding:13px 15px;'+
+    'background:var(--ink3);margin-bottom:12px;line-height:1.6;">'+
+    '<div style="font-size:12px;font-weight:700;margin-bottom:6px;">Document privacy</div>'+
+    '<div style="font-size:11px;color:var(--ink-soft);margin-bottom:10px;">'+entEsc(LG_PRIVACY_BLURB)+'</div>'+
+
+    '<div style="font-size:11px;color:var(--ink-soft);margin-bottom:4px;font-weight:600;">Where it will be stored</div>'+
+    '<select id="lg-doc-storage" style="width:100%;background:var(--ink2);border:1px solid var(--ink4);'+
+      'color:var(--white);border-radius:7px;padding:8px 10px;font-size:12px;outline:none;margin-bottom:4px;">'+
+      connected.map(function(s){ return '<option value="'+s.id+'">'+entEsc(s.name)+'</option>'; }).join('')+
+      others.map(function(s){ return '<option value="'+s.id+'" disabled>'+entEsc(s.name)+' — not connected</option>'; }).join('')+
+    '</select>'+
+    '<div id="lg-storage-detail" style="font-size:11px;color:var(--ink-soft);margin-bottom:10px;">'+
+      entEsc(LG_STORAGE[0].detail)+'</div>'+
+
+    '<div style="font-size:11px;color:var(--ink-soft);margin-bottom:4px;font-weight:600;">Retention</div>'+
+    '<select id="lg-doc-retention" style="width:100%;background:var(--ink2);border:1px solid var(--ink4);'+
+      'color:var(--white);border-radius:7px;padding:8px 10px;font-size:12px;outline:none;margin-bottom:6px;">'+
+      lgRetentionOptions('permanent')+'</select>'+
+    '<div id="lg-retention-note" style="font-size:11px;color:var(--ink-soft);margin-bottom:10px;"></div>'+
+
+    '<div style="font-size:11px;color:var(--ink-soft);margin-bottom:10px;">'+
+      '<b>Who can access it:</b> only signed-in users of your account, and only for companies you own.<br>'+
+      '<b>Encryption:</b> in transit (HTTPS) and at rest.<br>'+
+      '<b>Links:</b> expire after 5 minutes and are not guessable.<br>'+
+      '<b>Deletion:</b> you can delete it at any time; every change is written to the audit trail.<br>'+
+      '<b>Not used for:</b> training, indexing, or access by any other client.</div>'+
+
+    '<label style="display:flex;gap:8px;align-items:flex-start;font-size:12px;cursor:pointer;">'+
+      '<input type="checkbox" id="lg-doc-consent" style="margin-top:3px;">'+
+      '<span>I have read the above and consent to this document being stored on the terms shown.</span></label>'+
+  '</div>';
+}
+
+// Keep the two explanatory lines in step with the selects.
+function lgPrivacyWire(){
+  var stor = document.getElementById('lg-doc-storage');
+  var det  = document.getElementById('lg-storage-detail');
+  if(stor && det){
+    stor.onchange = function(){ det.textContent = lgStorageById(stor.value).detail; };
+  }
+  var ret  = document.getElementById('lg-doc-retention');
+  var note = document.getElementById('lg-retention-note');
+  var paint = function(){
+    if(!ret || !note) return;
+    if(ret.value === 'permanent'){
+      note.textContent = 'The document is kept until you delete it.';
+      note.style.color = 'var(--ink-soft)';
+    } else {
+      // §8: never promise automatic deletion the architecture does not perform.
+      note.innerHTML = 'Due for deletion after ' + entEsc(ret.value) + ' days. It becomes inaccessible ' +
+        'on that date and is removed by the purge action. <b>Scheduled hourly deletion requires pg_cron ' +
+        'to be enabled</b> — see db/007_document_privacy.sql.';
+      note.style.color = '#F59E0B';
+    }
+  };
+  if(ret){ ret.onchange = paint; }
+  paint();
+}
+
+// Read the consent panel. Returns null when consent is missing.
+function lgPrivacyRead(){
+  var consent = document.getElementById('lg-doc-consent');
+  if(!consent || !consent.checked) return null;
+  var stor = document.getElementById('lg-doc-storage');
+  var ret  = document.getElementById('lg-doc-retention');
+  var retention = ret ? ret.value : 'permanent';
+  var expires = null;
+  if(retention !== 'permanent'){
+    var d = new Date();
+    d.setDate(d.getDate() + parseInt(retention,10));
+    expires = d.toISOString();
+  }
+  return {
+    storage: stor ? lgStorageById(stor.value).name : LG_STORAGE[0].name,
+    retention: retention === 'permanent' ? 'permanent' : 'temporary',
+    retentionDays: retention === 'permanent' ? null : parseInt(retention,10),
+    expiresAt: expires,
+    consentBy: (CURRENT_USER && CURRENT_USER.email) || 'user',
+    consentAt: new Date().toISOString()
+  };
+}
+
+// Expiry is enforced on access, not merely displayed.
+function lgDocExpired(ev){
+  if(!ev || !ev.docExpiresAt) return false;
+  return new Date(ev.docExpiresAt).getTime() <= Date.now();
+}
+
+async function lgPurgeExpired(){
+  if(!supaClient || !CURRENT_USER){ alert('Not signed in.'); return; }
+  if(!confirm('Delete every document whose retention period has ended?\n\nThis cannot be undone.')) return;
+  try{
+    var res = await supaClient.rpc('purge_expired_documents');
+    if(res.error) throw res.error;
+    var n = (res.data && res.data.length) || 0;
+    alert(n ? ('Deleted ' + n + ' expired document(s).') : 'No documents were due for deletion.');
+    await loadCloudClients();
+    if(typeof renderEntities==='function') renderEntities();
+  }catch(e){
+    var m = (e && e.message) || String(e);
+    if(/function .* does not exist|schema cache/i.test(m))
+      m += '  →  Run db/007_document_privacy.sql first.';
+    alert('Could not purge: ' + m);
+  }
+}
+
+var LG_MAX_FILE = 10 * 1024 * 1024;   // 10 MB
+var LG_OK_TYPES = ['application/pdf','image/png','image/jpeg','image/jpg','image/webp'];
+
+async function lgUploadEvidence(entityId, key, file){
+  if(!supaClient) throw new Error('Not signed in.');
+  if(file.size > LG_MAX_FILE) throw new Error('File is larger than 10 MB.');
+  if(LG_OK_TYPES.indexOf(file.type) < 0)
+    throw new Error('Only PDF, PNG, JPEG or WebP are accepted (got ' + (file.type||'unknown') + ').');
+
+  var safe = String(file.name).replace(/[^A-Za-z0-9._-]/g,'_').slice(-80);
+  var path = String(entityId) + '/' + String(key) + '/' + Date.now() + '_' + safe;
+  var res = await supaClient.storage.from('evidence').upload(path, file, {upsert:false});
+  if(res.error){
+    var m = res.error.message||String(res.error);
+    if(/bucket/i.test(m)) m += '  →  Run db/005_maker_checker_and_documents.sql first.';
+    throw new Error(m);
+  }
+  return path;
+}
+
+// Signed URL — the bucket is private, so links are short-lived.
+async function lgOpenEvidence(pathStr){
+  if(!supaClient){ alert('Not signed in.'); return; }
+  var res = await supaClient.storage.from('evidence').createSignedUrl(pathStr, 300);
+  if(res.error || !res.data){ alert('Could not open the document: '+((res.error&&res.error.message)||'unknown')); return; }
+  window.open(res.data.signedUrl, '_blank', 'noopener');
+}
+
+function lgFileLabel(pathStr){
+  if(!pathStr) return null;
+  var parts = String(pathStr).split('/');
+  return parts[parts.length-1].replace(/^\d+_/,'');
+}
+
+// ── the checker action ───────────────────────────────────────────
+function lgCanCheck(st){
+  if(!st || !st.evidence) return {can:false, why:'There is nothing recorded to check.'};
+  if(st.checkState === 'verified') return {can:false, why:'Already confirmed.'};
+  var me = (CURRENT_USER&&CURRENT_USER.email)||'';
+  var maker = st.evidence.recordedBy || '';
+  if(maker && me && maker.toLowerCase() === me.toLowerCase())
+    return {can:false, why:'You recorded this entry. A different person must confirm it.'};
+  return {can:true, why:''};
+}
+
+async function lgCheckApprove(entityId, key){
+  var c=null;
+  if(typeof CLIENTS!=='undefined')
+    for(var i=0;i<CLIENTS.length;i++) if(String(CLIENTS[i].id)===String(entityId)) c=CLIENTS[i];
+  if(!c) return;
+  var ev = (c.chart&&c.chart[key]) || {};
+  var me = (CURRENT_USER&&CURRENT_USER.email)||'user';
+  if((ev.recordedBy||'').toLowerCase() === me.toLowerCase()){
+    alert('You recorded this entry. Maker–checker requires a different person to confirm it.');
+    return;
+  }
+  if(!confirm('Confirm this filing as verified?\n\nYou are attesting that you have seen the evidence and it supports the filing.')) return;
+  await lgPersist(entityId, key, Object.assign({}, ev, {
+    status:'done',
+    checkState:'verified', checkNote:null,
+    verifiedBy: me, verifiedAt: new Date().toISOString()
+  }));
+  lgWhyClose();
+}
+
+async function lgCheckReject(entityId, key){
+  var c=null;
+  if(typeof CLIENTS!=='undefined')
+    for(var i=0;i<CLIENTS.length;i++) if(String(CLIENTS[i].id)===String(entityId)) c=CLIENTS[i];
+  if(!c) return;
+  var ev = (c.chart&&c.chart[key]) || {};
+  var me = (CURRENT_USER&&CURRENT_USER.email)||'user';
+  if((ev.recordedBy||'').toLowerCase() === me.toLowerCase()){
+    alert('You recorded this entry. A different person must review it.');
+    return;
+  }
+  var why = prompt('Why is this being rejected? (shown to whoever recorded it)');
+  if(why === null) return;
+  await lgPersist(entityId, key, Object.assign({}, ev, {
+    status:'pending',
+    checkState:'rejected', checkNote: why || 'No reason given',
+    verifiedBy: me, verifiedAt: new Date().toISOString()
+  }));
+  lgWhyClose();
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// §13 AUDIT TRAIL — append-only. Every status change is recorded
+// with who, when, from what source, and by what method.
+// ═══════════════════════════════════════════════════════════════
+var LG_AUDIT_CACHE = {};        // "companyId|key" -> rows
+
+async function lgAuditWrite(entityId, key, prevState, newState, extra){
+  extra = extra || {};
+  var rec = {
+    company_id: entityId,
+    compliance_key: key,
+    previous_status: prevState || null,
+    new_status: newState,
+    actor: (CURRENT_USER && CURRENT_USER.email) || 'unknown',
+    user_id: CURRENT_USER && CURRENT_USER.id,
+    verification_source: extra.source || null,
+    verification_method: extra.method || null,
+    filing_reference: extra.reference || null,
+    filing_date: extra.filingDate || null,
+    source_url: extra.sourceUrl || null,
+    source_response: extra.sourceResponse || null,
+    confidence: extra.confidence || null,
+    override_reason: extra.overrideReason || null
+  };
+  // Keep a local copy so the trail shows even when the table is not yet created.
+  var ck = entityId + '|' + key;
+  (LG_AUDIT_CACHE[ck] = LG_AUDIT_CACHE[ck] || []).unshift(
+    Object.assign({occurred_at: new Date().toISOString(), _local:true}, rec));
+
+  if(!supaClient || !CURRENT_USER) return;
+  try{
+    var res = await supaClient.from('compliance_audit').insert(rec);
+    if(res.error) throw res.error;
+  }catch(e){
+    var msg = (e && e.message) || String(e);
+    // Absent table is not fatal — the change still happened, the trail is local.
+    if(!/does not exist|schema cache/i.test(msg)) console.error('[audit]', msg);
+  }
+}
+
+async function lgAuditRead(entityId, key){
+  var ck = entityId + '|' + key;
+  var local = LG_AUDIT_CACHE[ck] || [];
+  if(!supaClient || !CURRENT_USER) return local;
+  try{
+    var res = await supaClient.from('compliance_audit')
+      .select('*').eq('company_id', entityId).eq('compliance_key', key)
+      .order('occurred_at', {ascending:false}).limit(50);
+    if(res.error) throw res.error;
+    return (res.data && res.data.length) ? res.data : local;
+  }catch(e){ return local; }
+}
+
+function lgAuditRows(rows){
+  if(!rows || !rows.length)
+    return '<div style="font-size:13px;color:var(--ink-soft);">No changes recorded yet.</div>';
+  return '<div class="cu-tablewrap" style="max-height:220px;overflow-y:auto;"><table class="cu-table">'+
+    '<thead><tr><th>When</th><th>Change</th><th>By</th><th>Source / method</th><th>Reference</th></tr></thead><tbody>'+
+    rows.map(function(r){
+      var when = String(r.occurred_at||'').replace('T',' ').slice(0,19);
+      var from = r.previous_status ? lgStateMeta(r.previous_status).label : '—';
+      var to   = lgStateMeta(r.new_status).label;
+      return '<tr>'+
+        '<td class="mono" style="white-space:nowrap;font-size:11px;">'+entEsc(when)+
+          (r._local?' <span style="color:#F59E0B;">local</span>':'')+'</td>'+
+        '<td style="font-size:12px;">'+entEsc(from)+' &rarr; <b>'+entEsc(to)+'</b>'+
+          (r.override_reason?'<div style="font-size:11px;color:#F59E0B;">override: '+entEsc(r.override_reason)+'</div>':'')+'</td>'+
+        '<td style="font-size:12px;">'+entEsc(r.actor||'—')+'</td>'+
+        '<td style="font-size:12px;">'+entEsc(r.verification_source||'—')+
+          (r.verification_method?'<div style="font-size:11px;color:var(--ink-soft);">'+entEsc(r.verification_method)+'</div>':'')+'</td>'+
+        '<td class="mono" style="font-size:11px;">'+entEsc(r.filing_reference||'—')+'</td>'+
+      '</tr>';
+    }).join('')+'</tbody></table></div>';
+}
+
+// §14 — manual override. Requires a reason, a reference, and identity.
+async function lgOverrideOpen(entityId, key){
+  lgWhyClose();
+  var c=null;
+  if(typeof CLIENTS!=='undefined')
+    for(var i=0;i<CLIENTS.length;i++) if(String(CLIENTS[i].id)===String(entityId)) c=CLIENTS[i];
+  if(!c) return;
+  var mo=document.createElement('div');
+  mo.id='lg-ovr-modal';
+  mo.style.cssText='position:fixed;inset:0;background:rgba(11,18,32,.75);z-index:9999;display:flex;'+
+    'align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto;';
+  mo.onclick=function(e){ if(e.target===mo) lgOverrideClose(); };
+  mo.innerHTML =
+    '<div style="background:var(--ink2);border:1px solid var(--ink4);border-radius:14px;padding:24px;'+
+      'width:100%;max-width:520px;margin:auto;">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">'+
+        '<div style="font-size:17px;font-weight:700;">Manual confirmation</div>'+
+        '<button onclick="lgOverrideClose()" style="background:none;border:none;color:var(--slate);cursor:pointer;font-size:24px;line-height:1;">&times;</button></div>'+
+      '<div style="font-size:12px;color:var(--ink-soft);margin-bottom:16px;line-height:1.6;">'+
+        'Use this only when automated verification is unavailable and you have personally '+
+        'reviewed the filing acknowledgement. Your name, the reason and the reference are '+
+        'written to the audit trail and cannot be edited afterwards.</div>'+
+      entField('lg-ovr-ref','Supporting reference','SRN / acknowledgement no.','')+
+      entField('lg-ovr-date','Filing date','',' ','date')+
+      '<div style="margin-bottom:12px;">'+
+        '<div style="font-size:11px;color:var(--ink-soft);font-weight:600;margin-bottom:4px;">Reason (required)</div>'+
+        '<textarea id="lg-ovr-why" rows="3" placeholder="e.g. MCA source unavailable; filing acknowledgement reviewed by authorised CS." '+
+          'style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);'+
+          'border-radius:8px;padding:9px 11px;font-size:13px;outline:none;box-sizing:border-box;resize:vertical;"></textarea></div>'+
+      '<div id="lg-ovr-err" style="display:none;font-size:12px;color:#EF4444;margin:8px 0;"></div>'+
+      '<div style="display:flex;gap:8px;margin-top:16px;">'+
+        '<button class="cc-btn-primary" style="flex:1;" onclick="lgOverrideSave('+lgArg(entityId)+','+lgArg(key)+')">Confirm manually</button>'+
+        '<button class="cc-btn" onclick="lgOverrideClose()">Cancel</button></div>'+
+    '</div>';
+  document.body.appendChild(mo);
+}
+function lgOverrideClose(){ var m=document.getElementById('lg-ovr-modal'); if(m) m.remove(); }
+
+async function lgOverrideSave(entityId, key){
+  var g=function(id){ var e=document.getElementById(id); return e?String(e.value||'').trim():''; };
+  var why=g('lg-ovr-why'), ref=g('lg-ovr-ref'), date=g('lg-ovr-date');
+  var eb=document.getElementById('lg-ovr-err');
+  if(why.length < 10){
+    if(eb){ eb.textContent='Give a reason of at least 10 characters — it is written to the audit trail.'; eb.style.display='block'; }
+    return;
+  }
+  if(!ref && !date){
+    if(eb){ eb.textContent='Record a supporting reference or a filing date.'; eb.style.display='block'; }
+    return;
+  }
+  var c=null;
+  for(var i=0;i<CLIENTS.length;i++) if(String(CLIENTS[i].id)===String(entityId)) c=CLIENTS[i];
+  var rw=null;
+  try{ getComplianceChart(c).forEach(function(r){ if(r.key===key) rw=r; }); }catch(e){}
+  var v = lgValidateEvidence(entityId, key, date, ref, rw, c);
+  if(!v.ok){
+    if(eb){ eb.innerHTML = lgIssueHtml(v); eb.style.display='block'; }
+    return;
+  }
+  var prev = rw ? lgResolveStatus(rw, c).state : null;
+  await lgPersist(entityId, key, {
+    status:'done', filedOn:date||null, filingRef:ref||null,
+    evidenceSource:'Entered by you', evidenceNote:null,
+    verificationMethod:'Manual confirmation by authorised user',
+    manualConfirmation:true, confidence:v.confidence,
+    recordedBy:(CURRENT_USER&&CURRENT_USER.email)||'user', recordedAt:new Date().toISOString(),
+    checkState:'unchecked', overrideReason:why
+  });
+  await lgAuditWrite(entityId, key, prev, 'MANUAL_CONFIRMATION', {
+    source:'Entered by you', method:'Manual confirmation by authorised user',
+    reference:ref||null, filingDate:date||null, confidence:v.confidence, overrideReason:why
+  });
+  lgOverrideClose();
+}
+
+function lgRefIndex(){
+  var idx = {};
+  if(typeof CLIENTS==='undefined') return idx;
+  CLIENTS.forEach(function(c){
+    var chart = c.chart||{};
+    Object.keys(chart).forEach(function(k){
+      var ref = chart[k] && chart[k].filingRef;
+      if(!ref) return;
+      var norm = String(ref).toUpperCase().replace(/[^A-Z0-9]/g,'');
+      if(!norm) return;
+      (idx[norm] = idx[norm] || []).push({company:c.name, companyId:c.id, key:k});
+    });
+  });
+  return idx;
+}
+
+// Loose shape check. MCA SRNs and exchange acknowledgement numbers differ, so a
+// mismatch is a warning — never a block. Blocking valid formats we do not know
+// about would be worse than the problem.
+function lgRefLooksOdd(ref){
+  var s = String(ref||'').trim();
+  if(s.length < 6)  return 'shorter than any filing reference we recognise';
+  if(s.length > 30) return 'longer than any filing reference we recognise';
+  if(!/[0-9]/.test(s)) return 'missing any digits';
+  if(/^(.)\1+$/.test(s.replace(/[^A-Za-z0-9]/g,''))) return 'placeholder text rather than a real reference';
+  if(/^(?:na|n\/a|none|nil|test|xxx+|abc+|123+|0+)$/i.test(s)) return 'placeholder text rather than a real reference';
+  return null;
+}
+
+// entityId/key identify the row being edited so it does not clash with itself.
+function lgValidateEvidence(entityId, key, filedOn, ref, row, company){
+  var errors = [], warnings = [];
+  var refNorm = String(ref||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+
+  // ── reference ──
+  if(refNorm){
+    var idx = lgRefIndex();
+    var uses = (idx[refNorm]||[]).filter(function(u){
+      return !(String(u.companyId)===String(entityId) && u.key===key);
+    });
+    if(uses.length){
+      var where = uses.map(function(u){ return u.company+' · '+u.key; }).join(', ');
+      errors.push('This reference is already recorded against ' + where +
+                  '. A filing reference is unique to one filing.');
+    }
+    var odd = lgRefLooksOdd(ref);
+    if(odd) warnings.push('The reference is ' + odd + '.');
+  }
+
+  // ── date ──
+  if(filedOn){
+    var d = lgDays(filedOn);
+    if(d === null){
+      errors.push('The filing date could not be read.');
+    } else {
+      if(d > 0) errors.push('The filing date is in the future.');
+
+      // Cannot pre-date incorporation. The CIN carries the year.
+      if(company && company.cin){
+        var p = cinParse(company.cin);
+        if(p && p.valid){
+          var yr = parseInt(String(filedOn).slice(0,4),10);
+          if(yr && yr < p.year)
+            errors.push('Filed in ' + yr + ', before the company was incorporated in ' + p.year + '.');
+        }
+      }
+
+      // An annual filing cannot be made before the year it reports on has ended.
+      if(row && company && company.fyend){
+        var fy = String(company.fyend);
+        var fyParts = fy.split('-').map(Number);
+        var fyM = (fyParts.length===3 && fyParts[1]>=1 && fyParts[1]<=12) ? fyParts[1]
+                : (fyParts.length===2 && fyParts[0]>=1 && fyParts[0]<=12) ? fyParts[0] : 3;
+        var annual = ['agm','aoc4','mgt7','adt1','mr3','csr','dir3kyc'];
+        if(annual.indexOf(row.key) >= 0 && row.due){
+          var dueD = lgDays(row.due), filedD = lgDays(filedOn);
+          // more than 13 months before the due date is not plausible for an annual filing
+          if(filedD !== null && dueD !== null && (dueD - filedD) > 400)
+            warnings.push('Filed more than a year before the due date — check the date is right.');
+        }
+      }
+
+      // Late filings are legitimate but worth surfacing at entry time.
+      if(row && row.due){
+        var dd = lgDays(row.due), fd = lgDays(filedOn);
+        if(dd !== null && fd !== null && fd > dd)
+          warnings.push('Filed ' + (fd - dd) + ' day(s) after the due date — this will be recorded as Filed late.');
+      }
+    }
+  }
+
+  if(!filedOn && !refNorm)
+    errors.push('Record at least a filing date or a reference.');
+
+  // Confidence follows what was actually supplied.
+  var confidence = (filedOn && refNorm) ? 'high' : (refNorm ? 'medium' : 'low');
+  return {ok: errors.length===0, errors: errors, warnings: warnings, confidence: confidence};
+}
+
+function lgIssueHtml(v){
+  if(!v.errors.length && !v.warnings.length) return '';
+  var h = '';
+  v.errors.forEach(function(e){
+    h += '<div style="font-size:12px;color:#EF4444;margin-top:4px;">&#10007; '+entEsc(e)+'</div>';
+  });
+  v.warnings.forEach(function(w){
+    h += '<div style="font-size:12px;color:#F59E0B;margin-top:4px;">! '+entEsc(w)+'</div>';
+  });
+  return h;
+}
+
+function lgRegOpen(entityId){
+  var c=null;
+  if(typeof CLIENTS!=='undefined')
+    for(var i=0;i<CLIENTS.length;i++) if(String(CLIENTS[i].id)===String(entityId)) c=CLIENTS[i];
+  if(!c) return;
+
+  var rows;
+  try{ rows = getComplianceChart(c); }catch(e){ alert('Could not build the obligation list: '+e.message); return; }
+
+  var body = rows.map(function(r){
+    var st = lgResolveStatus(r, c);
+    var ev = (c.chart&&c.chart[r.key]) || {};
+    var filed = ev.filedOn || ev.completedOn || '';
+    var ref   = ev.filingRef || '';
+    var overdue = (st.days!==null && st.days<0 && !filed);
+    return '<tr data-key="'+entEsc(r.key)+'">'+
+      '<td style="min-width:190px;">'+
+        '<div style="font-weight:600;">'+entEsc(r.obligation)+'</div>'+
+        '<div style="font-size:11px;color:var(--ink-soft);">'+entEsc(r.law)+' · '+entEsc(r.section)+
+          (r.form&&r.form!=='—'?' · <span class="mono">'+entEsc(r.form)+'</span>':'')+'</div></td>'+
+      '<td class="mono" style="white-space:nowrap;'+(overdue?'color:#B45309;font-weight:600;':'')+'">'+
+        entEsc(r.due||'—')+'</td>'+
+      '<td>'+lgPill(st.state)+'</td>'+
+      '<td><input type="date" class="lg-reg-date" value="'+entEsc(filed)+'" '+
+        'style="background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:7px;'+
+        'padding:6px 8px;font-size:12px;outline:none;width:150px;"></td>'+
+      '<td><input type="text" class="lg-reg-ref" value="'+entEsc(ref)+'" placeholder="SRN / ref" '+
+        'style="background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:7px;'+
+        'padding:6px 8px;font-size:12px;outline:none;width:150px;font-family:\'IBM Plex Mono\',monospace;"></td>'+
+      '</tr>';
+  }).join('');
+
+  var mo=document.createElement('div');
+  mo.id='lg-reg-modal';
+  mo.style.cssText='position:fixed;inset:0;background:rgba(11,18,32,.75);z-index:9998;display:flex;'+
+    'align-items:flex-start;justify-content:center;padding:20px 12px;overflow-y:auto;';
+  mo.onclick=function(e){ if(e.target===mo) lgRegClose(); };
+  mo.innerHTML=
+    '<div style="background:var(--ink2);border:1px solid var(--ink4);border-radius:14px;padding:22px;'+
+      'width:100%;max-width:980px;margin:auto;">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">'+
+        '<div><div style="font-size:17px;font-weight:700;">Filing register — '+entEsc(c.name)+'</div>'+
+        '<div style="font-size:12px;color:var(--ink-soft);margin-top:3px;">'+
+          'Enter the date filed and the SRN for anything already filed, then save once. '+
+          'Leave a row blank if it has not been filed.</div></div>'+
+        '<button onclick="lgRegClose()" style="background:none;border:none;color:var(--slate);cursor:pointer;font-size:24px;line-height:1;">&times;</button></div>'+
+
+      '<div style="display:flex;gap:8px;margin:14px 0;flex-wrap:wrap;">'+
+        '<button class="cc-btn" onclick="lgRegFillDue()">Fill blanks with due date</button>'+
+        '<button class="cc-btn" onclick="lgRegClearAll()">Clear all</button>'+
+      '</div>'+
+
+      '<div class="cu-tablewrap" style="max-height:56vh;overflow-y:auto;">'+
+        '<table class="cu-table" id="lg-reg-table"><thead><tr>'+
+          '<th>Obligation</th><th>Due</th><th>Status</th><th>Date filed</th><th>SRN / reference</th>'+
+        '</tr></thead><tbody>'+body+'</tbody></table></div>'+
+
+      '<div id="lg-reg-err" style="display:none;font-size:12px;color:#EF4444;margin-top:10px;"></div>'+
+      '<div style="display:flex;gap:8px;margin-top:16px;align-items:center;">'+
+        '<button class="cc-btn-primary" style="flex:1;" onclick="lgRegSave('+lgArg(c.id)+')">Save filing register</button>'+
+        '<button class="cc-btn" onclick="lgRegClose()">Cancel</button></div>'+
+    '</div>';
+  document.body.appendChild(mo);
+}
+function lgRegClose(){ var m=document.getElementById('lg-reg-modal'); if(m) m.remove(); }
+
+// Convenience: most filings happen on or near the statutory date.
+function lgRegFillDue(){
+  var trs = document.querySelectorAll('#lg-reg-table tbody tr');
+  for(var i=0;i<trs.length;i++){
+    var d = trs[i].querySelector('.lg-reg-date');
+    if(d && !d.value){
+      var due = trs[i].children[1].innerText.trim();
+      if(/^\d{4}-\d{2}-\d{2}$/.test(due)) d.value = due;
+    }
+  }
+}
+function lgRegClearAll(){
+  var trs = document.querySelectorAll('#lg-reg-table tbody tr');
+  for(var i=0;i<trs.length;i++){
+    var d=trs[i].querySelector('.lg-reg-date'), r=trs[i].querySelector('.lg-reg-ref');
+    if(d) d.value=''; if(r) r.value='';
+  }
+}
+
+async function lgRegSave(entityId){
+  var trs = document.querySelectorAll('#lg-reg-table tbody tr');
+  var c=null;
+  if(typeof CLIENTS!=='undefined')
+    for(var i=0;i<CLIENTS.length;i++) if(String(CLIENTS[i].id)===String(entityId)) c=CLIENTS[i];
+  if(!c) return;
+
+  var recs=[], cleared=[];
+  for(var j=0;j<trs.length;j++){
+    var key = trs[j].getAttribute('data-key');
+    var d = (trs[j].querySelector('.lg-reg-date')||{}).value || '';
+    var r = ((trs[j].querySelector('.lg-reg-ref')||{}).value || '').trim();
+    var had = c.chart && c.chart[key] && (c.chart[key].filedOn || c.chart[key].filingRef || c.chart[key].status==='done');
+    if(d || r){
+      recs.push({key:key, filedOn:d||null, filingRef:r||null});
+    } else if(had){
+      cleared.push(key);
+    }
+  }
+
+  // Validate every row first — including against each other — and write nothing
+  // unless the whole register is clean. A half-saved register is worse than none.
+  var rowsByKey = {};
+  try{ getComplianceChart(c).forEach(function(r){ rowsByKey[r.key]=r; }); }catch(e){}
+
+  var seen = {}, problems = [];
+  recs.forEach(function(rec){
+    var v = lgValidateEvidence(entityId, rec.key, rec.filedOn, rec.filingRef, rowsByKey[rec.key], c);
+    v.errors.forEach(function(msg){ problems.push({key:rec.key, msg:msg}); });
+    rec._confidence = v.confidence;
+    // duplicates *within this unsaved register* are not yet in CLIENTS, so check here
+    var norm = String(rec.filingRef||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+    if(norm){
+      if(seen[norm]) problems.push({key:rec.key,
+        msg:'Reference reused on this screen — also entered against "'+seen[norm]+'".'});
+      else seen[norm] = (rowsByKey[rec.key]&&rowsByKey[rec.key].obligation) || rec.key;
+    }
+  });
+
+  if(problems.length){
+    var eb2=document.getElementById('lg-reg-err');
+    if(eb2){
+      eb2.innerHTML = problems.map(function(p){
+        var nm = (rowsByKey[p.key]&&rowsByKey[p.key].obligation) || p.key;
+        return '<div style="margin-top:4px;">&#10007; <b>'+entEsc(nm)+'</b> — '+entEsc(p.msg)+'</div>';
+      }).join('');
+      eb2.style.display='block';
+    }
+    // highlight the offending rows
+    var trs2 = document.querySelectorAll('#lg-reg-table tbody tr');
+    for(var q=0;q<trs2.length;q++){
+      var bad = problems.some(function(p){ return p.key === trs2[q].getAttribute('data-key'); });
+      trs2[q].style.background = bad ? 'rgba(239,68,68,.08)' : '';
+    }
+    return;
+  }
+
+  var btn = document.querySelector('#lg-reg-modal .cc-btn-primary');
+  if(btn){ btn.disabled=true; btn.textContent='Saving '+(recs.length+cleared.length)+' row(s)…'; }
+
+  var failed=[];
+  var stamp = new Date().toISOString();
+  var who = (CURRENT_USER&&CURRENT_USER.email)||'user';
+
+  for(var k=0;k<recs.length;k++){
+    try{
+      await lgPersist(entityId, recs[k].key, {
+        status:'done', filedOn:recs[k].filedOn, filingRef:recs[k].filingRef,
+        evidenceSource:'Entered by you', evidenceNote:null, confidence:recs[k]._confidence,
+        recordedBy:who, recordedAt:stamp,
+        checkState:'unchecked', checkNote:null,
+        verifiedBy:null, verifiedAt:null
+      }, true);
+    }catch(e){ failed.push(recs[k].key); }
+  }
+  for(var m2=0;m2<cleared.length;m2++){
+    try{
+      await lgPersist(entityId, cleared[m2], {
+        status:'pending', filedOn:null, filingRef:null,
+        evidenceNote:null, evidenceSource:null, verifiedBy:null, verifiedAt:null
+      }, true);
+    }catch(e){ failed.push(cleared[m2]); }
+  }
+
+  if(failed.length){
+    var eb=document.getElementById('lg-reg-err');
+    if(eb){ eb.textContent = failed.length+' row(s) failed to save. The rest were saved.'; eb.style.display='block'; }
+    if(btn){ btn.disabled=false; btn.textContent='Save filing register'; }
+    return;
+  }
+
+  lgRegClose();
+  if(typeof renderCommandCenter==='function') renderCommandCenter();
+  if(typeof renderEntities==='function' && document.getElementById('p-entities').classList.contains('on')) renderEntities();
+  if(typeof renderMyWork==='function' && document.getElementById('p-mywork').classList.contains('on')) renderMyWork();
+  if(typeof renderUniverse==='function' && document.getElementById('p-universe').classList.contains('on')) renderUniverse();
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// INTERNAL COMPLIANCE
+// Policies, SOPs, ISO checklists, registers, licences, insurance,
+// AMCs, training, internal audits. Entirely the organisation's own
+// data — nothing here depends on an external source, so unlike the
+// statutory side a status here can be stated plainly.
+// ═══════════════════════════════════════════════════════════════
+var INTERNAL = [];                       // loaded rows
+var INT_FILTERS = {category:'', status:'active', entity:'', q:''};
+
+var INT_CATEGORIES = [
+  ['policy','Policy'], ['sop','SOP / Procedure'], ['iso','ISO checklist'],
+  ['register','Statutory register'], ['licence','Licence / Permit'],
+  ['insurance','Insurance'], ['contract','Contract / AMC'],
+  ['training','Training'], ['audit','Internal audit'], ['other','Other']
+];
+var INT_FREQUENCIES = [
+  ['one_time','One-time'], ['monthly','Monthly'], ['quarterly','Quarterly'],
+  ['half_yearly','Half-yearly'], ['annual','Annual'], ['biennial','Every 2 years'],
+  ['as_needed','As needed']
+];
+var INT_FREQ_MONTHS = {monthly:1, quarterly:3, half_yearly:6, annual:12, biennial:24};
+
+function intLabel(list, v){
+  for(var i=0;i<list.length;i++) if(list[i][0]===v) return list[i][1];
+  return v || '—';
+}
+
+// Next due = last completed + the interval. One-time and as-needed do not recur.
+function intNextDue(freq, from){
+  var months = INT_FREQ_MONTHS[freq];
+  if(!months || !from) return null;
+  var p = String(from).split('-').map(Number);
+  if(p.length !== 3) return null;
+  var d = new Date(p[0], p[1]-1, p[2]);
+  d.setMonth(d.getMonth() + months);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function intStatusOf(row){
+  if(row.status === 'retired') return {label:'Retired',  tone:'neutral'};
+  if(row.status === 'paused')  return {label:'Paused',   tone:'neutral'};
+  if(row.frequency === 'as_needed') return {label:'As needed', tone:'info'};
+  var due = row.next_due || row.first_due;
+  if(!due) return {label:'No date set', tone:'warn'};
+  var d = lgDays(due);
+  if(d === null) return {label:'No date set', tone:'warn'};
+  if(d < 0)  return {label:(-d)+'d overdue', tone:'crit', days:d};
+  if(d === 0) return {label:'Due today',     tone:'warn', days:d};
+  if(d <= 30) return {label:'Due in '+d+'d', tone:'warn', days:d};
+  return {label:'On track', tone:'ok', days:d};
+}
+
+async function intLoad(){
+  if(!supaClient || !CURRENT_USER){ INTERNAL = []; return; }
+  try{
+    var res = await supaClient.from('internal_compliances')
+      .select('*').order('next_due', {ascending:true, nullsFirst:false});
+    if(res.error) throw res.error;
+    INTERNAL = res.data || [];
+  }catch(e){
+    INTERNAL = [];
+    var m=(e&&e.message)||String(e);
+    if(/does not exist|schema cache/i.test(m)) INTERNAL.__missing = true;
+    else console.error('[internal]', m);
+  }
+}
+
+function renderInternal(){
+  var root = document.getElementById('int-root');
+  if(!root) return;
+  if(!INTERNAL.length && !INTERNAL.__loaded){
+    root.innerHTML = '<div style="padding:40px;text-align:center;color:var(--ink-soft);font-size:13px;">Loading…</div>';
+    intLoad().then(function(){ INTERNAL.__loaded = true; renderInternal(); });
+    return;
+  }
+
+  var f = INT_FILTERS;
+  var rows = INTERNAL.filter(function(r){
+    if(f.category && r.category !== f.category) return false;
+    if(f.status && r.status !== f.status) return false;
+    if(f.entity && String(r.company_id||'') !== f.entity) return false;
+    if(f.q){
+      var hay = (r.title+' '+(r.reference||'')+' '+(r.owner||'')+' '+(r.description||'')).toLowerCase();
+      if(hay.indexOf(f.q.toLowerCase()) < 0) return false;
+    }
+    return true;
+  });
+
+  // counts across everything active, not just the filtered view
+  var active = INTERNAL.filter(function(r){ return r.status==='active'; });
+  var overdue=0, soon=0, ok=0;
+  active.forEach(function(r){
+    var s = intStatusOf(r);
+    if(s.tone==='crit') overdue++;
+    else if(s.tone==='warn') soon++;
+    else if(s.tone==='ok') ok++;
+  });
+
+  var entOpts = '<option value="">All entities</option>' +
+    '<option value=""'+'>'+'</option>';
+  entOpts = '<option value="">All entities</option>';
+  if(typeof CLIENTS!=='undefined')
+    CLIENTS.forEach(function(c){
+      entOpts += '<option value="'+entEsc(c.id)+'"'+(f.entity===String(c.id)?' selected':'')+'>'+entEsc(c.name)+'</option>';
+    });
+
+  var head =
+    '<div class="cc-pagehead">'+
+      '<div><div class="cc-crumb">Operate › Internal Compliance</div>'+
+      '<h1 class="cc-h1">Internal Compliance</h1>'+
+      '<p class="cc-sub">Policies, SOPs, ISO checklists, registers, licences and renewals — '+
+      'tracked against your own schedule, not a regulator&rsquo;s.</p></div>'+
+      '<div class="cc-headbtns"><button class="cc-btn-primary" onclick="intOpen()">+ Add item</button></div>'+
+    '</div>';
+
+  if(INTERNAL.__missing){
+    root.innerHTML = head +
+      '<div class="cc-empty"><div class="cc-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></div>'+
+      '<h2>Table not created yet</h2><p>Run <b>db/008_internal_compliances.sql</b> in the Supabase SQL editor, then reload.</p></div>';
+    return;
+  }
+
+  if(!INTERNAL.length){
+    root.innerHTML = head +
+      '<div class="cc-empty"><div class="cc-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>'+
+      '<h2>Nothing tracked yet</h2><p>Add your first policy, SOP, register or licence renewal.</p>'+
+      '<button class="cc-btn-primary" onclick="intOpen()">+ Add item</button></div>';
+    return;
+  }
+
+  var chips =
+    '<div class="cu-summary">'+
+      '<div class="cu-sum-chip"><b>'+active.length+'</b> active</div>'+
+      '<div class="cu-sum-chip" style="color:#B91C1C;"><b>'+overdue+'</b> overdue</div>'+
+      '<div class="cu-sum-chip" style="color:#B45309;"><b>'+soon+'</b> due within 30 days</div>'+
+      '<div class="cu-sum-chip" style="color:#047857;"><b>'+ok+'</b> on track</div>'+
+    '</div>';
+
+  var filters =
+    '<div class="cu-filters">'+
+      '<div class="cu-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>'+
+        '<input placeholder="Search title, reference, owner…" value="'+entEsc(f.q)+'" oninput="intSetFilter(\'q\',this.value)"></div>'+
+      '<select onchange="intSetFilter(\'category\',this.value)"><option value="">All categories</option>'+
+        INT_CATEGORIES.map(function(c){ return '<option value="'+c[0]+'"'+(f.category===c[0]?' selected':'')+'>'+c[1]+'</option>'; }).join('')+'</select>'+
+      '<select onchange="intSetFilter(\'status\',this.value)">'+
+        ['active','paused','retired'].map(function(s){
+          return '<option value="'+s+'"'+(f.status===s?' selected':'')+'>'+s.charAt(0).toUpperCase()+s.slice(1)+'</option>'; }).join('')+
+        '<option value=""'+(f.status===''?' selected':'')+'>All</option></select>'+
+      '<select onchange="intSetFilter(\'entity\',this.value)">'+entOpts+'</select>'+
+      '<button class="cu-clear" onclick="intClear()">Clear</button>'+
+    '</div>';
+
+  var body = rows.map(function(r){
+    var s = intStatusOf(r);
+    var ent = '';
+    if(r.company_id && typeof CLIENTS!=='undefined')
+      CLIENTS.forEach(function(c){ if(String(c.id)===String(r.company_id)) ent = c.name; });
+    return '<tr>'+
+      '<td><div style="font-weight:600;">'+entEsc(r.title)+'</div>'+
+        (r.reference?'<div class="mono" style="font-size:11px;color:var(--ink-soft);">'+entEsc(r.reference)+'</div>':'')+
+        (r.description?'<div style="font-size:11px;color:var(--ink-soft);">'+entEsc(String(r.description).slice(0,90))+'</div>':'')+'</td>'+
+      '<td>'+intLabel(INT_CATEGORIES, r.category)+'</td>'+
+      '<td>'+entEsc(ent||'All entities')+'</td>'+
+      '<td>'+intLabel(INT_FREQUENCIES, r.frequency)+'</td>'+
+      '<td>'+entEsc(r.owner||'—')+'</td>'+
+      '<td class="mono" style="white-space:nowrap;">'+entEsc(r.last_completed||'never')+'</td>'+
+      '<td class="mono" style="white-space:nowrap;">'+entEsc(r.next_due||r.first_due||'—')+'</td>'+
+      '<td><span class="lg-pill lg-'+s.tone+'">'+entEsc(s.label)+'</span></td>'+
+      '<td style="white-space:nowrap;">'+
+        '<button class="cc-btn-primary" onclick="intComplete('+lgArg(r.id)+')">Mark done</button> '+
+        '<button class="cc-btn" onclick="intOpen('+lgArg(r.id)+')">Edit</button> '+
+        '<button class="cc-btn" onclick="intDelete('+lgArg(r.id)+')">Delete</button></td>'+
+    '</tr>';
+  }).join('');
+
+  root.innerHTML = head + chips + filters +
+    '<div class="cu-tablewrap"><table class="cu-table"><thead><tr>'+
+      '<th>Item</th><th>Category</th><th>Entity</th><th>Frequency</th><th>Owner</th>'+
+      '<th>Last done</th><th>Next due</th><th>Status</th><th></th>'+
+    '</tr></thead><tbody>'+body+'</tbody></table></div>'+
+    '<div class="cu-foot">Showing '+rows.length+' of '+INTERNAL.length+' item(s).</div>';
+}
+
+function intSetFilter(k,v){ INT_FILTERS[k]=v; renderInternal(); }
+function intClear(){ INT_FILTERS={category:'',status:'active',entity:'',q:''}; renderInternal(); }
+
+
+// ── add / edit ──────────────────────────────────────────────────
+function intOpen(id){
+  var r = {};
+  if(id) for(var i=0;i<INTERNAL.length;i++) if(String(INTERNAL[i].id)===String(id)) r = INTERNAL[i];
+
+  var entOpts = '<option value="">Applies across all entities</option>';
+  if(typeof CLIENTS!=='undefined')
+    CLIENTS.forEach(function(c){
+      entOpts += '<option value="'+entEsc(c.id)+'"'+(String(r.company_id||'')===String(c.id)?' selected':'')+'>'+entEsc(c.name)+'</option>';
+    });
+
+  var sel = function(id2,label,list,cur){
+    return '<div style="margin-bottom:12px;"><div style="font-size:11px;color:var(--ink-soft);font-weight:600;margin-bottom:4px;">'+label+'</div>'+
+      '<select id="'+id2+'" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);'+
+      'border-radius:8px;padding:9px 11px;font-size:13px;outline:none;">'+
+      list.map(function(o){ return '<option value="'+o[0]+'"'+(cur===o[0]?' selected':'')+'>'+o[1]+'</option>'; }).join('')+
+      '</select></div>';
+  };
+
+  var m = document.createElement('div');
+  m.id='int-modal';
+  m.style.cssText='position:fixed;inset:0;background:rgba(11,18,32,.75);z-index:9998;display:flex;'+
+    'align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto;';
+  m.onclick=function(e){ if(e.target===m) intClose(); };
+  m.innerHTML =
+    '<div style="background:var(--ink2);border:1px solid var(--ink4);border-radius:14px;padding:24px;'+
+      'width:100%;max-width:560px;margin:auto;">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">'+
+        '<div style="font-size:17px;font-weight:700;">'+(id?'Edit item':'Add internal compliance')+'</div>'+
+        '<button onclick="intClose()" style="background:none;border:none;color:var(--slate);cursor:pointer;font-size:24px;line-height:1;">&times;</button></div>'+
+      '<div style="font-size:12px;color:var(--ink-soft);margin-bottom:16px;line-height:1.6;">'+
+        'This is your own schedule — nothing here is verified against a regulator, so a status '+
+        'means exactly what you record.</div>'+
+
+      entField('int-title','Title','e.g. POSH policy annual review', r.title||'')+
+      entField('int-ref','Reference','(optional) internal doc no. / ISO clause', r.reference||'')+
+      sel('int-category','Category', INT_CATEGORIES, r.category||'policy')+
+      '<div style="margin-bottom:12px;"><div style="font-size:11px;color:var(--ink-soft);font-weight:600;margin-bottom:4px;">Entity</div>'+
+        '<select id="int-entity" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);'+
+        'border-radius:8px;padding:9px 11px;font-size:13px;outline:none;">'+entOpts+'</select></div>'+
+      sel('int-freq','Frequency', INT_FREQUENCIES, r.frequency||'annual')+
+      sel('int-crit','Criticality', [['low','Low'],['medium','Medium'],['high','High'],['critical','Critical']], r.criticality||'medium')+
+      entField('int-owner','Owner','who is responsible', r.owner||'')+
+      entField('int-firstdue','First / next due date','', r.next_due||r.first_due||'', 'date')+
+      entField('int-lastdone','Last completed','(optional)', r.last_completed||'', 'date')+
+      sel('int-status','Status', [['active','Active'],['paused','Paused'],['retired','Retired']], r.status||'active')+
+      '<div style="margin-bottom:12px;"><div style="font-size:11px;color:var(--ink-soft);font-weight:600;margin-bottom:4px;">Notes</div>'+
+        '<textarea id="int-notes" rows="2" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);'+
+        'color:var(--white);border-radius:8px;padding:9px 11px;font-size:13px;outline:none;box-sizing:border-box;resize:vertical;">'+
+        entEsc(r.description||'')+'</textarea></div>'+
+
+      '<div id="int-err" style="display:none;font-size:12px;color:#EF4444;margin:8px 0;"></div>'+
+      '<div style="display:flex;gap:8px;margin-top:16px;">'+
+        '<button class="cc-btn-primary" style="flex:1;" onclick="intSave('+(id?lgArg(id):'')+')">'+(id?'Save changes':'Add item')+'</button>'+
+        '<button class="cc-btn" onclick="intClose()">Cancel</button></div>'+
+    '</div>';
+  document.body.appendChild(m);
+  var t=document.getElementById('int-title'); if(t) t.focus();
+}
+function intClose(){ var m=document.getElementById('int-modal'); if(m) m.remove(); }
+function intErr(msg){ var e=document.getElementById('int-err'); if(e){ e.textContent=msg; e.style.display='block'; } }
+
+async function intSave(id){
+  var g=function(i){ var e=document.getElementById(i); return e?String(e.value||'').trim():''; };
+  var title=g('int-title');
+  if(!title){ intErr('Give the item a title.'); return; }
+  if(!supaClient || !CURRENT_USER){ intErr('Not signed in.'); return; }
+
+  var freq=g('int-freq'), lastDone=g('int-lastdone'), firstDue=g('int-firstdue');
+  // If it recurs and a completion date is known, the next due follows from it.
+  var nextDue = firstDue || null;
+  if(lastDone){
+    var derived = intNextDue(freq, lastDone);
+    if(derived) nextDue = derived;
+  }
+
+  var payload = {
+    user_id: CURRENT_USER.id,
+    company_id: g('int-entity') || null,
+    title: title,
+    category: g('int-category'),
+    reference: g('int-ref') || null,
+    description: g('int-notes') || null,
+    owner: g('int-owner') || null,
+    frequency: freq,
+    criticality: g('int-crit'),
+    first_due: firstDue || null,
+    last_completed: lastDone || null,
+    next_due: nextDue,
+    status: g('int-status'),
+    updated_at: new Date().toISOString()
+  };
+
+  try{
+    var res = id
+      ? await supaClient.from('internal_compliances').update(payload).eq('id', id).select()
+      : await supaClient.from('internal_compliances').insert(payload).select();
+    if(res.error) throw res.error;
+    intClose();
+    INTERNAL.__loaded = false;
+    await intLoad();
+    INTERNAL.__loaded = true;
+    renderInternal();
+  }catch(e){
+    var msg=(e&&e.message)||String(e);
+    if(/does not exist|schema cache/i.test(msg))
+      msg += '  →  Run db/008_internal_compliances.sql in the Supabase SQL editor.';
+    intErr('Could not save: '+msg);
+  }
+}
+
+// Mark done: logs the completion and rolls the next due date forward.
+async function intComplete(id){
+  var r=null;
+  for(var i=0;i<INTERNAL.length;i++) if(String(INTERNAL[i].id)===String(id)) r=INTERNAL[i];
+  if(!r) return;
+
+  var today = new Date();
+  var iso = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+  var when = prompt('Completed on (YYYY-MM-DD):', iso);
+  if(when === null) return;
+  when = String(when).trim();
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(when)){ alert('Enter the date as YYYY-MM-DD.'); return; }
+  if(lgDays(when) > 0){ alert('That date is in the future.'); return; }
+
+  var next = intNextDue(r.frequency, when);
+  if(!supaClient || !CURRENT_USER){ alert('Not signed in.'); return; }
+  try{
+    var up = await supaClient.from('internal_compliances')
+      .update({last_completed: when, next_due: next, updated_at: new Date().toISOString()})
+      .eq('id', id).select();
+    if(up.error) throw up.error;
+    // History, so a recurring item keeps every cycle rather than overwriting.
+    var lg = await supaClient.from('internal_compliance_log').insert({
+      internal_id: id, user_id: CURRENT_USER.id, completed_on: when,
+      completed_by: (CURRENT_USER && CURRENT_USER.email) || 'user'
+    });
+    if(lg.error && !/does not exist|schema cache/i.test(lg.error.message||'')) throw lg.error;
+
+    INTERNAL.__loaded = false;
+    await intLoad();
+    INTERNAL.__loaded = true;
+    renderInternal();
+    if(next) alert('Recorded. Next due '+next+'.');
+  }catch(e){
+    var msg=(e&&e.message)||String(e);
+    if(/does not exist|schema cache/i.test(msg))
+      msg += '  →  Run db/008_internal_compliances.sql first.';
+    alert('Could not record: '+msg);
+  }
+}
+
+async function intDelete(id){
+  var nm='';
+  for(var i=0;i<INTERNAL.length;i++) if(String(INTERNAL[i].id)===String(id)) nm=INTERNAL[i].title;
+  if(!confirm('Remove "'+(nm||'this item')+'"?\n\nIts completion history is removed with it.')) return;
+  if(!supaClient){ alert('Not signed in.'); return; }
+  try{
+    var res = await supaClient.from('internal_compliances').delete().eq('id', id);
+    if(res.error) throw res.error;
+    INTERNAL.__loaded = false;
+    await intLoad();
+    INTERNAL.__loaded = true;
+    renderInternal();
+  }catch(e){ alert('Could not delete: '+((e&&e.message)||e)); }
+}
+
+function renderEntities(){
+  var root = document.getElementById('ent-root');
+  if(!root) return;
+  var list = (typeof CLIENTS!=='undefined' && Array.isArray(CLIENTS)) ? CLIENTS : [];
+
+  var head =
+    '<div class="cc-pagehead">'+
+      '<div><div class="cc-crumb">Operate › Entities</div>'+
+      '<h1 class="cc-h1">Entities</h1>'+
+      '<p class="cc-sub">Master data for <b>'+list.length+'</b> '+(list.length===1?'entity':'entities')+
+      '. These figures drive every applicability test — Secretarial Audit, CSR, and the filing calendar.</p></div>'+
+      '<div class="cc-headbtns"><button class="cc-btn" onclick="lgPurgeExpired()">Purge expired documents</button>'+
+      '<button class="cc-btn" onclick="lgSystemCheck()">System check</button>'+
+      '<button class="cc-btn" onclick="bulkOpen()">Import from spreadsheet</button>'+
+      '<button class="cc-btn-primary" onclick="entOpen()">+ Add entity</button></div>'+
+    '</div>';
+
+  if(!list.length){
+    root.innerHTML = head +
+      '<div class="cc-empty"><div class="cc-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V7l7-4 7 4v14"/></svg></div>'+
+      '<h2>No entities yet</h2><p>Add a company to populate the compliance calendar and obligation register.</p>'+
+      '<button class="cc-btn-primary" onclick="entOpen()">+ Add your first entity</button></div>';
+    return;
+  }
+
+  var rows = list.map(function(c){
+    var obligations = '—';
+    try { obligations = getComplianceChart(c).length; } catch(e){ obligations = '!'; }
+    var missing = [];
+    if(!c.networth)   missing.push('net worth');
+    if(!c.netprofit)  missing.push('net profit');
+    if(!c.borrowings) missing.push('borrowings');
+    var warn = missing.length
+      ? '<div style="font-size:11px;color:#F59E0B;margin-top:3px;">⚠ missing '+missing.join(', ')+' — some tests cannot run</div>'
+      : '';
+    return '<tr>'+
+      '<td><div style="font-weight:700;">'+entEsc(c.name)+'</div>'+
+        '<div class="mono" style="font-size:11px;color:var(--ink-soft);">'+entEsc(c.cin||'no CIN')+'</div>'+warn+'</td>'+
+      '<td>'+entTypeLabel(c.type)+'</td>'+
+      '<td class="mono">'+entEsc(c.fyend||'—')+'</td>'+
+      '<td class="mono">'+entFmt(c.capital)+'</td>'+
+      '<td class="mono">'+entFmt(c.turnover)+'</td>'+
+      '<td class="mono">'+entFmt(c.netprofit)+'</td>'+
+      '<td class="mono">'+obligations+'</td>'+
+      '<td style="white-space:nowrap;">'+
+        '<button class="cc-btn-primary" onclick="lgRegOpen('+lgArg(c.id)+')">Filings</button> '+
+        '<button class="cc-btn" onclick="entOpen('+lgArg(c.id)+')">Edit</button> '+
+        '<button class="cc-btn" onclick="entDelete('+lgArg(c.id)+')">Delete</button></td>'+
+      '</tr>';
+  }).join('');
+
+  root.innerHTML = head +
+    '<div class="cu-tablewrap"><table class="cu-table">'+
+    '<thead><tr><th>Entity</th><th>Type</th><th>FY end</th><th>Paid-up capital</th>'+
+    '<th>Turnover</th><th>Net profit</th><th>Obligations</th><th></th></tr></thead>'+
+    '<tbody>'+rows+'</tbody></table></div>';
+}
+
+function entField(id,label,hint,value,type){
+  return '<div style="margin-bottom:12px;">'+
+    '<div style="font-size:11px;color:var(--ink-soft);font-weight:600;margin-bottom:4px;">'+label+
+      (hint?' <span style="font-weight:400;opacity:.75;">'+hint+'</span>':'')+'</div>'+
+    '<input id="'+id+'" type="'+(type||'text')+'" value="'+entEsc(value)+'" '+
+      'style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);'+
+      'border-radius:8px;padding:9px 11px;font-size:13px;outline:none;box-sizing:border-box;"></div>';
+}
+
+function entOpen(id){
+  ENT_EDITING = id || null;
+  var c = {};
+  if(id && typeof CLIENTS!=='undefined'){
+    for(var i=0;i<CLIENTS.length;i++) if(String(CLIENTS[i].id)===String(id)) c = CLIENTS[i];
+  }
+  var opts = ENT_TYPES.map(function(t){
+    return '<option value="'+t[0]+'"'+(c.type===t[0]?' selected':'')+'>'+t[1]+'</option>';
+  }).join('');
+
+  var m = document.createElement('div');
+  m.id = 'ent-modal';
+  m.style.cssText='position:fixed;inset:0;background:rgba(11,18,32,.75);z-index:9998;display:flex;'+
+    'align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto;';
+  m.onclick = function(e){ if(e.target===m) entClose(); };
+
+  m.innerHTML =
+    '<div style="background:var(--ink2);border:1px solid var(--ink4);border-radius:14px;padding:24px;'+
+      'width:100%;max-width:560px;margin:auto;box-shadow:0 20px 60px rgba(0,0,0,.4);">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">'+
+        '<div style="font-size:17px;font-weight:700;">'+(id?'Edit entity':'Add entity')+'</div>'+
+        '<button onclick="entClose()" style="background:none;border:none;color:var(--slate);'+
+          'cursor:pointer;font-size:24px;line-height:1;">&times;</button></div>'+
+      '<div style="font-size:12px;color:var(--ink-soft);margin-bottom:18px;">'+
+        'All money figures in <b>₹ crore</b>. Leave a field blank if it does not apply — '+
+        'blank means the test that depends on it is skipped, not that it passes.</div>'+
+
+      entField('ent-name','Company name','',c.name||'')+
+      '<div style="margin-bottom:12px;">'+
+        '<div style="font-size:11px;color:var(--ink-soft);font-weight:600;margin-bottom:4px;">CIN '+
+          '<span style="font-weight:400;opacity:.75;">— fills in type, listed status, state and year</span></div>'+
+        '<input id="ent-cin" type="text" value="'+entEsc(c.cin||'')+'" oninput="entCinChanged()" '+
+          'placeholder="U74999MH2015PTC123456" spellcheck="false" '+
+          'style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);'+
+          'border-radius:8px;padding:9px 11px;font-size:13px;outline:none;box-sizing:border-box;'+
+          'font-family:\'IBM Plex Mono\',monospace;letter-spacing:.04em;">'+
+        '<div style="margin-top:6px;">'+
+          '<button type="button" id="ent-fetch-btn" class="cc-btn" onclick="entFetchFromCin()">Fetch details</button>'+
+          '<span style="font-size:11px;color:var(--ink-soft);margin-left:8px;">'+
+            'pulls name, status and paid-up capital from MCA master data</span>'+
+        '</div>'+
+        '<div id="ent-cin-info" style="display:none;font-size:11px;line-height:1.5;margin-top:5px;color:var(--ink-soft);"></div>'+
+      '</div>'+
+
+      '<div style="margin-bottom:12px;"><div style="font-size:11px;color:var(--ink-soft);font-weight:600;margin-bottom:4px;">Company type</div>'+
+      '<select id="ent-type" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);'+
+        'color:var(--white);border-radius:8px;padding:9px 11px;font-size:13px;outline:none;">'+opts+'</select></div>'+
+
+      entField('ent-fyend','Financial year end','(only day & month are used)',c.fyend||'','date')+
+      entField('ent-capital','Paid-up share capital','₹ crore · Sec 204 limb: ≥ 50',entToCrore(c.capital),'number')+
+      entField('ent-turnover','Annual turnover','₹ crore · Sec 204 ≥ 250 · CSR ≥ 1000',entToCrore(c.turnover),'number')+
+      entField('ent-networth','Net worth','₹ crore · CSR limb: ≥ 500',entToCrore(c.networth),'number')+
+      entField('ent-netprofit','Net profit (preceding FY)','₹ crore · CSR limb: ≥ 5',entToCrore(c.netprofit),'number')+
+      entField('ent-borrowings','Borrowings from banks / PFIs','₹ crore · Sec 204 limb: ≥ 100',entToCrore(c.borrowings),'number')+
+
+      '<div id="ent-err" style="display:none;font-size:12px;color:#EF4444;margin:8px 0;"></div>'+
+      '<div style="display:flex;gap:8px;margin-top:18px;">'+
+        '<button class="cc-btn-primary" style="flex:1;" onclick="entSave()">'+(id?'Save changes':'Add entity')+'</button>'+
+        '<button class="cc-btn" onclick="entClose()">Cancel</button></div>'+
+    '</div>';
+
+  document.body.appendChild(m);
+  entCinChanged();
+  var n = document.getElementById('ent-name'); if(n) n.focus();
+}
+
+function entClose(){
+  var m = document.getElementById('ent-modal');
+  if(m) m.remove();
+  ENT_EDITING = null;
+}
+
+function entErr(msg){
+  var e = document.getElementById('ent-err');
+  if(e){ e.textContent = msg; e.style.display='block'; }
+}
+
+async function entSave(){
+  var v = function(id){ var el=document.getElementById(id); return el ? el.value.trim() : ''; };
+  var name = v('ent-name');
+  if(!name){ entErr('Company name is required.'); return; }
+  if(!supaClient || !CURRENT_USER){ entErr('Not signed in — cannot save.'); return; }
+
+  var payload = {
+    name: name,
+    cin: v('ent-cin') || null,
+    type: v('ent-type'),
+    fyend: v('ent-fyend') || null,
+    capital:    entToRupees(v('ent-capital')),
+    turnover:   entToRupees(v('ent-turnover')),
+    networth:   entToRupees(v('ent-networth')),
+    netprofit:  entToRupees(v('ent-netprofit')),
+    borrowings: entToRupees(v('ent-borrowings'))
+  };
+
+  try{
+    var res;
+    if(ENT_EDITING){
+      res = await supaClient.from('companies').update(payload).eq('id', ENT_EDITING).select();
+    } else {
+      payload.user_id = CURRENT_USER.id;
+      res = await supaClient.from('companies').insert(payload).select();
+    }
+    if(res.error) throw res.error;
+    entClose();
+    await loadCloudClients();
+    renderEntities();
+    if(typeof renderCommandCenter==='function') renderCommandCenter();
+  }catch(e){
+    // A missing column here means db/001_add_financial_columns.sql has not been run yet.
+    var msg = (e && e.message) ? e.message : String(e);
+    if(/column .* does not exist|schema cache/i.test(msg)){
+      msg += '  →  Run db/001_add_financial_columns.sql in the Supabase SQL editor first.';
+    }
+    entErr('Could not save: ' + msg);
+  }
+}
+
+async function entDelete(id){
+  var nm = '';
+  if(typeof CLIENTS!=='undefined')
+    for(var i=0;i<CLIENTS.length;i++) if(String(CLIENTS[i].id)===String(id)) nm = CLIENTS[i].name;
+  if(!confirm('Remove "'+(nm||'this entity')+'"?\n\nIts compliance history will be removed with it. This cannot be undone.')) return;
+  if(!supaClient){ alert('Not signed in.'); return; }
+  try{
+    var res = await supaClient.from('companies').delete().eq('id', id);
+    if(res.error) throw res.error;
+    await loadCloudClients();
+    renderEntities();
+    if(typeof renderCommandCenter==='function') renderCommandCenter();
+  }catch(e){
+    alert('Could not delete: ' + ((e && e.message) || e));
+  }
+}
+
 function mwMenu(e,entityId,key){
   e.stopPropagation();
   // simple action set — reuse the detail modal for now
