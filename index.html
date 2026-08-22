@@ -908,7 +908,7 @@ input[type="text"], input[type="password"], textarea, select {
     </div>
     <div>
       <div class="n">LawGovern</div>
-      <div class="t">Compliance OS · v44</div>
+      <div class="t">Compliance OS · v45</div>
     </div>
   </div>
   <div class="cc-search">
@@ -5656,10 +5656,22 @@ function renderUniverse(){
         '<option value="unlisted"'+(f.listing==='unlisted'?' selected':'')+'>Unlisted only</option></select>'+
       '<select onchange="cuSetFilter(\'freq\',this.value)"><option value="">Any frequency</option>'+
         (function(){
+          // Count against rows that already satisfy every OTHER filter, so the
+          // number beside an option is what you will actually get.
           var counts = {};
-          all.forEach(function(r){ if(r.freq) counts[r.freq] = (counts[r.freq]||0)+1; });
-          return Object.keys(counts).sort().map(function(k){
-            return '<option value="'+k+'"'+(f.freq===k?' selected':'')+'>'+k+' ('+counts[k]+')</option>';
+          all.forEach(function(r){
+            if(f.entity  && r.entity !== f.entity) return;
+            if(f.law     && cuLawShort(r.law) !== f.law) return;
+            if(f.status  && r.status !== f.status) return;
+            if(f.vstatus && r.vstate !== f.vstatus) return;
+            if(f.vmethod && r.vmethod !== f.vmethod) return;
+            if(f.listing && r.listing !== f.listing) return;
+            if(r.freq) counts[r.freq] = (counts[r.freq]||0)+1;
+          });
+          var keys = Object.keys(counts).sort();
+          if(f.freq && keys.indexOf(f.freq) < 0) keys.push(f.freq);
+          return keys.map(function(k){
+            return '<option value="'+k+'"'+(f.freq===k?' selected':'')+'>'+k+' ('+(counts[k]||0)+')</option>';
           }).join('');
         })()+
       '</select>'+
@@ -5670,7 +5682,33 @@ function renderUniverse(){
 
   var body='';
   if(!rows.length){
-    body='<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--ink-soft);">No obligations match these filters. <a onclick="cuClear()" style="color:var(--blue);cursor:pointer;">Clear filters</a></td></tr>';
+    body = (function(){
+          // Work out which single filter is responsible, so the message can say so.
+          var tests = [
+            ['listing', f.listing, function(r){ return r.listing === f.listing; }, 'Listing'],
+            ['freq',    f.freq,    function(r){ return r.freq === f.freq; },       'Frequency'],
+            ['entity',  f.entity,  function(r){ return r.entity === f.entity; },   'Entity'],
+            ['law',     f.law,     function(r){ return cuLawShort(r.law) === f.law; }, 'Law'],
+            ['vstatus', f.vstatus, function(r){ return r.vstate === f.vstatus; },  'Verification status'],
+            ['status',  f.status,  function(r){ return r.status === f.status; },   'Status']
+          ];
+          var culprits = [];
+          tests.forEach(function(t){
+            if(!t[1]) return;
+            if(!all.some(t[2])) culprits.push(t[3] + ' \u201c' + t[1] + '\u201d');
+          });
+          var why = culprits.length
+            ? 'Nothing in this register matches ' + culprits.join(' or ') + '.'
+            : 'No single filter is empty on its own \u2014 it is the combination that matches nothing.';
+          var hint = '';
+          if(f.listing === 'unlisted' && !all.some(function(r){ return r.listing === 'unlisted'; }))
+            hint = ' You have no unlisted entity on record \u2014 add one under Entities to see its obligations.';
+          else if(f.listing === 'listed' && !all.some(function(r){ return r.listing === 'listed'; }))
+            hint = ' You have no listed entity on record.';
+          return '<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--ink-soft);line-height:1.7;">' +
+            why + hint +
+            ' <a onclick="cuClear()" style="color:var(--blue);cursor:pointer;">Clear filters</a></td></tr>';
+        })();
   } else {
     rows.forEach(function(r){
       body+='<tr onclick="cuOpenDetail(\''+r.entityId+'\',\''+r.key+'\')">'+
