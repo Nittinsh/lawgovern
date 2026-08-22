@@ -1,0 +1,1188 @@
+{
+ "meta": {
+  "source": "master sheet.xlsx",
+  "fyEnd": {
+   "month": 3,
+   "day": 31
+  },
+  "quarterEnds": [
+   {
+    "q": "Q1",
+    "covers": "Apr-Jun",
+    "month": 6,
+    "day": 30
+   },
+   {
+    "q": "Q2",
+    "covers": "Jul-Sep",
+    "month": 9,
+    "day": 30
+   },
+   {
+    "q": "Q3",
+    "covers": "Oct-Dec",
+    "month": 12,
+    "day": 31
+   },
+   {
+    "q": "Q4",
+    "covers": "Jan-Mar",
+    "month": 3,
+    "day": 31
+   }
+  ],
+  "halfYearEnds": [
+   {
+    "h": "H1",
+    "covers": "Apr-Sep",
+    "month": 9,
+    "day": 30
+   },
+   {
+    "h": "H2",
+    "covers": "Oct-Mar",
+    "month": 3,
+    "day": 31
+   }
+  ],
+  "sheet": "SEBI PIT Compliance",
+  "count": 42
+ },
+ "rules": [
+  {
+   "id": "PIT-REG-2-1",
+   "sourceRow": 1,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Reg. 2",
+   "area": "Definitions",
+   "title": "Connected person",
+   "detail": "Map persons connected with the listed entity or having a relationship reasonably expected to provide UPSI access; keep the connected-person universe current.",
+   "frequency": "Onboarding; role/adviser changes",
+   "timelineText": "Continuous / on change",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entity / PIT-covered persons",
+   "owner": "Compliance / CS / HR / Legal",
+   "evidence": "Connected-person master; declarations",
+   "risk": "Scope failure / hidden insider risk",
+   "priority": "High",
+   "needsReview": false
+  },
+  {
+   "id": "PIT-REG-2-2",
+   "sourceRow": 2,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Reg. 2",
+   "area": "Definitions",
+   "title": "Insider / designated person",
+   "detail": "Maintain a complete insider and designated-person universe under PIT and the company Code; update when roles or UPSI access change.",
+   "frequency": "Appointment; transfer; access change",
+   "timelineText": "Prompt update; periodic review",
+   "due": {
+    "type": "at_trigger",
+    "when": "Prompt update; periodic review"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entity / relevant intermediaries/fiduciaries",
+   "owner": "Compliance / HR / IT",
+   "evidence": "DP master; access matrix",
+   "risk": "Control failure / trading risk",
+   "priority": "Critical",
+   "needsReview": false
+  },
+  {
+   "id": "PIT-REG-2-1-N-3",
+   "sourceRow": 3,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Reg. 2(1)(n)",
+   "area": "UPSI",
+   "title": "UPSI identification",
+   "detail": "Classify information as UPSI where it is not generally available and is likely to materially affect securities price; document classification and rationale.",
+   "frequency": "Creation/receipt of material information",
+   "timelineText": "Immediate",
+   "due": {
+    "type": "at_trigger",
+    "when": "Immediate"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "PIT-covered entities",
+   "owner": "Compliance / CFO / CS / Legal",
+   "evidence": "UPSI register; classification memo",
+   "risk": "Unlawful communication/trading risk",
+   "priority": "Critical",
+   "needsReview": false
+  },
+  {
+   "id": "PIT-REG-2-1-N-2025-AMENDMENT-4",
+   "sourceRow": 4,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Reg. 2(1)(n) / 2025 amendment",
+   "area": "UPSI",
+   "title": "Expanded UPSI categories",
+   "detail": "Cover specified UPSI categories including financial results/performance, dividends, capital structure changes, M&A/demerger/acquisition/delisting/disposal/expansion, KMP changes, material LODR events and specified additional categories added in 2025.",
+   "frequency": "Board agenda / transaction initiation / material event",
+   "timelineText": "At event inception",
+   "due": {
+    "type": "at_trigger",
+    "when": "At event inception"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entities",
+   "owner": "Compliance / CS / CFO / Legal",
+   "evidence": "UPSI register; board papers; deal codes",
+   "risk": "2025 expansion widens control universe",
+   "priority": "Critical",
+   "needsReview": false
+  },
+  {
+   "id": "PIT-REG-3-1-5",
+   "sourceRow": 5,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Reg. 3(1)",
+   "area": "UPSI communication",
+   "title": "Prohibition on communication",
+   "detail": "Do not communicate, provide or allow access to UPSI except for legitimate purposes, performance of duties or discharge of legal obligations.",
+   "frequency": "Any sharing of UPSI",
+   "timelineText": "Before sharing",
+   "due": {
+    "type": "at_trigger",
+    "when": "Before sharing"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Insiders / connected persons",
+   "owner": "Business owner / Compliance / Legal",
+   "evidence": "Approval; NDA/notice; access log",
+   "risk": "Insider-trading exposure",
+   "priority": "Critical",
+   "needsReview": false
+  },
+  {
+   "id": "PIT-REG-3-2-6",
+   "sourceRow": 6,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Reg. 3(2)",
+   "area": "UPSI procurement",
+   "title": "Prohibition on procurement",
+   "detail": "Do not procure or cause communication of UPSI from an insider except for legitimate purposes, duties or legal obligations.",
+   "frequency": "Any request/receipt",
+   "timelineText": "Before receipt where practicable",
+   "due": {
+    "type": "at_trigger",
+    "when": "Before receipt where practicable"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "All UPSI recipients",
+   "owner": "Recipient / Compliance / Legal",
+   "evidence": "Request approval; acknowledgement",
+   "risk": "Insider-trading exposure",
+   "priority": "Critical",
+   "needsReview": false
+  },
+  {
+   "id": "PIT-REG-3-9A-7",
+   "sourceRow": 7,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Reg. 3 / 9A",
+   "area": "UPSI access",
+   "title": "Need-to-know / legitimate purpose",
+   "detail": "Define legitimate purpose categories and restrict UPSI access to persons who need it; record business purpose and access.",
+   "frequency": "Every UPSI project",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entities / intermediaries / fiduciaries",
+   "owner": "Compliance / Legal / IT",
+   "evidence": "Need-to-know matrix; access logs",
+   "risk": "Leakage risk",
+   "priority": "High",
+   "needsReview": false
+  },
+  {
+   "id": "PIT-REG-4-1-8",
+   "sourceRow": 8,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Reg. 4(1)",
+   "area": "Trading prohibition",
+   "title": "No trading while in possession of UPSI",
+   "detail": "Prohibit trading while in possession of UPSI, subject only to operative statutory defences/exceptions.",
+   "frequency": "Every trade",
+   "timelineText": "Continuous / pre-trade",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Insiders",
+   "owner": "DP / Promoter / KMP / Compliance",
+   "evidence": "Trade approval; trading records",
+   "risk": "Insider-trading action / penalties",
+   "priority": "Critical",
+   "needsReview": false
+  },
+  {
+   "id": "PIT-REG-4-9",
+   "sourceRow": 9,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Reg. 4",
+   "area": "Trading prohibition",
+   "title": "Defence evidence",
+   "detail": "Where an exception/defence is relied upon, preserve evidence demonstrating satisfaction of each condition.",
+   "frequency": "Exception-based trade",
+   "timelineText": "Before/at trade",
+   "due": {
+    "type": "at_trigger",
+    "when": "Before/at trade"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Insiders",
+   "owner": "Compliance / Legal",
+   "evidence": "Defence memo; supporting records",
+   "risk": "Weak defence in enforcement",
+   "priority": "High",
+   "needsReview": false
+  },
+  {
+   "id": "PIT-REG-5-10",
+   "sourceRow": 10,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Reg. 5",
+   "area": "Trading plan",
+   "title": "Trading plan approval",
+   "detail": "Permit trading plans only through Compliance Officer approval/public disclosure and subject to all operative regulatory conditions.",
+   "frequency": "Trading-plan request",
+   "timelineText": "Before trading begins",
+   "due": {
+    "type": "at_trigger",
+    "when": "Before trading begins"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Eligible insiders",
+   "owner": "Insider / Compliance Officer",
+   "evidence": "Plan; approval; public disclosure",
+   "risk": "Invalid trades",
+   "priority": "High",
+   "needsReview": false
+  },
+  {
+   "id": "PIT-REG-5-2-AMENDED-2025-11",
+   "sourceRow": 11,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Reg. 5(2) amended 2025",
+   "area": "Trading plan",
+   "title": "Minimum lead time",
+   "detail": "Ensure the trading plan does not commence earlier than 120 days from public disclosure under the 2025 amendment.",
+   "frequency": "Plan disclosure",
+   "timelineText": "Minimum 120 days before commencement",
+   "due": {
+    "type": "cadence",
+    "minPerYear": 4,
+    "maxGapDays": 120
+   },
+   "dueConfidence": "exact",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Trading-plan users",
+   "owner": "Compliance Officer",
+   "evidence": "Disclosure timestamp; date computation",
+   "risk": "Early trading / invalid plan",
+   "priority": "Critical",
+   "needsReview": false
+  },
+  {
+   "id": "PIT-REG-5-2-12",
+   "sourceRow": 12,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Reg. 5(2)",
+   "area": "Trading plan",
+   "title": "Plan parameters",
+   "detail": "Record quantity/value, nature of trade, intervals/dates and other mandatory parameters; avoid overlap with another trading plan and meet all operative conditions.",
+   "frequency": "Plan drafting/approval",
+   "timelineText": "Before submission",
+   "due": {
+    "type": "at_trigger",
+    "when": "Before submission"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Trading-plan users",
+   "owner": "Insider / Compliance",
+   "evidence": "Approved plan; change log",
+   "risk": "Plan non-compliance",
+   "priority": "High",
+   "needsReview": false
+  },
+  {
+   "id": "PIT-REG-5-13",
+   "sourceRow": 13,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Reg. 5",
+   "area": "Trading plan",
+   "title": "Execution reconciliation",
+   "detail": "Reconcile every trade against the approved trading plan and document deviations only where legally permitted.",
+   "frequency": "Each execution",
+   "timelineText": "At execution",
+   "due": {
+    "type": "at_trigger",
+    "when": "At execution"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Trading-plan users",
+   "owner": "Compliance / Broker liaison",
+   "evidence": "Broker report; reconciliation",
+   "risk": "Deviation risk",
+   "priority": "High",
+   "needsReview": false
+  },
+  {
+   "id": "PIT-REG-7-1-14",
+   "sourceRow": 14,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Reg. 7(1)",
+   "area": "Disclosures",
+   "title": "Initial holding disclosure",
+   "detail": "Obtain prescribed initial disclosures from promoters, promoter group, KMP and directors/persons covered by the operative disclosure provisions.",
+   "frequency": "Applicability / appointment / status event",
+   "timelineText": "Within prescribed timeline",
+   "due": {
+    "type": "review"
+   },
+   "dueConfidence": "unknown",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entities",
+   "owner": "Compliance / CS",
+   "evidence": "Initial disclosure; acknowledgement",
+   "risk": "Late/non-disclosure",
+   "priority": "High",
+   "needsReview": true
+  },
+  {
+   "id": "PIT-REG-7-1-B-15",
+   "sourceRow": 15,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Reg. 7(1)(b)",
+   "area": "Disclosures",
+   "title": "Appointment / becoming promoter",
+   "detail": "Obtain the prescribed disclosure when a person becomes a promoter or is appointed as director/KMP.",
+   "frequency": "Appointment / status change",
+   "timelineText": "Within prescribed timeline",
+   "due": {
+    "type": "review"
+   },
+   "dueConfidence": "unknown",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entities",
+   "owner": "Compliance / HR / CS",
+   "evidence": "Appointment record; disclosure proof",
+   "risk": "Recurring PIT finding",
+   "priority": "High",
+   "needsReview": true
+  },
+  {
+   "id": "PIT-REG-7-2-A-16",
+   "sourceRow": 16,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Reg. 7(2)(a)",
+   "area": "Disclosures",
+   "title": "Continual disclosure threshold",
+   "detail": "Promoter, employee or director and other prescribed persons must disclose trades when the prescribed aggregate traded-value threshold is crossed in a calendar quarter.",
+   "frequency": "Threshold crossed",
+   "timelineText": "Within 2 trading days",
+   "due": {
+    "type": "review"
+   },
+   "dueConfidence": "unknown",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Promoters / employees / directors / prescribed persons",
+   "owner": "DP / Promoter / Compliance",
+   "evidence": "Trade statement; disclosure",
+   "risk": "Late/omitted disclosure",
+   "priority": "Critical",
+   "needsReview": true
+  },
+  {
+   "id": "PIT-REG-7-2-B-17",
+   "sourceRow": 17,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Reg. 7(2)(b)",
+   "area": "Disclosures",
+   "title": "Company exchange intimation",
+   "detail": "Notify the stock exchange of the relevant trading disclosure particulars within the prescribed period after receipt or becoming aware.",
+   "frequency": "Receipt/awareness",
+   "timelineText": "Within 2 trading days",
+   "due": {
+    "type": "review"
+   },
+   "dueConfidence": "unknown",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entities",
+   "owner": "Compliance / CS",
+   "evidence": "Exchange acknowledgement",
+   "risk": "Exchange non-compliance",
+   "priority": "Critical",
+   "needsReview": true
+  },
+  {
+   "id": "PIT-REG-7-3-18",
+   "sourceRow": 18,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Reg. 7(3)",
+   "area": "Disclosures",
+   "title": "Other connected persons",
+   "detail": "Obtain/submit trading disclosures from other connected persons identified by the company when applicable under the operative framework.",
+   "frequency": "Trade / identification",
+   "timelineText": "Applicable prescribed timeline",
+   "due": {
+    "type": "review"
+   },
+   "dueConfidence": "unknown",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entities / identified connected persons",
+   "owner": "Compliance",
+   "evidence": "Disclosure register; exchange filing",
+   "risk": "Hidden trading risk",
+   "priority": "High",
+   "needsReview": true
+  },
+  {
+   "id": "PIT-REG-8-19",
+   "sourceRow": 19,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Reg. 8",
+   "area": "Fair disclosure",
+   "title": "Code of Fair Disclosure",
+   "detail": "Board to formulate and publish a Code of Practices and Procedures for Fair Disclosure of UPSI aligned to Schedule A.",
+   "frequency": "Policy adoption/amendment",
+   "timelineText": "On adoption + amendments",
+   "due": {
+    "type": "review"
+   },
+   "dueConfidence": "unknown",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed companies",
+   "owner": "Board / CS / Compliance",
+   "evidence": "Approved code; website evidence",
+   "risk": "Policy failure",
+   "priority": "Critical",
+   "needsReview": true
+  },
+  {
+   "id": "PIT-REG-8-2-20",
+   "sourceRow": 20,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Reg. 8(2)",
+   "area": "Fair disclosure",
+   "title": "Exchange intimation",
+   "detail": "Promptly intimate the Code of Fair Disclosure and amendments to stock exchange(s).",
+   "frequency": "Policy approval/amendment",
+   "timelineText": "Promptly",
+   "due": {
+    "type": "at_trigger",
+    "when": "Promptly"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed companies",
+   "owner": "CS / Compliance",
+   "evidence": "Exchange acknowledgement",
+   "risk": "Late intimation",
+   "priority": "High",
+   "needsReview": false
+  },
+  {
+   "id": "PIT-SCHEDULE-A-21",
+   "sourceRow": 21,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Schedule A",
+   "area": "Fair disclosure",
+   "title": "Prompt public disclosure",
+   "detail": "Promptly make public UPSI that may impact price discovery as soon as credible and concrete information exists.",
+   "frequency": "UPSI becomes credible/concrete",
+   "timelineText": "As soon as practicable",
+   "due": {
+    "type": "review"
+   },
+   "dueConfidence": "unknown",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed companies",
+   "owner": "CS / CFO / IR / Compliance",
+   "evidence": "Exchange filing; website posting; timestamps",
+   "risk": "Selective disclosure risk",
+   "priority": "Critical",
+   "needsReview": true
+  },
+  {
+   "id": "PIT-SCHEDULE-A-22",
+   "sourceRow": 22,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Schedule A",
+   "area": "Fair disclosure",
+   "title": "Uniform dissemination",
+   "detail": "Disseminate UPSI uniformly and universally and avoid selective dissemination.",
+   "frequency": "Any disclosure",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed companies",
+   "owner": "IR / CS / Compliance",
+   "evidence": "Disclosure archive; communication log",
+   "risk": "Selective disclosure risk",
+   "priority": "Critical",
+   "needsReview": false
+  },
+  {
+   "id": "PIT-SCHEDULE-A-23",
+   "sourceRow": 23,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Schedule A",
+   "area": "Fair disclosure",
+   "title": "Chief Investor Relations Officer",
+   "detail": "Designate a senior officer for dissemination of information and disclosure of UPSI.",
+   "frequency": "Officer appointment/change",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed companies",
+   "owner": "Board / CEO / CS",
+   "evidence": "Appointment evidence",
+   "risk": "Accountability gap",
+   "priority": "High",
+   "needsReview": false
+  },
+  {
+   "id": "PIT-SCHEDULE-A-24",
+   "sourceRow": 24,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Schedule A",
+   "area": "Fair disclosure",
+   "title": "Accidental/selective disclosure",
+   "detail": "Promptly disseminate information inadvertently/ selectively disclosed so it becomes generally available.",
+   "frequency": "Leak/selective disclosure",
+   "timelineText": "Immediate",
+   "due": {
+    "type": "at_trigger",
+    "when": "Immediate"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed companies",
+   "owner": "IR / Compliance / CS",
+   "evidence": "Incident log; corrective filing",
+   "risk": "Escalation / enforcement",
+   "priority": "Critical",
+   "needsReview": false
+  },
+  {
+   "id": "PIT-SCHEDULE-A-25",
+   "sourceRow": 25,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Schedule A",
+   "area": "Fair disclosure",
+   "title": "Rumours / news verification",
+   "detail": "Provide appropriate and fair responses to news reports and regulatory requests for verification of market rumours.",
+   "frequency": "Rumour/news query",
+   "timelineText": "Promptly / as applicable",
+   "due": {
+    "type": "at_trigger",
+    "when": "Promptly / as applicable"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed companies",
+   "owner": "IR / CS / Compliance",
+   "evidence": "Query and response log",
+   "risk": "Market communication risk",
+   "priority": "High",
+   "needsReview": false
+  },
+  {
+   "id": "PIT-REG-9-SCHEDULE-B-26",
+   "sourceRow": 26,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Reg. 9 / Schedule B",
+   "area": "Code of Conduct",
+   "title": "PIT Code",
+   "detail": "Board to formulate Code of Conduct regulating, monitoring and reporting trading by employees/connected persons using Schedule B minimum standards.",
+   "frequency": "Policy adoption/amendment",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entities and specified intermediaries/fiduciaries",
+   "owner": "Board / Compliance Officer",
+   "evidence": "Code; board minutes",
+   "risk": "Core governance failure",
+   "priority": "Critical",
+   "needsReview": false
+  },
+  {
+   "id": "PIT-SCHEDULE-B-27",
+   "sourceRow": 27,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Schedule B",
+   "area": "Trading window",
+   "title": "Designated persons and immediate relatives",
+   "detail": "Apply applicable trading restrictions and monitoring to designated persons and their immediate relatives under the company Code.",
+   "frequency": "DP onboarding / relative declaration",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entities",
+   "owner": "Compliance / HR",
+   "evidence": "DP master; declarations",
+   "risk": "Universe failure",
+   "priority": "Critical",
+   "needsReview": false
+  },
+  {
+   "id": "PIT-SCHEDULE-B-CL-3-28",
+   "sourceRow": 28,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Schedule B cl. 3",
+   "area": "Trading control",
+   "title": "Pre-clearance",
+   "detail": "Require pre-clearance for trades above the company Code threshold and prohibit execution without valid approval.",
+   "frequency": "Proposed trade",
+   "timelineText": "Before trade",
+   "due": {
+    "type": "at_trigger",
+    "when": "Before trade"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Designated persons",
+   "owner": "Compliance Officer",
+   "evidence": "Pre-clearance request/approval",
+   "risk": "Unauthorised trade",
+   "priority": "Critical",
+   "needsReview": false
+  },
+  {
+   "id": "PIT-SCHEDULE-B-29",
+   "sourceRow": 29,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Schedule B",
+   "area": "Trading control",
+   "title": "Contra trade",
+   "detail": "Apply applicable contra-trade restriction and document any permitted exception.",
+   "frequency": "Purchase/sale sequence",
+   "timelineText": "At each trade",
+   "due": {
+    "type": "review"
+   },
+   "dueConfidence": "unknown",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Designated persons",
+   "owner": "Compliance Officer",
+   "evidence": "Trade register; exception approval",
+   "risk": "Breach risk",
+   "priority": "High",
+   "needsReview": true
+  },
+  {
+   "id": "PIT-SCHEDULE-B-CL-4-30",
+   "sourceRow": 30,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Schedule B cl. 4",
+   "area": "Trading window",
+   "title": "Event-based closure",
+   "detail": "Close the trading window whenever designated persons may reasonably be expected to possess UPSI, for the securities to which it relates.",
+   "frequency": "UPSI identified/anticipated",
+   "timelineText": "From closure trigger until permitted reopening",
+   "due": {
+    "type": "review"
+   },
+   "dueConfidence": "unknown",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entities",
+   "owner": "Compliance Officer",
+   "evidence": "Closure/opening log; notice",
+   "risk": "Direct trading risk",
+   "priority": "Critical",
+   "needsReview": true
+  },
+  {
+   "id": "PIT-SCHEDULE-B-CL-4-2-31",
+   "sourceRow": 31,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Schedule B cl. 4(2)",
+   "area": "Trading window",
+   "title": "Quarter-end/results blackout",
+   "detail": "Apply trading restriction from end of every quarter till 48 hours after declaration of financial results, subject to operative SEBI/exchange framework.",
+   "frequency": "Quarter-end / financial results",
+   "timelineText": "Every quarter",
+   "due": {
+    "type": "quarterly",
+    "anchorDates": [
+     {
+      "q": "Q1",
+      "covers": "Apr-Jun",
+      "month": 6,
+      "day": 30
+     },
+     {
+      "q": "Q2",
+      "covers": "Jul-Sep",
+      "month": 9,
+      "day": 30
+     },
+     {
+      "q": "Q3",
+      "covers": "Oct-Dec",
+      "month": 12,
+      "day": 31
+     },
+     {
+      "q": "Q4",
+      "covers": "Jan-Mar",
+      "month": 3,
+      "day": 31
+     }
+    ]
+   },
+   "dueConfidence": "derived",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entities",
+   "owner": "Compliance / CS",
+   "evidence": "Quarter calendar; closure notice; reopen proof",
+   "risk": "Frequent recurring breach risk",
+   "priority": "Critical",
+   "needsReview": false
+  },
+  {
+   "id": "PIT-SEBI-CIRCULAR-FRAMEWORK-32",
+   "sourceRow": 32,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "SEBI circular framework",
+   "area": "Trading window automation",
+   "title": "PAN freeze / automated restriction",
+   "detail": "Maintain accurate DP and securities data for exchange/depository automated trading-window restriction and PAN freezing frameworks.",
+   "frequency": "DP add/remove; result blackout",
+   "timelineText": "As prescribed by SEBI/exchange/depository framework",
+   "due": {
+    "type": "review"
+   },
+   "dueConfidence": "unknown",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entities",
+   "owner": "Compliance / Depository / IT",
+   "evidence": "Freeze/unfreeze evidence",
+   "risk": "Trading during closure",
+   "priority": "Critical",
+   "needsReview": true
+  },
+  {
+   "id": "PIT-REG-9A-33",
+   "sourceRow": 33,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Reg. 9A",
+   "area": "Internal controls",
+   "title": "Institutional mechanism",
+   "detail": "CEO/MD or analogous person must put in place adequate/effective internal controls to prevent insider trading.",
+   "frequency": "Control design / review",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entities, intermediaries, fiduciaries",
+   "owner": "CEO/MD / Compliance",
+   "evidence": "Control framework; review",
+   "risk": "Governance gap",
+   "priority": "Critical",
+   "needsReview": false
+  },
+  {
+   "id": "PIT-REG-9A-2-A-D-34",
+   "sourceRow": 34,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Reg. 9A(2)(a)-(d)",
+   "area": "Internal controls",
+   "title": "UPSI, access and sharing controls",
+   "detail": "Identify access holders; identify and protect UPSI; restrict communication/procurement; maintain list of all persons with whom UPSI is shared and use confidentiality agreements/notices as applicable.",
+   "frequency": "Every UPSI event",
+   "timelineText": "Contemporaneous",
+   "due": {
+    "type": "review"
+   },
+   "dueConfidence": "unknown",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entities / intermediaries / fiduciaries",
+   "owner": "Compliance / IT / Legal",
+   "evidence": "UPSI register; sharing list; NDA; logs",
+   "risk": "Inspection/evidence gap",
+   "priority": "Critical",
+   "needsReview": true
+  },
+  {
+   "id": "PIT-REG-9A-2-F-35",
+   "sourceRow": 35,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Reg. 9A(2)(f)",
+   "area": "Internal controls",
+   "title": "Periodic review",
+   "detail": "Periodically review effectiveness of internal controls for prevention of insider trading and close identified gaps.",
+   "frequency": "Control-testing cycle",
+   "timelineText": "Periodic",
+   "due": {
+    "type": "review"
+   },
+   "dueConfidence": "unknown",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entities / intermediaries / fiduciaries",
+   "owner": "Compliance / Internal Audit",
+   "evidence": "Testing report; remediation tracker",
+   "risk": "Persistent control weakness",
+   "priority": "High",
+   "needsReview": true
+  },
+  {
+   "id": "PIT-SDD-FRAMEWORK-36",
+   "sourceRow": 36,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "SDD framework",
+   "area": "Digital records",
+   "title": "Structured Digital Database",
+   "detail": "Maintain an auditable digital database showing UPSI sharing/access information and preserve integrity of the information trail.",
+   "frequency": "Every sharing/access event",
+   "timelineText": "Contemporaneous",
+   "due": {
+    "type": "review"
+   },
+   "dueConfidence": "unknown",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Applicable listed entities / regulated intermediaries/fiduciaries",
+   "owner": "Compliance / IT",
+   "evidence": "SDD export; logs",
+   "risk": "Cannot reconstruct information flow",
+   "priority": "Critical",
+   "needsReview": true
+  },
+  {
+   "id": "PIT-PIT-GOVERNANCE-37",
+   "sourceRow": 37,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "PIT governance",
+   "area": "Registers",
+   "title": "PIT master register",
+   "detail": "Maintain integrated registers for UPSI, designated persons, immediate relatives, trading windows, pre-clearance, trading plans, disclosures, violations and training.",
+   "frequency": "Every control event",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entities",
+   "owner": "Compliance Officer",
+   "evidence": "Integrated PIT register",
+   "risk": "Audit-trail weakness",
+   "priority": "High",
+   "needsReview": false
+  },
+  {
+   "id": "PIT-PIT-LODR-INTERFACE-38",
+   "sourceRow": 38,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "PIT / LODR interface",
+   "area": "Disclosure reconciliation",
+   "title": "Reconcile PIT UPSI with LODR disclosures",
+   "detail": "Reconcile UPSI identification with LODR material-event and financial-result workflows so disclosure is timely and responsibilities are clear.",
+   "frequency": "Board agenda / event / results",
+   "timelineText": "At inception and closure",
+   "due": {
+    "type": "at_trigger",
+    "when": "At inception and closure"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entities",
+   "owner": "CS / Compliance / CFO / IR",
+   "evidence": "Reconciliation checklist",
+   "risk": "Delayed disclosure",
+   "priority": "Critical",
+   "needsReview": false
+  },
+  {
+   "id": "PIT-PIT-GOVERNANCE-39",
+   "sourceRow": 39,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "PIT governance",
+   "area": "Regulatory watch",
+   "title": "Regulatory change monitoring",
+   "detail": "Monitor PIT amendments, SEBI circulars, informal guidance and exchange/depository implementation updates; update policies and controls.",
+   "frequency": "Regulatory update",
+   "timelineText": "Continuous / monthly review",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "PIT-covered entities",
+   "owner": "Compliance / CS",
+   "evidence": "Regulatory tracker; change memo",
+   "risk": "Stale controls",
+   "priority": "High",
+   "needsReview": false
+  },
+  {
+   "id": "PIT-PIT-GOVERNANCE-40",
+   "sourceRow": 40,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "PIT governance",
+   "area": "Training",
+   "title": "PIT awareness and acknowledgement",
+   "detail": "Train relevant personnel on UPSI, trading restrictions, pre-clearance, disclosures, confidentiality and consequences; retain acknowledgement.",
+   "frequency": "Onboarding + periodic",
+   "timelineText": "Onboarding and periodic refresh",
+   "due": {
+    "type": "review"
+   },
+   "dueConfidence": "unknown",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entities / relevant intermediaries",
+   "owner": "HR / Compliance",
+   "evidence": "Training register; acknowledgements",
+   "risk": "Awareness-driven breaches",
+   "priority": "Medium",
+   "needsReview": true
+  },
+  {
+   "id": "PIT-PIT-GOVERNANCE-41",
+   "sourceRow": 41,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "PIT governance",
+   "area": "Incident management",
+   "title": "Violation escalation",
+   "detail": "Investigate suspected violations, preserve evidence, escalate internally and make external reporting where legally required.",
+   "frequency": "Suspected breach",
+   "timelineText": "Immediate",
+   "due": {
+    "type": "at_trigger",
+    "when": "Immediate"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entities / relevant intermediaries",
+   "owner": "Compliance / Legal / CS / Board",
+   "evidence": "Incident file; investigation; board note",
+   "risk": "Aggravated enforcement risk",
+   "priority": "Critical",
+   "needsReview": false
+  },
+  {
+   "id": "PIT-PIT-GOVERNANCE-42",
+   "sourceRow": 42,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "PIT governance",
+   "area": "Inspection readiness",
+   "title": "Audit-ready evidence pack",
+   "detail": "Maintain policy, UPSI lifecycle, access, SDD, DP master, trading-window, pre-clearance, disclosures, exchange filings, incidents and testing evidence in a retrievable format.",
+   "frequency": "Continuous readiness",
+   "timelineText": "Ongoing",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "All PIT-covered entities",
+   "owner": "Compliance / CS / Internal Audit",
+   "evidence": "PIT inspection pack",
+   "risk": "Evidence gap",
+   "priority": "High",
+   "needsReview": false
+  }
+ ]
+}
