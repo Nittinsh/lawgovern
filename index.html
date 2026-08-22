@@ -908,7 +908,7 @@ input[type="text"], input[type="password"], textarea, select {
     </div>
     <div>
       <div class="n">LawGovern</div>
-      <div class="t">Compliance OS · v48</div>
+      <div class="t">Compliance OS · v49</div>
     </div>
   </div>
   <div class="cc-search">
@@ -938,7 +938,6 @@ input[type="text"], input[type="password"], textarea, select {
 <div class="navhead">Operate</div>
 <div class="navitem" onclick="sw('mywork')" id="t-mywork"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3 8-8M20 12v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h9"/></svg><span>My Work</span></div>
 <div class="navitem" onclick="sw('cal')" id="t-cal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Calendar</span></div>
-<div class="navitem" onclick="sw('cl')" id="t-cl"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3 8-8M20 12v7H4V5h11"/></svg><span>Checklist</span></div>
 <div class="navitem" onclick="sw('entities')" id="t-entities"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h2m-2 4h2m-2 4h2m4-8h2m-2 4h2m-2 4h2"/></svg><span>Entities</span></div>
 <div class="navitem" onclick="sw('events')" id="t-events"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 8v5l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>Material Events</span></div>
 <div class="navitem" onclick="sw('internal')" id="t-internal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg><span>Internal Compliance</span></div>
@@ -1022,39 +1021,6 @@ input[type="text"], input[type="password"], textarea, select {
 </div>
 
 <!-- CHECKLIST PANEL -->
-<div class="panel" id="p-cl">
-  <div class="ps" id="clc">
-    <div class="fc"><h3>Company Profile</h3>
-      <div class="fl">Company Type *</div>
-      <select class="fsl" id="cot">
-        <option value="">Select...</option>
-        <option value="pvt">Private Limited Company (Independent)</option>
-        <option value="pvtsub">Private Limited (Subsidiary of Public Co)</option>
-        <option value="pub">Public Limited Company (Unlisted)</option>
-        <option value="listed">Listed Company – Equity (NSE/BSE)</option>
-        <option value="debt">Listed Company – Debt / NCD</option>
-        <option value="opc">One Person Company (OPC)</option>
-        <option value="small">Small Company</option>
-        <option value="sec8">Section 8 Company</option>
-      </select>
-      <div class="fl">Listing Status *</div>
-      <div class="og">
-        <div class="ob" onclick="sl(this)">Listed (NSE/BSE)</div>
-        <div class="ob" onclick="sl(this)">Unlisted</div>
-        <div class="ob" onclick="sl(this)">SME Listed</div>
-        <div class="ob" onclick="sl(this)">Planning IPO</div>
-      </div>
-    </div>
-    <div class="fc"><h3>Additional Applicability</h3>
-      <div class="cr" onclick="tg('c1')"><div class="cb on" id="c1">✓</div><div class="cll">CSR Applicable (Net worth ≥₹500 Cr OR Turnover ≥₹1,000 Cr OR Net Profit ≥₹5 Cr)</div></div>
-      <div class="cr" onclick="tg('c2')"><div class="cb" id="c2"></div><div class="cll">Cost Audit Applicable</div></div>
-      <div class="cr" onclick="tg('c3')"><div class="cb" id="c3"></div><div class="cll">Has MSME Suppliers (outstanding payments >45 days)</div></div>
-      <div class="cr" onclick="tg('c4')"><div class="cb" id="c4"></div><div class="cll">IEPF Transfer Required (dividend unclaimed ≥7 years)</div></div>
-    </div>
-    <button class="gb" id="genbtn" onclick="genCL()">✦ Generate Compliance Checklist</button>
-  </div>
-</div>
-
 <!-- CALENDAR PANEL -->
 <div class="panel" id="p-cal">
   <div class="cfi">
@@ -1220,29 +1186,6 @@ input[type="text"], input[type="password"], textarea, select {
           </div>
         </div>
 
-        <!-- RIGHT: CHECKLIST GENERATOR -->
-        <div style="background:var(--ink2);border:1px solid var(--ink4);border-radius:12px;overflow:hidden;">
-          <div style="background:var(--ink3);padding:10px 14px;border-bottom:1px solid var(--ink4);font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;">Compliance Checklist Generator</div>
-          <div style="padding:14px;">
-            <div style="font-size:11px;color:var(--slate);margin-bottom:5px;">Company Type</div>
-            <select id="cl-type" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:8px;padding:8px 10px;font-size:12px;outline:none;margin-bottom:8px;">
-              <option value="private">Private Limited</option>
-              <option value="public">Public Unlisted</option>
-              <option value="listed">Listed Company</option>
-              <option value="opc">One Person Company (OPC)</option>
-              <option value="small">Small Company</option>
-              <option value="sec8">Section 8 Company</option>
-              <option value="llp">LLP</option>
-            </select>
-            <div style="font-size:11px;color:var(--slate);margin-bottom:5px;">Paid-up Capital (Rs. Crore)</div>
-            <input id="cl-capital" type="number" placeholder="e.g. 5" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:8px;padding:8px 10px;font-size:13px;outline:none;margin-bottom:8px;box-sizing:border-box;">
-            <div style="font-size:11px;color:var(--slate);margin-bottom:5px;">Annual Turnover (Rs. Crore)</div>
-            <input id="cl-turnover" type="number" placeholder="e.g. 50" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:8px;padding:8px 10px;font-size:13px;outline:none;margin-bottom:8px;box-sizing:border-box;">
-            <div style="font-size:11px;color:var(--slate);margin-bottom:5px;">Net Profit (Rs. Crore, if any)</div>
-            <input id="cl-profit" type="number" placeholder="e.g. 6" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:8px;padding:8px 10px;font-size:13px;outline:none;margin-bottom:10px;box-sizing:border-box;">
-            <button onclick="genChecklist()" style="width:100%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);font-weight:700;font-size:13px;border:none;border-radius:9px;padding:10px;cursor:pointer;">Generate Checklist &#8594;</button>
-          </div>
-        </div>
       </div>
 
       <!-- CHECKLIST OUTPUT -->
@@ -2203,102 +2146,6 @@ var CLD={CA:"#3b82f6",LODR:"#10b981",PIT:"#8b5cf6",IEPF:"#f59e0b"};
 // ═══════════════════════════════════════════════════
 // CHECKLIST DATA
 // ═══════════════════════════════════════════════════
-var CDATA={
-all:[
-{t:"DPT-3 – Return of Deposits/Loans (NIL return mandatory for ALL companies)",f:"DPT-3 (MCA V3 Lot 3)",d:"30 June every year",p:"HIGH",n:"ALL companies must file including NIL. Penalty: Rs.5,000–Rs.25,000/day.",T:"CA"},
-{t:"DIR-3 KYC – Every DIN holder must complete KYC annually",f:"DIR-3 KYC / DIR-3 KYC Web (MCA V3)",d:"30 September (FY 2024-25: extended 31 Oct 2025)",p:"HIGH",n:"DIN deactivated on default. Reactivation fee: Rs.5,000.",T:"CA"},
-{t:"DIR-12 – Intimate any director/KMP appointment, resignation, or change",f:"DIR-12 (MCA V3, Jan 2023)",d:"Within 30 days of change",p:"HIGH",n:"Penalty Rs.50,000 + Rs.500/day. Obtain DIR-2 + DIR-8 from incoming director.",T:"CA"},
-{t:"CHG-1 – Register every charge on assets with ROC",f:"CHG-1 (MCA V3)",d:"Within 30 days of charge creation",p:"HIGH",n:"After 300 days: NCLT condonation needed. Unregistered charge may be void against liquidator.",T:"CA"},
-{t:"MGT-14 – File all Special Resolutions and applicable Board Resolutions",f:"MGT-14 (MCA V3)",d:"Within 30 days of passing resolution",p:"HIGH",n:"Required for all SRs. Penalty: Rs.5 Lakh.",T:"CA"},
-],
-pvt:[
-{t:"Board Meetings – Minimum 4 per year; gap between consecutive meetings ≤ 120 days",f:"Minutes Book + Board Notice",d:"Throughout FY — 4 meetings (Sec 173(1))",p:"HIGH",n:"Penalty Rs.25,000 per director per default meeting. First meeting within 30 days of incorporation.",T:"CA"},
-{t:"AGM – Annual General Meeting",f:"AGM notice + minutes",d:"On or before 30 September",p:"HIGH",n:"Notice: 21 clear days. Penalty: company ≤Rs.1 Lakh + Rs.5,000/day.",T:"CA"},
-{t:"AOC-4 – File Financial Statements",f:"AOC-4 (MCA V3 Lot 3, Jul 2025)",d:"Within 30 days of AGM (by 30 Oct)",p:"HIGH",n:"Figures in absolute rupees. Penalty Rs.1,000/day.",T:"CA"},
-{t:"MGT-7 – File Annual Return",f:"MGT-7 (MCA V3 Lot 3, Jul 2025)",d:"Within 60 days of AGM (by 29 Nov)",p:"HIGH",n:"New: RO photograph + GPS + gender-wise SH data. Penalty Rs.50,000 + Rs.100/day.",T:"CA"},
-{t:"ADT-1 – Auditor Appointment (once per 5-year term)",f:"ADT-1 (MCA V3 Lot 3, Jul 2025)",d:"Within 15 days of AGM",p:"MEDIUM",n:"Annual ratification NOT mandatory. No rotation required for independent pvt cos.",T:"CA"},
-],
-pvtsub:[
-{t:"Board Meetings – Minimum 4 per year; gap ≤ 120 days",f:"Minutes Book",d:"Throughout FY (Sec 173(1))",p:"HIGH",n:"Same as public company rules apply since subsidiary of public company.",T:"CA"},
-{t:"AGM",f:"AGM notice + minutes",d:"On or before 30 September",p:"HIGH",n:"Standard provisions apply.",T:"CA"},
-{t:"AOC-4 – Financial Statements",f:"AOC-4 (MCA V3 Lot 3, Jul 2025)",d:"Within 30 days of AGM",p:"HIGH",n:"Subsidiary accounts part of parent's consolidated statements.",T:"CA"},
-{t:"MGT-7 – Annual Return",f:"MGT-7 (MCA V3 Lot 3, Jul 2025)",d:"Within 60 days of AGM",p:"HIGH",n:"Full MGT-7 — not simplified.",T:"CA"},
-{t:"MR-1 – MANDATORY for this company type (pvt subsidiary of public co)",f:"MR-1 (MCA V3, Jan 2023)",d:"Within 60 days of MD/WTD/CEO/CFO/CS appointment",p:"HIGH",n:"KEY POINT: pvt subsidiary of public company MUST file MR-1. Independent pvt cos are exempt.",T:"CA"},
-{t:"ADT-1 – Auditor Appointment",f:"ADT-1 (MCA V3 Lot 3, Jul 2025)",d:"Within 15 days of AGM",p:"MEDIUM",n:"Once per 5-year term.",T:"CA"},
-],
-pub:[
-{t:"Board Meetings – Minimum 4 per year; gap ≤ 120 days",f:"Minutes Book",d:"Throughout FY (Sec 173(1))",p:"HIGH",n:"Penalty Rs.25,000 per director per default.",T:"CA"},
-{t:"Audit Committee – Mandatory (if paid-up ≥ Rs.10 Cr OR turnover ≥ Rs.100 Cr OR loans ≥ Rs.50 Cr)",f:"Board Committee Minutes",d:"Throughout FY — min 4 meetings/year",p:"HIGH",n:"Sec 177. Min 3 directors, majority IDs, chairperson = ID.",T:"CA"},
-{t:"NRC – Nomination & Remuneration Committee (same thresholds as Audit Committee)",f:"Board Committee Minutes",d:"Throughout FY",p:"HIGH",n:"Sec 178. Policy to be disclosed in Directors' Report.",T:"CA"},
-{t:"Independent Directors – At least 2 IDs (if thresholds met)",f:"DIR-12 + Letter of Appointment",d:"On appointment",p:"HIGH",n:"Sec 149(4). IICA Databank registration mandatory.",T:"CA"},
-{t:"AGM",f:"AGM notice + minutes",d:"On or before 30 September",p:"HIGH",n:"Notice 21 clear days. Penalty: Rs.1 Lakh + Rs.5,000/day.",T:"CA"},
-{t:"AOC-4 + AOC-4 CFS (if subsidiaries)",f:"AOC-4 + AOC-4 CFS (MCA V3 Lot 3)",d:"Within 30 days of AGM",p:"HIGH",n:"Figures in absolute rupees. CSR-2 linked. Penalty Rs.1,000/day.",T:"CA"},
-{t:"MGT-7 – Annual Return (PCS certification inside if paid-up ≥ Rs.10 Cr)",f:"MGT-7 (MCA V3 Lot 3)",d:"Within 60 days of AGM",p:"HIGH",n:"Penalty Rs.50,000 + Rs.100/day.",T:"CA"},
-{t:"MR-1 – MD/WTD/CEO/CFO/CS Appointment",f:"MR-1 (MCA V3, Jan 2023)",d:"Within 60 days of appointment",p:"HIGH",n:"Mandatory for ALL public companies.",T:"CA"},
-{t:"Secretarial Audit MR-3 (if paid-up ≥ Rs.50 Cr OR turnover ≥ Rs.250 Cr)",f:"MR-3 by Practising CS",d:"With Annual Report",p:"HIGH",n:"Sec 204. Penalty Rs.1 Lakh–Rs.5 Lakh.",T:"CA"},
-{t:"ADT-1 + Mandatory Auditor Rotation",f:"ADT-1 (MCA V3 Lot 3)",d:"Within 15 days of AGM",p:"MEDIUM",n:"Rotation mandatory (Sec 139(2)): individual 5 yrs; firm 10 yrs.",T:"CA"},
-{t:"PAS-6 – Half-Yearly Demat Reconciliation by PCS",f:"PAS-6 by PCS",d:"Within 60 days of Sep 30 and Mar 31",p:"HIGH",n:"Rule 9A: ALL unlisted public companies.",T:"CA"},
-],
-listed:[
-{t:"Board Meetings – Min 4/year + Audit Committee before each for financials",f:"Board + Committee Minutes",d:"Throughout FY — on financial year basis (LODR Amendment 2026)",p:"HIGH",n:"LODR Reg 17.",T:"LODR"},
-{t:"Quarterly Financial Results – Limited Review (Q1/Q2/Q3) + Audited (Q4/Annual)",f:"Online SE filing",d:"Q1/Q2/Q3: within 45 days of quarter end; Annual: within 60 days of FY end",p:"HIGH",n:"LODR Reg 33. Consolidated + Standalone.",T:"LODR"},
-{t:"Shareholding Pattern – Every Quarter",f:"Online SE filing",d:"Within 21 days of each quarter end",p:"HIGH",n:"LODR Reg 31.",T:"LODR"},
-{t:"CG Report – Every Quarter",f:"CG Report to SE",d:"Within 21 days of each quarter end",p:"HIGH",n:"LODR Reg 27(2).",T:"LODR"},
-{t:"Annual Secretarial Compliance Report by PCS (Reg 24A)",f:"Report by independent PCS to SE",d:"On or before 31 May",p:"HIGH",n:"SEBI Circular 2019.",T:"LODR"},
-{t:"Secretarial Audit MR-3 – Mandatory ALL listed companies",f:"MR-3 by Practising CS",d:"With Annual Report",p:"HIGH",n:"Sec 204 + LODR Reg 24A.",T:"CA"},
-{t:"MR-1 – MD/WTD/CEO/CFO/CS Appointment (CS mandatory for ALL listed)",f:"MR-1 (MCA V3, Jan 2023)",d:"Within 60 days of appointment",p:"HIGH",n:"CS mandatory for all listed companies.",T:"CA"},
-{t:"RPT Disclosure to SE – Half-Yearly",f:"SE disclosure",d:"15 April (Oct–Mar) and 15 October (Apr–Sep)",p:"HIGH",n:"LODR Reg 23(9).",T:"LODR"},
-{t:"PAS-6 – Quarterly Demat Reconciliation",f:"PAS-6 to SE by PCS",d:"Within 30 days of each quarter end",p:"HIGH",n:"SEBI Circular.",T:"LODR"},
-{t:"Trading Window – Quarterly Closure",f:"Internal circular to all DPs",d:"Close at quarter end; reopen 48 hrs after results",p:"HIGH",n:"SEBI PIT Circular 2019.",T:"PIT"},
-{t:"SDD – Structured Digital Database (Continuous)",f:"Electronic database",d:"Maintained continuously; 8-year retention",p:"HIGH",n:"PIT Reg 3(5). Actively enforced by SEBI.",T:"PIT"},
-{t:"Website: MOA/AOA + Director Profiles (LODR Third Amendment 2024)",f:"Company Website",d:"By 31 March 2025 (ongoing)",p:"HIGH",n:"LODR Reg 46(2).",T:"LODR"},
-{t:"Non-Disqualification Certificate to SE",f:"Certificate to SE",d:"30 April each year",p:"HIGH",n:"LODR Sch V Part D.",T:"LODR"},
-{t:"Annual Promoter Shareholding Disclosure – Form B",f:"SE disclosure",d:"30 April",p:"HIGH",n:"PIT Reg 6(2).",T:"PIT"},
-{t:"HVDLE Threshold Check (revised to Rs.5,000 Cr – LODR Amendment 2026)",f:"Board review",d:"Ongoing",p:"MEDIUM",n:"LODR Amendment Jan 20 2026.",T:"LODR"},
-],
-opc:[
-{t:"Board Meeting – Single director: written resolution in minutes book; 2 directors: 2/year",f:"Resolution in minutes / Minutes book",d:"Single director: anytime; 2 directors: 1 per half-year",p:"LOW",n:"Sec 173(5). Single director: no formal meeting — record resolution in minutes within 30 days.",T:"CA"},
-{t:"AOC-4 OPC – Financial Statements (180-day special provision)",f:"AOC-4 OPC (MCA V3)",d:"Within 180 days of FY end — by 27 September",p:"HIGH",n:"OPC gets 180 days from 31 March (not 30 days from AGM). Penalty Rs.1,000/day.",T:"CA"},
-{t:"MGT-7A – Annual Return (60 days from FY end, NOT from AGM)",f:"MGT-7A (MCA V3 Lot 3)",d:"Within 60 days of FY end — by 29 May",p:"HIGH",n:"OPC files from FY end (31 Mar). No AGM. Simplified form.",T:"CA"},
-{t:"ADT-1 – Auditor Appointment",f:"ADT-1 (MCA V3 Lot 3)",d:"Within 15 days of Board/member resolution on appointment",p:"MEDIUM",n:"No AGM — auditor appointed by Board resolution. File ADT-1 within 15 days.",T:"CA"},
-{t:"NO AGM Required – OPC fully exempt (Sec 96 not applicable)",f:"Exemption",d:"N/A",p:"LOW",n:"OPC is completely exempt from holding Annual General Meeting.",T:"CA"},
-{t:"NO Cash Flow Statement Required",f:"Exemption",d:"N/A",p:"LOW",n:"OPC exempt from cash flow statement.",T:"CA"},
-{t:"Nominee Director – INC-3 consent (one-time at incorporation; update on change)",f:"INC-3 (MCA V3)",d:"At incorporation; within 30 days of change",p:"MEDIUM",n:"Every OPC must have a nominee who takes over on death/incapacity of sole member.",T:"CA"},
-],
-small:[
-{t:"Board Meetings – ONLY 2 PER YEAR (NOT 4): 1 in Jan–Jun AND 1 in Jul–Dec, ≥90 days gap",f:"Minutes Book",d:"Sec 173(5) — 2 meetings/year only",p:"HIGH",n:"CRITICAL CORRECTION: Small companies need ONLY 2 board meetings/year. NOT 4. Gap between meetings: minimum 90 days. Penalty Rs.25,000 per director per default.",T:"CA"},
-{t:"AGM – Annual General Meeting (still required for small companies)",f:"AGM notice + minutes",d:"On or before 30 September",p:"HIGH",n:"AGM required. Notice: 21 clear days.",T:"CA"},
-{t:"AOC-4 – Financial Statements (NO cash flow statement required)",f:"AOC-4 (MCA V3 Lot 3)",d:"Within 30 days of AGM (by 30 Oct)",p:"HIGH",n:"EXEMPT from cash flow statement. Figures in absolute rupees. Penalty Rs.1,000/day.",T:"CA"},
-{t:"MGT-7A – SIMPLIFIED Annual Return (NOT full MGT-7)",f:"MGT-7A (MCA V3 Lot 3)",d:"Within 60 days of AGM (by 29 Nov)",p:"HIGH",n:"Abridged form. No PCS certification required. Penalty Rs.50,000 + Rs.100/day.",T:"CA"},
-{t:"ADT-1 – Auditor Appointment (NO mandatory rotation required)",f:"ADT-1 (MCA V3 Lot 3)",d:"Within 15 days of AGM",p:"MEDIUM",n:"EXEMPT from mandatory rotation (Sec 139(2)). Same auditor can continue indefinitely.",T:"CA"},
-{t:"Simplified Directors' Report (Sec 134(3A))",f:"Part of Annual Report",d:"Before AGM",p:"LOW",n:"No detailed Board evaluation or remuneration policy required.",T:"CA"},
-{t:"NO Secretarial Audit Required",f:"Exemption",d:"N/A",p:"LOW",n:"MR-3 NOT required for small companies.",T:"CA"},
-{t:"NO Internal Audit Mandatory",f:"Exemption",d:"N/A",p:"LOW",n:"Sec 138 not applicable to small companies.",T:"CA"},
-{t:"NO Mandatory Auditor Rotation",f:"Exemption",d:"N/A",p:"LOW",n:"Sec 139(2) does not apply to small companies.",T:"CA"},
-{t:"NO Cash Flow Statement Required",f:"Exemption",d:"N/A",p:"LOW",n:"Small companies exempt from cash flow statement preparation.",T:"CA"},
-],
-sec8:[
-{t:"Board Meetings – MINIMUM 2 PER YEAR (NOT 4): 1 per half-year, ≥90 days gap",f:"Minutes Book",d:"Companies (Meetings of Board) Second Amendment Rules 2017",p:"HIGH",n:"Section 8 companies need ONLY 2 board meetings/year. NOT 4. Violation: Rs.25,000 per director.",T:"CA"},
-{t:"AGM – Annual General Meeting",f:"AGM notice + minutes",d:"On or before 30 September",p:"HIGH",n:"AGM required. Can convene with shorter notice if all members consent.",T:"CA"},
-{t:"AOC-4 – Financial Statements",f:"AOC-4 (MCA V3 Lot 3)",d:"Within 30 days of AGM",p:"HIGH",n:"Surplus must be applied only to stated objects. No dividend.",T:"CA"},
-{t:"MGT-7 – Annual Return (FULL form — not simplified)",f:"MGT-7 (MCA V3 Lot 3)",d:"Within 60 days of AGM",p:"HIGH",n:"Sec 8 companies file full MGT-7.",T:"CA"},
-{t:"Licence Compliance – Apply profits ONLY to objects (Sec 8(1))",f:"Internal compliance record",d:"Continuous",p:"HIGH",n:"CRITICAL: No dividend to members. Licence revocable for violation. Penalty Rs.10 Lakh–Rs.1 Crore + imprisonment.",T:"CA"},
-{t:"FCRA Annual Return (if receiving foreign contributions)",f:"FC-3C / FC-4 on FCRA portal",d:"31 December each year",p:"HIGH",n:"FCRA 2010. Registration renewal every 5 years.",T:"CA"},
-{t:"ADT-1 – Auditor Appointment",f:"ADT-1 (MCA V3 Lot 3)",d:"Within 15 days of AGM",p:"MEDIUM",n:"Once per 5-year term.",T:"CA"},
-],
-csr:[{t:"CSR-2 Annual Report — LINKED filing with AOC-4",f:"CSR-2 (linked with AOC-4, MCA V3)",d:"With AOC-4 (within 30 days of AGM)",p:"HIGH",n:"Sec 135. CSR-2 is a LINKED filing — not separate. Unspent: transfer to designated account within 30 days of FY end. Penalty: 2× unspent or Rs.1 Cr; officer: up to Rs.2 Lakh.",T:"CA"}],
-cost:[
-{t:"CRA-2 – Cost Auditor Appointment",f:"CRA-2 (MCA V3 Lot 3, Jul 2025)",d:"Within 30 days of Board meeting; within 180 days of FY start",p:"MEDIUM",n:"File within 30 days of appointment.",T:"CA"},
-{t:"CRA-4 – Cost Audit Report in XBRL",f:"CRA-4 XBRL (MCA V3 Lot 3, Jul 2025)",d:"Within 30 days of receipt (30 Sep standard; 31 Dec 2025 for FY 2024-25 only)",p:"HIGH",n:"Now in XBRL format on MCA V3.",T:"CA"},
-],
-msme:[{t:"MSME-1 – Half-Yearly Outstanding Payment Return",f:"MSME-1 (MCA V3)",d:"31 October (Apr–Sep) and 30 April (Oct–Mar)",p:"HIGH",n:"Sec 405. ALL companies with MSME suppliers with payments outstanding >45 days. Penalty Rs.20,000–Rs.3 Lakh.",T:"CA"}],
-iepf:[
-{t:"IEPF-4 – Notice to Shareholders (3 months before transfer)",f:"IEPF-4",d:"By 31 July",p:"HIGH",n:"Individual notice + website publication.",T:"IEPF"},
-{t:"IEPF-2 – Statement of Unclaimed Amounts",f:"IEPF-2",d:"Within 90 days of AGM (by 30 Sep)",p:"MEDIUM",n:"Sec 124(2).",T:"IEPF"},
-{t:"IEPF-1 – Transfer Unpaid Dividend (7+ years)",f:"IEPF-1",d:"31 October",p:"HIGH",n:"Penalty: 2× amount + imprisonment ≤2 years.",T:"IEPF"},
-{t:"Transfer Shares to IEPF Demat Account",f:"IEPF-1 shares section",d:"31 October",p:"HIGH",n:"Shares of all SHs with 7+ consecutive years unclaimed dividend.",T:"IEPF"},
-],
-};
 
 // ═══════════════════════════════════════════════════
 // CHAT LOGIC — Offline first, AI fallback
@@ -2487,58 +2334,6 @@ function tg(id){
   if(chks[id]){b.classList.add('on');b.textContent='✓';}
   else{b.classList.remove('on');b.textContent='';}
 }
-function genCL(){
-  var ct=document.getElementById('cot').value;
-  if(!ct||!lst){
-    var e=document.createElement('div');
-    e.style.cssText='background:#ef444415;border:1px solid #ef444440;color:#ef4444;padding:10px 13px;border-radius:9px;font-size:12px;margin-bottom:10px;';
-    e.textContent='Please select Company Type and Listing Status first.';
-    var c=document.getElementById('clc'),g=document.querySelector('.gb');
-    c.insertBefore(e,g);setTimeout(function(){e.remove();},3000);return;
-  }
-  var items=[].concat(CDATA.all);
-  if(CDATA[ct]) items=items.concat(CDATA[ct]);
-  if(lst.indexOf('Listed')>=0&&lst.indexOf('Planning')<0&&lst.indexOf('SME')<0) items=items.concat(CDATA.listed||[]);
-  if(lst.indexOf('SME')>=0) items=items.concat((CDATA.listed||[]).filter(function(i){return i.T==='CA';}));
-  if(chks.c1) items=items.concat(CDATA.csr);
-  if(chks.c2) items=items.concat(CDATA.cost);
-  if(chks.c3) items=items.concat(CDATA.msme);
-  if(chks.c4) items=items.concat(CDATA.iepf);
-  var seen=new Set(),dedup=[];
-  items.forEach(function(i){if(!seen.has(i.t)){seen.add(i.t);dedup.push(i);}});
-  var grp={};
-  dedup.forEach(function(i){if(!grp[i.T])grp[i.T]=[];grp[i.T].push(i);});
-  var tn={CA:'Companies Act 2013',LODR:'SEBI LODR Regulations 2015',PIT:'SEBI PIT Regulations 2015',IEPF:'IEPF Rules 2016'};
-  var alerts=['MGT-8 ABOLISHED Jul 14 2025 — PCS certification now inside MGT-7',
-    'DPT-3 due 30 JUNE (not 31 May) · MSC-3 due 31 MARCH (not 30 Sep)',
-    'MR-1 — ONLY for public companies + private subsidiaries of public companies',
-    'Annual auditor ratification NOT mandatory (Companies Amendment Act 2017)',
-    'LODR Third Amendment 2024: MOA/AOA + director profiles on website by 31 Mar 2025',
-    'LODR Amendment 2026 (Jan 20 2026): HVDLE threshold Rs.5,000 Cr; material subsidiary definition revised',
-    'AOC-4 from Jul 2025: figures in ABSOLUTE RUPEES — not rounded',
-    'Small Company: ONLY 2 board meetings/year · Section 8: ONLY 2 board meetings/year'];
-  var coLabel=document.getElementById('cot').options[document.getElementById('cot').selectedIndex].text;
-  var html='<div class="bb" onclick="resetCL()">← New Checklist</div>'
-    +'<div class="rh"><div class="rt">'+coLabel+'</div><div class="rs">'+dedup.length+' compliances identified · '+lst+'</div></div>';
-  html+='<div class="ab"><h4>⚠ Critical Alerts & Recent Amendments</h4>'+alerts.map(function(a){return '<div class="ai2">'+a+'</div>';}).join('')+'</div>';
-  Object.keys(grp).forEach(function(T){
-    var st=TST[T]||TST.CA;
-    html+='<div class="catb"><div class="cath" style="'+st.h+'"><h4 style="'+st.n+'">'+(tn[T]||T)+'</h4><span class="cbdg" style="'+st.b+'">'+grp[T].length+' items</span></div>';
-    grp[T].forEach(function(item){
-      var pc=item.p==='HIGH'?'ph':item.p==='MEDIUM'?'pm':'pl';
-      html+='<div class="ci2"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:7px"><div class="it">'+item.t+'</div><span class="pr '+pc+'">'+item.p+'</span></div>'
-        +'<div class="im"><span><strong>Form:</strong> '+item.f+'</span><span><strong>Due:</strong> '+item.d+'</span></div>'
-        +(item.n?'<div class="inn">📌 '+item.n+'</div>':'')+'</div>';
-    });
-    html+='</div>';
-  });
-  document.getElementById('clc').innerHTML=html;
-}
-function resetCL(){
-  lst='';chks={c1:true,c2:false,c3:false,c4:false};
-  document.getElementById('clc').innerHTML='<div class="fc"><h3>Company Profile</h3><div class="fl">Company Type *</div><select class="fsl" id="cot"><option value="">Select...</option><option value="pvt">Private Limited Company (Independent)</option><option value="pvtsub">Private Limited (Subsidiary of Public Co)</option><option value="pub">Public Limited Company (Unlisted)</option><option value="listed">Listed Company – Equity (NSE/BSE)</option><option value="debt">Listed Company – Debt / NCD</option><option value="opc">One Person Company (OPC)</option><option value="small">Small Company</option><option value="sec8">Section 8 Company</option></select><div class="fl">Listing Status *</div><div class="og"><div class="ob" onclick="sl(this)">Listed (NSE/BSE)</div><div class="ob" onclick="sl(this)">Unlisted</div><div class="ob" onclick="sl(this)">SME Listed</div><div class="ob" onclick="sl(this)">Planning IPO</div></div></div><div class="fc"><h3>Additional Applicability</h3><div class="cr" onclick="tg(\'c1\')"><div class="cb on" id="c1">✓</div><div class="cll">CSR Applicable</div></div><div class="cr" onclick="tg(\'c2\')"><div class="cb" id="c2"></div><div class="cll">Cost Audit Applicable</div></div><div class="cr" onclick="tg(\'c3\')"><div class="cb" id="c3"></div><div class="cll">Has MSME Suppliers (>45 days)</div></div><div class="cr" onclick="tg(\'c4\')"><div class="cb" id="c4"></div><div class="cll">IEPF Transfer Required</div></div></div><button class="gb" onclick="genCL()">✦ Generate Compliance Checklist</button>';
-}
-
 // ═══════════════════════════════════════════════════
 // CALENDAR
 // ═══════════════════════════════════════════════════
@@ -3651,16 +3446,6 @@ function askAboutClient(id){
   setTimeout(function(){
     var inp=document.getElementById('chat-input')||document.querySelector('#p-chat textarea,#p-chat input[type=text]');
     if(inp){ inp.value='Company: '+c.name+' ('+c.type+'). Pending compliances: '+dlist+'. What are the most critical actions and exact steps to complete each one?'; inp.focus(); }
-  },200);
-}
-
-function genChecklist(id){
-  var c=CLIENTS.find(function(x){return x.id===id;}); if(!c)return;
-  var tl={private:'Private Limited',public:'Public Unlisted',listed:'Listed',opc:'OPC',sec8:'Section 8',llp:'LLP'};
-  sw('chat');
-  setTimeout(function(){
-    var inp=document.getElementById('chat-input')||document.querySelector('#p-chat textarea,#p-chat input[type=text]');
-    if(inp){ inp.value='Generate complete annual compliance checklist for '+c.name+', a '+tl[c.type]+' company, paid-up capital ₹'+c.capital+', turnover ₹'+c.turnover+'. Include all ROC filings, board meeting requirements, AGM, and applicable SEBI/RBI requirements with exact form numbers and deadlines.'; inp.focus(); }
   },200);
 }
 
@@ -8938,9 +8723,64 @@ var CD_STEPS = {
 };
 var CD_DEFAULT_STEPS = ['Prepare required documents','Internal review','Committee/Board approval','Regulatory filing','Update statutory registers','Archive evidence & acknowledgement'];
 
-function cdSteps(key){
+// Step templates are matched against the obligation's FORM, SECTION and TITLE,
+// not its id. The generated rule sets use ids like CA-SECTION-137-9 and
+// LODR-REG-33-3-A, so id matching found a template for 1 of 236 obligations.
+var CD_STEP_MATCHERS = [
+  // [ regex tested against "<section> <form> <title>", template key ]
+  [/\bAOC-?4\b|section\s*137/i,                  'aoc4'],
+  [/\bMGT-?7A?\b|section\s*92\b/i,              'mgt7'],
+  [/\bDIR-?3\s*KYC\b|rule\s*12A/i,              'dir3kyc'],
+  [/\bDPT-?3\b|rule\s*16A|deposit/i,             'dpt3'],
+  [/\bADT-?1\b|section\s*139/i,                  'adt1'],
+  [/annual general meeting|\bAGM\b|section\s*96/i,'agm'],
+  [/\bFLA\b|foreign liabilities/i,                'fla'],
+  [/\bIEPF-?2\b|unclaimed|unpaid amount/i,        'iepf2'],
+  [/\bMR-?3\b|secretarial audit|section\s*204|reg\s*24A/i, 'secrpt'],
+  [/shareholding pattern|\bSHP\b|reg\s*31\b/i,   'shp'],
+  [/financial results|reg\s*33\b/i,               'results']
+];
+
+// Steps for obligations with no specific template, by the kind of duty it is.
+var CD_STEPS_BY_KIND = {
+  filing:     ['Compile the required particulars','Internal review','Board or committee approval where required',
+               'File with the authority','Record the filing reference','Archive the acknowledgement'],
+  meeting:    ['Fix date, time and venue','Issue notice and agenda within the statutory period',
+               'Hold the meeting and pass resolutions','Draft and circulate minutes','Enter minutes in the minute book'],
+  register:   ['Identify the triggering entry','Update the register promptly','Obtain signature or authentication',
+               'Preserve at the registered office'],
+  policy:     ['Draft or review the policy','Board or committee approval','Publish or circulate as required',
+               'Diarise the next review'],
+  disclosure: ['Confirm the event and its materiality','Prepare the disclosure',
+               'Obtain authorised signatory approval','Submit within the prescribed clock','Record the reference'],
+  standing:   ['Confirm the control is operating','Evidence the check performed','Escalate any exception',
+               'Record the review date']
+};
+
+function cdStepKind(row){
+  var t = ((row && (row.section||'')) + ' ' + (row && (row.form||'')) + ' ' +
+           (row && (row.obligation||'')) + ' ' + (row && (row.category||''))).toLowerCase();
+  if(/meeting|agm|egm|board|committee/.test(t))                 return 'meeting';
+  if(/register|minute|record[s]? maintenance/.test(t))          return 'register';
+  if(/policy|code of conduct|framework|charter/.test(t))        return 'policy';
+  if(/disclos|intimat|announce|material event/.test(t))         return 'disclosure';
+  if(/file|filing|return|form|submit/.test(t))                  return 'filing';
+  if(row && row.standing)                                       return 'standing';
+  return 'filing';
+}
+
+// row may be the full obligation, or just a key for older call sites.
+function cdSteps(row){
+  var key = (typeof row === 'string') ? row : (row && row.key) || '';
+  var hay = (typeof row === 'string') ? key
+          : ((row && row.section||'') + ' ' + (row && row.form||'') + ' ' + (row && row.obligation||''));
+
+  for(var i=0;i<CD_STEP_MATCHERS.length;i++){
+    if(CD_STEP_MATCHERS[i][0].test(hay)) return CD_STEPS[CD_STEP_MATCHERS[i][1]];
+  }
   for(var k in CD_STEPS){ if(key && key.indexOf(k)>-1) return CD_STEPS[k]; }
-  return CD_STEPS[key] || CD_DEFAULT_STEPS;
+  if(typeof row === 'object' && row) return CD_STEPS_BY_KIND[cdStepKind(row)] || CD_DEFAULT_STEPS;
+  return CD_DEFAULT_STEPS;
 }
 
 function cdApprovalChain(risk,law){
@@ -8967,7 +8807,7 @@ function openComplianceDetail(entityId,key){
   CD_CURRENT={entityId:entityId,key:key,c:c,r:r};
   var days=ccDaysUntil(r.due);
   var st=cdGetState(entityId,key);
-  var steps=cdSteps(key);
+  var steps=cdSteps(r);
   var chain=cdApprovalChain(r.risk,r.law);
   var doneSteps=st.steps||{};
   var stepCount=steps.length, doneCount=Object.keys(doneSteps).filter(function(k){return doneSteps[k];}).length;
@@ -9125,7 +8965,7 @@ function cdDelEvidence(i){
 }
 function cdMarkComplete(){
   var st=cdGetState(CD_CURRENT.entityId,CD_CURRENT.key);
-  var steps=cdSteps(CD_CURRENT.key); st.steps={};
+  var steps=cdSteps(CD_CURRENT.r || CD_CURRENT.key); st.steps={};
   for(var i=0;i<steps.length;i++) st.steps[i]=true;
   st.completed=true; cdLog(st,'Marked complete');
   cdSaveState(CD_CURRENT.entityId,CD_CURRENT.key,st);
