@@ -1583,10 +1583,14 @@
    "dueConfidence": "derived",
    "appliesTo": {
     "entityType": [
-     "public"
+     "private",
+     "public",
+     "listed",
+     "opc",
+     "sec8"
     ]
    },
-   "appliesToText": "Unlisted Public only",
+   "appliesToText": "Public + Private",
    "trigger": "Threshold/class based; not universal merely because company is public",
    "owner": "CS/PCS",
    "evidence": "MR-3",
@@ -1608,10 +1612,11 @@
    "dueConfidence": "none",
    "appliesTo": {
     "entityType": [
+     "listed",
      "public"
     ]
    },
-   "appliesToText": "Unlisted Public only",
+   "appliesToText": "Listed + Public",
    "trigger": "Prescribed classes of public companies",
    "owner": "Board/CS",
    "evidence": "Composition memo, DIR-12",

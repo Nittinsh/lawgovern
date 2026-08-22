@@ -109,8 +109,22 @@ def parse_timeline(text, freq):
 
 
 def parse_ca_applicability(text):
-    """Companies Act sheet: 'Public + Private', 'Unlisted Public only', 'Private only'."""
+    """Map the sheet's applicability wording onto entity types.
+
+    Recognised values, most specific first:
+      'Listed only'            -> listed entities alone
+      'Listed + Public'        -> listed and unlisted public
+      'Unlisted Public only'   -> unlisted public alone (excludes listed)
+      'Private only'           -> private and OPC
+      'Public + Private'       -> everything
+    'Listed only' exists so the sheet can express a Companies Act obligation that
+    bites solely on listed entities; without it there was nowhere to put one.
+    """
     tl = (text or '').lower()
+    if 'listed only' in tl:
+        return {'entityType': ['listed']}
+    if 'listed + public' in tl or 'listed and public' in tl:
+        return {'entityType': ['listed', 'public']}
     if 'private only' in tl:
         return {'entityType': ['private', 'opc']}
     if 'unlisted public only' in tl:
@@ -198,6 +212,7 @@ def main():
                    ensure_ascii=False, indent=1))
 
     print(f'Companies Act : {len(ca)} controls')
+    print('  applicability:', dict(Counter(c['appliesToText'] or '?' for c in ca)))
     print('  confidence  :', dict(Counter(c['dueConfidence'] for c in ca)))
     print('  due types   :', dict(Counter(c['due']['type'] for c in ca)))
     print()
