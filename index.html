@@ -908,7 +908,7 @@ input[type="text"], input[type="password"], textarea, select {
     </div>
     <div>
       <div class="n">LawGovern</div>
-      <div class="t">Compliance OS · v46</div>
+      <div class="t">Compliance OS · v47</div>
     </div>
   </div>
   <div class="cc-search">
@@ -6064,9 +6064,7 @@ async function entFetchFromCin(auto){
     if(out){
       out.style.display='block';
       out.innerHTML = '<span style="color:#10B981;">✓ Fetched from MCA master data</span> · ' + bits.join(' · ') +
-        (data.address ? '<div style="margin-top:4px;opacity:.85;">'+entEsc(data.address)+'</div>' : '') +
-        '<div style="margin-top:4px;opacity:.8;">Turnover, net worth and net profit are not published in this '+
-        'dataset — enter those from the financials.</div>';
+        (data.address ? '<div style="margin-top:4px;opacity:.85;">'+entEsc(data.address)+'</div>' : '');
     }
   }catch(e){
     var why = String(e && e.message || e);
@@ -6145,8 +6143,8 @@ function entCinSummaryHtml(r, applied){
   return '<span style="color:#10B981;">✓ Valid CIN</span> · <b>' + entEsc(r.ownershipLabel) + '</b>' +
     (r.listed ? ' · <b style="color:#2563EB;">Listed</b>' : ' · Unlisted') +
     ' · incorporated <b>' + r.year + '</b> in <b>' + entEsc(r.state) + '</b>' + (applied || '') +
-    '<div style="margin-top:4px;opacity:.8;">Capital, turnover, net worth and net profit are not encoded in a CIN — ' +
-    'they come from filed financials. Enter them below.</div>';
+    '<div style="margin-top:4px;opacity:.8;">Paid-up capital is not encoded in a CIN; ' +
+    'it is filled in from MCA master data where available.</div>';
 }
 
 // Redraw the CIN summary from whatever is currently in the field.
@@ -8747,21 +8745,15 @@ function renderEntities(){
   var rows = list.map(function(c){
     var obligations = '—';
     try { obligations = getComplianceChart(c).length; } catch(e){ obligations = '!'; }
-    var missing = [];
-    if(!c.networth)   missing.push('net worth');
-    if(!c.netprofit)  missing.push('net profit');
-    if(!c.borrowings) missing.push('borrowings');
-    var warn = missing.length
-      ? '<div style="font-size:11px;color:#F59E0B;margin-top:3px;">⚠ missing '+missing.join(', ')+' — some tests cannot run</div>'
-      : '';
+    // The old "missing figures" warning is gone with the fields: nothing in the
+    // obligation set depends on them any more.
+    var warn = '';
     return '<tr>'+
       '<td><div style="font-weight:700;">'+entEsc(c.name)+'</div>'+
         '<div class="mono" style="font-size:11px;color:var(--ink-soft);">'+entEsc(c.cin||'no CIN')+'</div>'+warn+'</td>'+
       '<td>'+entTypeLabel(c.type)+'</td>'+
       '<td class="mono">'+entEsc(c.fyend||'—')+'</td>'+
       '<td class="mono">'+entFmt(c.capital)+'</td>'+
-      '<td class="mono">'+entFmt(c.turnover)+'</td>'+
-      '<td class="mono">'+entFmt(c.netprofit)+'</td>'+
       '<td class="mono">'+obligations+'</td>'+
       '<td style="white-space:nowrap;">'+
         '<button class="cc-btn-primary" onclick="lgRegOpen('+lgArg(c.id)+')">Filings</button> '+
@@ -8773,7 +8765,7 @@ function renderEntities(){
   root.innerHTML = head +
     '<div class="cu-tablewrap"><table class="cu-table">'+
     '<thead><tr><th>Entity</th><th>Type</th><th>FY end</th><th>Paid-up capital</th>'+
-    '<th>Turnover</th><th>Net profit</th><th>Obligations</th><th></th></tr></thead>'+
+    '<th>Obligations</th><th></th></tr></thead>'+
     '<tbody>'+rows+'</tbody></table></div>';
 }
 
@@ -8840,10 +8832,10 @@ function entOpen(id){
 
       entField('ent-fyend','Financial year end','(only day & month are used)',c.fyend||'','date')+
       entField('ent-capital','Paid-up share capital','₹ crore · Sec 204 limb: ≥ 50',entToCrore(c.capital),'number')+
-      entField('ent-turnover','Annual turnover','₹ crore · Sec 204 ≥ 250 · CSR ≥ 1000',entToCrore(c.turnover),'number')+
-      entField('ent-networth','Net worth','₹ crore · CSR limb: ≥ 500',entToCrore(c.networth),'number')+
-      entField('ent-netprofit','Net profit (preceding FY)','₹ crore · CSR limb: ≥ 5',entToCrore(c.netprofit),'number')+
-      entField('ent-borrowings','Borrowings from banks / PFIs','₹ crore · Sec 204 limb: ≥ 100',entToCrore(c.borrowings),'number')+
+      // Turnover, net worth, net profit and borrowings were removed from this
+      // form: the obligation set is driven by entity type and the generated rule
+      // sets, so these figures changed nothing. The database columns are kept so
+      // no data is lost, and threshold-based applicability can be revived later.
 
       '<div id="ent-err" style="display:none;font-size:12px;color:#EF4444;margin:8px 0;"></div>'+
       '<div style="display:flex;gap:8px;margin-top:18px;">'+
@@ -8878,11 +8870,9 @@ async function entSave(){
     cin: v('ent-cin') || null,
     type: v('ent-type'),
     fyend: v('ent-fyend') || null,
-    capital:    entToRupees(v('ent-capital')),
-    turnover:   entToRupees(v('ent-turnover')),
-    networth:   entToRupees(v('ent-networth')),
-    netprofit:  entToRupees(v('ent-netprofit')),
-    borrowings: entToRupees(v('ent-borrowings'))
+    capital:    entToRupees(v('ent-capital'))
+    // turnover / networth / netprofit / borrowings are no longer collected here;
+    // existing values in the database are left untouched rather than nulled.
   };
 
   try{
