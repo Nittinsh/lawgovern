@@ -906,7 +906,7 @@ input[type="text"], input[type="password"], textarea, select {
     </div>
     <div>
       <div class="n">LawGovern</div>
-      <div class="t">Compliance OS · v35</div>
+      <div class="t">Compliance OS · v36</div>
     </div>
   </div>
   <div class="cc-search">
@@ -5479,6 +5479,8 @@ function mwSetTab(id){ MW_TAB=id; renderMyWork(); }
 // Money is entered in CRORE and stored in RUPEES; see db/001_add_financial_columns.sql
 // ═══════════════════════════════════════════════════
 var ENT_CR = 10000000;                 // ₹1 crore in rupees
+var ENT_AUTOFETCH_LAST = null;         // CIN we already auto-looked-up
+var ENT_AUTOFETCH_TIMER = null;
 var ENT_EDITING = null;                // company id being edited, null = new
 
 function entToCrore(rupees){           // stored rupees -> crore, for the form
@@ -5583,7 +5585,7 @@ function cinParse(raw){
 // Fills name, status, registered office and PAID-UP CAPITAL.
 // Turnover, net worth and net profit are NOT in this dataset.
 // ═══════════════════════════════════════════════════════════════
-async function entFetchFromCin(){
+async function entFetchFromCin(auto){
   var cinEl = document.getElementById('ent-cin');
   var out   = document.getElementById('ent-cin-info');
   var btn   = document.getElementById('ent-fetch-btn');
@@ -5596,12 +5598,17 @@ async function entFetchFromCin(){
     return;
   }
   if(!supaClient || !CURRENT_USER){
+    if(auto) return;
     if(out){ out.style.display='block';
       out.innerHTML = '<span style="color:#F59E0B;">Sign in first — the lookup runs server-side.</span>'; }
     return;
   }
 
   if(btn){ btn.disabled = true; btn.textContent = 'Fetching…'; }
+  if(auto && out){
+    out.style.display='block';
+    out.innerHTML = '<span style="color:var(--ink-soft);">Looking up company name…</span>';
+  }
   try{
     var sess = await supaClient.auth.getSession();
     var token = sess && sess.data && sess.data.session && sess.data.session.access_token;
@@ -5666,7 +5673,16 @@ async function entFetchFromCin(){
     } else {
       msg = 'Lookup failed: ' + entEsc(why);
     }
-    if(out){ out.style.display='block'; out.innerHTML = '<span style="color:#F59E0B;">⚠ '+msg+'</span>'; }
+    if(out){
+      out.style.display='block';
+      if(auto){
+        // Put the CIN summary back, and note the lookup quietly underneath.
+        entCinChangedRender();
+        out.innerHTML += '<div style="margin-top:4px;color:#F59E0B;">⚠ Name lookup unavailable — '+msg+'</div>';
+      } else {
+        out.innerHTML = '<span style="color:#F59E0B;">⚠ '+msg+'</span>';
+      }
+    }
   }finally{
     if(btn){ btn.disabled = false; btn.textContent = 'Fetch details'; }
   }
@@ -5698,12 +5714,38 @@ function entCinChanged(){
       if(sel.options[i].value === r.appType){ sel.selectedIndex = i; applied = ' · type set automatically'; break; }
     }
   }
-  out.innerHTML =
-    '<span style="color:#10B981;">✓ Valid CIN</span> · <b>' + entEsc(r.ownershipLabel) + '</b>' +
+  // A complete, valid CIN is enough to go and get the name — do it without
+  // making the user find a button. Once per CIN, debounced.
+  if(ENT_AUTOFETCH_LAST !== r.cin){
+    ENT_AUTOFETCH_LAST = r.cin;
+    clearTimeout(ENT_AUTOFETCH_TIMER);
+    ENT_AUTOFETCH_TIMER = setTimeout(function(){
+      var nameEl = document.getElementById('ent-name');
+      // Never clobber something already typed.
+      if(nameEl && !String(nameEl.value||'').trim()) entFetchFromCin(true);
+    }, 400);
+  }
+
+  out.innerHTML = entCinSummaryHtml(r, applied);
+}
+
+// Just the readout. Safe to call repeatedly; never starts a lookup.
+function entCinSummaryHtml(r, applied){
+  return '<span style="color:#10B981;">✓ Valid CIN</span> · <b>' + entEsc(r.ownershipLabel) + '</b>' +
     (r.listed ? ' · <b style="color:#2563EB;">Listed</b>' : ' · Unlisted') +
-    ' · incorporated <b>' + r.year + '</b> in <b>' + entEsc(r.state) + '</b>' + applied +
+    ' · incorporated <b>' + r.year + '</b> in <b>' + entEsc(r.state) + '</b>' + (applied || '') +
     '<div style="margin-top:4px;opacity:.8;">Capital, turnover, net worth and net profit are not encoded in a CIN — ' +
     'they come from filed financials. Enter them below.</div>';
+}
+
+// Redraw the CIN summary from whatever is currently in the field.
+function entCinChangedRender(){
+  var el  = document.getElementById('ent-cin');
+  var out = document.getElementById('ent-cin-info');
+  if(!el || !out) return;
+  var r = cinParse(el.value);
+  if(!r.valid) return;
+  out.innerHTML = entCinSummaryHtml(r, '');
 }
 
 
@@ -7910,6 +7952,10 @@ function entField(id,label,hint,value,type){
 
 function entOpen(id){
   ENT_EDITING = id || null;
+  // Reset the auto-lookup guard so reopening the form retries a CIN that
+  // failed last time (e.g. the lookup service was down or not yet deployed).
+  ENT_AUTOFETCH_LAST = null;
+  clearTimeout(ENT_AUTOFETCH_TIMER);
   var c = {};
   if(id && typeof CLIENTS!=='undefined'){
     for(var i=0;i<CLIENTS.length;i++) if(String(CLIENTS[i].id)===String(id)) c = CLIENTS[i];
