@@ -1,0 +1,8 @@
+# Local statutory reference material — NEVER commit.
+# GitHub Pages serves everything in this repo publicly; commercial
+# compilations are copyrighted and bare acts just bloat the deploy.
+reference/
+
+# Local dev
+.claude/
+lawgovern-diagnostic.js
