@@ -944,7 +944,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v60">
+      <meta id="build-version" content="v61">
     </div>
   </div>
   <div class="cc-search">
@@ -2159,20 +2159,6 @@ var FORMS = {
 "INC-20":{title:"Intimation of Conversion — Post Regional Director Approval",status:"Active",portal:"MCA V3",updated:"Rule 22 Companies (Incorporation) Rules 2014",applies:"After Regional Director approves Section 8 conversion",timeline:"Within 30 days of RD order",section:"Sec 8(5) r/w Rule 22",penalty:"Late filing: additional fee; non-filing: conversion certificate not issued",linked:"INC-18 (application), INC-19 (notice)",notes:"Filed after RD grants approval. ROC then issues fresh Certificate of Incorporation as Private Limited Company. Company must also address compliance requirements: (1) update name (add 'Private Limited'), (2) file altered MoA/AoA, (3) comply with private company requirements going forward.",steps:["Receive RD order approving conversion","File INC-20 on MCA V3 within 30 days","ROC issues fresh Certificate of Incorporation","Update company name in all records","Address tax compliance: Section 12A/80G cancellation, Section 115TD exit tax","Inform all stakeholders of conversion","Update bank accounts, contracts, licenses"]},"PAS-3":{title:"Return of Allotment",status:"Migrated",portal:"MCA V3 Lot 3 (July 14, 2025)",updated:"July 14 2025",applies:"All companies on every fresh allotment of shares/securities",timeline:"Within 30 days of allotment",section:"Sec 39 r/w Rule 12",penalty:"Rs.1,000/day up to Rs.5 Lakh",linked:"SH-7 (if authorized capital increase needed)",notes:"Listed companies: allotment in demat form only. Private placement: requires prior SR approval + MGT-14 filing.",steps:["Board approves allotment","Verify private placement SR (if applicable)","Credit shares to demat accounts","File PAS-3 on MCA V3 within 30 days","Update register of members"]},
 };
 
-var CAL=[
-{m:"APRIL",i:[{d:"1 Apr",t:"Trading Window reopens (48 hrs after Q4 results)",T:"PIT",r:"SEBI PIT Circular 2019"},{d:"21 Apr",t:"Shareholding Pattern – Q4",T:"LODR",r:"Reg 31"},{d:"21 Apr",t:"CG Report – Q4",T:"LODR",r:"Reg 27(2)"},{d:"21 Apr",t:"Investor Complaints – Q4",T:"LODR",r:"Reg 13"},{d:"30 Apr",t:"Annual Promoter Disclosure (Form B)",T:"PIT",r:"PIT Reg 6(2)"},{d:"30 Apr",t:"Annual DP Declarations",T:"PIT",r:"PIT Reg 9"},{d:"30 Apr",t:"Non-Disqualification Certificate",T:"LODR",r:"Sch V Part D"},{d:"30 Apr",t:"RPT Disclosure H2 (Oct–Mar)",T:"LODR",r:"Reg 23(9)"},{d:"30 Apr",t:"MSME-1 – Oct to Mar half-year",T:"CA",r:"Sec 405"},{d:"30 Apr",t:"Share Transfer Certificate H2 (by PCS)",T:"LODR",r:"Reg 40(9)"}]},
-{m:"MAY",i:[{d:"29 May",t:"OPC Annual Return – MGT-7A (60 days from 31 Mar)",T:"CA",r:"Sec 92 r/w Rule 11A"},{d:"31 May",t:"Annual Secretarial Compliance Report to SE",T:"LODR",r:"SEBI Circular 2019"},{d:"31 May",t:"Audited Annual Financial Results to SE",T:"LODR",r:"LODR Reg 33"}]},
-{m:"JUNE",i:[{d:"30 Jun",t:"DPT-3 – Return of Deposits/Loans (ALL companies, incl. NIL)",T:"CA",r:"Sec 73 r/w Rule 16"}]},
-{m:"JULY",i:[{d:"21 Jul",t:"Shareholding Pattern – Q1 (Apr–Jun)",T:"LODR",r:"Reg 31"},{d:"21 Jul",t:"CG Report – Q1",T:"LODR",r:"Reg 27(2)"},{d:"21 Jul",t:"Investor Complaints – Q1",T:"LODR",r:"Reg 13"},{d:"31 Jul",t:"IEPF-4 Notice to SHs (3 months before Oct transfer)",T:"IEPF",r:"IEPF Rules 5"},{d:"31 Jul",t:"DIR-3 KYC filing window opens (deadline 30 Sep)",T:"CA",r:"Rule 12A"}]},
-{m:"AUGUST",i:[{d:"14 Aug",t:"Q1 Financial Results – Final Deadline",T:"LODR",r:"Reg 33"},{d:"31 Aug",t:"Update Unclaimed Dividend List on Website",T:"IEPF",r:"IEPF Rules + Sec 124"}]},
-{m:"SEPTEMBER",i:[{d:"27 Sep",t:"OPC Financial Statements – AOC-4 OPC (180 days from 31 Mar)",T:"CA",r:"Sec 137 (OPC)"},{d:"30 Sep",t:"AGM – Final Deadline (all companies except OPC)",T:"CA",r:"Sec 96"},{d:"30 Sep",t:"DIR-3 KYC – Standard Final Deadline",T:"CA",r:"Rule 12A"},{d:"30 Sep",t:"SDD Annual Review",T:"PIT",r:"PIT Reg 3(5)"},{d:"30 Sep",t:"IEPF-2 Statement (within 90 days of AGM)",T:"IEPF",r:"Sec 124(2)"},{d:"30 Sep",t:"CRA-4 – Cost Audit Report (standard; extended 31 Dec 2025 for FY24-25)",T:"CA",r:"Sec 148"},{d:"30 Sep",t:"PAS-6 H1 – Demat Reconciliation (unlisted public)",T:"CA",r:"Rule 9A"}]},
-{m:"OCTOBER",i:[{d:"15 Oct",t:"ADT-1 – Auditor Appointment (15 days from 30 Sep AGM)",T:"CA",r:"Sec 139"},{d:"21 Oct",t:"Shareholding Pattern – Q2",T:"LODR",r:"Reg 31"},{d:"21 Oct",t:"CG Report – Q2",T:"LODR",r:"Reg 27(2)"},{d:"30 Oct",t:"AOC-4 – Financial Statements (30 days from AGM)",T:"CA",r:"Sec 137"},{d:"30 Oct",t:"Share Transfer Certificate H1 (by PCS)",T:"LODR",r:"Reg 40(9)"},{d:"31 Oct",t:"Transfer Dividend to IEPF (IEPF-1)",T:"IEPF",r:"Sec 125"},{d:"31 Oct",t:"Transfer Shares to IEPF Demat",T:"IEPF",r:"IEPF Rules"},{d:"31 Oct",t:"MSME-1 – Apr to Sep half-year",T:"CA",r:"Sec 405"},{d:"31 Oct",t:"DIR-3 KYC – Extended Deadline FY 2024-25",T:"CA",r:"Rule 12A"}]},
-{m:"NOVEMBER",i:[{d:"14 Nov",t:"Q2 Financial Results – Final Deadline",T:"LODR",r:"Reg 33"},{d:"29 Nov",t:"MGT-7 Annual Return (60 days after AGM)",T:"CA",r:"Sec 92"},{d:"29 Nov",t:"Small Co MGT-7A (60 days after AGM)",T:"CA",r:"Sec 92 r/w Rule 11A"}]},
-{m:"DECEMBER",i:[{d:"31 Dec",t:"CRA-4 – FY 2024-25 Extended Deadline",T:"CA",r:"Sec 148 (MCA circular)"},{d:"31 Dec",t:"FCRA Annual Return (if Sec 8 company receives foreign funds)",T:"CA",r:"FCRA Sec 18"},{d:"31 Dec",t:"Annual Compliance Review for next FY",T:"CA",r:"All laws"}]},
-{m:"JANUARY",i:[{d:"21 Jan",t:"Shareholding Pattern – Q3 (Oct–Dec)",T:"LODR",r:"Reg 31"},{d:"21 Jan",t:"CG Report – Q3",T:"LODR",r:"Reg 27(2)"},{d:"31 Jan",t:"PAS-6 H2 – Demat Reconciliation (unlisted public)",T:"CA",r:"Rule 9A"}]},
-{m:"FEBRUARY",i:[{d:"5 Feb",t:"Physical Transfer Window Opens (LODR Amendment 2026)",T:"LODR",r:"LODR Amendment Jan 20 2026"},{d:"14 Feb",t:"Q3 Financial Results – Final Deadline",T:"LODR",r:"Reg 33"},{d:"15 Feb",t:"RPT Disclosure H1 preparation (Oct–Mar)",T:"LODR",r:"Reg 23(9)"}]},
-{m:"MARCH",i:[{d:"31 Mar",t:"MSC-3 – Dormant Company Annual Return (CORRECT DATE)",T:"CA",r:"Sec 455 r/w Rule 10"},{d:"31 Mar",t:"Website: MOA/AOA + Director Profiles (LODR Third Amendment 2024)",T:"LODR",r:"Reg 46(2)"},{d:"31 Mar",t:"FY-End Board Meeting – Approve Accounts",T:"CA",r:"Sec 134"},{d:"31 Mar",t:"Close Trading Window for Q4",T:"PIT",r:"SEBI PIT Circular 2019"},{d:"31 Mar",t:"CSR – Transfer Unspent Amount to designated account",T:"CA",r:"Sec 135(6)"},{d:"31 Mar",t:"Review Material Subsidiaries (new definition – LODR 2026)",T:"LODR",r:"Reg 16 — LODR Amendment 2026"}]},
-];
 
 var TST={
   CA:{h:"background:#3b82f610;border-color:#3b82f630",n:"color:#3b82f6",b:"background:#3b82f620;color:#3b82f6"},
@@ -2379,19 +2365,79 @@ function tg(id){
 var calF='ALL';
 function cf(el,f){calF=f;document.querySelectorAll('.cfb').forEach(function(b){b.classList.remove('on');});el.classList.add('on');rc();}
 function rc(){
-  var g=document.getElementById('cg'),html='';
-  CAL.forEach(function(m){
-    var items=calF==='ALL'?m.i:m.i.filter(function(i){return i.T===calF;});
-    if(!items.length) return;
-    html+='<div class="mc"><div class="mh"><span class="mn">'+m.m+'</span><span class="mct">'+items.length+'</span></div>';
-    items.forEach(function(i){
-      html+='<div class="mi"><div class="md" style="background:'+(CLD[i.T]||'#888')+'"></div><span class="mdt">'+i.d+'</span><div><div class="mt">'+i.t+'</div><div class="mr2">'+i.r+'</div></div></div>';
+  var g = document.getElementById('cg');
+  if(!g) return;
+
+  var clients = (typeof CLIENTS !== 'undefined' && CLIENTS) ? CLIENTS : [];
+  if(!clients.length){
+    g.innerHTML = '<div class="cc-empty"><div class="cc-empty-icon">'+
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">'+
+      '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div>'+
+      '<h2>No entities yet</h2><p>The calendar is built from your entities&rsquo; own obligations. '+
+      'Add a company to populate it.</p>'+
+      '<button class="cc-btn-primary" onclick="sw(\'entities\')">Go to Entities</button></div>';
+    return;
+  }
+
+  // Every dated obligation across every entity, grouped by month.
+  var byMonth = {};
+  clients.forEach(function(c){
+    var rows = [];
+    try{ rows = getComplianceChart(c); }catch(e){ return; }
+    rows.forEach(function(r){
+      if(!r.due) return;                      // standing duties have no calendar slot
+      var p = String(r.due).split('-').map(Number);
+      if(p.length !== 3) return;
+      var law = calLawTag(r.law);
+      if(calF !== 'ALL' && law !== calF) return;
+      (byMonth[p[1]] = byMonth[p[1]] || []).push({
+        day: p[2], date: r.due, month: p[1],
+        title: r.obligation, ref: r.section, law: law,
+        entity: c.name, entityId: c.id, key: r.key, days: lgDays(r.due)
+      });
     });
-    html+='</div>';
   });
-  g.innerHTML=html;
+
+  // Financial-year order: April first.
+  var order = [4,5,6,7,8,9,10,11,12,1,2,3];
+  var names = {1:'JANUARY',2:'FEBRUARY',3:'MARCH',4:'APRIL',5:'MAY',6:'JUNE',7:'JULY',
+               8:'AUGUST',9:'SEPTEMBER',10:'OCTOBER',11:'NOVEMBER',12:'DECEMBER'};
+  var mAbbr = {1:'Jan',2:'Feb',3:'Mar',4:'Apr',5:'May',6:'Jun',7:'Jul',
+               8:'Aug',9:'Sep',10:'Oct',11:'Nov',12:'Dec'};
+
+  var html = '', shown = 0;
+  order.forEach(function(mn){
+    var items = byMonth[mn];
+    if(!items || !items.length) return;
+    items.sort(function(a,b){ return a.day - b.day || a.title.localeCompare(b.title); });
+    shown += items.length;
+    html += '<div class="mc"><div class="mh"><span class="mn">'+names[mn]+'</span>'+
+            '<span class="mct">'+items.length+'</span></div>';
+    items.forEach(function(i){
+      var late = (i.days !== null && i.days < 0);
+      html += '<div class="mi" style="cursor:pointer;" onclick="cuOpenDetail('+lgArg(i.entityId)+','+lgArg(i.key)+')">'+
+        '<div class="md" style="background:'+(CLD[i.law]||'#94A3B8')+'"></div>'+
+        '<span class="mdt"'+(late?' style="color:#B91C1C;"':'')+'>'+i.day+' '+mAbbr[i.month]+'</span>'+
+        '<div><div class="mt">'+entEsc(i.title)+'</div>'+
+        '<div class="mr2">'+entEsc(i.ref||'')+
+          (clients.length > 1 ? ' · '+entEsc(i.entity) : '')+'</div></div></div>';
+    });
+    html += '</div>';
+  });
+
+  g.innerHTML = html || '<div class="cc-empty"><h2>Nothing dated in this view</h2>'+
+    '<p>Continuous and event-driven obligations have no fixed date, so they do not appear here. '+
+    'Clear the filter or see the full register in Compliance Universe.</p></div>';
 }
 
+// Map a law name onto the filter tags the calendar uses.
+function calLawTag(law){
+  var t = String(law||'').toLowerCase();
+  if(t.indexOf('pit') >= 0 || t.indexOf('insider') >= 0) return 'PIT';
+  if(t.indexOf('lodr') >= 0) return 'LODR';
+  if(t.indexOf('iepf') >= 0) return 'IEPF';
+  return 'CA';
+}
 // ═══════════════════════════════════════════════════
 // FORM FINDER
 // ═══════════════════════════════════════════════════
