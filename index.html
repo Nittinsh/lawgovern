@@ -94,15 +94,15 @@
 .applogout:hover{border-color:var(--red);background:var(--rose-bg);}
 
 .appshell{display:grid;grid-template-columns:236px 1fr;min-height:calc(100vh - 64px);}
-.appside{background:var(--navy);border-right:1px solid rgba(255,255,255,.06);padding:16px 12px;overflow-y:auto;height:calc(100vh - 64px);position:sticky;top:64px;}
+.appside{background:var(--paper);border-right:1px solid var(--line);padding:14px 12px;overflow-y:auto;height:calc(100vh - 64px);position:sticky;top:64px;}
 .appside::-webkit-scrollbar{width:6px;}
 .appside::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px;}
-.navhead{font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:#4E5E78;font-weight:700;padding:0 10px;margin:16px 0 6px;}
+.navhead{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);font-weight:700;padding:0 10px;margin:18px 0 6px;}
 .navhead:first-child{margin-top:0;}
-.navitem{display:flex;align-items:center;gap:11px;padding:8px 10px;border-radius:8px;font-size:13px;color:#A9B6CC;cursor:pointer;transition:.13s;font-weight:500;margin-bottom:1px;position:relative;}
+.navitem{display:flex;align-items:center;gap:11px;padding:8px 11px;border-radius:9px;font-size:13px;color:var(--ink-mid);cursor:pointer;transition:.13s;font-weight:600;margin-bottom:1px;position:relative;}
 .navitem .ni{width:16px;height:16px;stroke-width:1.9;flex-shrink:0;opacity:.85;}
-.navitem:hover{background:rgba(255,255,255,.05);color:#E4EAF4;}
-.navitem.on{background:linear-gradient(90deg,rgba(37,99,235,.22),rgba(37,99,235,.05));color:#fff;font-weight:600;}
+.navitem:hover{background:var(--bg);color:var(--navy);}
+.navitem.on{background:var(--blue-wash);color:var(--blue);font-weight:700;}.navitem.on:before{content:'';position:absolute;left:0;top:7px;bottom:7px;width:3px;border-radius:0 3px 3px 0;background:var(--blue);}.navitem .ni{opacity:.75;} .navitem.on .ni{opacity:1;}
 .navitem.on::before{content:'';position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:0 3px 3px 0;background:linear-gradient(var(--blue),var(--cyan));}
 .appmain{padding:26px;overflow-x:hidden;background:var(--bg);}
 @media(max-width:900px){.appshell{grid-template-columns:1fr;}.appside{position:static;height:auto;}}
@@ -167,6 +167,136 @@
 .cc-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
 .cc-dot.ok{background:var(--ok);} .cc-dot.warn{background:var(--warn);}
 .cc-hint{font-size:11.5px;font-weight:600;color:var(--warn);background:var(--warn-wash);padding:2px 8px;border-radius:6px;margin-left:8px;}
+/* ── Command centre ──────────────────────────────────────────────
+   A four-column board. Cards are uniform objects so the eye can scan them;
+   two of them span a pair of columns because their content is a list rather
+   than a single figure. */
+.hdr-ent{display:flex;align-items:center;gap:9px;padding:6px 12px;border:1px solid var(--line);border-radius:10px;background:var(--paper);cursor:pointer;transition:.14s;max-width:260px;}
+.hdr-ent:hover{border-color:var(--blue);}
+.hdr-ent svg{width:16px;height:16px;color:var(--ink-soft);flex-shrink:0;}
+.hdr-ent-n{font-size:12.5px;font-weight:700;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:190px;}
+.hdr-ent-c{font-size:10.5px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:190px;}
+@media(max-width:900px){.hdr-ent{display:none;}}
+.cmd-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px;}
+.cmd-head .cc-h1{font-size:27px;}
+.cmd-head-r{display:flex;gap:9px;flex-shrink:0;}
+.cmd-ent{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:7px;}
+.cmd-ent-name{font-size:14px;font-weight:700;color:var(--ink-mid);letter-spacing:.01em;}
+.cmd-ent-cin{font-size:12px;color:var(--ink-soft);}
+
+.cmd-chip{font-size:11px;font-weight:700;padding:3px 9px;border-radius:7px;white-space:nowrap;background:var(--bg);border:1px solid var(--line);color:var(--ink-mid);}
+.cmd-chip.blue{background:var(--blue-wash);border-color:transparent;color:var(--blue);}
+.cmd-chip.crit{background:var(--crit-wash);border-color:transparent;color:var(--crit);}
+.cmd-chip.warn{background:var(--warn-wash);border-color:transparent;color:var(--warn);}
+.cmd-chip.info{background:var(--bg);color:var(--ink-soft);}
+
+.cmd-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-items:start;}
+.cmd-span2{grid-column:span 2;}
+@media(max-width:1250px){.cmd-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media(max-width:760px){.cmd-grid{grid-template-columns:minmax(0,1fr);}.cmd-span2{grid-column:span 1;}}
+
+.cmd-card{background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 3px rgba(11,18,32,.05),0 8px 24px rgba(11,18,32,.04);overflow:hidden;display:flex;flex-direction:column;}
+.cmd-card-crit{border-color:#F5C6C6;}
+.cmd-card-accent{background:linear-gradient(180deg,#FAFBFF,var(--paper));}
+.cmd-card-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line-soft);}
+.cmd-card-h h3{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft);display:flex;align-items:center;gap:8px;}
+.cmd-card-h h3 svg{width:15px;height:15px;color:var(--crit);}
+.cmd-card-b{padding:14px 16px;flex:1;}
+.cmd-foot{padding-top:10px;margin-top:auto;font-size:12px;}
+.cmd-note{padding:10px 16px 12px;font-size:11.5px;color:var(--ink-soft);border-top:1px solid var(--line-soft);}
+.cmd-help{width:16px;height:16px;border-radius:50%;background:var(--bg);border:1px solid var(--line);color:var(--ink-soft);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:help;flex-shrink:0;}
+
+/* donut */
+.cmd-cov{display:flex;gap:16px;align-items:center;flex-wrap:wrap;}
+.cmd-donut{position:relative;flex-shrink:0;}
+.cmd-donut svg{width:100%;height:100%;display:block;}
+.cmd-donut-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.cmd-donut-v{font-family:'IBM Plex Mono';font-size:28px;font-weight:700;color:var(--navy);line-height:1;}
+.cmd-donut-max{font-size:13px;color:var(--ink-soft);font-weight:600;}
+.cmd-donut-l{font-size:10.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.08em;margin-top:4px;}
+.cmd-legs{flex:1;min-width:150px;display:flex;flex-direction:column;gap:6px;}
+.cmd-leg{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-mid);}
+.cmd-leg i{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+.cmd-leg span{flex:1;min-width:0;}
+.cmd-leg b{font-family:'IBM Plex Mono';font-weight:700;color:var(--navy);}
+.cmd-leg.total{border-top:1px solid var(--line-soft);padding-top:7px;margin-top:2px;font-weight:600;}
+
+/* at a glance */
+.cmd-gl{display:flex;gap:13px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line-soft);cursor:pointer;}
+.cmd-gl:last-child{border-bottom:none;}
+.cmd-gl:hover .cmd-gl-t{color:var(--blue);}
+.cmd-gl.zero{opacity:.5;}
+.cmd-gl-n{font-family:'IBM Plex Mono';font-size:24px;font-weight:700;min-width:34px;line-height:1;}
+.cmd-gl-n.crit{color:var(--crit);} .cmd-gl-n.warn{color:var(--warn);} .cmd-gl-n.info{color:var(--ink-mid);}
+.cmd-gl-t{font-size:13px;font-weight:600;color:var(--navy);}
+.cmd-gl-s{font-size:11.5px;margin-top:1px;}
+.cmd-gl-s.crit{color:var(--crit);} .cmd-gl-s.warn{color:var(--warn);} .cmd-gl-s.info{color:var(--ink-soft);}
+
+/* insights */
+.cmd-ins{list-style:none;display:flex;flex-direction:column;gap:9px;}
+.cmd-ins li{font-size:12.5px;line-height:1.6;color:var(--ink-mid);padding-left:15px;position:relative;}
+.cmd-ins li:before{content:'';position:absolute;left:0;top:7px;width:6px;height:6px;border-radius:50%;background:var(--blue);}
+.cmd-ins b{color:var(--navy);font-family:'IBM Plex Mono';}
+
+/* immediate attention */
+.cmd-imm-t{font-size:16px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+.cmd-imm-s{font-size:12px;color:var(--ink-soft);margin-top:3px;}
+.cmd-imm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:10px;overflow:hidden;margin-top:13px;}
+.cmd-imm-grid>div{background:var(--paper);padding:10px 12px;}
+.cmd-imm-grid span{display:block;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px;}
+.cmd-imm-grid b{font-size:13px;font-weight:700;color:var(--navy);}
+.cmd-imm-grid b.crit{color:var(--crit);} .cmd-imm-grid b.warn{color:var(--warn);}
+.cmd-imm-n{font-size:12px;color:var(--ink-mid);line-height:1.6;margin-top:12px;}
+.cc-btn-crit{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:9px;font-family:'Manrope';font-weight:700;font-size:13px;cursor:pointer;border:1px solid var(--crit);background:var(--crit);color:#fff;transition:.14s;}
+.cc-btn-crit:hover{background:#DC2626;}
+.cmd-toolrow{display:flex;gap:9px;align-items:center;flex-wrap:wrap;}
+
+/* upcoming */
+.cmd-up{display:flex;gap:12px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line-soft);cursor:pointer;}
+.cmd-up:last-child{border-bottom:none;}
+.cmd-up:hover .cmd-up-t{color:var(--blue);}
+.cmd-up-d{width:42px;flex-shrink:0;text-align:center;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:5px 0;}
+.cmd-up-d b{display:block;font-family:'IBM Plex Mono';font-size:15px;font-weight:700;color:var(--navy);line-height:1;}
+.cmd-up-d span{display:block;font-size:9px;font-weight:700;letter-spacing:.06em;color:var(--ink-soft);margin-top:2px;}
+.cmd-up-m{flex:1;min-width:0;}
+.cmd-up-t{font-size:13px;font-weight:600;color:var(--navy);}
+.cmd-up-s{font-size:11.5px;color:var(--ink-soft);margin-top:1px;}
+
+/* activity */
+.cmd-act{display:flex;gap:11px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line-soft);}
+.cmd-act:last-child{border-bottom:none;}
+.cmd-act-i{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.cmd-act-i.ok{background:var(--ok-wash);color:var(--ok);} .cmd-act-i.warn{background:var(--warn-wash);color:var(--warn);}
+.cmd-act-t{font-size:12.5px;font-weight:600;color:var(--navy);}
+.cmd-act-s{font-size:11.5px;color:var(--ink-soft);margin-top:1px;}
+
+/* quick actions */
+.cmd-qa{display:flex;gap:11px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line-soft);cursor:pointer;}
+.cmd-qa:last-child{border-bottom:none;}
+.cmd-qa:hover .cmd-qa-t{color:var(--blue);}
+.cmd-qa-i{width:28px;height:28px;border-radius:8px;background:var(--blue-wash);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.cmd-qa-t{font-size:12.5px;font-weight:600;color:var(--navy);}
+.cmd-qa-s{font-size:11px;color:var(--ink-soft);}
+
+/* calendar strip */
+.cmd-mon{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line-soft);cursor:pointer;}
+.cmd-mon:last-child{border-bottom:none;}
+.cmd-mon-n{font-size:13px;font-weight:700;color:var(--navy);}
+.cmd-mon-n span{font-family:'IBM Plex Mono';font-weight:500;color:var(--ink-soft);font-size:11px;}
+.cmd-mon-c{font-size:11.5px;color:var(--ink-soft);}
+
+/* risk matrix */
+.cmd-mx{display:grid;grid-template-columns:16px 1fr;grid-template-rows:1fr 16px;gap:6px;align-items:center;}
+.cmd-mx-y{writing-mode:vertical-rl;transform:rotate(180deg);font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft);text-align:center;}
+.cmd-mx-g{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;}
+.cmd-mx-c{aspect-ratio:1.6;border-radius:7px;background:var(--bg);border:1px solid var(--line-soft);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono';font-size:13px;font-weight:700;color:var(--ink-mid);}
+.cmd-mx-c.on{background:var(--warn-wash);border-color:transparent;color:var(--warn);}
+.cmd-mx-c.hot{background:var(--crit-wash);border-color:transparent;color:var(--crit);}
+.cmd-mx-x{grid-column:2;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft);text-align:right;}
+
+/* ask */
+.cmd-ask{font-size:12.5px;color:var(--ink-mid);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 12px;margin-bottom:7px;cursor:pointer;transition:.14s;}
+.cmd-ask:hover{border-color:var(--blue);color:var(--blue);}
 .cc-strip{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}
 .cc-stat{display:inline-flex;align-items:baseline;gap:6px;padding:8px 14px;background:var(--paper);border:1px solid var(--line);border-radius:10px;font-size:12.5px;color:var(--ink-mid);cursor:pointer;transition:.14s;}
 .cc-stat:hover{border-color:var(--blue);color:var(--blue);}
@@ -457,7 +587,7 @@ body.nav-locked{overflow:hidden;}
 @media(max-width:900px){
   .mobile-menu-btn{display:flex;}
   .appshell{grid-template-columns:1fr;}
-  .appside{position:fixed;left:0;top:0;bottom:0;width:270px;height:100vh;z-index:200;transform:translateX(-100%);transition:transform .25s ease;box-shadow:4px 0 24px rgba(0,0,0,.2);padding-top:16px;}
+  .appside{position:fixed;left:0;top:0;bottom:0;width:270px;height:100vh;z-index:200;transform:translateX(-100%);transition:transform .25s ease;box-shadow:4px 0 24px rgba(11,18,32,.14);padding-top:16px;}
   .appside.mobile-open{transform:translateX(0);}
   .appmain{height:auto;min-height:calc(100vh - 60px);}
   .cc-topgrid{grid-template-columns:1fr;}
@@ -993,7 +1123,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v78">
+      <meta id="build-version" content="v80">
     </div>
   </div>
   <div class="cc-search">
@@ -1004,6 +1134,11 @@ input[type="text"], input[type="password"], textarea, select {
     <div id="gs-results" class="gs-results" style="display:none;"></div>
   </div>
   <div class="appheader-right">
+    <div class="hdr-ent" id="hdr-ent" onclick="sw('entities')" title="Manage entities">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>
+      <div><div class="hdr-ent-n" id="hdr-ent-name">No entity</div>
+      <div class="hdr-ent-c mono" id="hdr-ent-cin">&mdash;</div></div>
+    </div>
     <div class="appuser">
       <div class="greet">Signed in as</div>
       <div class="uname" id="header-username">—</div>
@@ -5527,6 +5662,13 @@ function ccComputeStats(){
   // tile bound to any single one of them would read 0 forever.
   stats.pastDue = stats.overdueConfirmed + stats.notFound + stats.unverified;
 
+  // Two more windows the command centre reports on separately.
+  stats.dueIn90 = stats.agenda.length;
+  stats.due31to90 = stats.agenda.filter(function(a){ return a.days > 30; }).length;
+  // On track: applicable, not past due, and nothing outstanding to action.
+  stats.onTrack = stats.upcoming + stats.standing - stats.due31to90 - (stats.dueIn30 - stats.dueThisWeek);
+  if(stats.onTrack < 0) stats.onTrack = 0;
+
   // Recorded by someone, confirmed by nobody — the queue you work through.
   stats.awaitingConfirmation = stats.awaitingCheck + stats.rejected + stats.verificationPending;
 
@@ -5627,7 +5769,19 @@ function ccSig(risk,days){
   return '<div class="cc-sig '+cls+'"></div>';
 }
 
+// The header chip follows the register, so it cannot drift from the data.
+function ccSyncHeaderEntity(){
+  var n = document.getElementById('hdr-ent-name'), c = document.getElementById('hdr-ent-cin');
+  if(!n || !c) return;
+  var list = (typeof CLIENTS !== 'undefined' && CLIENTS) ? CLIENTS : [];
+  if(!list.length){ n.textContent = 'No entity'; c.textContent = 'Add one to begin'; return; }
+  if(list.length === 1){ n.textContent = list[0].name || '—'; c.textContent = list[0].cin || 'no CIN recorded'; return; }
+  n.textContent = ccPlural(list.length, 'entity', 'entities');
+  c.textContent = 'Portfolio view';
+}
+
 function renderCommandCenter(){
+  ccSyncHeaderEntity();
   var root = document.getElementById('cc-dash-root');
   if(!root) return;
   var s = ccComputeStats();
@@ -5636,157 +5790,384 @@ function renderCommandCenter(){
     root.innerHTML = '<div class="cc-empty">'+
       '<div class="cc-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>'+
       '<h2>Welcome to your Compliance Dashboard</h2>'+
-      '<p>Add your client companies to see live compliance health, deadlines, and obligations across your whole portfolio.</p>'+
+      '<p>Add your client companies to see live deadlines and obligations across the portfolio.</p>'+
       '<button class="cc-btn-primary" onclick="entOpen()">+ Add your first company</button>'+
       '</div>';
     return;
   }
 
-  var entityLine = s.entities === 1
-    ? (CLIENTS[0] ? CLIENTS[0].name : 'your entity')
-    : ccPlural(s.entities, 'entity', 'entities');
-
-  // ── what is late ───────────────────────────────────────────────
-  var lateHtml = '';
-  s.late.slice(0, 8).forEach(function(it){
-    lateHtml += '<div class="cc-att-row">'+
-      ccSig(it.risk, it.days)+
-      '<div class="cc-att-main">'+
-        '<div class="cc-att-title">'+entEsc(it.obligation)+
-          (ccForm(it.form) ? ' <span class="cc-att-code mono">'+entEsc(ccForm(it.form))+'</span>' : '')+'</div>'+
-        '<div class="cc-att-meta">'+entEsc(it.company)+' &middot; '+entEsc(it.section)+
-          ' &middot; was due '+ccFmtDate(it.due)+' &middot; nothing recorded</div>'+
-      '</div>'+
-      '<div class="cc-att-right">'+
-        '<div class="cc-att-due mono" style="color:var(--crit);">'+Math.abs(it.days)+'d late</div>'+
-        '<div class="cc-rowacts">'+
-          '<a class="cc-link" onclick="lgRecordOpen('+lgArg(it.entityId)+','+lgArg(it.key)+')">Record filing</a>'+
-          '<a class="cc-link" onclick="lgWhy('+lgArg(it.entityId)+','+lgArg(it.key)+')">Why?</a>'+
-        '</div>'+
-      '</div>'+
-    '</div>';
-  });
-  if(!lateHtml) lateHtml = '<div class="cc-none">Nothing is past its date with no filing recorded.</div>';
-
-  // ── what has been filed ────────────────────────────────────────
-  var filedHtml = '';
-  s.filed.slice(0, 8).forEach(function(it){
-    filedHtml += '<div class="cc-att-row">'+
-      '<span class="cc-dot '+(it.late ? 'warn' : 'ok')+'"></span>'+
-      '<div class="cc-att-main">'+
-        '<div class="cc-att-title">'+entEsc(it.obligation)+
-          (ccForm(it.form) ? ' <span class="cc-att-code mono">'+entEsc(ccForm(it.form))+'</span>' : '')+'</div>'+
-        '<div class="cc-att-meta">'+entEsc(it.company)+' &middot; '+entEsc(it.section)+
-          (it.reference ? ' &middot; <span class="mono">'+entEsc(it.reference)+'</span>'
-                        : ' &middot; no reference recorded')+'</div>'+
-      '</div>'+
-      '<div class="cc-att-right">'+
-        '<div class="cc-att-due mono">'+(it.filedOn ? ccFmtDate(it.filedOn) : 'date not recorded')+
-          // A colour alone does not tell you how late. Say it.
-          (it.filedOn && it.due
-            ? (it.late
-                ? ' <span style="color:var(--warn);">&middot; '+ccDaysBetween(it.due,it.filedOn)+'d late</span>'
-                : ' <span style="color:var(--ok);">&middot; on time</span>')
-            : '')+'</div>'+
-        '<div class="cc-rowacts">'+lgPill(it.state)+
-          '<a class="cc-link" onclick="lgWhy('+lgArg(it.entityId)+','+lgArg(it.key)+')">Why?</a></div>'+
-      '</div>'+
-    '</div>';
-  });
-  if(!filedHtml) filedHtml =
-    '<div class="cc-none">Nothing recorded yet. Open any obligation and use '+
-    '<b>Record filing</b> &mdash; the date and reference you enter show up here, '+
-    'and the obligation leaves the past-due list.</div>';
-
-  // ── what is coming ─────────────────────────────────────────────
-  var agHtml = '';
-  s.agenda.slice(0, 12).forEach(function(it){
-    var soon = it.days <= 7;
-    agHtml += '<tr onclick="cuOpenDetail('+lgArg(it.entityId)+','+lgArg(it.key)+')">'+
-      '<td data-label="Date" class="mono" style="white-space:nowrap;'+(soon?'color:var(--warn);font-weight:700;':'')+'">'+
-        ccFmtDate(it.due)+'</td>'+
-      '<td data-label="Obligation"><div class="cu-oblig">'+entEsc(it.obligation)+'</div>'+
-        '<div class="cu-oblig-sub">'+entEsc(it.company)+' &middot; '+entEsc(it.section)+'</div></td>'+
-      '<td data-label="Form" class="mono" style="white-space:nowrap;">'+
-        entEsc(ccForm(it.form))+'</td>'+
-      '<td data-label="In" class="mono" style="white-space:nowrap;'+(soon?'color:var(--warn);font-weight:700;':'color:var(--ink-soft);')+'">'+
-        it.days+'d</td></tr>';
-  });
+  var c0 = (typeof CLIENTS !== 'undefined' && CLIENTS[0]) ? CLIENTS[0] : null;
+  var entName = s.entities === 1 && c0 ? c0.name : ccPlural(s.entities,'entity','entities');
+  var typeLabel = c0 ? ({listed:'Listed company', public:'Public company', private:'Private company',
+                         opc:'One Person Company', sec8:'Section 8 company', llp:'LLP'}[c0.type] || c0.type) : '';
 
   root.innerHTML =
-  '<div class="cc-pagehead">'+
-    '<div><div class="cc-crumb">Intelligence &rsaquo; Dashboard</div>'+
-    '<h1 class="cc-h1">Compliance Dashboard</h1>'+
-    '<p class="cc-sub">'+entEsc(entityLine)+' &middot; '+
-      ccPlural(s.totalObligations,'applicable obligation','applicable obligations')+'</p></div>'+
-    '<div class="cc-headbtns"><button class="cc-btn" onclick="sw(\'entities\')">Manage entities</button>'+
-    '<button class="cc-btn-primary" onclick="sw(\'chat\')">&#9670; Ask AI</button></div>'+
-  '</div>'+
+    ccCmdHead(s, c0, entName, typeLabel) +
+    '<div class="cmd-grid">'+
+      ccCardCoverage(s) +
+      ccCardGlance(s) +
+      ccCardSummary(s) +
+      ccCardInsights(s) +
+      ccCardImmediate(s) +
+      ccCardUpcoming(s) +
+      ccCardActivity(s) +
+      ccCardQuick(s) +
+      ccCardCalendar(s) +
+      ccCardRadar(s) +
+      ccCardMatrix(s) +
+      ccCardCopilot(s) +
+    '</div>';
+}
 
-  // One line, not four cards. Each figure opens the register filtered to it.
-  '<div class="cc-strip">'+
-    '<span class="cc-stat'+(s.late.length?' crit':'')+'" onclick="ccGo(\'vstatus\',\'OVERDUE,NOT_FOUND,VERIFICATION_UNAVAILABLE\')">'+
-      '<b>'+s.late.length+'</b> past due</span>'+
-    '<span class="cc-stat'+(s.agenda.length?' warn':'')+'" onclick="ccGo(\'within\',\'90\')">'+
-      '<b>'+s.agenda.length+'</b> in the next 90 days</span>'+
-    '<span class="cc-stat" onclick="ccGo(\'vstatus\',\'STANDING\')">'+
-      '<b>'+s.standing+'</b> ongoing</span>'+
-    '<span class="cc-stat'+(s.evidenceOnRecord?' ok':'')+'" onclick="ccGo(\'vstatus\',\'FILED,FILED_LATE,MANUAL_CONFIRMATION,FILED_PENDING,AWAITING_CHECK\')">'+
-      '<b>'+s.evidenceOnRecord+'</b> with a filing on record</span>'+
-  '</div>'+
-
-  '<div class="cc-card" style="margin-top:16px;">'+
-    '<div class="cc-card-h"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+
-      '<path d="M12 3l9 16H3L12 3z"/><path d="M12 10v4" stroke-linecap="round"/></svg>'+
-      'Past due, nothing recorded'+(s.late.length?' &mdash; '+ccPlural(s.late.length,'item','items'):'')+'</h3>'+
-      (s.late.length>8?'<span class="cc-link" onclick="ccGo(\'vstatus\',\'OVERDUE,NOT_FOUND,VERIFICATION_UNAVAILABLE\')">View all</span>':'')+
+// ── page head ────────────────────────────────────────────────────
+function ccCmdHead(s, c0, entName, typeLabel){
+  return '<div class="cmd-head">'+
+    '<div class="cmd-head-l">'+
+      '<h1 class="cc-h1">Compliance Command Center</h1>'+
+      '<div class="cmd-ent">'+
+        '<span class="cmd-ent-name">'+entEsc(entName)+'</span>'+
+        (typeLabel ? '<span class="cmd-chip blue">'+entEsc(typeLabel)+'</span>' : '')+
+        (c0 && c0.cin ? '<span class="cmd-ent-cin">CIN: <span class="mono">'+entEsc(c0.cin)+'</span></span>' : '')+
+      '</div>'+
     '</div>'+
-    '<div class="cc-card-b">'+lateHtml+'</div>'+
-  '</div>'+
-
-  // The two halves of "where do we actually stand", side by side.
-  '<div class="cc-card" style="margin-top:16px;">'+
-    '<div class="cc-card-h"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+
-      '<path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
-      'Filed &amp; recorded'+(s.filed.length?' &mdash; '+ccPlural(s.filed.length,'item','items'):'')+
-      (s.filedLateCount?' <span class="cc-hint">'+s.filedLateCount+' after the due date</span>':'')+'</h3>'+
-      (s.filed.length>8?'<span class="cc-link" onclick="ccGo(\'vstatus\',\'FILED,FILED_LATE,MANUAL_CONFIRMATION,FILED_PENDING,AWAITING_CHECK\')">View all</span>':'')+
+    '<div class="cmd-head-r">'+
+      '<button class="cc-btn" onclick="sw(\'entities\')">Manage entities</button>'+
+      '<button class="cc-btn-primary" onclick="sw(\'chat\')">&#9670; Ask AI</button>'+
     '</div>'+
-    '<div class="cc-card-b">'+filedHtml+'</div>'+
-  '</div>'+
+  '</div>';
+}
 
-  '<div class="cc-card" style="margin-top:16px;">'+
-    '<div class="cc-card-h"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+
-      '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>'+
-      'Next 90 days</h3>'+
-      '<span class="cc-link" onclick="sw(\'cal\')">Open calendar</span></div>'+
-    (agHtml
-      ? '<div class="cu-tablewrap" style="border:none;box-shadow:none;border-radius:0;">'+
-        '<table class="cu-table"><thead><tr><th>Date</th><th>Obligation</th><th>Form</th><th>In</th>'+
-        '</tr></thead><tbody>'+agHtml+'</tbody></table></div>'+
-        (s.agenda.length>12?'<div class="cu-foot">Showing 12 of '+s.agenda.length+'. '+
-          '<a class="cc-link" onclick="ccGo(\'within\',\'90\')">See the rest</a></div>':'')
-      : '<div class="cc-card-b"><div class="cc-none">Nothing falls due in the next 90 days.</div></div>')+
-  '</div>'+
+// ── a donut, drawn from segments ─────────────────────────────────
+// Stroke-dasharray on a single circle per segment: no library, and it stays
+// crisp at any size because it is one path per slice rather than a bitmap.
+function ccDonut(segments, centre, caption, size){
+  size = size || 132;
+  var r = 54, circ = 2 * Math.PI * r;
+  var total = segments.reduce(function(a,x){ return a + x.value; }, 0);
+  var off = 0, paths = '';
+  if(total > 0){
+    segments.forEach(function(seg){
+      if(!seg.value) return;
+      var len = (seg.value / total) * circ;
+      paths += '<circle cx="70" cy="70" r="'+r+'" fill="none" stroke="'+seg.color+'" stroke-width="15"'+
+               ' stroke-dasharray="'+len.toFixed(2)+' '+(circ-len).toFixed(2)+'"'+
+               ' stroke-dashoffset="'+(-off).toFixed(2)+'" transform="rotate(-90 70 70)"'+
+               ' stroke-linecap="butt"><title>'+entEsc(seg.label)+': '+seg.value+'</title></circle>';
+      off += len;
+    });
+  } else {
+    paths = '<circle cx="70" cy="70" r="'+r+'" fill="none" stroke="var(--line)" stroke-width="15"/>';
+  }
+  return '<div class="cmd-donut" style="width:'+size+'px;height:'+size+'px;">'+
+    '<svg viewBox="0 0 140 140">'+
+      '<circle cx="70" cy="70" r="'+r+'" fill="none" stroke="var(--line-soft)" stroke-width="15"/>'+
+      paths+
+    '</svg>'+
+    '<div class="cmd-donut-c"><div class="cmd-donut-v">'+centre+'</div>'+
+      '<div class="cmd-donut-l">'+caption+'</div></div>'+
+  '</div>';
+}
 
-  // Nearly a third of the register lives here and none of it is dated. Naming a
-  // few makes it obvious what kind of duty this is, rather than an opaque count.
-  '<div class="cc-card" style="margin-top:16px;">'+
-    '<div class="cc-card-h"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+
-      '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round"/></svg>'+
-      'Ongoing &amp; event-driven &mdash; '+s.standing+'</h3>'+
-      '<span class="cc-link" onclick="ccGo(\'vstatus\',\'STANDING\')">View all</span></div>'+
-    '<div class="cc-card-b">'+
-      '<div class="cc-none" style="text-align:left;padding:0 0 10px;">No fixed date: these run continuously, '+
-        'or the clock starts when the event happens.</div>'+
-      '<div class="cc-taglist">'+
-        s.standingNames.map(function(n){ return '<span class="cc-tag">'+entEsc(n)+'</span>'; }).join('')+
-        (s.standing > s.standingNames.length
-          ? '<span class="cc-tag cc-tag-more">+'+(s.standing - s.standingNames.length)+' more</span>' : '')+
+function ccLegendRow(color, label, value){
+  return '<div class="cmd-leg"><i style="background:'+color+'"></i>'+
+    '<span>'+label+'</span><b>'+value+'</b></div>';
+}
+
+// ── 1. evidence coverage ─────────────────────────────────────────
+// The reference shows "88/100 Excellent, +6.4% vs last month". No prior period
+// is stored, so there is nothing to compare against and no score to report.
+// What IS computable is how much of the register has a filing behind it.
+function ccCardCoverage(s){
+  var pct = s.totalObligations ? Math.round((s.evidenceOnRecord / s.totalObligations) * 100) : 0;
+  var tone = pct >= 80 ? 'var(--ok)' : pct >= 40 ? 'var(--warn)' : 'var(--crit)';
+  return '<div class="cmd-card">'+
+    '<div class="cmd-card-h"><h3>Evidence coverage</h3>'+
+      '<span class="cmd-help" title="The share of applicable obligations with a filing date or reference recorded. It is not a compliance score: nothing here has been confirmed against MCA or the exchanges.">?</span></div>'+
+    '<div class="cmd-card-b cmd-cov">'+
+      ccDonut([{value:s.evidenceOnRecord, color:tone, label:'With a filing on record'},
+               {value:Math.max(0, s.totalObligations - s.evidenceOnRecord), color:'var(--line)', label:'Nothing recorded'}],
+              '<span style="color:'+tone+'">'+pct+'</span><span class="cmd-donut-max">/100</span>',
+              s.evidenceOnRecord ? 'covered' : 'no filings')+
+      '<div class="cmd-legs">'+
+        ccLegendRow('var(--ok)','With a filing on record', s.evidenceOnRecord)+
+        ccLegendRow('var(--crit)','Past due, nothing recorded', s.pastDue)+
+        ccLegendRow('var(--warn)','Due within 30 days', s.dueIn30)+
+        ccLegendRow('#93C5FD','Ongoing / event-driven', s.standing)+
+        ccLegendRow('var(--line)','Not applicable', s.notApplicable)+
+        '<div class="cmd-leg total"><span>Applicable obligations</span><b>'+s.totalObligations+'</b></div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="cmd-note">No prior period is stored, so there is nothing to compare this against yet.</div>'+
+  '</div>';
+}
+
+// ── 2. at a glance ───────────────────────────────────────────────
+function ccCardGlance(s){
+  var row = function(n, title, sub, tone, action){
+    return '<div class="cmd-gl'+(n?'':' zero')+'" onclick="'+action+'">'+
+      '<div class="cmd-gl-n '+tone+'">'+n+'</div>'+
+      '<div><div class="cmd-gl-t">'+title+'</div>'+
+      '<div class="cmd-gl-s '+tone+'">'+sub+'</div></div></div>';
+  };
+  return '<div class="cmd-card">'+
+    '<div class="cmd-card-h"><h3>At a glance</h3>'+
+      '<span class="cc-link" onclick="sw(\'mywork\')">View all &rarr;</span></div>'+
+    '<div class="cmd-card-b">'+
+      row(s.pastDue,'Past due','nothing recorded against these','crit',
+          "ccGo('vstatus','OVERDUE,NOT_FOUND,VERIFICATION_UNAVAILABLE')")+
+      row(s.dueIn30,'Due within 30 days','plan these now','warn',"ccGo('within','30')")+
+      row(s.due31to90,'Due in 31 to 90 days','on the horizon','info',"ccGo('within','90')")+
+      row(s.awaitingConfirmation,'Awaiting confirmation','recorded, not yet confirmed','info',
+          "ccGo('vstatus','AWAITING_CHECK,CHECK_REJECTED,FILED_PENDING')")+
+    '</div>'+
+  '</div>';
+}
+
+// ── 3. obligations summary ───────────────────────────────────────
+function ccCardSummary(s){
+  var segs = [
+    {value:s.onTrack,        color:'var(--ok)',   label:'On track'},
+    {value:s.dueIn30,        color:'var(--warn)', label:'Due soon'},
+    {value:s.pastDue,        color:'var(--crit)', label:'Past due'},
+    {value:s.due31to90,      color:'#93C5FD',     label:'Due 31-90 days'},
+    {value:s.notApplicable,  color:'var(--line)', label:'Not applicable'}
+  ];
+  return '<div class="cmd-card">'+
+    '<div class="cmd-card-h"><h3>Obligations summary</h3></div>'+
+    '<div class="cmd-card-b cmd-cov">'+
+      ccDonut(segs, s.totalObligations, 'total')+
+      '<div class="cmd-legs">'+
+        ccLegendRow('var(--ok)','On track', s.onTrack)+
+        ccLegendRow('var(--warn)','Due soon', s.dueIn30)+
+        ccLegendRow('var(--crit)','Past due', s.pastDue)+
+        ccLegendRow('#93C5FD','Due 31-90 days', s.due31to90)+
+        ccLegendRow('var(--line)','Not applicable', s.notApplicable)+
+      '</div>'+
+    '</div>'+
+    '<div class="cmd-foot"><span class="cc-link" onclick="sw(\'universe\')">Open the full register &rarr;</span></div>'+
+  '</div>';
+}
+
+// ── 4. what the data supports ────────────────────────────────────
+function ccCardInsights(s){
+  var soon = s.agenda.filter(function(a){ return a.days <= 14; });
+  var lines = [];
+  if(soon.length) lines.push('<b>'+ccPlural(soon.length,'obligation','obligations')+
+    '</b> fall due within the next 14 days.');
+  if(s.pastDue) lines.push('<b>'+ccPlural(s.pastDue,'item','items')+
+    '</b> '+(s.pastDue===1?'is':'are')+' past '+(s.pastDue===1?'its':'their')+
+    ' date with no filing recorded.');
+  if(!s.evidenceOnRecord) lines.push('No filing has been recorded yet, so nothing here can be '+
+    'evidenced if it is questioned.');
+  if(s.standing) lines.push('<b>'+s.standing+'</b> duties have no fixed date &mdash; they run '+
+    'continuously or start on an event.');
+  if(!lines.length) lines.push('Nothing needs attention in the next 90 days.');
+
+  return '<div class="cmd-card cmd-card-accent">'+
+    '<div class="cmd-card-h"><h3>What the data shows</h3></div>'+
+    '<div class="cmd-card-b">'+
+      '<ul class="cmd-ins">'+lines.map(function(l){ return '<li>'+l+'</li>'; }).join('')+'</ul>'+
+      '<div class="cmd-note" style="padding:0;margin-top:10px;">Computed from your register. '+
+        'No trend or forecast is shown because no prior period is stored.</div>'+
+    '</div>'+
+  '</div>';
+}
+
+// ── 5. immediate attention ───────────────────────────────────────
+function ccCardImmediate(s){
+  var it = s.late[0];
+  if(!it){
+    return '<div class="cmd-card cmd-span2">'+
+      '<div class="cmd-card-h"><h3>Immediate attention</h3></div>'+
+      '<div class="cmd-card-b"><div class="cc-none">Nothing is past its date with no filing recorded.</div></div>'+
+    '</div>';
+  }
+  return '<div class="cmd-card cmd-span2 cmd-card-crit">'+
+    '<div class="cmd-card-h">'+
+      '<h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3L12 3z"/><path d="M12 10v4" stroke-linecap="round"/></svg>Immediate attention</h3>'+
+      '<span class="cmd-chip crit">'+Math.abs(it.days)+' days overdue</span></div>'+
+    '<div class="cmd-card-b">'+
+      '<div class="cmd-imm-t">'+entEsc(it.obligation)+
+        (ccForm(it.form) ? ' <span class="cc-att-code mono">'+entEsc(ccForm(it.form))+'</span>' : '')+'</div>'+
+      '<div class="cmd-imm-s">'+entEsc(it.company)+' &middot; '+entEsc(it.law||'')+'</div>'+
+      '<div class="cmd-imm-grid">'+
+        '<div><span>Due date</span><b class="mono">'+ccFmtDate(it.due)+'</b></div>'+
+        '<div><span>Status</span><b class="crit">Past due</b></div>'+
+        '<div><span>Risk</span><b class="'+(it.risk==='critical'||it.risk==='high'?'crit':'warn')+'">'+
+          entEsc((it.risk||'').replace(/^./,function(m){return m.toUpperCase();}))+'</b></div>'+
+        '<div><span>Basis</span><b class="mono">'+entEsc(it.section||'')+'</b></div>'+
+      '</div>'+
+      '<div class="cmd-imm-n">No filing recorded against this obligation. If it was filed, record '+
+        'the date and reference so it stops appearing here.</div>'+
+      '<div class="cmd-toolrow" style="margin-top:12px;">'+
+        '<button class="cc-btn-crit" onclick="lgRecordOpen('+lgArg(it.entityId)+','+lgArg(it.key)+')">Record filing</button>'+
+        '<button class="cc-btn" onclick="lgWhy('+lgArg(it.entityId)+','+lgArg(it.key)+')">Why is this flagged?</button>'+
+        (s.late.length > 1 ? '<span class="cc-link" onclick="ccGo(\'vstatus\',\'OVERDUE,NOT_FOUND,VERIFICATION_UNAVAILABLE\')">'+
+          (s.late.length-1)+' more &rarr;</span>' : '')+
       '</div>'+
     '</div>'+
   '</div>';
 }
+
+// ── 6. upcoming ──────────────────────────────────────────────────
+function ccCardUpcoming(s){
+  var soon = s.agenda.filter(function(a){ return a.days <= 30; });
+  var body = soon.length
+    ? soon.slice(0,5).map(function(a){
+        var p = String(a.due).split('-');
+        var mo = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][(+p[1])-1];
+        return '<div class="cmd-up" onclick="cuOpenDetail('+lgArg(a.entityId)+','+lgArg(a.key)+')">'+
+          '<div class="cmd-up-d"><b>'+p[2]+'</b><span>'+mo+'</span></div>'+
+          '<div class="cmd-up-m"><div class="cmd-up-t">'+entEsc(a.obligation)+'</div>'+
+          '<div class="cmd-up-s">'+entEsc(a.company)+' &middot; '+entEsc(a.section||'')+'</div></div>'+
+          '<span class="cmd-chip '+(a.days<=7?'warn':'info')+'">'+a.days+'d</span></div>';
+      }).join('')
+    : '<div class="cc-none">Nothing falls due in the next 30 days.</div>';
+  return '<div class="cmd-card cmd-span2">'+
+    '<div class="cmd-card-h"><h3>Upcoming &mdash; next 30 days</h3>'+
+      '<span class="cc-link" onclick="sw(\'cal\')">View calendar &rarr;</span></div>'+
+    '<div class="cmd-card-b">'+body+
+      (soon.length>5?'<div class="cmd-foot"><span class="cc-link" onclick="ccGo(\'within\',\'30\')">'+
+        'All '+soon.length+' &rarr;</span></div>':'')+
+    '</div>'+
+  '</div>';
+}
+
+// ── 7. recent activity ───────────────────────────────────────────
+function ccCardActivity(s){
+  var body = s.filed.length
+    ? s.filed.slice(0,5).map(function(f){
+        return '<div class="cmd-act">'+
+          '<span class="cmd-act-i '+(f.late?'warn':'ok')+'">'+(f.late?'!':'&#10003;')+'</span>'+
+          '<div><div class="cmd-act-t">'+entEsc(f.obligation)+'</div>'+
+          '<div class="cmd-act-s">'+(f.filedOn?ccFmtDate(f.filedOn):'date not recorded')+
+            (f.reference?' &middot; <span class="mono">'+entEsc(f.reference)+'</span>':'')+
+            (f.late?' &middot; <span style="color:var(--warn)">late</span>':'')+'</div></div></div>';
+      }).join('')
+    : '<div class="cc-none">Nothing recorded yet. Use <b>Record filing</b> on any obligation and it appears here.</div>';
+  return '<div class="cmd-card">'+
+    '<div class="cmd-card-h"><h3>Recent activity</h3>'+
+      (s.filed.length?'<span class="cc-link" onclick="ccGo(\'vstatus\',\'FILED,FILED_LATE,MANUAL_CONFIRMATION,FILED_PENDING,AWAITING_CHECK\')">View all &rarr;</span>':'')+
+    '</div><div class="cmd-card-b">'+body+'</div>'+
+  '</div>';
+}
+
+// ── 8. quick actions ─────────────────────────────────────────────
+function ccCardQuick(s){
+  var a = function(icon, title, sub, action){
+    return '<div class="cmd-qa" onclick="'+action+'">'+
+      '<span class="cmd-qa-i">'+icon+'</span>'+
+      '<div><div class="cmd-qa-t">'+title+'</div><div class="cmd-qa-s">'+sub+'</div></div></div>';
+  };
+  return '<div class="cmd-card">'+
+    '<div class="cmd-card-h"><h3>Quick actions</h3></div>'+
+    '<div class="cmd-card-b">'+
+      a('&#43;','Add an entity','company details and CIN',"entOpen()")+
+      a('&#9776;','Open the register','every applicable obligation',"sw('universe')")+
+      a('&#9998;','Draft a resolution','board, ordinary or special',"sw('res')")+
+      a('&#9635;','Find a form','155 forms and filings',"sw('ff')")+
+    '</div>'+
+  '</div>';
+}
+
+// ── 9. calendar strip ────────────────────────────────────────────
+function ccCardCalendar(s){
+  var byMonth = {};
+  s.agenda.concat(s.late).forEach(function(a){
+    if(!a.due) return;
+    var p = String(a.due).split('-');
+    var key = p[0]+'-'+p[1];
+    (byMonth[key] = byMonth[key] || []).push(a);
+  });
+  var keys = Object.keys(byMonth).sort().slice(0,4);
+  var names = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var body = keys.length
+    ? keys.map(function(k){
+        var p = k.split('-'), items = byMonth[k];
+        var late = items.filter(function(i){ return i.days < 0; }).length;
+        return '<div class="cmd-mon" onclick="sw(\'cal\')">'+
+          '<div class="cmd-mon-n">'+names[(+p[1])-1]+' <span>'+p[0]+'</span></div>'+
+          '<div class="cmd-mon-c">'+ccPlural(items.length,'item','items')+
+            (late?' &middot; <span style="color:var(--crit)">'+late+' late</span>':'')+'</div></div>';
+      }).join('')
+    : '<div class="cc-none">Nothing dated in the next 90 days.</div>';
+  return '<div class="cmd-card">'+
+    '<div class="cmd-card-h"><h3>Calendar</h3>'+
+      '<span class="cc-link" onclick="sw(\'cal\')">Open &rarr;</span></div>'+
+    '<div class="cmd-card-b">'+body+'</div>'+
+  '</div>';
+}
+
+// ── 10. regulatory radar ─────────────────────────────────────────
+// The reference says "2 obligations potentially affected" against each update.
+// Deciding that needs a mapping from a circular to the obligations it changes,
+// which does not exist — so the updates are listed without inventing a count.
+function ccCardRadar(s){
+  return '<div class="cmd-card">'+
+    '<div class="cmd-card-h"><h3>Regulatory radar</h3>'+
+      '<span class="cc-link" onclick="sw(\'tracker\')">Open &rarr;</span></div>'+
+    '<div class="cmd-card-b">'+
+      '<div class="cc-none" style="padding:14px 4px;text-align:left;">Circulars and notifications '+
+      'are fetched from SEBI, MCA, RBI, IBBI and Income Tax on demand. Open the radar to pull the '+
+      'latest.</div>'+
+      '<button class="cc-btn" style="width:100%;justify-content:center;" onclick="sw(\'tracker\')">Fetch latest updates</button>'+
+    '</div>'+
+  '</div>';
+}
+
+// ── 11. risk matrix ──────────────────────────────────────────────
+// Impact from the obligation's recorded risk, likelihood from how close it is
+// to its date. Both come from the register; nothing is modelled.
+function ccCardMatrix(s){
+  var cells = {};
+  var impactOf = function(r){ return (r==='critical'||r==='high') ? 2 : (r==='medium' ? 1 : 0); };
+  var likeOf = function(d){ return d < 0 ? 2 : (d <= 30 ? 1 : 0); };
+  s.late.concat(s.agenda).forEach(function(a){
+    var key = impactOf(a.risk)+','+likeOf(a.days);
+    cells[key] = (cells[key]||0) + 1;
+  });
+  var grid = '';
+  for(var i=2;i>=0;i--){
+    for(var l=0;l<3;l++){
+      var n = cells[i+','+l] || 0;
+      var hot = (i>=1 && l>=1);
+      grid += '<div class="cmd-mx-c'+(n?(hot?' hot':' on'):'')+'">'+(n||'')+'</div>';
+    }
+  }
+  return '<div class="cmd-card">'+
+    '<div class="cmd-card-h"><h3>Risk matrix</h3>'+
+      '<span class="cmd-help" title="Impact is the risk recorded against the obligation. Likelihood is how close it is to its due date. Both come from your register.">?</span></div>'+
+    '<div class="cmd-card-b">'+
+      '<div class="cmd-mx"><div class="cmd-mx-y">Impact</div>'+
+        '<div class="cmd-mx-g">'+grid+'</div>'+
+        '<div class="cmd-mx-x">Likelihood &rarr;</div></div>'+
+    '</div>'+
+  '</div>';
+}
+
+// ── 12. ask ──────────────────────────────────────────────────────
+function ccCardCopilot(s){
+  var qs = ['What is due this month?','Why is the FLA return applicable?',
+            'Which obligations apply to a listed company?','What changed recently?'];
+  return '<div class="cmd-card cmd-card-accent">'+
+    '<div class="cmd-card-h"><h3>Ask compliance</h3></div>'+
+    '<div class="cmd-card-b">'+
+      qs.map(function(q){
+        return '<div class="cmd-ask" onclick="ccAsk('+lgArg(q)+')">'+entEsc(q)+'</div>';
+      }).join('')+
+      '<button class="cc-btn-primary" style="width:100%;justify-content:center;margin-top:10px;" '+
+        'onclick="sw(\'chat\')">Open AI Compliance</button>'+
+    '</div>'+
+  '</div>';
+}
+
+function ccAsk(q){
+  sw('chat');
+  var i = document.getElementById('ci');
+  if(i){ i.value = q; i.focus(); }
+}
+
+
 
 // The rules data uses '-', an en dash and an em dash interchangeably for
 // "no form". Testing against only one of them printed a stray dash in the
