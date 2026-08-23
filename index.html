@@ -990,7 +990,9 @@ function enterApp(){
   if(typeof renderCommandCenter === 'function') renderCommandCenter();
   // Load cloud data, then re-render dashboard with real numbers
   if(typeof loadCloudClients === 'function'){
-    Promise.resolve(loadCloudClients()).then(function(){
+    Promise.resolve(loadCloudClients())
+      .then(function(){ return (typeof lgLoadRegisters === 'function') ? lgLoadRegisters() : null; })
+      .then(function(){
       if(typeof renderCommandCenter === 'function') renderCommandCenter();
     }).catch(function(){});
   }
@@ -1171,7 +1173,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v83">
+      <meta id="build-version" content="v84">
     </div>
   </div>
   <div class="cc-search">
@@ -4398,6 +4400,161 @@ function cmRows(dataset, c, agmIso, tag){
   return out;
 }
 
+// ═══════════════════════════════════════════════════
+// REGISTERS -> RULES ENGINE
+// ═══════════════════════════════════════════════════
+// getComplianceChart is synchronous, so the registers have to be in memory
+// before it runs. They are loaded once after the companies land and refreshed
+// whenever a register row is saved.
+var LG_REGS = {directors:null, shareholders:null, meetings:null};
+
+async function lgLoadRegisters(){
+  if(!supaClient || !CURRENT_USER){ LG_REGS = {directors:[], shareholders:[], meetings:[]}; return; }
+  var tables = ['directors','shareholders','meetings'];
+  for(var i=0;i<tables.length;i++){
+    var t = tables[i];
+    try{
+      var r = await supaClient.from(t).select('*');
+      // A missing table is not an error worth shouting about here: the register
+      // panel says which migration creates it. The engine just sees no rows.
+      LG_REGS[t] = (r.error ? [] : (r.data || []));
+    }catch(e){ LG_REGS[t] = []; }
+  }
+}
+
+function regRowsFor(table, companyId){
+  var all = LG_REGS[table];
+  if(!all) return [];
+  return all.filter(function(r){ return String(r.company_id) === String(companyId); });
+}
+
+function lgDirectorsInOffice(companyId){
+  return regRowsFor('directors', companyId).filter(function(d){ return !d.cessation_on; });
+}
+
+// ── derived obligations ──────────────────────────────────────────
+function regDerivedRows(c, ctx){
+  var rows = [];
+  var dt = ctx.dt, plus = ctx.plus, y = ctx.y;
+  var fyEnd = ctx.fyEnd, fyStart = ctx.fyStart;
+
+  // ── DIR-3 KYC, per DIN holder ──────────────────────────────────
+  // Rule 12A: every individual holding a DIN as on 31 March files by 30
+  // September. One obligation per person, not one for the company.
+  var dirs = lgDirectorsInOffice(c.id);
+  dirs.filter(function(d){ return d.din; }).forEach(function(d){
+    var due = dt(y, 9, 30);
+    var cycleStart = dt(y, 4, 1);
+    var done = d.din_kyc_on && String(d.din_kyc_on) >= cycleStart;
+    rows.push({
+      key:'dir3kyc-'+String(d.din).replace(/\D/g,''),
+      law:'Companies Act 2013', section:'Sec 153 r/w Rule 12A', form:'DIR-3 KYC',
+      obligation:'DIR-3 KYC — '+(d.name||'director')+' (DIN '+d.din+')',
+      owner:'Director / CS', due:due, risk:'high', applicable:true,
+      penalty:'DIN deactivated; Rs.5,000 to reactivate',
+      derived:'directors',
+      autoEvidence: done ? {filedOn:String(d.din_kyc_on), source:'Directors register'} : null
+    });
+  });
+
+  // ── Board meeting cadence, Sec 173 ─────────────────────────────
+  var mtgs = regRowsFor('meetings', c.id).filter(function(m){
+    return m.kind === 'board' && m.held_on && String(m.held_on) >= fyStart && String(m.held_on) <= fyEnd;
+  }).sort(function(a,b){ return String(a.held_on).localeCompare(String(b.held_on)); });
+
+  // Sec 173(5): OPC, small and dormant companies hold two a year, one per half.
+  // Small company thresholds are the 2022 figures — paid-up up to Rs 4 crore
+  // and turnover up to Rs 40 crore.
+  var small = (c.type === 'opc') ||
+              (c.type === 'private' && Number(c.capital||0) <= 40000000 &&
+               Number(c.turnover||0) <= 400000000);
+  var need = small ? 2 : 4;
+
+  var maxGap = 0, gapNote = '';
+  for(var i=1;i<mtgs.length;i++){
+    var g = ccDaysBetween(String(mtgs[i-1].held_on), String(mtgs[i].held_on));
+    if(g > maxGap){ maxGap = g; }
+  }
+  if(!small && maxGap > 120) gapNote = ' Longest gap so far is '+maxGap+' days; Section 173(1) allows 120.';
+  var cadenceMet = mtgs.length >= need && (small || maxGap <= 120);
+
+  rows.push({
+    key:'bm-cadence',
+    law:'Companies Act 2013', section:'Sec 173(1)'+(small?' r/w 173(5)':''), form:'-',
+    obligation:'Board meetings — '+mtgs.length+' of '+need+' held this financial year',
+    owner:'CS / Board', due:fyEnd, risk:'critical', applicable:true,
+    penalty:'Rs.25,000 company; Rs.5,000 every officer in default',
+    derived:'meetings',
+    derivedNote:(cadenceMet
+      ? 'Requirement met for the year.'
+      : (need - mtgs.length) + ' more required before ' + ccFmtDate(fyEnd) + '.') + gapNote,
+    autoEvidence: cadenceMet && mtgs.length
+      ? {filedOn:String(mtgs[mtgs.length-1].held_on), source:'Meetings register'} : null
+  });
+
+  // ── Minutes into the minute book, SS-1 ─────────────────────────
+  regRowsFor('meetings', c.id).forEach(function(m){
+    if(!m.held_on) return;
+    if(m.minutes_state === 'entered') return;
+    var due = plus(String(m.held_on), 30);
+    rows.push({
+      key:'minutes-'+m.id,
+      law:'Secretarial Standards', section:'SS-1 / SS-2 r/w Sec 118', form:'-',
+      obligation:'Minutes of the '+(m.kind||'board').replace(/_/g,' ')+' meeting held '+ccFmtDate(m.held_on),
+      owner:'CS', due:due, risk:'medium', applicable:true,
+      penalty:'Rs.25,000 company; Rs.5,000 officer in default',
+      derived:'meetings',
+      autoEvidence: m.minutes_signed_on ? {filedOn:String(m.minutes_signed_on), source:'Meetings register'} : null
+    });
+  });
+
+  // ── BEN-2, once a BEN-1 has been received ──────────────────────
+  // This obligation does not exist until a declaration comes in, which is why
+  // it could never be generated from company-level fields.
+  regRowsFor('shareholders', c.id).forEach(function(sh){
+    if(!sh.ben1_received) return;
+    rows.push({
+      key:'ben2-'+sh.id,
+      law:'Companies Act 2013', section:'Sec 90(4) r/w SBO Rules 2018', form:'BEN-2',
+      obligation:'BEN-2 — return of significant beneficial owner ('+(sh.name||'holder')+')',
+      owner:'CS', due:plus(String(sh.ben1_received), 30), risk:'high', applicable:true,
+      penalty:'Rs.1 Lakh + Rs.1,000/day; shares may be disenfranchised',
+      derived:'shareholders',
+      autoEvidence: sh.ben2_filed ? {filedOn:String(sh.ben2_filed), source:'Shareholders register'} : null
+    });
+  });
+
+  // ── Board composition, Sec 149 ─────────────────────────────────
+  // A shortfall here is arithmetic on the practice's own register, so it can be
+  // stated outright rather than left unverified.
+  if(dirs.length){
+    var minNeeded = c.type === 'opc' ? 1 : (c.type === 'public' || c.type === 'listed') ? 3 : 2;
+    var women = dirs.filter(function(d){ return d.designation === 'woman_director'; }).length;
+    var indep = dirs.filter(function(d){ return d.designation === 'independent'; }).length;
+    var problems = [];
+    if(dirs.length < minNeeded)
+      problems.push('Board has '+dirs.length+' director'+(dirs.length===1?'':'s')+
+                    '; Section 149(1) requires at least '+minNeeded+'.');
+    if(c.type === 'listed' && !women)
+      problems.push('No woman director recorded; the proviso to Section 149(1) requires one.');
+    if(c.type === 'listed' && indep < Math.ceil(dirs.length/3))
+      problems.push('Independent directors: '+indep+' of '+Math.ceil(dirs.length/3)+
+                    ' required under Section 149(4).');
+    rows.push({
+      key:'board-composition',
+      law:'Companies Act 2013', section:'Sec 149', form:'-',
+      obligation:'Board composition — '+ccPlural(dirs.length,'director','directors')+' in office',
+      owner:'Board / CS', due:null, risk: problems.length ? 'critical' : 'medium', applicable:true,
+      penalty:'Rs.50,000 + Rs.500/day continuing',
+      derived:'directors',
+      shortfall: problems.length ? problems.join(' ') : null,
+      derivedNote: problems.length ? problems.join(' ') : 'Meets the minimum strength on record.'
+    });
+  }
+
+  return rows;
+}
+
 function getComplianceChart(c){
   var y  = new Date().getFullYear();
 
@@ -4505,6 +4662,25 @@ function getComplianceChart(c){
         rows = rows.concat(cmRows(PIT_DATA, c, agm, 'pit'));
     }catch(e){ console.error('[pit]', e); }
   }
+
+  // Obligations that can only be known from the practice's own registers.
+  try{
+    if(typeof regDerivedRows === 'function'){
+      // The CURRENT financial year, not the one that has just closed. With a
+      // 31 March year end, on any date from April onward the year in progress
+      // ends the following 31 March -- counting against the closed year showed
+      // "0 of 4 board meetings" while two had already been held.
+      var _todayIso = dt(new Date().getFullYear(), new Date().getMonth()+1, new Date().getDate());
+      var fyEndY = y;
+      if(dt(y, fyMonth, fyDay) < _todayIso) fyEndY = y + 1;
+      var _fyEnd = dt(fyEndY, fyMonth, fyDay);
+      var _fyStartD = new Date(fyEndY, fyMonth - 1, fyDay);
+      _fyStartD.setDate(_fyStartD.getDate() + 1);
+      _fyStartD.setFullYear(_fyStartD.getFullYear() - 1);
+      var _fyStart = dt(_fyStartD.getFullYear(), _fyStartD.getMonth() + 1, _fyStartD.getDate());
+      rows = rows.concat(regDerivedRows(c, {dt:dt, plus:plus, y:y, fyEnd:_fyEnd, fyStart:_fyStart}));
+    }
+  }catch(e){ console.error('[registers]', e); }
 
   // Belt and braces against duplicates across the three generated sets.
   var seenKeys = {};
@@ -6172,7 +6348,10 @@ async function regSave(key, id){
     if(r.error) throw new Error(r.error.message);
     regClose();
     REG_DATA[key] = null;
+    // The engine reads these, so it has to see the change too.
+    if(typeof lgLoadRegisters === 'function') await lgLoadRegisters();
     regRender(key);
+    if(typeof renderCommandCenter === 'function') renderCommandCenter();
   }catch(e){
     regErr(/relation .* does not exist|could not find the table/i.test(e.message)
       ? 'The '+cfg.table+' table does not exist yet. Run db/010_governance_registers.sql first.'
@@ -6188,7 +6367,9 @@ async function regDelete(key, id){
     if(r.error) throw new Error(r.error.message);
     regClose();
     REG_DATA[key] = null;
+    if(typeof lgLoadRegisters === 'function') await lgLoadRegisters();
     regRender(key);
+    if(typeof renderCommandCenter === 'function') renderCommandCenter();
   }catch(e){ regErr(e.message); }
 }
 
@@ -8047,6 +8228,9 @@ var LG_STATE = {
   // when a trigger occurs. Asserts nothing and needs nothing today — counting
   // these as "action required" overstated the workload by more than half.
   STANDING:          {label:'Ongoing / event-driven',      tone:'neutral', asserts:'none',      sourceBacked:false},
+  // Derived from the practice's own register, so it states a fact rather than
+  // a status we cannot verify.
+  SHORTFALL:         {label:'Below the requirement',        tone:'crit',    asserts:'none',      sourceBacked:false},
   UNKNOWN:           {label:'Unknown',                     tone:'neutral', asserts:'none',      sourceBacked:false},
 
   // Maker-checker, when the policy is switched on.
@@ -8224,6 +8408,27 @@ function lgResolveStatus(row, company){
   }
 
   // ── 2. No filing record ────────────────────────────────────────
+  // A register entry is evidence of the same class as a recorded filing:
+  // entered by the user, confirmed by no outside source.
+  if(row.autoEvidence && row.autoEvidence.filedOn){
+    out.manual = true;
+    out.evidence = {filedOn:row.autoEvidence.filedOn, filingRef:null,
+                    source:row.autoEvidence.source, note:null, file:null};
+    var _fd = lgDays(row.autoEvidence.filedOn);
+    out.late = (days !== null && _fd !== null && _fd > days);
+    out.state = out.autoState = 'FILED_PENDING';
+    out.confidence = 'low';
+    return out;
+  }
+
+  // A composition shortfall is arithmetic on the user's own register, not a
+  // claim about what a regulator holds, so it can be stated outright.
+  if(row.shortfall){
+    out.state = out.autoState = 'SHORTFALL';
+    out.confidence = 'high';
+    return out;
+  }
+
   // A duty with no due date is not an unknown; it is one that runs continuously
   // or waits on a trigger. UNKNOWN is now reserved for a genuine gap.
   if(days === null){ out.state = out.autoState = 'STANDING'; return out; }
