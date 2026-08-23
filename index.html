@@ -171,6 +171,54 @@
    A four-column board. Cards are uniform objects so the eye can scan them;
    two of them span a pair of columns because their content is a list rather
    than a single figure. */
+/* nav badge */
+.nav-badge{margin-left:auto;font-family:'IBM Plex Mono';font-size:10.5px;font-weight:700;background:var(--crit);color:#fff;border-radius:9px;padding:1px 7px;}
+.navitem.on .nav-badge{background:var(--blue);}
+
+/* collapse */
+.side-foot{display:flex;align-items:center;gap:10px;padding:9px 11px;margin-top:18px;border-top:1px solid var(--line);padding-top:14px;font-size:12px;font-weight:600;color:var(--ink-soft);cursor:pointer;}
+.side-foot:hover{color:var(--blue);}
+.side-foot svg{width:15px;height:15px;}
+body.side-min .appshell{grid-template-columns:64px 1fr;}
+body.side-min .appside{padding:14px 8px;}
+body.side-min .navitem span:not(.nav-badge),body.side-min .navhead,body.side-min .side-foot span{display:none;}
+body.side-min .navitem{justify-content:center;padding:10px 0;}
+body.side-min .navhead{height:10px;margin:10px 0 4px;border-top:1px solid var(--line);}
+body.side-min .side-foot{justify-content:center;}
+body.side-min .side-foot svg{transform:rotate(180deg);}
+@media(max-width:900px){body.side-min .appshell{grid-template-columns:1fr;}}
+
+/* bell */
+.hdr-bell{position:relative;width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink-mid);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.14s;}
+.hdr-bell:hover{border-color:var(--blue);color:var(--blue);}
+.hdr-bell svg{width:17px;height:17px;}
+.hdr-bell-n{position:absolute;top:-5px;right:-5px;min-width:17px;height:17px;border-radius:9px;background:var(--crit);color:#fff;font-family:'IBM Plex Mono';font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px;}
+.notif-panel{position:absolute;top:60px;right:104px;width:340px;max-height:420px;overflow-y:auto;background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 48px rgba(11,18,32,.16);z-index:400;}
+.notif-h{padding:13px 15px;border-bottom:1px solid var(--line-soft);font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft);}
+.notif-i{display:flex;gap:11px;align-items:flex-start;padding:11px 15px;border-bottom:1px solid var(--line-soft);cursor:pointer;}
+.notif-i:last-child{border-bottom:none;}
+.notif-i:hover{background:var(--bg);}
+.notif-t{font-size:12.5px;font-weight:600;color:var(--navy);}
+.notif-s{font-size:11.5px;color:var(--ink-soft);margin-top:1px;}
+@media(max-width:640px){.notif-panel{right:10px;left:10px;width:auto;}}
+
+/* registers */
+.reg-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
+.reg-grid .reg-f:has(textarea){grid-column:1/-1;}
+@media(max-width:560px){.reg-grid{grid-template-columns:1fr;}}
+.reg-hint{font-size:11px;color:var(--ink-soft);margin-top:4px;line-height:1.5;}
+.reg-err{background:var(--rose-bg);border:1px solid #F2C9C9;color:var(--crit);border-radius:9px;padding:10px 13px;font-size:12.5px;margin-bottom:14px;}
+
+/* settings */
+.set-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:13px 0;border-bottom:1px solid var(--line-soft);}
+.set-row:last-child{border-bottom:none;}
+.set-t{font-size:13px;font-weight:600;color:var(--navy);}
+.set-n{font-size:12px;color:var(--ink-soft);line-height:1.6;margin-top:3px;max-width:62ch;}
+.set-sw{width:42px;height:24px;border-radius:12px;border:1px solid var(--line);background:var(--bg);cursor:pointer;flex-shrink:0;padding:0;position:relative;transition:.16s;}
+.set-sw span{position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:var(--paper);box-shadow:0 1px 3px rgba(11,18,32,.2);transition:.16s;}
+.set-sw.on{background:var(--blue);border-color:var(--blue);}
+.set-sw.on span{left:21px;}
+.set-chk{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--ink-mid);padding:6px 0;cursor:pointer;}
 .hdr-ent{display:flex;align-items:center;gap:9px;padding:6px 12px;border:1px solid var(--line);border-radius:10px;background:var(--paper);cursor:pointer;transition:.14s;max-width:260px;}
 .hdr-ent:hover{border-color:var(--blue);}
 .hdr-ent svg{width:16px;height:16px;color:var(--ink-soft);flex-shrink:0;}
@@ -1123,7 +1171,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v80">
+      <meta id="build-version" content="v83">
     </div>
   </div>
   <div class="cc-search">
@@ -1139,6 +1187,11 @@ input[type="text"], input[type="password"], textarea, select {
       <div><div class="hdr-ent-n" id="hdr-ent-name">No entity</div>
       <div class="hdr-ent-c mono" id="hdr-ent-cin">&mdash;</div></div>
     </div>
+    <button class="hdr-bell" id="notif-btn" onclick="notifToggle()" title="Notifications">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+      <span class="hdr-bell-n" id="notif-count" style="display:none">0</span>
+    </button>
+    <div class="notif-panel" id="notif-panel" style="display:none;"></div>
     <div class="appuser">
       <div class="greet">Signed in as</div>
       <div class="uname" id="header-username">—</div>
@@ -1157,19 +1210,30 @@ input[type="text"], input[type="password"], textarea, select {
 <div class="navitem" onclick="sw('universe')" id="t-universe"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg><span>Compliance Universe</span></div>
 <div class="navitem" onclick="sw('chat')" id="t-chat"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3.2"/></svg><span>AI Compliance</span></div>
 <div class="navitem" onclick="sw('ff')" id="t-ff"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><span>Forms &amp; Filings</span></div>
+<div class="navitem" onclick="sw('changes')" id="t-changes"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 10l7-7 7 7"/></svg><span>Change Tracker</span></div>
 <div class="navitem" onclick="sw('tracker')" id="t-tracker"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v3M12 18v3"/></svg><span>Regulatory Radar</span></div>
 <div class="navhead">Operate</div>
 <div class="navitem" onclick="sw('mywork')" id="t-mywork"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3 8-8M20 12v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h9"/></svg><span>My Work</span></div>
 <div class="navitem" onclick="sw('cal')" id="t-cal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Calendar</span></div>
 <div class="navitem" onclick="sw('entities')" id="t-entities"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h2m-2 4h2m-2 4h2m4-8h2m-2 4h2m-2 4h2"/></svg><span>Entities</span></div>
 <div class="navitem" onclick="sw('events')" id="t-events"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 8v5l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>Material Events</span></div>
+<div class="navitem" onclick="sw('directors')" id="t-directors"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-8 0v2"/><circle cx="12" cy="7" r="4"/></svg><span>Directors &amp; KMP</span></div>
+<div class="navitem" onclick="sw('shareholders')" id="t-shareholders"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg><span>Shareholders</span></div>
+<div class="navitem" onclick="sw('meetings')" id="t-meetings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Board &amp; Meetings</span></div>
 <div class="navitem" onclick="sw('internal')" id="t-internal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg><span>Internal Compliance</span></div>
+<div class="navitem" onclick="sw('approvals')" id="t-approvals"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Approvals</span><span class="nav-badge" id="nav-approvals-n" style="display:none">0</span></div>
 <div class="navhead">Document Studio</div>
 <div class="navitem" onclick="sw('res')" id="t-res"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg><span>Resolutions</span></div>
 <div class="navitem" onclick="sw('docs')" id="t-docs"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 5h16M4 12h16M4 19h10"/></svg><span>Notices &amp; Minutes</span></div>
 <div class="navhead">Reference</div>
 <div class="navitem" onclick="sw('penalty')" id="t-penalty"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 3h12M6 8h12M9 3c0 6 6 6 6 11a4 4 0 0 1-8 0"/></svg><span>Penalties</span></div>
 <div class="navitem" onclick="sw('deeplaw')" id="t-deeplaw"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3l9 4v5c0 5-3.5 8-9 9-5.5-1-9-4-9-9V7l9-4z"/></svg><span>Deep Law</span></div>
+<div class="navitem" onclick="sw('audit')" id="t-audit"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>Audit Trail</span></div>
+<div class="navitem" onclick="sw('settings')" id="t-settings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Settings</span></div>
+<div class="side-foot" onclick="sideCollapse()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+  <span id="side-collapse-t">Collapse</span>
+</div>
 <div class="navhead" id="admin-nav-head" style="display:none">Administration</div>
 <div class="navitem" onclick="sw('admin')" id="t-admin" style="display:none"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.3l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2.2-1.3L14 2h-4l-.3 2.2a7 7 0 0 0-2.2 1.3l-2.3-1-2 3.4 2 1.5A7 7 0 0 0 5 12a7 7 0 0 0 .1 1.3l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2.2 1.3L10 22h4l.3-2.2a7 7 0 0 0 2.2-1.3l2.3 1 2-3.4-2-1.5z"/></svg><span>Administration</span></div>
 </aside>
@@ -1268,6 +1332,13 @@ input[type="text"], input[type="password"], textarea, select {
 </div>
 
 <!-- FORM FINDER PANEL -->
+<div class="panel" id="p-directors"><div class="cc-tool"><div id="reg-root-directors"></div></div></div>
+<div class="panel" id="p-shareholders"><div class="cc-tool"><div id="reg-root-shareholders"></div></div></div>
+<div class="panel" id="p-meetings"><div class="cc-tool"><div id="reg-root-meetings"></div></div></div>
+<div class="panel" id="p-changes"><div class="cc-tool"><div id="reg-root-changes"></div></div></div>
+<div class="panel" id="p-approvals"><div class="cc-tool"><div id="apr-root"></div></div></div>
+<div class="panel" id="p-audit"><div class="cc-tool"><div id="aud-root"></div></div></div>
+<div class="panel" id="p-settings"><div class="cc-tool"><div id="set-root"></div></div></div>
 <div class="panel" id="p-ff">
   <div id="fm-root"></div>
 </div>
@@ -2516,6 +2587,10 @@ function sw(id) {
   if (id==='ff' && typeof renderForms==='function') renderForms();
   if (id==='tracker' && typeof trkRenderSources==='function') trkRenderSources();
   if (id==='penalty' && typeof renderPenalties==='function') renderPenalties();
+  if (id==='approvals' && typeof renderApprovals==='function') renderApprovals();
+  if (id==='audit' && typeof renderAudit==='function') renderAudit();
+  if (id==='settings' && typeof renderSettings==='function') renderSettings();
+  if (typeof LG_REG !== 'undefined' && LG_REG[id]) regRender(id);
 }
 
 // ═══════════════════════════════════════════════════
@@ -5780,6 +5855,685 @@ function ccSyncHeaderEntity(){
   c.textContent = 'Portfolio view';
 }
 
+// ═══════════════════════════════════════════════════
+// GOVERNANCE REGISTERS
+// ═══════════════════════════════════════════════════
+// Directors, shareholders, meetings and law changes are the same object: a
+// list of rows belonging to an entity, with an add/edit form. One engine, four
+// configurations — a fifth register is a config entry, not another panel.
+var LG_REG = {
+  directors: {
+    table:'directors', crumb:'Entities', title:'Directors &amp; KMP', scoped:true,
+    sub:'The board and key managerial personnel. Drives DIR-3 KYC per director, '+
+        'DIR-12 on any change, and the Section 149 composition tests.',
+    order:'name', addLabel:'Add a director',
+    cols:[
+      {f:'name',        l:'Name',        t:'text',   req:true, list:true, main:true},
+      {f:'din',         l:'DIN',         t:'text',   list:true, mono:true,
+       hint:'8 digits. Leave blank for a KMP without a DIN.'},
+      {f:'designation', l:'Designation', t:'select', list:true, def:'director',
+       opts:[['director','Director'],['independent','Independent Director'],
+             ['woman_director','Woman Director'],['managing_director','Managing Director'],
+             ['whole_time','Whole-time Director'],['nominee','Nominee Director'],
+             ['additional','Additional Director'],['alternate','Alternate Director'],
+             ['cs','Company Secretary'],['cfo','CFO'],['ceo','CEO'],['manager','Manager']]},
+      {f:'appointed_on',l:'Appointed on',t:'date',   list:true},
+      {f:'cessation_on',l:'Ceased on',   t:'date',   list:true,
+       hint:'Leave blank while the person is in office.'},
+      {f:'din_kyc_on',  l:'Last DIR-3 KYC', t:'date', list:true,
+       hint:'DIR-3 KYC is due by 30 September each year for every DIN holder.'},
+      {f:'email',       l:'Email',       t:'text'},
+      {f:'is_kmp',      l:'Is KMP under Sec 203', t:'bool'},
+      {f:'notes',       l:'Notes',       t:'textarea'}
+    ]
+  },
+  shareholders: {
+    table:'shareholders', crumb:'Entities', title:'Shareholders', scoped:true,
+    sub:'The share register. Drives significant beneficial ownership under Section 90, '+
+        'PAS-6 reconciliation and the shareholding pattern under LODR Reg 31.',
+    order:'name', addLabel:'Add a shareholder',
+    cols:[
+      {f:'name',       l:'Name',        t:'text',   req:true, list:true, main:true},
+      {f:'category',   l:'Category',    t:'select', list:true, def:'promoter',
+       opts:[['promoter','Promoter'],['promoter_group','Promoter group'],['public','Public'],
+             ['institutional','Institutional'],['foreign','Foreign'],['employee','Employee'],
+             ['other','Other']]},
+      {f:'holder_type',l:'Holder type', t:'select', def:'individual',
+       opts:[['individual','Individual'],['body_corporate','Body corporate'],['trust','Trust'],
+             ['huf','HUF'],['government','Government']]},
+      {f:'shares_held',l:'Shares held', t:'number', list:true, mono:true},
+      {f:'is_demat',   l:'Held in demat', t:'bool', list:true, def:true},
+      {f:'is_sbo',     l:'Significant beneficial owner', t:'bool', list:true,
+       hint:'Section 90: an individual holding 10% or more of shares, voting rights or distributable dividend.'},
+      {f:'ben1_received', l:'BEN-1 received on', t:'date'},
+      {f:'ben2_filed',    l:'BEN-2 filed on',    t:'date'},
+      {f:'pan',        l:'PAN',         t:'text', mono:true},
+      {f:'folio',      l:'Folio / DP-Client ID', t:'text', mono:true},
+      {f:'notes',      l:'Notes',       t:'textarea'}
+    ]
+  },
+  meetings: {
+    table:'meetings', crumb:'Workspace', title:'Board &amp; Meetings', scoped:true,
+    sub:'Board, committee and general meetings. Section 173 requires four board meetings a year '+
+        'with no more than 120 days between two of them.',
+    order:'held_on', desc:true, addLabel:'Record a meeting',
+    cols:[
+      {f:'kind',        l:'Meeting',     t:'select', list:true, main:true, def:'board',
+       opts:[['board','Board meeting'],['agm','Annual General Meeting'],['egm','Extraordinary GM'],
+             ['audit_committee','Audit Committee'],['nrc','Nomination & Remuneration'],
+             ['csr','CSR Committee'],['stakeholders','Stakeholders Relationship'],
+             ['rmc','Risk Management'],['class','Class meeting'],['creditors','Creditors meeting']]},
+      {f:'held_on',     l:'Held on',     t:'date', list:true},
+      {f:'scheduled_for',l:'Scheduled for', t:'date', list:true,
+       hint:'Fill this in for a meeting not yet held.'},
+      {f:'mode',        l:'Mode',        t:'select', list:true, def:'physical',
+       opts:[['physical','Physical'],['vc','Video conference'],['oavm','OAVM'],['hybrid','Hybrid']]},
+      {f:'notice_sent_on', l:'Notice sent on', t:'date',
+       hint:'Section 173(3): at least seven days for a board meeting.'},
+      {f:'attendees',   l:'Attendees',   t:'number', list:true},
+      {f:'total_eligible', l:'Eligible to attend', t:'number'},
+      {f:'quorum_met',  l:'Quorum met',  t:'bool', list:true, def:true},
+      {f:'minutes_state', l:'Minutes',   t:'select', list:true, def:'pending',
+       opts:[['pending','Pending'],['drafted','Drafted'],['circulated','Circulated'],
+             ['signed','Signed'],['entered','Entered in the minute book']]},
+      {f:'minutes_signed_on', l:'Minutes signed on', t:'date',
+       hint:'SS-1: minutes to be entered within 30 days of the meeting.'},
+      {f:'resolutions', l:'Resolutions passed', t:'number'},
+      {f:'venue',       l:'Venue',       t:'text'},
+      {f:'notes',       l:'Notes',       t:'textarea'}
+    ]
+  },
+  changes: {
+    table:'law_changes', crumb:'Intelligence', title:'Change Tracker', scoped:false,
+    sub:'Amendments you have decided are relevant, and what they affect. Entries are recorded by '+
+        'a person: nothing here can decide on its own that a circular changes a particular obligation.',
+    order:'published_on', desc:true, addLabel:'Record a change',
+    cols:[
+      {f:'title',       l:'What changed', t:'text', req:true, list:true, main:true},
+      {f:'regulator',   l:'Regulator',   t:'select', list:true, def:'MCA',
+       opts:[['MCA','MCA'],['SEBI','SEBI'],['RBI','RBI'],['IBBI','IBBI'],['IT','Income Tax'],['Other','Other']]},
+      {f:'reference',   l:'Circular / notification no.', t:'text', list:true, mono:true},
+      {f:'published_on',l:'Published on', t:'date', list:true},
+      {f:'effective_from', l:'Effective from', t:'date', list:true},
+      {f:'impact',      l:'Impact',      t:'select', list:true, def:'review',
+       opts:[['none','No impact'],['review','Needs review'],['action','Action required'],['urgent','Urgent']]},
+      {f:'status',      l:'Status',      t:'select', list:true, def:'open',
+       opts:[['open','Open'],['assessed','Assessed'],['actioned','Actioned'],['not_relevant','Not relevant']]},
+      {f:'source_url',  l:'Source link', t:'text'},
+      {f:'affects_note',l:'What it affects', t:'textarea',
+       hint:'Which obligations or entities this touches, in your own words.'},
+      {f:'summary',     l:'Summary',     t:'textarea'}
+    ]
+  }
+};
+
+var REG_DATA = {};       // key -> rows
+var REG_ENTITY = {};     // key -> selected company id
+var REG_ERR = {};
+
+function regCompany(key){
+  var cfg = LG_REG[key];
+  if(!cfg.scoped) return null;
+  if(REG_ENTITY[key]) return REG_ENTITY[key];
+  if(typeof CLIENTS !== 'undefined' && CLIENTS.length) return CLIENTS[0].id;
+  return null;
+}
+
+async function regLoad(key){
+  var cfg = LG_REG[key];
+  REG_ERR[key] = null;
+  if(!supaClient || !CURRENT_USER){ REG_DATA[key] = []; return; }
+  try{
+    var q = supaClient.from(cfg.table).select('*');
+    if(cfg.scoped){
+      var cid = regCompany(key);
+      if(!cid){ REG_DATA[key] = []; return; }
+      q = q.eq('company_id', cid);
+    }
+    var r = await q.order(cfg.order, {ascending: !cfg.desc});
+    if(r.error){ REG_ERR[key] = r.error.message; REG_DATA[key] = []; return; }
+    REG_DATA[key] = r.data || [];
+  }catch(e){ REG_ERR[key] = e.message; REG_DATA[key] = []; }
+}
+
+function regLabel(col, v){
+  if(col.t === 'bool') return v ? 'Yes' : 'No';
+  if(col.t === 'select' && col.opts){
+    for(var i=0;i<col.opts.length;i++) if(col.opts[i][0] === v) return col.opts[i][1];
+  }
+  if(col.t === 'date' && v) return ccFmtDate(v);
+  if(col.t === 'number' && (v || v === 0)) return Number(v).toLocaleString('en-IN');
+  return v == null || v === '' ? '—' : String(v);
+}
+
+function regRender(key){
+  var cfg = LG_REG[key];
+  var root = document.getElementById('reg-root-'+key);
+  if(!root) return;
+
+  var entSel = '';
+  if(cfg.scoped && typeof CLIENTS !== 'undefined' && CLIENTS.length > 1){
+    entSel = '<select class="lg-field" onchange="REG_ENTITY['+lgArg(key)+']=this.value;REG_DATA['+
+      lgArg(key)+']=null;regRender('+lgArg(key)+');">'+
+      CLIENTS.map(function(c){
+        return '<option value="'+entEsc(c.id)+'"'+(String(regCompany(key))===String(c.id)?' selected':'')+
+          '>'+entEsc(c.name)+'</option>';
+      }).join('')+'</select>';
+  }
+
+  var head = '<div class="cc-pagehead"><div>'+
+    '<div class="cc-crumb">'+cfg.crumb+' &rsaquo; '+cfg.title+'</div>'+
+    '<h1 class="cc-h1">'+cfg.title+'</h1>'+
+    '<p class="cc-sub">'+cfg.sub+'</p></div>'+
+    '<div class="cc-headbtns">'+entSel+
+      '<button class="cc-btn-primary" onclick="regOpen('+lgArg(key)+')">+ '+cfg.addLabel+'</button>'+
+    '</div></div>';
+
+  if(cfg.scoped && !regCompany(key)){
+    root.innerHTML = head + '<div class="cc-empty"><h2>No entity yet</h2>'+
+      '<p>This register belongs to a company. Add one first.</p>'+
+      '<button class="cc-btn-primary" onclick="entOpen()">+ Add a company</button></div>';
+    return;
+  }
+
+  if(REG_DATA[key] == null){
+    root.innerHTML = head + '<div class="cc-card"><div class="cc-card-b">'+
+      '<div class="cc-none">Loading&hellip;</div></div></div>';
+    regLoad(key).then(function(){ regRender(key); });
+    return;
+  }
+
+  if(REG_ERR[key]){
+    var missing = /relation .* does not exist|could not find the table/i.test(REG_ERR[key]);
+    root.innerHTML = head + '<div class="cc-card"><div class="cc-card-b">'+
+      '<div class="cc-none" style="text-align:left;">'+
+      (missing
+        ? '<b>The <span class="mono">'+cfg.table+'</span> table does not exist yet.</b><br>'+
+          'Run <span class="mono">db/010_governance_registers.sql</span> in the Supabase SQL editor, '+
+          'then reload. It creates all four governance registers and is safe to run more than once.'
+        : 'Could not load this register: '+entEsc(REG_ERR[key]))+
+      '</div></div></div>';
+    return;
+  }
+
+  var listCols = cfg.cols.filter(function(c){ return c.list; });
+  if(!REG_DATA[key].length){
+    root.innerHTML = head + '<div class="cc-empty"><h2>Nothing recorded yet</h2>'+
+      '<p>'+cfg.sub+'</p>'+
+      '<button class="cc-btn-primary" onclick="regOpen('+lgArg(key)+')">+ '+cfg.addLabel+'</button></div>';
+    return;
+  }
+
+  var rows = REG_DATA[key].map(function(r){
+    return '<tr onclick="regOpen('+lgArg(key)+','+lgArg(r.id)+')">'+
+      listCols.map(function(c){
+        var v = regLabel(c, r[c.f]);
+        return '<td data-label="'+c.l.replace(/&amp;/g,'&')+'"'+
+          (c.mono?' class="mono"':'')+(c.main?' style="font-weight:600;color:var(--navy);"':'')+
+          '>'+entEsc(v)+'</td>';
+      }).join('')+
+      '<td data-label="" style="text-align:right;white-space:nowrap;">'+
+        '<a class="cc-link" onclick="event.stopPropagation();regOpen('+lgArg(key)+','+lgArg(r.id)+')">Edit</a></td>'+
+    '</tr>';
+  }).join('');
+
+  root.innerHTML = head +
+    '<div class="cu-tablewrap"><table class="cu-table"><thead><tr>'+
+      listCols.map(function(c){ return '<th>'+c.l+'</th>'; }).join('')+'<th></th>'+
+    '</tr></thead><tbody>'+rows+'</tbody></table></div>'+
+    '<div class="cu-foot">'+ccPlural(REG_DATA[key].length,'record','records')+'.</div>';
+}
+
+// ── add / edit ───────────────────────────────────────────────────
+function regOpen(key, id){
+  var cfg = LG_REG[key];
+  var row = id ? (REG_DATA[key]||[]).filter(function(r){ return String(r.id)===String(id); })[0] : null;
+  var old = document.getElementById('reg-modal'); if(old) old.remove();
+
+  var mo = document.createElement('div');
+  mo.className = 'cd-modal'; mo.id = 'reg-modal'; mo.style.display = 'flex';
+  mo.onclick = function(e){ if(e.target === mo) regClose(); };
+
+  var fields = cfg.cols.map(function(c){
+    var v = row ? row[c.f] : (c.def !== undefined ? c.def : '');
+    if(v == null) v = '';
+    var id2 = 'reg-f-'+c.f;
+    var input;
+    if(c.t === 'select'){
+      input = '<select id="'+id2+'" class="lg-field" style="width:100%">'+
+        c.opts.map(function(o){
+          return '<option value="'+entEsc(o[0])+'"'+(String(v)===o[0]?' selected':'')+'>'+entEsc(o[1])+'</option>';
+        }).join('')+'</select>';
+    } else if(c.t === 'bool'){
+      input = '<label class="set-chk"><input type="checkbox" id="'+id2+'"'+(v?' checked':'')+'> Yes</label>';
+    } else if(c.t === 'textarea'){
+      input = '<textarea id="'+id2+'" class="lg-field" style="width:100%;min-height:70px;resize:vertical;">'+
+        entEsc(v)+'</textarea>';
+    } else {
+      input = '<input id="'+id2+'" class="lg-field" style="width:100%" type="'+
+        (c.t==='date'?'date':c.t==='number'?'number':'text')+'" value="'+entEsc(v)+'">';
+    }
+    return '<div class="reg-f"><label class="lg-label" for="'+id2+'">'+c.l+
+      (c.req?' <span style="color:var(--crit)">*</span>':'')+'</label>'+input+
+      (c.hint?'<div class="reg-hint">'+c.hint+'</div>':'')+'</div>';
+  }).join('');
+
+  mo.innerHTML = '<div class="cd-inner" style="max-width:640px;"><div class="cd-body">'+
+    '<div class="cd-head"><div><h2 style="font-size:19px;font-weight:800;color:var(--navy);">'+
+      (row ? 'Edit' : cfg.addLabel)+'</h2>'+
+      '<div style="font-size:12.5px;color:var(--ink-soft);margin-top:3px;">'+cfg.title+'</div></div>'+
+      '<button onclick="regClose()" style="background:none;border:none;color:var(--ink-soft);cursor:pointer;font-size:26px;line-height:1;">&times;</button></div>'+
+    '<div id="reg-err" class="reg-err" style="display:none;"></div>'+
+    '<div class="reg-grid">'+fields+'</div>'+
+    '<div class="cc-headbtns" style="margin-top:20px;justify-content:flex-end;">'+
+      (row?'<button class="cc-btn" style="color:var(--crit);border-color:#F5C6C6;" onclick="regDelete('+
+        lgArg(key)+','+lgArg(row.id)+')">Delete</button>':'')+
+      '<button class="cc-btn" onclick="regClose()">Cancel</button>'+
+      '<button class="cc-btn-primary" id="reg-save" onclick="regSave('+lgArg(key)+','+
+        (row?lgArg(row.id):'null')+')">Save</button>'+
+    '</div></div></div>';
+  document.body.appendChild(mo);
+}
+
+function regClose(){ var m = document.getElementById('reg-modal'); if(m) m.remove(); }
+
+function regErr(msg){
+  var e = document.getElementById('reg-err');
+  if(!e) return;
+  e.textContent = msg; e.style.display = msg ? 'block' : 'none';
+}
+
+async function regSave(key, id){
+  var cfg = LG_REG[key];
+  var rec = {};
+  for(var i=0;i<cfg.cols.length;i++){
+    var c = cfg.cols[i], el = document.getElementById('reg-f-'+c.f);
+    if(!el) continue;
+    var v;
+    if(c.t === 'bool') v = !!el.checked;
+    else if(c.t === 'number') v = el.value === '' ? null : Number(el.value);
+    else v = el.value === '' ? null : el.value;
+    if(c.req && (v === null || v === '')){
+      regErr(c.l + ' is required.');
+      el.focus(); return;
+    }
+    rec[c.f] = v;
+  }
+  if(cfg.scoped) rec.company_id = regCompany(key);
+  rec.user_id = CURRENT_USER ? CURRENT_USER.id : null;
+  rec.updated_at = new Date().toISOString();
+
+  var btn = document.getElementById('reg-save');
+  if(btn){ btn.disabled = true; btn.textContent = 'Saving…'; }
+  try{
+    var r = id
+      ? await supaClient.from(cfg.table).update(rec).eq('id', id)
+      : await supaClient.from(cfg.table).insert(rec);
+    if(r.error) throw new Error(r.error.message);
+    regClose();
+    REG_DATA[key] = null;
+    regRender(key);
+  }catch(e){
+    regErr(/relation .* does not exist|could not find the table/i.test(e.message)
+      ? 'The '+cfg.table+' table does not exist yet. Run db/010_governance_registers.sql first.'
+      : e.message);
+    if(btn){ btn.disabled = false; btn.textContent = 'Save'; }
+  }
+}
+
+async function regDelete(key, id){
+  if(!confirm('Delete this record? This cannot be undone.')) return;
+  try{
+    var r = await supaClient.from(LG_REG[key].table).delete().eq('id', id);
+    if(r.error) throw new Error(r.error.message);
+    regClose();
+    REG_DATA[key] = null;
+    regRender(key);
+  }catch(e){ regErr(e.message); }
+}
+
+// ═══════════════════════════════════════════════════
+// CUSTOMISE — which cards the command centre shows
+// ═══════════════════════════════════════════════════
+var CMD_CARDS = [
+  {id:'coverage',  label:'Evidence coverage'},
+  {id:'glance',    label:'At a glance'},
+  {id:'summary',   label:'Obligations summary'},
+  {id:'insights',  label:'What the data shows'},
+  {id:'immediate', label:'Immediate attention'},
+  {id:'upcoming',  label:'Upcoming — next 30 days'},
+  {id:'activity',  label:'Recent activity'},
+  {id:'quick',     label:'Quick actions'},
+  {id:'calendar',  label:'Calendar'},
+  {id:'radar',     label:'Regulatory radar'},
+  {id:'matrix',    label:'Risk matrix'},
+  {id:'copilot',   label:'Ask compliance'}
+];
+
+function ccCardVisible(id){
+  try{ return localStorage.getItem('lg_card_'+id) !== '0'; }catch(e){ return true; }
+}
+function ccCardToggle(id, on){
+  try{ localStorage.setItem('lg_card_'+id, on ? '1' : '0'); }catch(e){}
+  if(typeof renderCommandCenter === 'function') renderCommandCenter();
+}
+
+// ═══════════════════════════════════════════════════
+// NOTIFICATIONS
+// ═══════════════════════════════════════════════════
+// Counted from the register, not stored. Everything it lists is something the
+// app can already point at, so there is no separate feed to drift out of date.
+function notifItems(){
+  if(typeof CLIENTS === 'undefined' || !CLIENTS.length) return [];
+  var s = ccComputeStats(), out = [];
+  s.late.slice(0,6).forEach(function(l){
+    out.push({tone:'crit', title:l.obligation, sub:l.company+' · '+Math.abs(l.days)+' days past its date',
+              go:function(){ sw('home'); lgWhy(l.entityId, l.key); }});
+  });
+  s.agenda.filter(function(a){ return a.days <= 7; }).slice(0,4).forEach(function(a){
+    out.push({tone:'warn', title:a.obligation, sub:a.company+' · due in '+a.days+' days',
+              go:function(){ cuOpenDetail(a.entityId, a.key); }});
+  });
+  if(s.awaitingConfirmation)
+    out.push({tone:'info', title:ccPlural(s.awaitingConfirmation,'filing','filings')+' awaiting confirmation',
+              sub:'Someone other than the maker must confirm', go:function(){ sw('approvals'); }});
+  return out;
+}
+
+function notifRefresh(){
+  var b = document.getElementById('notif-count');
+  if(!b) return;
+  var n = notifItems().length;
+  b.textContent = n > 9 ? '9+' : n;
+  b.style.display = n ? '' : 'none';
+}
+
+function notifToggle(){
+  var p = document.getElementById('notif-panel');
+  if(!p) return;
+  if(p.style.display === 'block'){ p.style.display = 'none'; return; }
+  var items = notifItems();
+  p.innerHTML = '<div class="notif-h">Notifications</div>' + (items.length
+    ? items.map(function(it,i){
+        return '<div class="notif-i" data-i="'+i+'">'+
+          '<span class="cc-dot '+(it.tone==='crit'?'':'warn')+'" style="background:var(--'+
+            (it.tone==='crit'?'crit':it.tone==='warn'?'warn':'blue')+')"></span>'+
+          '<div><div class="notif-t">'+entEsc(it.title)+'</div>'+
+          '<div class="notif-s">'+entEsc(it.sub)+'</div></div></div>';
+      }).join('')
+    : '<div class="cc-none" style="padding:26px 12px;">Nothing needs your attention.</div>');
+  p.style.display = 'block';
+  p.querySelectorAll('.notif-i').forEach(function(el){
+    el.onclick = function(){ p.style.display='none'; items[+el.getAttribute('data-i')].go(); };
+  });
+}
+
+document.addEventListener('click', function(e){
+  var p = document.getElementById('notif-panel');
+  if(p && p.style.display === 'block' && !p.contains(e.target) &&
+     !(e.target.closest && e.target.closest('#notif-btn'))) p.style.display = 'none';
+});
+
+// ═══════════════════════════════════════════════════
+// SIDEBAR COLLAPSE
+// ═══════════════════════════════════════════════════
+function sideCollapse(){
+  var on = document.body.classList.toggle('side-min');
+  try{ localStorage.setItem('lg_side_min', on ? '1' : '0'); }catch(e){}
+  var t = document.getElementById('side-collapse-t');
+  if(t) t.textContent = on ? 'Expand' : 'Collapse';
+}
+try{ if(localStorage.getItem('lg_side_min') === '1') document.body.classList.add('side-min'); }catch(e){}
+
+// ⌘K / Ctrl-K puts the cursor in search from anywhere.
+document.addEventListener('keydown', function(e){
+  if((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')){
+    e.preventDefault();
+    var i = document.getElementById('globalSearch');
+    if(i){ i.focus(); i.select(); }
+  }
+  if(e.key === 'Escape'){
+    var p = document.getElementById('notif-panel');
+    if(p) p.style.display = 'none';
+  }
+});
+
+function aprRefreshBadge(){
+  if(typeof aprQueue !== 'function') return;
+  try{ aprBadge(aprQueue().filter(function(i){ return i.can.can; }).length); }catch(e){}
+}
+
+// ═══════════════════════════════════════════════════
+// APPROVALS — the maker-checker queue
+// ═══════════════════════════════════════════════════
+// Reads the same records the dashboard counts as "awaiting confirmation".
+// The rule that a maker cannot confirm their own entry is enforced here by
+// lgCanCheck, and again by a CHECK constraint in db/005.
+function aprQueue(){
+  var out = [];
+  if(typeof CLIENTS === 'undefined') return out;
+  CLIENTS.forEach(function(c){
+    var rows = [];
+    try{ rows = getComplianceChart(c); }catch(e){ return; }
+    rows.forEach(function(r){
+      if(r.applicable === false) return;
+      var st = lgResolveStatus(r, c);
+      if(['AWAITING_CHECK','CHECK_REJECTED','FILED_PENDING'].indexOf(st.state) < 0) return;
+      out.push({company:c.name, entityId:c.id, key:r.key, obligation:r.obligation,
+                form:r.form, section:r.section, due:r.due, state:st.state,
+                evidence:st.evidence || {}, can:lgCanCheck(st)});
+    });
+  });
+  return out;
+}
+
+function renderApprovals(){
+  var root = document.getElementById('apr-root');
+  if(!root) return;
+  var q = aprQueue();
+
+  var head = '<div class="cc-pagehead"><div>'+
+    '<div class="cc-crumb">Workspace &rsaquo; Approvals</div>'+
+    '<h1 class="cc-h1">Approvals</h1>'+
+    '<p class="cc-sub">Filings recorded by one person and awaiting confirmation by another. '+
+    'You cannot confirm an entry you recorded yourself.</p></div></div>';
+
+  if(!q.length){
+    root.innerHTML = head + '<div class="cc-card"><div class="cc-card-b">'+
+      '<div class="cc-none">Nothing is waiting for confirmation.</div></div></div>';
+    aprBadge(0);
+    return;
+  }
+
+  var rows = q.map(function(it){
+    var ev = it.evidence || {};
+    var blocked = !it.can.can;
+    return '<div class="cc-att-row">'+
+      '<span class="cc-dot '+(it.state==='CHECK_REJECTED'?'warn':'ok')+'"></span>'+
+      '<div class="cc-att-main">'+
+        '<div class="cc-att-title">'+entEsc(it.obligation)+
+          (ccForm(it.form)?' <span class="cc-att-code mono">'+entEsc(ccForm(it.form))+'</span>':'')+'</div>'+
+        '<div class="cc-att-meta">'+entEsc(it.company)+' &middot; '+entEsc(it.section||'')+
+          (ev.filedOn?' &middot; filed '+ccFmtDate(ev.filedOn):'')+
+          (ev.filingRef?' &middot; <span class="mono">'+entEsc(ev.filingRef)+'</span>':'')+
+          (ev.recordedBy?' &middot; recorded by '+entEsc(ev.recordedBy):'')+'</div>'+
+      '</div>'+
+      '<div class="cc-att-right">'+lgPill(it.state)+
+        '<div class="cc-rowacts">'+
+          (blocked
+            ? '<span style="font-size:11px;color:var(--ink-soft);" title="'+entEsc(it.can.why)+'">'+
+              entEsc(it.can.why)+'</span>'
+            : '<a class="cc-link" onclick="aprApprove('+lgArg(it.entityId)+','+lgArg(it.key)+')">Confirm</a>'+
+              '<a class="cc-link" style="color:var(--crit)" onclick="aprReject('+lgArg(it.entityId)+','+lgArg(it.key)+')">Reject</a>')+
+          '<a class="cc-link" onclick="lgWhy('+lgArg(it.entityId)+','+lgArg(it.key)+')">Why?</a>'+
+        '</div>'+
+      '</div></div>';
+  }).join('');
+
+  root.innerHTML = head +
+    '<div class="cc-card"><div class="cc-card-h"><h3>Waiting for confirmation &mdash; '+
+      ccPlural(q.length,'item','items')+'</h3></div>'+
+    '<div class="cc-card-b">'+rows+'</div></div>';
+  aprBadge(q.filter(function(i){ return i.can.can; }).length);
+}
+
+function aprBadge(n){
+  var b = document.getElementById('nav-approvals-n');
+  if(!b) return;
+  b.textContent = n;
+  b.style.display = n ? '' : 'none';
+}
+
+async function aprApprove(entityId, key){
+  if(typeof lgCheckApprove === 'function'){ await lgCheckApprove(entityId, key); }
+  renderApprovals();
+}
+
+async function aprReject(entityId, key){
+  var why = prompt('Why is this being rejected? The maker sees this.');
+  if(why === null) return;
+  if(typeof lgCheckReject === 'function'){ await lgCheckReject(entityId, key, why); }
+  else { await lgPersist(entityId, key, {checkState:'rejected', rejectReason:why}); }
+  renderApprovals();
+}
+
+// ═══════════════════════════════════════════════════
+// AUDIT TRAIL
+// ═══════════════════════════════════════════════════
+// db/006 created compliance_audit and lgPersist has written every status change
+// to it since. Nothing ever read it back — this is that reader. The table has
+// no UPDATE or DELETE policy, so what is shown here cannot be edited.
+var AUD_ROWS = null;
+
+async function audLoad(){
+  if(!supaClient || !CURRENT_USER) return [];
+  try{
+    var r = await supaClient.from('compliance_audit')
+      .select('*').order('occurred_at', {ascending:false}).limit(300);
+    return r.error ? [] : (r.data || []);
+  }catch(e){ return []; }
+}
+
+function renderAudit(){
+  var root = document.getElementById('aud-root');
+  if(!root) return;
+  var head = '<div class="cc-pagehead"><div>'+
+    '<div class="cc-crumb">Administration &rsaquo; Audit Trail</div>'+
+    '<h1 class="cc-h1">Audit Trail</h1>'+
+    '<p class="cc-sub">Every status change, who caused it and when. Append-only &mdash; the table '+
+    'carries no update or delete policy, so entries cannot be rewritten from the app.</p></div></div>';
+
+  if(AUD_ROWS === null){
+    root.innerHTML = head + '<div class="cc-card"><div class="cc-card-b">'+
+      '<div class="cc-none">Loading&hellip;</div></div></div>';
+    audLoad().then(function(rows){ AUD_ROWS = rows; renderAudit(); });
+    return;
+  }
+
+  if(!AUD_ROWS.length){
+    root.innerHTML = head + '<div class="cc-card"><div class="cc-card-b">'+
+      '<div class="cc-none">No changes recorded yet. Recording or confirming a filing writes here.</div>'+
+      '</div></div>';
+    return;
+  }
+
+  var nameOf = function(id){
+    if(typeof CLIENTS === 'undefined') return id;
+    for(var i=0;i<CLIENTS.length;i++) if(String(CLIENTS[i].id)===String(id)) return CLIENTS[i].name;
+    return id;
+  };
+
+  var rows = AUD_ROWS.map(function(a){
+    var when = String(a.occurred_at||'').replace('T',' ').slice(0,16);
+    return '<tr>'+
+      '<td data-label="When" class="mono" style="white-space:nowrap;">'+entEsc(when)+'</td>'+
+      '<td data-label="Entity">'+entEsc(nameOf(a.company_id))+'</td>'+
+      '<td data-label="Obligation" class="mono">'+entEsc(a.compliance_key||'')+'</td>'+
+      '<td data-label="Change">'+
+        (a.previous_status?'<span style="color:var(--ink-soft)">'+entEsc(a.previous_status)+'</span> &rarr; ':'')+
+        '<b>'+entEsc(a.new_status||'')+'</b></td>'+
+      '<td data-label="By">'+entEsc(a.actor||'')+'</td>'+
+      '<td data-label="Reference" class="mono">'+entEsc(a.filing_reference||'')+'</td>'+
+    '</tr>';
+  }).join('');
+
+  root.innerHTML = head +
+    '<div class="cu-tablewrap"><table class="cu-table"><thead><tr>'+
+    '<th>When</th><th>Entity</th><th>Obligation</th><th>Change</th><th>By</th><th>Reference</th>'+
+    '</tr></thead><tbody>'+rows+'</tbody></table></div>'+
+    '<div class="cu-foot">'+ccPlural(AUD_ROWS.length,'entry','entries')+', most recent first. '+
+    'Capped at the last 300.</div>';
+}
+
+// ═══════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════
+function setGet(k, dflt){
+  try{ var v = localStorage.getItem(k); return v === null ? dflt : v; }catch(e){ return dflt; }
+}
+function setPut(k, v){ try{ localStorage.setItem(k, v); }catch(e){} }
+
+function renderSettings(){
+  var root = document.getElementById('set-root');
+  if(!root) return;
+  var toggle = function(id, on, label, note){
+    return '<div class="set-row">'+
+      '<div><div class="set-t">'+label+'</div><div class="set-n">'+note+'</div></div>'+
+      '<button class="set-sw'+(on?' on':'')+'" id="'+id+'" onclick="setToggle('+lgArg(id)+')">'+
+      '<span></span></button></div>';
+  };
+  root.innerHTML =
+    '<div class="cc-pagehead"><div>'+
+      '<div class="cc-crumb">Administration &rsaquo; Settings</div>'+
+      '<h1 class="cc-h1">Settings</h1>'+
+      '<p class="cc-sub">Policy switches and preferences. These are stored on this browser.</p>'+
+    '</div></div>'+
+
+    '<div class="cc-card" style="max-width:720px;">'+
+      '<div class="cc-card-h"><h3>Controls</h3></div>'+
+      '<div class="cc-card-b">'+
+        toggle('lg_require_check', lgPolicySecondCheck(), 'Require a second person to confirm a filing',
+          'A recorded filing asserts nothing until someone other than the person who entered it confirms it. '+
+          'Turning this off means a single person can both record and rely on an entry.')+
+        toggle('lg_hide_na', setGet('lg_hide_na','0')==='1', 'Hide obligations that do not apply',
+          'Keeps the register to what is actually applicable to each entity.')+
+      '</div>'+
+    '</div>'+
+
+    '<div class="cc-card" style="max-width:720px;">'+
+      '<div class="cc-card-h"><h3>Dashboard cards</h3></div>'+
+      '<div class="cc-card-b">'+
+        '<div class="set-n" style="margin-bottom:11px;">Uncheck a card to hide it from the command centre.</div>'+
+        CMD_CARDS.map(function(c){
+          var on = ccCardVisible(c.id);
+          return '<label class="set-chk"><input type="checkbox"'+(on?' checked':'')+
+            ' onchange="ccCardToggle('+lgArg(c.id)+',this.checked)"> '+entEsc(c.label)+'</label>';
+        }).join('')+
+      '</div>'+
+    '</div>'+
+
+    '<div class="cc-card" style="max-width:720px;">'+
+      '<div class="cc-card-h"><h3>Connected sources</h3></div>'+
+      '<div class="cc-card-b">'+
+        LG_SOURCES.map(function(s){
+          return '<div class="set-row"><div><div class="set-t">'+entEsc(s.name)+'</div>'+
+            '<div class="set-n">'+entEsc(s.scope)+' &mdash; '+entEsc(s.why)+'</div></div>'+
+            '<span class="cmd-chip '+(s.connected?'blue':'info')+'">'+
+            (s.connected?'Connected':'Not connected')+'</span></div>';
+        }).join('')+
+      '</div>'+
+    '</div>';
+}
+
+function setToggle(id){
+  var el = document.getElementById(id);
+  if(!el) return;
+  var now = !el.classList.contains('on');
+  el.classList.toggle('on', now);
+  setPut(id, now ? '1' : '0');
+  if(id === 'lg_require_check' && typeof renderApprovals === 'function') aprRefreshBadge();
+}
+
 function renderCommandCenter(){
   ccSyncHeaderEntity();
   var root = document.getElementById('cc-dash-root');
@@ -5804,19 +6558,16 @@ function renderCommandCenter(){
   root.innerHTML =
     ccCmdHead(s, c0, entName, typeLabel) +
     '<div class="cmd-grid">'+
-      ccCardCoverage(s) +
-      ccCardGlance(s) +
-      ccCardSummary(s) +
-      ccCardInsights(s) +
-      ccCardImmediate(s) +
-      ccCardUpcoming(s) +
-      ccCardActivity(s) +
-      ccCardQuick(s) +
-      ccCardCalendar(s) +
-      ccCardRadar(s) +
-      ccCardMatrix(s) +
-      ccCardCopilot(s) +
+      // Order fixed, visibility from Settings — a card you hid stays hidden.
+      [['coverage',ccCardCoverage],['glance',ccCardGlance],['summary',ccCardSummary],
+       ['insights',ccCardInsights],['immediate',ccCardImmediate],['upcoming',ccCardUpcoming],
+       ['activity',ccCardActivity],['quick',ccCardQuick],['calendar',ccCardCalendar],
+       ['radar',ccCardRadar],['matrix',ccCardMatrix],['copilot',ccCardCopilot]]
+        .filter(function(p){ return ccCardVisible(p[0]); })
+        .map(function(p){ return p[1](s); }).join('')+
     '</div>';
+  notifRefresh();
+  aprRefreshBadge();
 }
 
 // ── page head ────────────────────────────────────────────────────
