@@ -47,6 +47,46 @@ serve(async (req) => {
       return json({ error: 'Server not configured: set OGD_API_KEY.' }, 500);
     }
 
+    // Diagnostic: {"cin":"<any valid CIN>","catalog":"director"} searches the
+    // OGD catalogue rather than one resource. It answers from the source
+    // whether a director or DIN dataset is published at all. The company master
+    // data resource this function normally reads carries no director fields,
+    // and every DIN API found elsewhere is a paid third party.
+    if (typeof body?.catalog === 'string') {
+      const term = (body.catalog || 'director').trim();
+      const endpoints = [
+        `https://api.data.gov.in/catalog?api-key=${encodeURIComponent(key)}` +
+          `&format=json&filters[title]=${encodeURIComponent(term)}&limit=20`,
+        `https://api.data.gov.in/lists?api-key=${encodeURIComponent(key)}` +
+          `&format=json&filters[title]=${encodeURIComponent(term)}&limit=20`,
+      ];
+      const tried: unknown[] = [];
+      for (const u of endpoints) {
+        try {
+          const rr = await fetch(u);
+          const txt = await rr.text();
+          let dd: any = null;
+          try { dd = JSON.parse(txt); } catch { /* an HTML error page */ }
+          const items = dd?.records ?? dd?.data ?? dd?.result ?? null;
+          tried.push({
+            endpoint: u.replace(/api-key=[^&]+/, 'api-key=***'),
+            status: rr.status,
+            count: Array.isArray(items) ? items.length : null,
+            titles: Array.isArray(items)
+              ? items.slice(0, 20).map((x: any) => x?.title ?? x?.name ?? null)
+              : null,
+            note: Array.isArray(items) ? null : txt.slice(0, 200),
+          });
+        } catch (e) {
+          tried.push({
+            endpoint: u.replace(/api-key=[^&]+/, 'api-key=***'),
+            error: String(e),
+          });
+        }
+      }
+      return json({ searched: term, tried });
+    }
+
     // Diagnostic: {"sample":true} returns the dataset's real column names and a
     // couple of rows, without filtering. Used to work out how CIN is stored.
     if (body?.sample === true) {
