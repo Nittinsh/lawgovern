@@ -61,13 +61,16 @@
 .appbrand .t{font-size:9.5px;color:var(--ink-soft);letter-spacing:.16em;text-transform:uppercase;font-weight:600;margin-top:3px;}
 .cc-search{flex:1;max-width:440px;display:flex;align-items:center;gap:9px;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:8px 13px;color:var(--ink-soft);}
 .cc-search{position:relative;}
-.gs-results{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--card);
-  border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 32px -8px rgba(11,18,32,.22);
-  max-height:60vh;overflow-y:auto;z-index:700;padding:6px;}
+/* var(--card) does not exist; the white surface variable is --panel. Without a
+   solid background the dashboard showed straight through the dropdown. */
+.gs-results{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--panel);
+  border:1px solid var(--line);border-radius:10px;box-shadow:0 14px 38px -10px rgba(11,18,32,.28);
+  max-height:60vh;overflow-y:auto;z-index:1200;padding:6px;}
 .gs-group{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
   color:var(--ink-soft);padding:9px 10px 5px;}
 .gs-item{padding:8px 10px;border-radius:7px;cursor:pointer;display:flex;gap:10px;align-items:flex-start;}
 .gs-item:hover,.gs-item.on{background:var(--bg);}
+.appheader,.hdr{position:relative;z-index:1100;}
 .gs-item-main{flex:1;min-width:0;}
 .gs-item-t{font-size:13px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .gs-item-s{font-size:11px;color:var(--ink-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -931,7 +934,7 @@ input[type="text"], input[type="password"], textarea, select {
     </div>
     <div>
       <div class="n">LawGovern</div>
-      <div class="t">Compliance OS · v54</div>
+      <div class="t">Compliance OS · v55</div>
     </div>
   </div>
   <div class="cc-search">
