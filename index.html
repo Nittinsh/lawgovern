@@ -60,6 +60,20 @@
 .appbrand .n{font-family:'Manrope',sans-serif;font-size:18px;font-weight:800;color:var(--navy);line-height:1;letter-spacing:-.4px;}
 .appbrand .t{font-size:9.5px;color:var(--ink-soft);letter-spacing:.16em;text-transform:uppercase;font-weight:600;margin-top:3px;}
 .cc-search{flex:1;max-width:440px;display:flex;align-items:center;gap:9px;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:8px 13px;color:var(--ink-soft);}
+.cc-search{position:relative;}
+.gs-results{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--card);
+  border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 32px -8px rgba(11,18,32,.22);
+  max-height:60vh;overflow-y:auto;z-index:700;padding:6px;}
+.gs-group{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-soft);padding:9px 10px 5px;}
+.gs-item{padding:8px 10px;border-radius:7px;cursor:pointer;display:flex;gap:10px;align-items:flex-start;}
+.gs-item:hover,.gs-item.on{background:var(--bg);}
+.gs-item-main{flex:1;min-width:0;}
+.gs-item-t{font-size:13px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.gs-item-s{font-size:11px;color:var(--ink-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.gs-tag{font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px;background:var(--bg);
+  border:1px solid var(--line);color:var(--ink-soft);flex-shrink:0;margin-top:2px;}
+.gs-empty{padding:14px 12px;font-size:12px;color:var(--ink-soft);}
 .cc-search svg{width:15px;height:15px;flex-shrink:0;}
 .cc-search input{border:none;background:none;outline:none;font-family:'Manrope';font-size:13px;color:var(--ink);width:100%;}
 .appheader-right{display:flex;align-items:center;gap:14px;margin-left:auto;}
@@ -917,12 +931,15 @@ input[type="text"], input[type="password"], textarea, select {
     </div>
     <div>
       <div class="n">LawGovern</div>
-      <div class="t">Compliance OS · v52</div>
+      <div class="t">Compliance OS · v54</div>
     </div>
   </div>
   <div class="cc-search">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
-    <input placeholder="Search entities, obligations, regulations, forms…" id="globalSearch">
+    <input placeholder="Search entities, obligations, regulations, forms…" id="globalSearch"
+      autocomplete="off" oninput="gsSearch(this.value)" onkeydown="gsKey(event)"
+      onfocus="if(this.value) gsSearch(this.value)">
+    <div id="gs-results" class="gs-results" style="display:none;"></div>
   </div>
   <div class="appheader-right">
     <div class="appuser">
@@ -8542,6 +8559,164 @@ async function intDelete(id){
     renderInternal();
   }catch(e){ alert('Could not delete: '+((e&&e.message)||e)); }
 }
+
+
+// ═══════════════════════════════════════════════════════════════
+// GLOBAL SEARCH
+// Searches what the app actually holds: entities, every applicable
+// obligation, the Schedule III event catalogue, and the form master.
+// Selecting a result navigates to the thing itself.
+// ═══════════════════════════════════════════════════════════════
+var GS_RESULTS = [], GS_SEL = -1;
+
+// Normalise the shorthand people actually type. "Sec 96" must match
+// "Section 96", and "Reg 33" must match "Regulation 33(3)(a)".
+// Normalise the shorthand people actually type, so "Sec 96" matches
+// "Section 96", "Reg 33" matches "Regulation 33(3)(a)", and "dpt3"
+// matches "DPT-3". Applied to both the query and the text searched.
+function gsNorm(s){
+  return String(s||'').toLowerCase()
+    .replace(/sections?/g, 'sec')
+    .replace(/regulations?/g, 'reg')
+    .replace(/schedules?/g, 'sch')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+// Same, with separators stripped entirely, so "dpt3" finds "DPT-3".
+function gsTight(s){ return gsNorm(s).replace(/ /g, ''); }
+
+// A match is a hit on either the spaced or the tight form.
+function gsHit(hay, q){
+  if(!q) return false;
+  return gsNorm(hay).indexOf(gsNorm(q)) >= 0 ||
+         gsTight(hay).indexOf(gsTight(q)) >= 0;
+}
+
+function gsCollect(q){
+  var n = gsNorm(q), out = [];
+  if(n.length < 2) return out;
+
+  // 1. entities
+  (typeof CLIENTS !== 'undefined' ? CLIENTS : []).forEach(function(c){
+    if(gsHit(c.name, q) || gsHit(c.cin, q)){
+      out.push({group:'Entities', tag:'Entity', title:c.name,
+                sub:(c.cin||'') + ' · ' + entTypeLabel(c.type),
+                go:function(){ sw('entities'); }});
+    }
+  });
+
+  // 2. obligations that actually apply, across every entity
+  var seen = {};
+  (typeof CLIENTS !== 'undefined' ? CLIENTS : []).forEach(function(c){
+    var rows = [];
+    try{ rows = getComplianceChart(c); }catch(e){ return; }
+    rows.forEach(function(r){
+      var hay = (r.obligation||'') + ' ' + (r.section||'') + ' ' +
+                (r.form||'') + ' ' + (r.law||'');
+      if(!gsHit(hay, q)) return;
+      var k = c.id + '|' + r.key;
+      if(seen[k]) return;
+      seen[k] = 1;
+      out.push({group:'Obligations', tag:(r.form && r.form !== '-' && r.form !== '—') ? r.form : 'Rule',
+                title:r.obligation,
+                sub:c.name + ' · ' + r.law + ' · ' + r.section + (r.due ? ' · due ' + r.due : ''),
+                go:(function(cid,key){ return function(){ cuOpenDetail(cid,key); }; })(c.id, r.key)});
+    });
+  });
+
+  // 3. Schedule III material events
+  ((typeof LODR_EVENT_DATA !== 'undefined' && LODR_EVENT_DATA.events) || []).forEach(function(e){
+    var hay = (e.event||'') + ' ' + (e.regulation||'') + ' ' + (e.schedulePart||'');
+    if(!gsHit(hay, q)) return;
+    out.push({group:'Material events', tag:'Sch III', title:String(e.event||'').slice(0,90),
+              sub:(e.schedulePart||'') + (e.para ? ' / ' + e.para : '') + ' · ' + (e.regulation||''),
+              go:(function(id){ return function(){ sw('events'); mevLogOpen(id); }; })(e.id)});
+  });
+
+  // 4. the form master
+  if(typeof FORM_MASTER !== 'undefined'){
+    var fm = FORM_MASTER;
+    var keys = Array.isArray(fm) ? fm : Object.keys(fm);
+    keys.forEach(function(item){
+      var name = Array.isArray(fm) ? (item.form || item.name || '') : item;
+      var desc = Array.isArray(fm) ? (item.desc || item.title || '') : (fm[item] || '');
+      if(!gsHit(name, q) && !gsHit(desc, q)) return;
+      out.push({group:'Forms', tag:'Form', title:String(name),
+                sub:String(desc).slice(0,90),
+                go:(function(nm){ return function(){ sw('ff');
+                  var i = document.getElementById('fin'); if(i){ i.value = nm; if(typeof findForm==='function') findForm(); }
+                }; })(name)});
+    });
+  }
+
+  // Exact-ish matches first, then cap so the list stays usable.
+  out.sort(function(a,b){
+    var ax = gsNorm(a.title).indexOf(gsNorm(q)), bx = gsNorm(b.title).indexOf(gsNorm(q));
+    if(ax < 0) ax = 999; if(bx < 0) bx = 999;
+    return ax - bx;
+  });
+  return out.slice(0, 40);
+}
+
+function gsSearch(q){
+  var box = document.getElementById('gs-results');
+  if(!box) return;
+  GS_RESULTS = gsCollect(q); GS_SEL = -1;
+
+  if(String(q||'').trim().length < 2){ box.style.display = 'none'; return; }
+  box.style.display = 'block';
+
+  if(!GS_RESULTS.length){
+    box.innerHTML = '<div class="gs-empty">Nothing matches “' + entEsc(q) + '”. ' +
+      'Try a form number (AOC-4), a section (Sec 96), a regulation (Reg 33) or an entity name.</div>';
+    return;
+  }
+
+  var html = '', lastGroup = null;
+  GS_RESULTS.forEach(function(r, i){
+    if(r.group !== lastGroup){ html += '<div class="gs-group">' + entEsc(r.group) + '</div>'; lastGroup = r.group; }
+    html += '<div class="gs-item" data-i="' + i + '" onclick="gsPick(' + i + ')">' +
+              '<div class="gs-item-main"><div class="gs-item-t">' + entEsc(r.title) + '</div>' +
+              '<div class="gs-item-s">' + entEsc(r.sub) + '</div></div>' +
+              '<span class="gs-tag">' + entEsc(r.tag) + '</span></div>';
+  });
+  box.innerHTML = html;
+}
+
+function gsPick(i){
+  var r = GS_RESULTS[i];
+  gsClose();
+  if(r && typeof r.go === 'function'){ try{ r.go(); }catch(e){ console.error('[search]', e); } }
+}
+
+function gsClose(){
+  var box = document.getElementById('gs-results');
+  if(box){ box.style.display = 'none'; }
+  var inp = document.getElementById('globalSearch');
+  if(inp) inp.blur();
+}
+
+function gsKey(ev){
+  var box = document.getElementById('gs-results');
+  if(!box || box.style.display === 'none') return;
+  if(ev.key === 'Escape'){ gsClose(); return; }
+  if(ev.key === 'Enter'){ ev.preventDefault(); gsPick(GS_SEL < 0 ? 0 : GS_SEL); return; }
+  if(ev.key !== 'ArrowDown' && ev.key !== 'ArrowUp') return;
+  ev.preventDefault();
+  GS_SEL += (ev.key === 'ArrowDown' ? 1 : -1);
+  if(GS_SEL < 0) GS_SEL = GS_RESULTS.length - 1;
+  if(GS_SEL >= GS_RESULTS.length) GS_SEL = 0;
+  var items = box.querySelectorAll('.gs-item');
+  for(var i=0;i<items.length;i++) items[i].classList.toggle('on', +items[i].getAttribute('data-i') === GS_SEL);
+  var sel = box.querySelector('.gs-item.on');
+  if(sel && sel.scrollIntoView) sel.scrollIntoView({block:'nearest'});
+}
+
+document.addEventListener('click', function(ev){
+  var wrap = document.querySelector('.cc-search');
+  if(wrap && !wrap.contains(ev.target)) gsClose();
+});
 
 function renderEntities(){
   var root = document.getElementById('ent-root');
