@@ -593,7 +593,8 @@ function lgShowLogin(message){
     var el=document.getElementById(id); if(el) el.innerHTML='';
   });
   document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('on'); p.style.display='none'; });
-  ['lg-why-modal','lg-rec-modal','lg-reg-modal','lg-sys-modal','ent-modal','bulk-modal'].forEach(function(id){
+  ['lg-why-modal','lg-rec-modal','lg-reg-modal','lg-sys-modal','ent-modal','bulk-modal',
+   'fm-modal'].forEach(function(id){
     var m=document.getElementById(id); if(m) m.remove();
   });
   if(message){
@@ -944,7 +945,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v63">
+      <meta id="build-version" content="v64">
     </div>
   </div>
   <div class="cc-search">
@@ -2693,7 +2694,7 @@ function fmOpen(name){
       entEsc(dm.note)+'</div>';
   }
 
-  mo.innerHTML = '<div class="cd-shell"><div class="cd-body">'+
+  mo.innerHTML = '<div class="cd-inner" style="max-width:760px;"><div class="cd-body">'+
     '<div class="cd-head"><div>'+
       '<div style="font-family:\'IBM Plex Mono\',monospace;font-size:24px;font-weight:700;color:var(--navy);">'+
         entEsc(x.form)+'</div>'+
