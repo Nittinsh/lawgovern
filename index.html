@@ -263,6 +263,15 @@
 .mw-item-main{flex:1;min-width:0;}
 .mw-item-title{font-weight:600;font-size:14px;color:var(--navy);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .mw-code{font-size:11px;color:var(--blue);background:var(--blue-wash);padding:1px 7px;border-radius:5px;}
+.mw-steps{display:flex;align-items:center;gap:9px;margin-top:7px;flex-wrap:wrap;}
+.mw-steps-bar{width:96px;height:5px;border-radius:3px;background:var(--line);overflow:hidden;flex-shrink:0;}
+.mw-steps-bar i{display:block;height:100%;border-radius:3px;transition:width .2s;}
+.mw-steps-bar i.ok{background:var(--ok);}
+.mw-steps-bar i.warn{background:var(--warn);}
+.mw-steps-bar i.idle{background:var(--line);}
+.mw-steps-count{font-size:11px;font-weight:600;color:var(--ink-soft);white-space:nowrap;}
+.mw-steps-next{font-size:11px;color:var(--ink-soft);opacity:.85;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:320px;}
+@media(max-width:640px){ .mw-steps-next{max-width:100%;} }
 .mw-item-meta{font-size:12px;color:var(--ink-soft);margin-top:3px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
 .mw-legal{color:var(--ink-mid);}
 .mw-dot{color:var(--ink-4);}
@@ -908,7 +917,7 @@ input[type="text"], input[type="password"], textarea, select {
     </div>
     <div>
       <div class="n">LawGovern</div>
-      <div class="t">Compliance OS · v49</div>
+      <div class="t">Compliance OS · v50</div>
     </div>
   </div>
   <div class="cc-search">
@@ -5587,6 +5596,28 @@ function mwGetTasks(){
   return cuBuildRows();
 }
 
+// Step progress for a task, read from the same per-obligation state the detail
+// modal writes. Returns null when there is nothing meaningful to show.
+function mwStepProgress(t){
+  if(!t || !t.entityId || !t.key) return null;
+  var row = t._row;
+  if(!row){
+    // Rebuild the obligation so the right step template is chosen.
+    try{
+      var c = (CLIENTS||[]).find(function(x){ return String(x.id) === String(t.entityId); });
+      if(c) row = getComplianceChart(c).find(function(x){ return x.key === t.key; });
+    }catch(e){}
+  }
+  var steps = cdSteps(row || t.key);
+  if(!steps || !steps.length) return null;
+  var st = {};
+  try{ st = cdGetState(t.entityId, t.key) || {}; }catch(e){}
+  var done = st.steps || {};
+  var n = 0;
+  for(var i=0;i<steps.length;i++) if(done[i]) n++;
+  return {done:n, total:steps.length, pct: Math.round(100*n/steps.length), next: steps[n] || null};
+}
+
 function mwBucket(t){
   // returns which tab a task belongs to
   if(t.done) return 'completed';
@@ -5651,6 +5682,16 @@ function renderMyWork(){
             '<span class="mw-dot">·</span>'+t.entity+
             '<span class="mw-dot">·</span>Owner: '+t.owner+
           '</div>'+
+          (function(){
+            var p = mwStepProgress(t);
+            if(!p) return '';
+            var tone = p.pct === 100 ? 'ok' : (p.done > 0 ? 'warn' : 'idle');
+            return '<div class="mw-steps">'+
+              '<div class="mw-steps-bar"><i class="'+tone+'" style="width:'+p.pct+'%"></i></div>'+
+              '<span class="mw-steps-count">'+p.done+' / '+p.total+' steps</span>'+
+              (p.next ? '<span class="mw-steps-next">Next: '+entEsc(p.next)+'</span>' : '')+
+            '</div>';
+          })()+
         '</div>'+
         '<div class="mw-item-side">'+
           '<div class="mw-risk '+(t.risk==='critical'||t.risk==='high'?'crit':(t.risk==='medium'?'warn':'low'))+'">'+(t.risk||'—')+'</div>'+
