@@ -944,7 +944,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v59">
+      <meta id="build-version" content="v60">
     </div>
   </div>
   <div class="cc-search">
@@ -2584,7 +2584,7 @@ function searchCirculars(q){
   renderCards(f);
   var st=document.getElementById('trk-status');
   st.style.display='block';
-  st.textContent=f.length+' results for "'+q+'"';
+  st.textContent=ccPlural(f.length,'result','results')+' for "'+q+'"';
 }
 
 function renderCards(items){
@@ -5559,7 +5559,8 @@ function renderUniverse(){
       th('Entity','entity')+th('Frequency','freq')+th('Due Date','due')+
       th('Risk','risk')+th('Status','status')+'<th></th>'+
     '</tr></thead><tbody>'+body+'</tbody></table></div>'+
-    '<div class="cu-foot">Showing <b>'+rows.length+'</b> of '+all.length+' obligations</div>';
+    '<div class="cu-foot">Showing <b>'+rows.length+'</b> of '+
+      ccPlural(all.length,'obligation','obligations')+'</div>';
 
   root.innerHTML = head + filters + table;
 }
@@ -6226,7 +6227,8 @@ async function bulkCommit(){
     await loadCloudClients();
     renderEntities();
     if(typeof renderCommandCenter==='function') renderCommandCenter();
-    if(failed.length) alert('Imported, but '+failed.length+' row(s) failed:\n\n'+failed.join('\n'));
+    if(failed.length) alert('Imported, but '+ccPlural(failed.length,'row','rows')+
+      ' failed:\n\n'+failed.join('\n'));
   }catch(err){
     var msg = (err && err.message) ? err.message : String(err);
     if(/column .* does not exist|schema cache/i.test(msg))
@@ -6914,7 +6916,8 @@ async function lgSystemCheck(){
       rows.push(lgCheckRow('Financial columns (001)','ok','networth, netprofit, borrowings present'));
       var list = comp.data||[];
       rows.push(lgCheckRow('Companies readable', list.length?'ok':'warn',
-        list.length ? list.length+' row(s) returned' : 'Query succeeded but returned 0 rows — check RLS policy.'));
+        list.length ? ccPlural(list.length,'row','rows')+' returned'
+                    : 'Query succeeded but returned 0 rows — check RLS policy.'));
       if(!list.length) notes.push('Zero rows with a valid session usually means a row-level-security policy is filtering them out.');
 
       // ── 3. unit audit: rupees vs crore ──
@@ -7047,7 +7050,7 @@ async function lgSystemCheck(){
       if(ic.error) throw ic.error;
       var nrec = (ic.data && ic.data.length) || 0;
       rows.push(lgCheckRow('Internal compliance (008)','ok',
-        nrec ? (nrec + ' item(s) tracked') : 'table ready — nothing added yet'));
+        nrec ? (ccPlural(nrec,'item','items') + ' tracked') : 'table ready — nothing added yet'));
     }catch(e){
       var im=(e&&e.message)||String(e);
       rows.push(lgCheckRow('Internal compliance (008)','fail', entEsc(im)));
@@ -7254,7 +7257,8 @@ async function lgPurgeExpired(){
     var res = await supaClient.rpc('purge_expired_documents');
     if(res.error) throw res.error;
     var n = (res.data && res.data.length) || 0;
-    alert(n ? ('Deleted ' + n + ' expired document(s).') : 'No documents were due for deletion.');
+    alert(n ? ('Deleted ' + ccPlural(n,'expired document','expired documents') + '.')
+            : 'No documents were due for deletion.');
     await loadCloudClients();
     if(typeof renderEntities==='function') renderEntities();
   }catch(e){
@@ -7756,7 +7760,8 @@ async function lgRegSave(entityId){
   }
 
   var btn = document.querySelector('#lg-reg-modal .cc-btn-primary');
-  if(btn){ btn.disabled=true; btn.textContent='Saving '+(recs.length+cleared.length)+' row(s)…'; }
+  if(btn){ btn.disabled=true;
+    btn.textContent='Saving '+ccPlural(recs.length+cleared.length,'row','rows')+'…'; }
 
   var failed=[];
   var stamp = new Date().toISOString();
@@ -7784,7 +7789,8 @@ async function lgRegSave(entityId){
 
   if(failed.length){
     var eb=document.getElementById('lg-reg-err');
-    if(eb){ eb.textContent = failed.length+' row(s) failed to save. The rest were saved.'; eb.style.display='block'; }
+    if(eb){ eb.textContent = ccPlural(failed.length,'row','rows')+
+      ' failed to save. The rest were saved.'; eb.style.display='block'; }
     if(btn){ btn.disabled=false; btn.textContent='Save filing register'; }
     return;
   }
@@ -7977,7 +7983,8 @@ function renderEvents(){
     '<div class="cc-pagehead">'+
       '<div><div class="cc-crumb">Operate › Material Events</div>'+
       '<h1 class="cc-h1">Material Events</h1>'+
-      '<p class="cc-sub">SEBI LODR Schedule III - <b>'+cat.length+'</b> events. '+
+      '<p class="cc-sub">SEBI LODR Schedule III - <b>'+cat.length+'</b> '+
+      (cat.length===1?'event':'events')+'. '+
       'These are triggered, not scheduled: the Reg 30 clock starts when the event occurs.</p></div>'+
       '<div class="cc-headbtns"><button class="cc-btn-primary" onclick="mevLogOpen()">+ Log an event</button></div>'+
     '</div>';
@@ -8042,7 +8049,8 @@ function renderEvents(){
           '<td><button class="cc-btn" onclick="mevLogOpen('+lgArg(e.id)+')">Log</button></td>'+
         '</tr>';
       }).join('')+'</tbody></table></div>'+
-      '<div class="cu-foot">Showing '+rows.length+' of '+cat.length+' catalogued events.</div>';
+      '<div class="cu-foot">Showing '+rows.length+' of '+
+        ccPlural(cat.length,'catalogued event','catalogued events')+'.</div>';
   } else {
     var list = f.view === 'open' ? open : MEV_LOG;
     if(!list.length){
@@ -8403,7 +8411,8 @@ function renderInternal(){
       '<th>Item</th><th>Category</th><th>Entity</th><th>Frequency</th><th>Owner</th>'+
       '<th>Last done</th><th>Next due</th><th>Status</th><th></th>'+
     '</tr></thead><tbody>'+body+'</tbody></table></div>'+
-    '<div class="cu-foot">Showing '+rows.length+' of '+INTERNAL.length+' item(s).</div>';
+    '<div class="cu-foot">Showing '+rows.length+' of '+
+      ccPlural(INTERNAL.length,'item','items')+'.</div>';
 }
 
 function intSetFilter(k,v){ INT_FILTERS[k]=v; renderInternal(); }
