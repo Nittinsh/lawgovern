@@ -1174,7 +1174,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v88">
+      <meta id="build-version" content="v89">
     </div>
   </div>
   <div class="cc-search">
@@ -6235,6 +6235,184 @@ function renderDocuments(){
 }
 
 // ═══════════════════════════════════════════════════
+// PASTE ROWS INTO A REGISTER
+// ═══════════════════════════════════════════════════
+// Copy a block from the MCA portal, an MGT-7, or a spreadsheet and drop it in.
+// Column order varies between all three, so for directors the parser finds the
+// DIN by its shape (8 digits), the dates by theirs, and treats what is left as
+// the name — rather than insisting on a fixed layout nobody's source matches.
+var PASTE_ROWS = [];
+
+function pasteOpen(key){
+  var cfg = LG_REG[key];
+  var old = document.getElementById('paste-modal'); if(old) old.remove();
+  var mo = document.createElement('div');
+  mo.className='cd-modal'; mo.id='paste-modal'; mo.style.display='flex';
+  mo.onclick=function(e){ if(e.target===mo) pasteClose(); };
+
+  var example = key==='directors'
+    ? 'NITTIN SHARMA\t01234567\tDirector\t01/06/2015\nASHA MENON\t07654321\tIndependent Director\t01/04/2021'
+    : key==='shareholders'
+      ? 'Promoter A\tPromoter\t250000\nPublic Investor\tPublic\t50000'
+      : 'Board meeting\t10/04/2026\nBoard meeting\t15/08/2026';
+
+  mo.innerHTML = '<div class="cd-inner" style="max-width:680px;"><div class="cd-body">'+
+    '<div class="cd-head"><div><h2 style="font-size:19px;font-weight:800;color:var(--navy);">Paste rows</h2>'+
+      '<div style="font-size:12.5px;color:var(--ink-soft);margin-top:3px;">'+cfg.title+'</div></div>'+
+      '<button onclick="pasteClose()" style="background:none;border:none;color:var(--ink-soft);cursor:pointer;font-size:26px;line-height:1;">&times;</button></div>'+
+    '<div class="set-n" style="margin-bottom:10px;">One row per line. Tab or comma separated &mdash; '+
+      'copying straight out of the MCA portal, an MGT-7 or Excel all work. '+
+      (key==='directors'
+        ? 'The DIN is found by its shape, so column order does not matter.'
+        : 'Columns are read in the order shown below.')+'</div>'+
+    '<pre class="dir-pre">'+entEsc(example)+'</pre>'+
+    '<textarea id="paste-in" class="lg-field" style="width:100%;min-height:150px;resize:vertical;font-family:\'IBM Plex Mono\';font-size:12px;" '+
+      'placeholder="Paste here"></textarea>'+
+    '<div id="paste-prev"></div>'+
+    '<div class="cc-headbtns" style="margin-top:16px;justify-content:flex-end;">'+
+      '<button class="cc-btn" onclick="pasteClose()">Cancel</button>'+
+      '<button class="cc-btn" onclick="pastePreview('+lgArg(key)+')">Preview</button>'+
+      '<button class="cc-btn-primary" id="paste-go" onclick="pasteSave('+lgArg(key)+')" disabled>Add rows</button>'+
+    '</div></div></div>';
+  document.body.appendChild(mo);
+  var ta = document.getElementById('paste-in');
+  if(ta) ta.focus();
+}
+function pasteClose(){ var m=document.getElementById('paste-modal'); if(m) m.remove(); }
+
+function pasteDate(s){
+  s = String(s||'').trim();
+  var m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if(m) return m[1]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[3]).padStart(2,'0');
+  m = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/);          // dd/mm/yyyy, as MCA renders it
+  if(m) return m[3]+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');
+  return null;
+}
+
+function pasteParse(key, text){
+  var cfg = LG_REG[key];
+  var lines = String(text||'').split(/\r?\n/).map(function(l){ return l.trim(); })
+                              .filter(function(l){ return l.length; });
+  var out = [];
+  lines.forEach(function(line){
+    var cells = line.indexOf('\t') >= 0 ? line.split('\t') : line.split(',');
+    cells = cells.map(function(c){ return c.trim(); }).filter(function(c){ return c.length; });
+    if(!cells.length) return;
+
+    if(key === 'directors'){
+      // Shape-based, because MCA, MGT-7 and Excel all order these differently.
+      var rec = {designation:'director'};
+      var rest = [];
+      cells.forEach(function(c){
+        if(!rec.din && /^\d{8}$/.test(c.replace(/\D/g,'')) && /^\D*\d[\d\s\-]*\D*$/.test(c)){
+          rec.din = c.replace(/\D/g,''); return;
+        }
+        var d = pasteDate(c);
+        if(d){ if(!rec.appointed_on) rec.appointed_on = d; else rec.cessation_on = d; return; }
+        rest.push(c);
+      });
+      // Whichever leftover looks like a role is the designation; the rest is the name.
+      var roleIdx = -1;
+      rest.forEach(function(c,i){
+        if(/director|manager|secretary|cfo|ceo|officer|partner/i.test(c) && roleIdx < 0) roleIdx = i;
+      });
+      if(roleIdx >= 0){
+        var raw = rest.splice(roleIdx,1)[0].toLowerCase();
+        rec.designation = /managing/.test(raw) ? 'managing_director'
+                        : /whole/.test(raw) ? 'whole_time'
+                        : /independent/.test(raw) ? 'independent'
+                        : /nominee/.test(raw) ? 'nominee'
+                        : /additional/.test(raw) ? 'additional'
+                        : /alternate/.test(raw) ? 'alternate'
+                        : /secretary/.test(raw) ? 'cs'
+                        : /cfo|financial/.test(raw) ? 'cfo'
+                        : /ceo|executive/.test(raw) ? 'ceo'
+                        : /manager/.test(raw) ? 'manager' : 'director';
+      }
+      rec.name = rest.join(' ').trim();
+      if(rec.name || rec.din) out.push(rec);
+      return;
+    }
+
+    // Everything else: positional, against the register's own list columns.
+    var cols = cfg.cols.filter(function(c){ return c.list; });
+    var rec2 = {};
+    cols.forEach(function(c,i){
+      var v = cells[i];
+      if(v === undefined) return;
+      if(c.t === 'date')        rec2[c.f] = pasteDate(v);
+      else if(c.t === 'number') rec2[c.f] = isNaN(Number(v.replace(/[,\s]/g,''))) ? null : Number(v.replace(/[,\s]/g,''));
+      else if(c.t === 'bool')   rec2[c.f] = /^(y|yes|true|1)$/i.test(v);
+      else if(c.t === 'select'){
+        var hit = (c.opts||[]).filter(function(o){
+          return o[0].toLowerCase() === v.toLowerCase() || o[1].toLowerCase() === v.toLowerCase();
+        })[0];
+        rec2[c.f] = hit ? hit[0] : (c.def || v);
+      }
+      else rec2[c.f] = v;
+    });
+    var req = cfg.cols.filter(function(c){ return c.req; })[0];
+    if(!req || rec2[req.f]) out.push(rec2);
+  });
+  return out;
+}
+
+function pastePreview(key){
+  var cfg = LG_REG[key];
+  var rows = pasteParse(key, (document.getElementById('paste-in')||{}).value);
+  PASTE_ROWS = rows;
+  var host = document.getElementById('paste-prev');
+  var go = document.getElementById('paste-go');
+  if(!rows.length){
+    host.innerHTML = '<div class="reg-err" style="margin-top:12px;">Nothing could be read from that. '+
+      'Check there is one record per line.</div>';
+    if(go) go.disabled = true;
+    return;
+  }
+  var cols = cfg.cols.filter(function(c){ return c.list; });
+  host.innerHTML = '<div class="set-n" style="margin:12px 0 8px;">'+
+      ccPlural(rows.length,'row','rows')+' read. Check them before adding.</div>'+
+    '<div class="cu-tablewrap" style="box-shadow:none;"><table class="cu-table"><thead><tr>'+
+      cols.map(function(c){ return '<th>'+c.l+'</th>'; }).join('')+
+    '</tr></thead><tbody>'+
+      rows.map(function(r){
+        return '<tr>'+cols.map(function(c){
+          return '<td data-label="'+c.l.replace(/&amp;/g,'&')+'">'+entEsc(regLabel(c, r[c.f]))+'</td>';
+        }).join('')+'</tr>';
+      }).join('')+
+    '</tbody></table></div>';
+  if(go) go.disabled = false;
+}
+
+async function pasteSave(key){
+  if(!PASTE_ROWS.length) return;
+  var cfg = LG_REG[key];
+  var btn = document.getElementById('paste-go');
+  if(btn){ btn.disabled = true; btn.textContent = 'Adding…'; }
+  var cid = regCompany(key);
+  var recs = PASTE_ROWS.map(function(r){
+    var o = {};
+    for(var k in r) o[k] = r[k];
+    if(cfg.scoped) o.company_id = cid;
+    o.user_id = CURRENT_USER ? CURRENT_USER.id : null;
+    return o;
+  });
+  try{
+    var res = await supaClient.from(cfg.table).insert(recs);
+    if(res.error) throw new Error(res.error.message);
+    pasteClose();
+    REG_DATA[key] = null;
+    if(typeof lgLoadRegisters === 'function') await lgLoadRegisters();
+    regRender(key);
+    if(typeof renderCommandCenter === 'function') renderCommandCenter();
+  }catch(e){
+    var h = document.getElementById('paste-prev');
+    if(h) h.insertAdjacentHTML('afterbegin','<div class="reg-err">'+entEsc(e.message)+'</div>');
+    if(btn){ btn.disabled = false; btn.textContent = 'Add rows'; }
+  }
+}
+
+// ═══════════════════════════════════════════════════
 // IMPORT DIRECTORS
 // ═══════════════════════════════════════════════════
 // MCA publishes director details per company but offers no API, and its terms
@@ -6546,6 +6724,7 @@ function regRender(key){
     '<h1 class="cc-h1">'+cfg.title+'</h1>'+
     '<p class="cc-sub">'+cfg.sub+'</p></div>'+
     '<div class="cc-headbtns">'+entSel+
+      '<button class="cc-btn" onclick="pasteOpen('+lgArg(key)+')">Paste rows</button>'+
       (key === 'directors'
         ? '<button class="cc-btn" onclick="dirImport()">Import from MCA</button>' : '')+
       '<button class="cc-btn-primary" onclick="regOpen('+lgArg(key)+')">+ '+cfg.addLabel+'</button>'+
