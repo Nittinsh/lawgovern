@@ -1,0 +1,919 @@
+{
+ "master": [
+  {
+   "category": "1. Incorporation Forms",
+   "form": "INC-1",
+   "desc": "Application to reserve the name of the company",
+   "type": "e-Form"
+  },
+  {
+   "category": "1. Incorporation Forms",
+   "form": "INC-3",
+   "desc": "Consent of Nominee as regards One Person Company (OPC)",
+   "type": "e-Form"
+  },
+  {
+   "category": "1. Incorporation Forms",
+   "form": "INC-4",
+   "desc": "Changes of nominee as regards One Person Company",
+   "type": "e-Form"
+  },
+  {
+   "category": "1. Incorporation Forms",
+   "form": "INC-5",
+   "desc": "Intimation of OPC for exceeding the prescribed threshold of more than Rs 50 lakh of the share capital or Rs 2 crore turnover.",
+   "type": "e-Form"
+  },
+  {
+   "category": "1. Incorporation Forms",
+   "form": "INC-6",
+   "desc": "Conversion of a private limited company into an OPC or vice versa",
+   "type": "e-Form"
+  },
+  {
+   "category": "1. Incorporation Forms",
+   "form": "INC-8",
+   "desc": "Declaration by an advocate, CA (chartered accountant, cost accountant, or CS (company secretary) in practice that all provisions of the Companies Act and rules related to incorporation have been complied with.",
+   "type": "Physical"
+  },
+  {
+   "category": "1. Incorporation Forms",
+   "form": "INC-9",
+   "desc": "Declaration by every subscriber of the memorandum and each of the first directors named in the articles that he/she has not been convicted of any offense for the preceding 5 years, and that all the documents filed with the Registrar are right.",
+   "type": "Physical"
+  },
+  {
+   "category": "1. Incorporation Forms",
+   "form": "INC-11",
+   "desc": "Certificate Of Incorporation",
+   "type": "Physical"
+  },
+  {
+   "category": "1. Incorporation Forms",
+   "form": "INC-11A",
+   "desc": "Certificate of incorporation on conversion from an unlimited company to a limited company.",
+   "type": "Physical"
+  },
+  {
+   "category": "1. Incorporation Forms",
+   "form": "INC-11B",
+   "desc": "Certificate of incorporation on conversion from a company limited by guarantee to a company limited by shares.",
+   "type": "Physical"
+  },
+  {
+   "category": "1. Incorporation Forms",
+   "form": "INC 13",
+   "desc": "Memorandum Of Association",
+   "type": "Physical"
+  },
+  {
+   "category": "1. Incorporation Forms",
+   "form": "INC 14",
+   "desc": "Declaration by a CA, CS, cost accountant, advocate in practice that the provisions of the association have been drawn up in conformity with the provisions of Section 8 and rules made thereunder and that all the requisites of the Act and the rules made in association to registration of the company under the Section 8 and matters incidental or supplemental thereto have been complied with.",
+   "type": "Physical"
+  },
+  {
+   "category": "1. Incorporation Forms",
+   "form": "INC 15",
+   "desc": "Declaration by each of the persons making the application (Section 8 companies)",
+   "type": "Physical"
+  },
+  {
+   "category": "1. Incorporation Forms",
+   "form": "INC 16/17",
+   "desc": "License issued under Section 8",
+   "type": "Physical"
+  },
+  {
+   "category": "1. Incorporation Forms",
+   "form": "INC 20A",
+   "desc": "A declaration given by the director for the commencement of business for a company.",
+   "type": "e-Form"
+  },
+  {
+   "category": "1. Incorporation Forms",
+   "form": "INC 22",
+   "desc": "A notice of the change in the company's registered office and its verification.",
+   "type": "e-Form"
+  },
+  {
+   "category": "1. Incorporation Forms",
+   "form": "INC 22A",
+   "desc": "Active company tagging identities and verification (Active)",
+   "type": "e-Form"
+  },
+  {
+   "category": "1. Incorporation Forms",
+   "form": "INC 24",
+   "desc": "Application to the Central Government for approval for a change in the name of the company.",
+   "type": "e-Form"
+  },
+  {
+   "category": "1. Incorporation Forms",
+   "form": "INC 25",
+   "desc": "A new incorporation certificate following a change in name.",
+   "type": "Physical"
+  },
+  {
+   "category": "1. Incorporation Forms",
+   "form": "INC 25A",
+   "desc": "An advertisement to publish in the newspaper when a company is converted into a private company.",
+   "type": "Physical"
+  },
+  {
+   "category": "1. Incorporation Forms",
+   "form": "INC 26",
+   "desc": "Advertisement to be published in the newspaper upon changing the company's registered office in the registry office from one state or Union territory to another.",
+   "type": "Physical"
+  },
+  {
+   "category": "1. Incorporation Forms",
+   "form": "INC 27",
+   "desc": "Conversion of a public company into a private company and vice versa, including the conversion of a company limited by guarantee to a company limited by shares.",
+   "type": "e-Form"
+  },
+  {
+   "category": "1. Incorporation Forms",
+   "form": "INC 28",
+   "desc": "The notice of the order of the court or any other competent authority.",
+   "type": "e-Form"
+  },
+  {
+   "category": "1. Incorporation Forms",
+   "form": "INC 32",
+   "desc": "SPICe+ (INC-32) is now an integrated web-based form for company incorporation.",
+   "type": "e-Form"
+  },
+  {
+   "category": "1. Incorporation Forms",
+   "form": "INC 33",
+   "desc": "e-MOA (Memorandum of Association)",
+   "type": "e-Form"
+  },
+  {
+   "category": "1. Incorporation Forms",
+   "form": "INC 34",
+   "desc": "e-AOA (Articles of Association)",
+   "type": "e-Form"
+  },
+  {
+   "category": "1. Incorporation Forms",
+   "form": "INC 35",
+   "desc": "An application for Goods and Service Tax (GST) identification number, Employees' State Insurance Corporation registration, plus Employees provided fund organization registration (AGILE-PRO)",
+   "type": "e-Form"
+  },
+  {
+   "category": "2. Director-Related Forms",
+   "form": "DIR 2",
+   "desc": "This is the consent given by the person appointed as the company director.",
+   "type": "Physical"
+  },
+  {
+   "category": "2. Director-Related Forms",
+   "form": "DIR 3",
+   "desc": "This is the application for the allotment of the Director Identification Number (DIN) before being appointed as a director in an existing company.",
+   "type": "e-Form"
+  },
+  {
+   "category": "2. Director-Related Forms",
+   "form": "DIR 3 KYC",
+   "desc": "An application for filing the director's KYC.",
+   "type": "e-Form"
+  },
+  {
+   "category": "2. Director-Related Forms",
+   "form": "DIR 3C",
+   "desc": "An intimation by the company to the Registrar on the DIN.",
+   "type": "e-Form,"
+  },
+  {
+   "category": "2. Director-Related Forms",
+   "form": "DIR 3A",
+   "desc": "The declaration provided by the individual applying as a director, if he does not have a last name, and uses only his first name.",
+   "type": "Physical"
+  },
+  {
+   "category": "2. Director-Related Forms",
+   "form": "DIR 3B",
+   "desc": "The intimation of the DIN to the company/companies in which an individual is a director.",
+   "type": "Physical"
+  },
+  {
+   "category": "2. Director-Related Forms",
+   "form": "DIR 5",
+   "desc": "An Application to surrender the DIN",
+   "type": "e-Form"
+  },
+  {
+   "category": "2. Director-Related Forms",
+   "form": "DIR 6",
+   "desc": "An intimation of changes in the particulars specified in the DIN application.",
+   "type": "e-Form"
+  },
+  {
+   "category": "2. Director-Related Forms",
+   "form": "DIR 8",
+   "desc": "An intimation by the director to the respective company about his/her disqualification.",
+   "type": "Physical"
+  },
+  {
+   "category": "2. Director-Related Forms",
+   "form": "DIR 9",
+   "desc": "The form for the company to disclose directors' disqualifications to the Registrar.",
+   "type": "Physical"
+  },
+  {
+   "category": "2. Director-Related Forms",
+   "form": "DIR 10",
+   "desc": "An application to remove disqualified directors from the company.",
+   "type": "Physical"
+  },
+  {
+   "category": "2. Director-Related Forms",
+   "form": "DIR 11",
+   "desc": "A notice of resignation by the director to the Registrar.",
+   "type": "e-Form"
+  },
+  {
+   "category": "2. Director-Related Forms",
+   "form": "DIR 12",
+   "desc": "The particulars of the directors and the key managerial personnel appointment, and any changes.",
+   "type": "e-Form"
+  },
+  {
+   "category": "3. Annual Compliance Forms",
+   "form": "AOC 4",
+   "desc": "The form for filing the company's annual financial statement and other relevant documents with the Registrar.",
+   "type": "e-Form"
+  },
+  {
+   "category": "3. Annual Compliance Forms",
+   "form": "AOC 4 (XBRL)",
+   "desc": "XBRL is the document for the financial statement and other documents to be filed with the Registrar.",
+   "type": "e-Form"
+  },
+  {
+   "category": "3. Annual Compliance Forms",
+   "form": "AOC-4 NBFC",
+   "desc": "The form is for NBFCs to file the financial statements and other relevant documents with the registrar.",
+   "type": "e-form"
+  },
+  {
+   "category": "3. Annual Compliance Forms",
+   "form": "AO4- CGS",
+   "desc": "The form is to file the consolidated financial statements and other relevant documents with the Registrar",
+   "type": "e-Form"
+  },
+  {
+   "category": "3. Annual Compliance Forms",
+   "form": "AOC 5",
+   "desc": "The notice to declare the address of the location in the company's book of accounts is well maintained.",
+   "type": "e-Form"
+  },
+  {
+   "category": "3. Annual Compliance Forms",
+   "form": "MGT 14",
+   "desc": "Filing the company resolutions and agreements with the registrar",
+   "type": "e-Form"
+  },
+  {
+   "category": "3. Annual Compliance Forms",
+   "form": "MGT 15",
+   "desc": "Form for filing a report on the AGM (Annual General Meeting )",
+   "type": "Physical"
+  },
+  {
+   "category": "3. Annual Compliance Forms",
+   "form": "DPT 3",
+   "desc": "Return of deposits",
+   "type": "e-Form"
+  },
+  {
+   "category": "3. Annual Compliance Forms",
+   "form": "MSME Form 1",
+   "desc": "The half-yearly returns are filed with the Registrar of Companies for any outstanding payment to the Micro or Small enterprise.",
+   "type": "e-Form"
+  },
+  {
+   "category": "4. Share Capital & Charges Forms",
+   "form": "SH 10",
+   "desc": "The register of shares or securities bought back",
+   "type": "Physical"
+  },
+  {
+   "category": "4. Share Capital & Charges Forms",
+   "form": "CHG 1",
+   "desc": "Application to register the modification or creation of a charge",
+   "type": "e-Form"
+  },
+  {
+   "category": "4. Share Capital & Charges Forms",
+   "form": "CHG 2",
+   "desc": "Registration of the charge certificate",
+   "type": "Physical"
+  },
+  {
+   "category": "4. Share Capital & Charges Forms",
+   "form": "CHG 3",
+   "desc": "Modification of the charge certificate",
+   "type": "Physical"
+  },
+  {
+   "category": "5. Audit & Financial Forms",
+   "form": "ADT 1",
+   "desc": "This form is to inform the registrar of the company's appointment of an auditor.",
+   "type": "e-Form"
+  },
+  {
+   "category": "5. Audit & Financial Forms",
+   "form": "ADT 2",
+   "desc": "This is the application to remove the company auditor before their term expiry.",
+   "type": "e-Form"
+  },
+  {
+   "category": "5. Audit & Financial Forms",
+   "form": "ADT 3",
+   "desc": "The notice of the auditor's resignation",
+   "type": "e-Form"
+  },
+  {
+   "category": "5. Audit & Financial Forms",
+   "form": "ADT 4",
+   "desc": "The Form to report any suspected fraud made by the auditor to the central government.",
+   "type": "Physical"
+  },
+  {
+   "category": "5. Audit & Financial Forms",
+   "form": "CRA 1",
+   "desc": "The maintenance of the cost records by some companies.",
+   "type": "Physical"
+  },
+  {
+   "category": "5. Audit & Financial Forms",
+   "form": "CRA 2",
+   "desc": "The form for the intimation of appointment of the cost auditor.",
+   "type": "e-Form"
+  },
+  {
+   "category": "5. Audit & Financial Forms",
+   "form": "CRA 3",
+   "desc": "Format of the cost audit report",
+   "type": "Physical"
+  },
+  {
+   "category": "5. Audit & Financial Forms",
+   "form": "CRA 4",
+   "desc": "The form for filing the cost audit report with the Government",
+   "type": "e-Form"
+  },
+  {
+   "category": "5. Audit & Financial Forms",
+   "form": "MR 1",
+   "desc": "A return of appointment of a Managing Director, Manager, or Whole Time Director.",
+   "type": "e-Form"
+  },
+  {
+   "category": "5. Audit & Financial Forms",
+   "form": "MR 2",
+   "desc": "This form is for the application to the Central Government for approval of remuneration/reappointment/appointment of the Director, Managing Director, or the Manager.",
+   "type": "e-Form"
+  },
+  {
+   "category": "5. Audit & Financial Forms",
+   "form": "MR 3",
+   "desc": "The format for the Secretarial Audit Report",
+   "type": "Physical"
+  },
+  {
+   "category": "6. Event-Based Forms",
+   "form": "RD-1",
+   "desc": "An application to the regional directors in order to change a financial year or transform a public company into a private company.",
+   "type": "e-Form"
+  },
+  {
+   "category": "6. Event-Based Forms",
+   "form": "RD GNL-5",
+   "desc": "A form for rectification of mistakes related to a change in a financial year or for converting a public company into a private company.",
+   "type": "e-Form"
+  },
+  {
+   "category": "6. Event-Based Forms",
+   "form": "BEN 1",
+   "desc": "In the case of an individual, a declaration by the significant beneficial owner.",
+   "type": "Physical"
+  },
+  {
+   "category": "6. Event-Based Forms",
+   "form": "MGT 1",
+   "desc": "Register of members of the company",
+   "type": "Physical"
+  },
+  {
+   "category": "6. Event-Based Forms",
+   "form": "MGT 2",
+   "desc": "Register of Debenture holders or any security holders",
+   "type": "Physical"
+  },
+  {
+   "category": "6. Event-Based Forms",
+   "form": "MGT 3",
+   "desc": "Notice of the change in the situation or discontinuation of a location where a foreign register is kept.",
+   "type": ">Physical"
+  },
+  {
+   "category": "6. Event-Based Forms",
+   "form": "MGT 9",
+   "desc": "Extract of the annual return",
+   "type": "Physical"
+  },
+  {
+   "category": "6. Event-Based Forms",
+   "form": "MGT 11",
+   "desc": "The appointment of a proxy for a meeting",
+   "type": "Physical"
+  },
+  {
+   "category": "6. Event-Based Forms",
+   "form": "MGT 12",
+   "desc": "Polling paper in the meeting",
+   "type": "Physical"
+  },
+  {
+   "category": "6. Event-Based Forms",
+   "form": "MGT 13",
+   "desc": "The scrutinizers report to the chairman on the meeting poll.",
+   "type": "Physical"
+  },
+  {
+   "category": "6. Event-Based Forms",
+   "form": "CAA 1",
+   "desc": "The creditors' responsibility statement related to Section 230- Powers to either compromise or make arrangements with the creditors and the members.",
+   "type": "Physical"
+  },
+  {
+   "category": "6. Event-Based Forms",
+   "form": "CAA 2",
+   "desc": "The notice of a meeting of any class or classes of the members or the creditors.",
+   "type": "Physical"
+  },
+  {
+   "category": "6. Event-Based Forms",
+   "form": "CAA 10",
+   "desc": "The solvency declaration",
+   "type": "Physical"
+  },
+  {
+   "category": "6. Event-Based Forms",
+   "form": "CAA 11",
+   "desc": "The approval notice for a scheme of merger",
+   "type": "Physical"
+  },
+  {
+   "category": "6. Event-Based Forms",
+   "form": "STK 1",
+   "desc": "A notice by the Registrar of Companies for removing the name of the company from the Registrar of Companies.",
+   "type": "Physical"
+  },
+  {
+   "category": "7. Foreign Company Forms",
+   "form": "FC 1",
+   "desc": "The information to be filed by a foreign company",
+   "type": "e-Form"
+  },
+  {
+   "category": "7. Foreign Company Forms",
+   "form": "FC 2",
+   "desc": "The return of the alteration in the documents filed for the registration of a foreign company.",
+   "type": "e-Form"
+  },
+  {
+   "category": "7. Foreign Company Forms",
+   "form": "FC 3",
+   "desc": "Annual accounts and the list of all the principal places of the business that are established in India by a foreign company.",
+   "type": "e-Form"
+  },
+  {
+   "category": "7. Foreign Company Forms",
+   "form": "FC 4",
+   "desc": "Annual Return of a Foreign Company",
+   "type": "e-Form"
+  },
+  {
+   "category": "7. Foreign Company Forms",
+   "form": "FC 5",
+   "desc": "Nomination for the Indian depository receipts",
+   "type": "Physical"
+  },
+  {
+   "category": "8. Other Forms",
+   "form": "DPT 4",
+   "desc": "A statement on the existing deposits as on the date of commencement of the Companies Act",
+   "type": "Physical"
+  },
+  {
+   "category": "8. Other Forms",
+   "form": "AOC 1",
+   "desc": "Statement including salient features of the financial statement of associates/ subsidiaries/ joint ventures.",
+   "type": "Physical"
+  },
+  {
+   "category": "8. Other Forms",
+   "form": "AOC 2",
+   "desc": "",
+   "type": ""
+  },
+  {
+   "category": "8. Other Forms",
+   "form": "Physical",
+   "desc": "",
+   "type": ""
+  },
+  {
+   "category": "8. Other Forms",
+   "form": "AOC 3",
+   "desc": "The statements encapsulate the salient features of the audited financial statements.",
+   "type": "Physical"
+  },
+  {
+   "category": "8. Other Forms",
+   "form": "AOC 3A",
+   "desc": "A Detailed statement on the annual financial statements to be filed by the company in accordance with the Companies Rules 2015.",
+   "type": ""
+  },
+  {
+   "category": "8. Other Forms",
+   "form": "RSC 1",
+   "desc": "The application was sent to the Tribunal to confirm the reduction of the share capital",
+   "type": "Physical"
+  }
+ ],
+ "detail": {
+  "MR-1": {
+   "title": "Return of Appointment of MD/WTD/Manager/CEO/CFO/CS",
+   "status": "Substituted",
+   "portal": "MCA V3 (January 23, 2023)",
+   "updated": "Jan 23 2023 — Companies (Appointment & Remuneration) Amendment Rules 2023",
+   "applies": "PUBLIC COMPANIES and PRIVATE COMPANIES that are SUBSIDIARIES of Public Companies ONLY. Independent private companies EXEMPT.",
+   "timeline": "Within 60 days of appointment",
+   "section": "Sec 196 r/w Rule 3",
+   "penalty": "Rs.50,000 + Rs.500/day continuing",
+   "linked": "MR-2 (if remuneration exceeds Schedule V limits)",
+   "notes": "Certified by practising CA/CS/Cost Accountant. Independent private companies do NOT file MR-1.",
+   "steps": [
+    "Board approves appointment",
+    "Obtain DIR-2 consent + DIR-8 from appointee",
+    "Verify remuneration against Schedule V",
+    "Get CA/CS/Cost Accountant certification",
+    "File MR-1 on MCA V3 within 60 days",
+    "File MR-2 separately if excess remuneration"
+   ]
+  },
+  "MGT-7": {
+   "title": "Annual Return",
+   "status": "Migrated",
+   "portal": "MCA V3 Lot 3 (July 14, 2025)",
+   "updated": "July 14 2025 — new fields added",
+   "applies": "All companies EXCEPT OPC and Small Companies (who file MGT-7A)",
+   "timeline": "Within 60 days of AGM (by 29 Nov if AGM 30 Sep)",
+   "section": "Sec 92 r/w Rule 11",
+   "penalty": "Rs.50,000 + Rs.100/day",
+   "linked": "MGT-7A (OPC/Small), PCS certification now embedded (MGT-8 abolished)",
+   "notes": "New from Jul 2025: registered office photograph with director + GPS coordinates + gender-wise SH data. PCS certification embedded inside — do NOT file MGT-8 separately.",
+   "steps": [
+    "Hold AGM by 30 Sep",
+    "Prepare return data",
+    "Photograph registered office with director visible",
+    "Note GPS lat/long coordinates",
+    "PCS certifies within form (if required)",
+    "File MGT-7 on MCA V3 within 60 days of AGM"
+   ]
+  },
+  "MGT-7A": {
+   "title": "Abridged Annual Return — OPC and Small Companies",
+   "status": "Migrated",
+   "portal": "MCA V3 Lot 3 (July 14, 2025)",
+   "updated": "July 14 2025",
+   "applies": "OPC: within 60 days of FY end. Small Company: within 60 days of AGM.",
+   "timeline": "OPC: by 29 May. Small Co: by 29 Nov (if AGM 30 Sep)",
+   "section": "Sec 92 r/w Rule 11A",
+   "penalty": "Rs.50,000 + Rs.100/day",
+   "linked": "MGT-7 (full return for others)",
+   "notes": "Simplified form — no PCS certification required. OPC files from FY end (no AGM required for OPC).",
+   "steps": [
+    "OPC: prepare after FY end",
+    "Small Co: prepare after AGM",
+    "File MGT-7A on MCA V3 — no PCS certification needed"
+   ]
+  },
+  "MGT-8": {
+   "title": "Certification of Annual Return by PCS",
+   "status": "Abolished",
+   "portal": "ABOLISHED — not a separate form from July 14, 2025",
+   "updated": "July 14 2025 — Abolished",
+   "applies": "N/A — certification is now inside MGT-7",
+   "timeline": "N/A",
+   "section": "Sec 92(2) — handled within MGT-7",
+   "penalty": "Filing MGT-8 separately is incorrect from July 14 2025",
+   "linked": "MGT-7 (PCS certification is now embedded here)",
+   "notes": "DO NOT file MGT-8 as a separate form. PCS certifies the annual return directly within MGT-7 on MCA V3 using DSC.",
+   "steps": [
+    "Do NOT file MGT-8 separately",
+    "PCS certifies within MGT-7 form on MCA V3",
+    "Ensure PCS has registered DSC on MCA V3"
+   ]
+  },
+  "AOC-4": {
+   "title": "Form for Filing Financial Statements",
+   "status": "Migrated",
+   "portal": "MCA V3 Lot 3 (July 14, 2025)",
+   "updated": "July 14 2025 — new requirements",
+   "applies": "All companies. AOC-4 CFS for companies with subsidiaries. OPC: AOC-4 OPC.",
+   "timeline": "Within 30 days of AGM (by 30 Oct if AGM 30 Sep). OPC: 180 days from FY end.",
+   "section": "Sec 137 r/w Rule 12",
+   "penalty": "Rs.1,000/day (max Rs.10 Lakh per document)",
+   "linked": "AOC-4 CFS, CSR-2 (linked), AOC-2 (linked), ADT-1 SRN required",
+   "notes": "From Jul 2025: figures in ABSOLUTE RUPEES (not rounded). ADT-1 SRN required as input. New secretarial auditor observations table. CSR-2 is a linked filing.",
+   "steps": [
+    "Board approves financial statements",
+    "Hold AGM",
+    "Collect ADT-1 SRN",
+    "Prepare AOC-4 with figures in absolute rupees",
+    "CSR-2 and AOC-2 as linked filings",
+    "File on MCA V3 within 30 days of AGM"
+   ]
+  },
+  "ADT-1": {
+   "title": "Information to Registrar — Auditor Appointment",
+   "status": "Migrated",
+   "portal": "MCA V3 Lot 3 (July 14, 2025)",
+   "updated": "July 14 2025 — new field: Audit Committee recommendation",
+   "applies": "All companies — filed ONCE per 5-year appointment",
+   "timeline": "Within 15 days of AGM (or Board resolution for OPC/Small Co)",
+   "section": "Sec 139(1) r/w Rule 4(2)",
+   "penalty": "Rs.25,000 to Rs.5 Lakh",
+   "linked": "AOC-4 (ADT-1 SRN required as input)",
+   "notes": "Annual ratification NOT mandatory. File once per 5-year term. New field: Audit Committee recommendation. SRN must be noted for future AOC-4.",
+   "steps": [
+    "AGM appoints auditor for 5-year term",
+    "Obtain auditor consent and certificate (Sec 141)",
+    "File ADT-1 on MCA V3 within 15 days of AGM",
+    "Note SRN — needed for AOC-4",
+    "No annual refiling required"
+   ]
+  },
+  "DIR-12": {
+   "title": "Particulars of Appointment of Directors and KMP",
+   "status": "Substituted",
+   "portal": "MCA V3 (January 23, 2023)",
+   "updated": "Jan 23 2023 + Companies Amendment Rules 2023 (Form 9 for disqualification)",
+   "applies": "All companies — for any appointment/resignation/vacation/disqualification/removal",
+   "timeline": "Within 30 days of appointment/cessation/change",
+   "section": "Sec 168, 170 r/w Rule 17",
+   "penalty": "Rs.50,000 + Rs.500/day",
+   "linked": "DIR-2 (consent), DIR-8 (disqualification), DIR-11 (by resigning director), MR-1",
+   "notes": "New: company must file Form 9 within 30 days of receiving DIR-8 (disqualification) from director. Obtain DIR-2 + DIR-8 from every incoming director.",
+   "steps": [
+    "Obtain DIR-2 consent + DIR-8 from incoming director",
+    "Board approves appointment",
+    "File DIR-12 on MCA V3 within 30 days",
+    "Resignation: director files DIR-11; company also files DIR-12",
+    "Disqualification: director files DIR-8; company files Form 9 within 30 days"
+   ]
+  },
+  "BEN-2": {
+   "title": "Return of Significant Beneficial Owners",
+   "status": "Active",
+   "portal": "MCA V3",
+   "updated": "SBO Rules 2018 — actively enforced since 2023",
+   "applies": "All companies on receiving BEN-1 from Significant Beneficial Owner",
+   "timeline": "Within 30 days of receiving BEN-1",
+   "section": "Sec 90(4) r/w SBO Rules 2018",
+   "penalty": "Rs.1 Lakh + Rs.1,000/day; shares may be disenfranchised",
+   "linked": "BEN-1 (SBO declaration), BEN-3 (company register), BEN-4 (notice to suspected SBO)",
+   "notes": "SBO = individual with ≥10% beneficial interest in shares/voting/dividend. Send BEN-4 to suspected SBOs proactively. Cross-verify BEN-3 with MGT-7 annually.",
+   "steps": [
+    "Identify individuals with ≥10% beneficial interest",
+    "Send BEN-4 notice to suspected SBOs",
+    "Receive BEN-1 from SBO within 30 days",
+    "File BEN-2 on MCA V3 within 30 days of BEN-1",
+    "Update BEN-3 register at registered office"
+   ]
+  },
+  "DPT-3": {
+   "title": "Return of Deposits / Outstanding Loans",
+   "status": "Migrated",
+   "portal": "MCA V3 Lot 3 (July 14, 2025)",
+   "updated": "July 14 2025",
+   "applies": "ALL companies — including NIL return (zero deposits/loans)",
+   "timeline": "On or before 30 JUNE each year",
+   "section": "Sec 73 r/w Rule 16",
+   "penalty": "Rs.5,000–Rs.25,000/day for company + officer",
+   "linked": "None",
+   "notes": "COMMON ERROR: Due date is 30 JUNE not 31 May. ALL companies must file — even NIL return. Reports outstanding as on 31 March.",
+   "steps": [
+    "Compile all deposits/loans outstanding as on 31 March",
+    "Include NIL if nothing outstanding",
+    "File DPT-3 on MCA V3 on or before 30 June",
+    "Attach auditor certificate for deposits accepted"
+   ]
+  },
+  "INC-20A": {
+   "title": "Declaration for Commencement of Business",
+   "status": "Substituted",
+   "portal": "MCA V3 (January 23, 2023)",
+   "updated": "Jan 23 2023",
+   "applies": "Every company with share capital incorporated on/after November 2, 2018",
+   "timeline": "Within 180 days of incorporation — one-time filing",
+   "section": "Sec 10A",
+   "penalty": "Company Rs.50,000; each director Rs.1,000/day. ROC may initiate removal.",
+   "linked": "SPICe+ (INC-32)",
+   "notes": "CRITICAL: Company CANNOT commence business or borrow money until INC-20A is filed. Bank statement required as proof of paid-up capital.",
+   "steps": [
+    "Open company bank account",
+    "Subscribers deposit share subscription",
+    "Obtain bank statement showing payment",
+    "File INC-20A on MCA V3 within 180 days",
+    "Do NOT start business before filing"
+   ]
+  },
+  "MSC-3": {
+   "title": "Annual Return for Dormant Companies",
+   "status": "Substituted",
+   "portal": "MCA V3 (January 23, 2023)",
+   "updated": "Jan 23 2023",
+   "applies": "Only companies with dormant status under Sec 455",
+   "timeline": "On or before 31 MARCH each year — NOT September",
+   "section": "Sec 455 r/w Rule 10",
+   "penalty": "Default penalty. Non-filing for 3 years: dormant status cancelled.",
+   "linked": "MSC-1 (apply for dormant), MSC-4 (revival)",
+   "notes": "COMMON MISTAKE: Due 31 MARCH not 30 September. If dormant status cancelled for non-filing, all standard compliance obligations recommence.",
+   "steps": [
+    "Confirm company still qualifies as dormant",
+    "Prepare MSC-3 with updated share capital",
+    "File on MCA V3 on or before 31 March"
+   ]
+  },
+  "CRA-4": {
+   "title": "Form of Cost Audit Report",
+   "status": "Migrated",
+   "portal": "MCA V3 Lot 3 (July 14, 2025) — XBRL format",
+   "updated": "July 14 2025 — now XBRL",
+   "applies": "Companies where cost audit is applicable under Cost Audit Rules 2014",
+   "timeline": "Within 30 days of receipt from Cost Auditor (by 30 Sep). FY 2024-25 only: extended to 31 Dec 2025.",
+   "section": "Sec 148 r/w Rule 6",
+   "penalty": "Company Rs.25,000–Rs.5 Lakh; Cost Auditor: debarment",
+   "linked": "CRA-2 (appointment), CRA-3 (report format)",
+   "notes": "Now in XBRL format on MCA V3. FY 2024-25 deadline extended to 31 December 2025 by MCA circular.",
+   "steps": [
+    "Board appoints Cost Auditor; file CRA-2",
+    "Cost Auditor prepares report (CRA-3)",
+    "Company files CRA-4 in XBRL on MCA V3 within 30 days of receipt"
+   ]
+  },
+  "MGT-14": {
+   "title": "Filing of Resolutions and Agreements",
+   "status": "Migrated",
+   "portal": "MCA V3",
+   "updated": "Migrated to MCA V3",
+   "applies": "All companies — for Special Resolutions and certain Board Resolutions under Sec 117",
+   "timeline": "Within 30 days of passing the resolution",
+   "section": "Sec 117 r/w Rule 24",
+   "penalty": "Company Rs.5 Lakh; officer Rs.1 Lakh",
+   "linked": "SH-7, INC-27, DIR-12",
+   "notes": "Required for ALL Special Resolutions and Board resolutions listed in Sec 117(3). Not all BRs require MGT-14.",
+   "steps": [
+    "Pass SR at EGM/AGM (or applicable BR)",
+    "Prepare certified copy of resolution",
+    "File MGT-14 on MCA V3 within 30 days",
+    "Attach agreements/documents as applicable"
+   ]
+  },
+  "CHG-1": {
+   "title": "Application for Registration of Creation/Modification of Charge",
+   "status": "Migrated",
+   "portal": "MCA V3",
+   "updated": "Migrated to MCA V3",
+   "applies": "All companies on creation/modification of charge",
+   "timeline": "Within 30 days (condoned to 60 days; beyond 300 days: NCLT condonation)",
+   "section": "Sec 77 r/w Rule 3",
+   "penalty": "Rs.5,000 + Rs.500/day; charge may be void against liquidator",
+   "linked": "CHG-4 (satisfaction), CHG-9 (debentures), CHG-7 (register of charges)",
+   "notes": "Unregistered charge may not be enforceable in liquidation. Maintain Register of Charges (CHG-7) at registered office.",
+   "steps": [
+    "Execute charge creation document",
+    "Prepare CHG-1 with asset details",
+    "File CHG-1 on MCA V3 within 30 days",
+    "Obtain charge ID from ROC",
+    "Record in CHG-7 register",
+    "File CHG-4 on satisfaction/repayment"
+   ]
+  },
+  "IEPF-1": {
+   "title": "Statement of Amounts Credited to IEPF",
+   "status": "Active",
+   "portal": "IEPF Portal (iepf.gov.in)",
+   "updated": "IEPF Rules 2016 as amended",
+   "applies": "All companies with dividend unclaimed for 7+ consecutive years",
+   "timeline": "On or before 31 October each year",
+   "section": "Sec 125 r/w IEPF Rules 2016",
+   "penalty": "2× amount + imprisonment ≤2 years for officers",
+   "linked": "IEPF-2, IEPF-4 (notice to SHs), IEPF-5 (SH claim)",
+   "notes": "Shares of affected shareholders must also be transferred to IEPF demat simultaneously. LODR Amendment 2026: NCD unclaimed interest/redemption also covered.",
+   "steps": [
+    "Identify 7+ year unclaimed dividends",
+    "Send IEPF-4 notice by 31 July",
+    "Publish list on website by 31 August",
+    "File IEPF-2 by 30 Sep",
+    "Transfer dividend to IEPF by 31 Oct",
+    "Transfer shares to IEPF demat",
+    "File IEPF-1 by 31 Oct"
+   ]
+  },
+  "INC-18": {
+   "title": "Application for Conversion of Section 8 Company into any Other Kind",
+   "status": "Active",
+   "portal": "MCA V3",
+   "updated": "Rule 21-22 of Companies (Incorporation) Rules 2014",
+   "applies": "Section 8 companies seeking conversion to Private Limited or other type",
+   "timeline": "File to Regional Director within 3 months of Special Resolution",
+   "section": "Sec 8(4)(ii), 8(5) r/w Rules 21-22 Companies (Incorporation) Rules 2014",
+   "penalty": "Conversion without RD approval void; company continues to be Section 8",
+   "linked": "MGT-14 (SR), INC-19 (newspaper notice), INC-20 (post-approval COI)",
+   "notes": "CRITICAL: This is Regional Director approval — NOT NCLT. NOT SPICe+. NOT simple MoA/AoA alteration. INC-32 (SPICe+) is WRONG. Section 122 is irrelevant. Section 115TD exit tax applies if Section 12A registered. Creditor consent mandatory. Assets must be transferred to another Sec 8 company or IEPF as directed by RD.",
+   "steps": [
+    "Board Resolution — approve conversion, altered MoA/AoA, fix SGM date",
+    "Pass Special Resolution at SGM — conversion + altered MoA/AoA",
+    "File MGT-14 within 30 days of SR",
+    "Within 1 week of filing application: publish INC-19 notice in 1 English + 1 vernacular newspaper",
+    "Intimate ROC, Income Tax Dept, Charity Commissioner, sectoral regulators",
+    "File INC-18 to Regional Director with: SR copy, altered MoA/AoA, audited FS, asset-liability statement, creditor list with written consent, director declaration, proof of publication",
+    "RD hearing if objections received",
+    "After RD approval order: file INC-20 within 30 days",
+    "ROC issues fresh Certificate of Incorporation as Private Limited Company",
+    "Address Section 115TD exit tax liability (if Sec 12A registered)"
+   ]
+  },
+  "INC-19": {
+   "title": "Notice for Conversion of Section 8 Company (Newspaper Publication)",
+   "status": "Active",
+   "portal": "Newspaper publication + intimation to authorities",
+   "updated": "Rule 22 Companies (Incorporation) Rules 2014",
+   "applies": "Mandatory step for Section 8 company conversion — within 1 week of filing INC-18",
+   "timeline": "Within 1 week of filing application to Regional Director",
+   "section": "Rule 22 Companies (Incorporation) Rules 2014",
+   "penalty": "Non-publication: application to RD may be rejected",
+   "linked": "INC-18 (main application), INC-20 (post-approval)",
+   "notes": "Must be published in: (1) one English language newspaper and (2) one vernacular language newspaper — both in the principal district where RO is situated. Must also intimate: ROC, Income Tax authority, Charity Commissioner if registered, any sectoral regulator.",
+   "steps": [
+    "Draft notice per Form INC-19",
+    "Publish in one English newspaper (principal district of RO)",
+    "Publish in one vernacular newspaper (principal district of RO)",
+    "Send notice to ROC",
+    "Send notice to jurisdictional Income Tax officer",
+    "Send notice to Charity Commissioner (if registered as charity)",
+    "Preserve newspaper clippings as proof",
+    "Attach proof of publication with INC-18 application"
+   ]
+  },
+  "INC-20": {
+   "title": "Intimation of Conversion — Post Regional Director Approval",
+   "status": "Active",
+   "portal": "MCA V3",
+   "updated": "Rule 22 Companies (Incorporation) Rules 2014",
+   "applies": "After Regional Director approves Section 8 conversion",
+   "timeline": "Within 30 days of RD order",
+   "section": "Sec 8(5) r/w Rule 22",
+   "penalty": "Late filing: additional fee; non-filing: conversion certificate not issued",
+   "linked": "INC-18 (application), INC-19 (notice)",
+   "notes": "Filed after RD grants approval. ROC then issues fresh Certificate of Incorporation as Private Limited Company. Company must also address compliance requirements: (1) update name (add 'Private Limited'), (2) file altered MoA/AoA, (3) comply with private company requirements going forward.",
+   "steps": [
+    "Receive RD order approving conversion",
+    "File INC-20 on MCA V3 within 30 days",
+    "ROC issues fresh Certificate of Incorporation",
+    "Update company name in all records",
+    "Address tax compliance: Section 12A/80G cancellation, Section 115TD exit tax",
+    "Inform all stakeholders of conversion",
+    "Update bank accounts, contracts, licenses"
+   ]
+  },
+  "PAS-3": {
+   "title": "Return of Allotment",
+   "status": "Migrated",
+   "portal": "MCA V3 Lot 3 (July 14, 2025)",
+   "updated": "July 14 2025",
+   "applies": "All companies on every fresh allotment of shares/securities",
+   "timeline": "Within 30 days of allotment",
+   "section": "Sec 39 r/w Rule 12",
+   "penalty": "Rs.1,000/day up to Rs.5 Lakh",
+   "linked": "SH-7 (if authorized capital increase needed)",
+   "notes": "Listed companies: allotment in demat form only. Private placement: requires prior SR approval + MGT-14 filing.",
+   "steps": [
+    "Board approves allotment",
+    "Verify private placement SR (if applicable)",
+    "Credit shares to demat accounts",
+    "File PAS-3 on MCA V3 within 30 days",
+    "Update register of members"
+   ]
+  }
+ }
+}
