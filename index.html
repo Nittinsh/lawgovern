@@ -206,6 +206,7 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 .reg-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
 .reg-grid .reg-f:has(textarea){grid-column:1/-1;}
 @media(max-width:560px){.reg-grid{grid-template-columns:1fr;}}
+.dir-pre{background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:11px 13px;font-family:'IBM Plex Mono';font-size:11.5px;line-height:1.7;color:var(--ink-mid);overflow-x:auto;white-space:pre-wrap;word-break:break-word;margin:10px 0;}
 .reg-hint{font-size:11px;color:var(--ink-soft);margin-top:4px;line-height:1.5;}
 .reg-err{background:var(--rose-bg);border:1px solid #F2C9C9;color:var(--crit);border-radius:9px;padding:10px 13px;font-size:12.5px;margin-bottom:14px;}
 
@@ -1173,7 +1174,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v87">
+      <meta id="build-version" content="v88">
     </div>
   </div>
   <div class="cc-search">
@@ -6234,6 +6235,143 @@ function renderDocuments(){
 }
 
 // ═══════════════════════════════════════════════════
+// IMPORT DIRECTORS
+// ═══════════════════════════════════════════════════
+// MCA publishes director details per company but offers no API, and its terms
+// prohibit bulk collection from MCA21. Sites that show this at scale are
+// licensed aggregators. So the route is a paid provider, configured as Supabase
+// secrets and called through functions/mca-directors — the key never reaches
+// the browser.
+//
+// Nothing is written until you have seen the list and chosen. An import that
+// silently rewrote your board would be worse than typing it.
+async function dirImport(){
+  var cid = regCompany('directors');
+  var c = null;
+  if(typeof CLIENTS !== 'undefined')
+    for(var i=0;i<CLIENTS.length;i++) if(String(CLIENTS[i].id)===String(cid)) c = CLIENTS[i];
+  if(!c){ alert('Select an entity first.'); return; }
+  if(!c.cin){ alert('This entity has no CIN recorded. Add it on the Entities screen first.'); return; }
+
+  dirImportModal('<div class="cc-none">Looking up '+entEsc(c.cin)+'&hellip;</div>');
+
+  try{
+    var sess = await supaClient.auth.getSession();
+    var tok = sess && sess.data && sess.data.session ? sess.data.session.access_token : null;
+    var r = await fetch(SUPA_URL + '/functions/v1/mca-directors', {
+      method:'POST',
+      headers:{'Content-Type':'application/json', 'Authorization':'Bearer '+tok, 'apikey':SUPA_ANON},
+      body: JSON.stringify({cin: c.cin})
+    });
+    var d = await r.json().catch(function(){ return null; });
+
+    if(r.status === 404 || !d){
+      dirImportModal('<div class="reg-err">The lookup function is not deployed. Run '+
+        '<span class="mono">supabase functions deploy mca-directors</span>.</div>');
+      return;
+    }
+    if(d.configured === false){
+      dirImportModal(
+        '<div class="reg-err"><b>No provider is configured.</b><br>'+entEsc(d.detail||'')+'</div>'+
+        '<div class="set-n">Director data is public per company on the MCA portal, but there is no '+
+        'free API for it and MCA\'s terms prohibit collecting it in bulk from MCA21. A licensed '+
+        'provider is needed. Once you have one:</div>'+
+        '<pre class="dir-pre">supabase secrets set DIR_API_URL=&lt;provider endpoint&gt;\n'+
+        'supabase secrets set DIR_API_KEY=&lt;your key&gt;\n'+
+        'supabase functions deploy mca-directors</pre>'+
+        '<div class="set-n">Until then, add directors by hand &mdash; it is a handful per company '+
+        'and only changes when the board does.</div>');
+      return;
+    }
+    if(d.unmapped){
+      dirImportModal('<div class="reg-err">The provider replied, but its format is not recognised.</div>'+
+        '<div class="set-n">Send this back and the adapter is a few lines:</div>'+
+        '<pre class="dir-pre">'+entEsc(JSON.stringify(d.raw, null, 1).slice(0, 1800))+'</pre>');
+      return;
+    }
+    if(!d.found || !d.directors || !d.directors.length){
+      dirImportModal('<div class="cc-none">The provider returned no directors for '+
+        entEsc(c.cin)+'.</div>');
+      return;
+    }
+
+    DIR_IMPORT = d.directors;
+    var existing = {};
+    (REG_DATA['directors']||[]).forEach(function(x){ if(x.din) existing[String(x.din)] = 1; });
+
+    dirImportModal(
+      '<div class="set-n" style="margin-bottom:12px;">'+ccPlural(d.directors.length,'director','directors')+
+        ' returned for <span class="mono">'+entEsc(c.cin)+'</span>. '+
+        'Choose which to add. Anyone already on the register is unticked.</div>'+
+      d.directors.map(function(x, i){
+        var dup = x.din && existing[String(x.din)];
+        return '<label class="set-chk" style="border-bottom:1px solid var(--line-soft);padding:9px 0;">'+
+          '<input type="checkbox" data-i="'+i+'"'+(dup?'':' checked')+'>'+
+          '<span><b>'+entEsc(x.name||'(no name)')+'</b>'+
+          (x.din?' <span class="mono" style="color:var(--ink-soft)">DIN '+entEsc(x.din)+'</span>':'')+
+          '<div class="set-n" style="margin-top:2px;">'+entEsc(x.designationRaw||x.designation)+
+          (x.appointed_on?' &middot; appointed '+ccFmtDate(x.appointed_on):'')+
+          (dup?' &middot; <span style="color:var(--warn)">already on the register</span>':'')+
+          '</div></span></label>';
+      }).join('')+
+      '<div class="set-n" style="margin-top:12px;">'+entEsc(d.note||'')+'</div>'+
+      '<div class="cc-headbtns" style="margin-top:16px;justify-content:flex-end;">'+
+        '<button class="cc-btn" onclick="dirImportClose()">Cancel</button>'+
+        '<button class="cc-btn-primary" id="dir-imp-go" onclick="dirImportSave()">Add selected</button>'+
+      '</div>');
+  }catch(e){
+    dirImportModal('<div class="reg-err">'+entEsc(e.message||String(e))+'</div>');
+  }
+}
+
+var DIR_IMPORT = [];
+
+function dirImportModal(inner){
+  var old = document.getElementById('dir-imp'); if(old) old.remove();
+  var mo = document.createElement('div');
+  mo.className='cd-modal'; mo.id='dir-imp'; mo.style.display='flex';
+  mo.onclick = function(e){ if(e.target===mo) dirImportClose(); };
+  mo.innerHTML = '<div class="cd-inner" style="max-width:620px;"><div class="cd-body">'+
+    '<div class="cd-head"><div><h2 style="font-size:19px;font-weight:800;color:var(--navy);">'+
+      'Import directors</h2>'+
+      '<div style="font-size:12.5px;color:var(--ink-soft);margin-top:3px;">From a licensed MCA data provider</div></div>'+
+      '<button onclick="dirImportClose()" style="background:none;border:none;color:var(--ink-soft);cursor:pointer;font-size:26px;line-height:1;">&times;</button></div>'+
+    '<div id="dir-imp-body">'+inner+'</div></div></div>';
+  document.body.appendChild(mo);
+}
+function dirImportClose(){ var m=document.getElementById('dir-imp'); if(m) m.remove(); }
+
+async function dirImportSave(){
+  var boxes = [].slice.call(document.querySelectorAll('#dir-imp input[type=checkbox]'));
+  var chosen = boxes.filter(function(b){ return b.checked; })
+                    .map(function(b){ return DIR_IMPORT[+b.getAttribute('data-i')]; });
+  if(!chosen.length){ dirImportClose(); return; }
+  var btn = document.getElementById('dir-imp-go');
+  if(btn){ btn.disabled = true; btn.textContent = 'Adding…'; }
+  var cid = regCompany('directors');
+  var recs = chosen.map(function(x){
+    return {user_id: CURRENT_USER ? CURRENT_USER.id : null, company_id: cid,
+            name: x.name || '(unnamed)', din: x.din || null,
+            designation: x.designation || 'director',
+            appointed_on: x.appointed_on || null, cessation_on: x.cessation_on || null,
+            notes: 'Imported from ' + (x.source || 'MCA data provider')};
+  });
+  try{
+    var r = await supaClient.from('directors').insert(recs);
+    if(r.error) throw new Error(r.error.message);
+    dirImportClose();
+    REG_DATA['directors'] = null;
+    if(typeof lgLoadRegisters === 'function') await lgLoadRegisters();
+    regRender('directors');
+    if(typeof renderCommandCenter === 'function') renderCommandCenter();
+  }catch(e){
+    var b = document.getElementById('dir-imp-body');
+    if(b) b.insertAdjacentHTML('afterbegin','<div class="reg-err">'+entEsc(e.message)+'</div>');
+    if(btn){ btn.disabled = false; btn.textContent = 'Add selected'; }
+  }
+}
+
+// ═══════════════════════════════════════════════════
 // GOVERNANCE REGISTERS
 // ═══════════════════════════════════════════════════
 // Directors, shareholders, meetings and law changes are the same object: a
@@ -6408,6 +6546,8 @@ function regRender(key){
     '<h1 class="cc-h1">'+cfg.title+'</h1>'+
     '<p class="cc-sub">'+cfg.sub+'</p></div>'+
     '<div class="cc-headbtns">'+entSel+
+      (key === 'directors'
+        ? '<button class="cc-btn" onclick="dirImport()">Import from MCA</button>' : '')+
       '<button class="cc-btn-primary" onclick="regOpen('+lgArg(key)+')">+ '+cfg.addLabel+'</button>'+
     '</div></div>';
 
