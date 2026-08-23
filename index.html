@@ -123,6 +123,16 @@
 .cc-topgrid{display:grid;grid-template-columns:340px 1fr;gap:18px;margin-bottom:18px;}
 @media(max-width:1100px){.cc-topgrid{grid-template-columns:1fr;}}
 
+/* Drafted output — resolutions, notices, minutes. .reshead and .rescopy were
+   applied on five elements each and styled nowhere; .resbody had only a
+   font-size rule inside a media query, so it read as defined while having no
+   base rule at all. The result was an unstyled document with the Copy button
+   dropped below the labels as a browser-default grey box. */
+.resbody{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(11,18,32,.05),0 8px 24px rgba(11,18,32,.04);}
+.reshead{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;background:var(--bg);border-bottom:1px solid var(--line);}
+.rescopy{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:9px;font-family:'Manrope';font-weight:600;font-size:12.5px;cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--ink-mid);white-space:nowrap;transition:.14s;}
+.rescopy:hover{border-color:var(--blue);color:var(--blue);}
+.rescontent{padding:20px 22px;font-size:14px;line-height:1.75;}
 .cc-card{background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 3px rgba(11,18,32,.05),0 8px 24px rgba(11,18,32,.04);}
 .cc-health{display:flex;flex-direction:column;align-items:center;padding:26px 18px 20px;}
 .cc-gauge{position:relative;width:220px;height:220px;}
@@ -945,7 +955,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v64">
+      <meta id="build-version" content="v65">
     </div>
   </div>
   <div class="cc-search">
@@ -2519,10 +2529,12 @@ function renderForms(){
   var nBasic = FORMS_MASTER.forms.filter(function(x){return x.detailLevel==='basic';}).length;
 
   var html =
-    '<div class="cc-head"><h1>Forms &amp; Filings Master</h1>'+
-    '<p class="cc-sub">Every form and prescribed filing currently in force under the '+
-      'Companies Act 2013, SEBI LODR and SEBI PIT — what it is for, who must file it, '+
-      'and by when. Withdrawn forms are excluded unless you ask for them.</p></div>'+
+    '<div class="cc-pagehead"><div>'+
+      '<div class="cc-crumb">Intelligence &rsaquo; Forms &amp; Filings</div>'+
+      '<h1 class="cc-h1">Forms &amp; Filings Master</h1>'+
+      '<p class="cc-sub">Every form and prescribed filing currently in force under the '+
+      'Companies Act 2013, SEBI LODR and SEBI PIT &mdash; what it is for, who must file it, '+
+      'and by when. Withdrawn forms are not listed.</p></div></div>'+
 
     '<div class="cu-summary">'+
       '<div class="cu-sum-chip" onclick="fmSet(\'detail\',\'\')"><b>'+
