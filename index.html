@@ -145,6 +145,9 @@
 .cc-hl i{width:9px;height:9px;border-radius:3px;display:block;}
 
 .cc-metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;align-content:start;}
+.cc-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.cc-dot.ok{background:var(--ok);} .cc-dot.warn{background:var(--warn);}
+.cc-hint{font-size:11.5px;font-weight:600;color:var(--warn);background:var(--warn-wash);padding:2px 8px;border-radius:6px;margin-left:8px;}
 .cc-strip{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}
 .cc-stat{display:inline-flex;align-items:baseline;gap:6px;padding:8px 14px;background:var(--paper);border:1px solid var(--line);border-radius:10px;font-size:12.5px;color:var(--ink-mid);cursor:pointer;transition:.14s;}
 .cc-stat:hover{border-color:var(--blue);color:var(--blue);}
@@ -971,7 +974,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v68">
+      <meta id="build-version" content="v69">
     </div>
   </div>
   <div class="cc-search">
@@ -5400,7 +5403,7 @@ function ccComputeStats(){
     manualConfirmation:0, verificationPending:0, partiallyVerified:0,
     dueNow:0, overdueConfirmed:0, notFound:0, unknown:0, dueIn30:0,
     pastDue:0, awaitingConfirmation:0, evidenceOnRecord:0,
-    byState:{}, items:[], late:[], agenda:[], standingNames:[],
+    byState:{}, items:[], late:[], agenda:[], standingNames:[], filed:[],
     // legacy aliases kept so older callers do not break
     compliant:0, atRisk:0, breach:0, overdue:0
   };
@@ -5448,6 +5451,20 @@ function ccComputeStats(){
         law:r.law, owner:r.owner, due:r.due, days:days, risk:r.risk,
         penalty:r.penalty, state:st.state
       };
+      // Anything with a filing record against it, whatever its confirmation
+      // state — the done list is about what was recorded, not about whether an
+      // outside source has since vouched for it.
+      if(st.filing){
+        stats.filed.push({
+          company:c.name, entityId:c.id, key:r.key,
+          obligation:r.obligation, form:r.form, section:r.section, law:r.law,
+          due:r.due, filedOn:st.filing.filingDate,
+          reference:st.filing.reference || st.filing.exchangeRef || null,
+          late:!!st.late, state:st.state, confidence:st.confidence,
+          hasDocument:!!st.document
+        });
+      }
+
       if(st.state === 'STANDING'){
         if(stats.standingNames.length < 6) stats.standingNames.push(r.obligation);
       } else if(!claimed && days < 0 && days !== 9999){
@@ -5468,6 +5485,12 @@ function ccComputeStats(){
     });
   });
   // What the CS actually has to do something about today.
+  // Most recently filed first; anything with no date recorded sinks.
+  stats.filed.sort(function(a,b){
+    return String(b.filedOn || '').localeCompare(String(a.filedOn || ''));
+  });
+  stats.filedLateCount = stats.filed.filter(function(f){ return f.late; }).length;
+
   stats.late.sort(function(a,b){ return a.days - b.days; });          // most overdue first
   stats.agenda.sort(function(a,b){ return a.days - b.days; });        // soonest first
 
@@ -5615,7 +5638,37 @@ function renderCommandCenter(){
       '</div>'+
     '</div>';
   });
-  if(!lateHtml) lateHtml = '<div class="cc-none">Nothing is past its date.</div>';
+  if(!lateHtml) lateHtml = '<div class="cc-none">Nothing is past its date with no filing recorded.</div>';
+
+  // ── what has been filed ────────────────────────────────────────
+  var filedHtml = '';
+  s.filed.slice(0, 8).forEach(function(it){
+    filedHtml += '<div class="cc-att-row">'+
+      '<span class="cc-dot '+(it.late ? 'warn' : 'ok')+'"></span>'+
+      '<div class="cc-att-main">'+
+        '<div class="cc-att-title">'+entEsc(it.obligation)+
+          (ccForm(it.form) ? ' <span class="cc-att-code mono">'+entEsc(ccForm(it.form))+'</span>' : '')+'</div>'+
+        '<div class="cc-att-meta">'+entEsc(it.company)+' &middot; '+entEsc(it.section)+
+          (it.reference ? ' &middot; <span class="mono">'+entEsc(it.reference)+'</span>'
+                        : ' &middot; no reference recorded')+'</div>'+
+      '</div>'+
+      '<div class="cc-att-right">'+
+        '<div class="cc-att-due mono">'+(it.filedOn ? ccFmtDate(it.filedOn) : 'date not recorded')+
+          // A colour alone does not tell you how late. Say it.
+          (it.filedOn && it.due
+            ? (it.late
+                ? ' <span style="color:var(--warn);">&middot; '+ccDaysBetween(it.due,it.filedOn)+'d late</span>'
+                : ' <span style="color:var(--ok);">&middot; on time</span>')
+            : '')+'</div>'+
+        '<div class="cc-rowacts">'+lgPill(it.state)+
+          '<a class="cc-link" onclick="lgWhy('+lgArg(it.entityId)+','+lgArg(it.key)+')">Why?</a></div>'+
+      '</div>'+
+    '</div>';
+  });
+  if(!filedHtml) filedHtml =
+    '<div class="cc-none">Nothing recorded yet. Open any obligation and use '+
+    '<b>Record filing</b> &mdash; the date and reference you enter show up here, '+
+    'and the obligation leaves the past-due list.</div>';
 
   // ── what is coming ─────────────────────────────────────────────
   var agHtml = '';
@@ -5657,10 +5710,21 @@ function renderCommandCenter(){
   '<div class="cc-card" style="margin-top:16px;">'+
     '<div class="cc-card-h"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+
       '<path d="M12 3l9 16H3L12 3z"/><path d="M12 10v4" stroke-linecap="round"/></svg>'+
-      'Past due'+(s.late.length?' &mdash; '+ccPlural(s.late.length,'item','items'):'')+'</h3>'+
+      'Past due, nothing recorded'+(s.late.length?' &mdash; '+ccPlural(s.late.length,'item','items'):'')+'</h3>'+
       (s.late.length>8?'<span class="cc-link" onclick="ccGo(\'vstatus\',\'OVERDUE,NOT_FOUND,VERIFICATION_UNAVAILABLE\')">View all</span>':'')+
     '</div>'+
     '<div class="cc-card-b">'+lateHtml+'</div>'+
+  '</div>'+
+
+  // The two halves of "where do we actually stand", side by side.
+  '<div class="cc-card" style="margin-top:16px;">'+
+    '<div class="cc-card-h"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+
+      '<path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
+      'Filed &amp; recorded'+(s.filed.length?' &mdash; '+ccPlural(s.filed.length,'item','items'):'')+
+      (s.filedLateCount?' <span class="cc-hint">'+s.filedLateCount+' after the due date</span>':'')+'</h3>'+
+      (s.filed.length>8?'<span class="cc-link" onclick="ccGo(\'vstatus\',\'FILED,FILED_LATE,MANUAL_CONFIRMATION,FILED_PENDING,AWAITING_CHECK\')">View all</span>':'')+
+    '</div>'+
+    '<div class="cc-card-b">'+filedHtml+'</div>'+
   '</div>'+
 
   '<div class="cc-card" style="margin-top:16px;">'+
@@ -5699,6 +5763,13 @@ function renderCommandCenter(){
 // The rules data uses '-', an en dash and an em dash interchangeably for
 // "no form". Testing against only one of them printed a stray dash in the
 // Form column of every row that had no form.
+// Whole days between two ISO dates. Both are plain YYYY-MM-DD, so parsing them
+// as UTC midnight gives an exact difference with no timezone drift.
+function ccDaysBetween(a,b){
+  var pa=String(a).split('-').map(Number), pb=String(b).split('-').map(Number);
+  return Math.round((Date.UTC(pb[0],pb[1]-1,pb[2]) - Date.UTC(pa[0],pa[1]-1,pa[2]))/86400000);
+}
+
 function ccForm(f){
   var t = String(f == null ? '' : f).trim();
   return (t === '' || t === '-' || t === '–' || t === '—') ? '' : t;
