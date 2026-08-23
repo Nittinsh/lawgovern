@@ -1173,7 +1173,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v85">
+      <meta id="build-version" content="v87">
     </div>
   </div>
   <div class="cc-search">
@@ -1223,6 +1223,8 @@ input[type="text"], input[type="password"], textarea, select {
 <div class="navitem" onclick="sw('shareholders')" id="t-shareholders"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg><span>Shareholders</span></div>
 <div class="navitem" onclick="sw('meetings')" id="t-meetings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Board &amp; Meetings</span></div>
 <div class="navitem" onclick="sw('internal')" id="t-internal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg><span>Internal Compliance</span></div>
+<div class="navitem" onclick="sw('filings')" id="t-filings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11l5 5v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M15 4v5h5M8 14h8M8 17h5"/></svg><span>Filings &amp; Records</span></div>
+<div class="navitem" onclick="sw('documents')" id="t-documents"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Documents</span></div>
 <div class="navitem" onclick="sw('approvals')" id="t-approvals"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Approvals</span><span class="nav-badge" id="nav-approvals-n" style="display:none">0</span></div>
 <div class="navhead">Document Studio</div>
 <div class="navitem" onclick="sw('res')" id="t-res"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg><span>Resolutions</span></div>
@@ -1334,6 +1336,8 @@ input[type="text"], input[type="password"], textarea, select {
 </div>
 
 <!-- FORM FINDER PANEL -->
+<div class="panel" id="p-filings"><div class="cc-tool"><div id="fil-root"></div></div></div>
+<div class="panel" id="p-documents"><div class="cc-tool"><div id="doc-root"></div></div></div>
 <div class="panel" id="p-directors"><div class="cc-tool"><div id="reg-root-directors"></div></div></div>
 <div class="panel" id="p-shareholders"><div class="cc-tool"><div id="reg-root-shareholders"></div></div></div>
 <div class="panel" id="p-meetings"><div class="cc-tool"><div id="reg-root-meetings"></div></div></div>
@@ -2589,6 +2593,8 @@ function sw(id) {
   if (id==='ff' && typeof renderForms==='function') renderForms();
   if (id==='tracker' && typeof trkRenderSources==='function') trkRenderSources();
   if (id==='penalty' && typeof renderPenalties==='function') renderPenalties();
+  if (id==='filings' && typeof renderFilings==='function') renderFilings();
+  if (id==='documents' && typeof renderDocuments==='function') renderDocuments();
   if (id==='approvals' && typeof renderApprovals==='function') renderApprovals();
   if (id==='audit' && typeof renderAudit==='function') renderAudit();
   if (id==='settings' && typeof renderSettings==='function') renderSettings();
@@ -6045,6 +6051,189 @@ function ccSyncHeaderEntity(){
 }
 
 // ═══════════════════════════════════════════════════
+// FILINGS & RECORDS
+// ═══════════════════════════════════════════════════
+// Every filing recorded against an obligation, across all entities. The data
+// already existed on compliance_status; there was nowhere to see it whole.
+var FIL_F = {entity:'', timing:'', q:''};
+
+function renderFilings(){
+  var root = document.getElementById('fil-root');
+  if(!root) return;
+  var s = ccComputeStats();
+  var all = s.filed || [];
+
+  var rows = all.filter(function(f){
+    if(FIL_F.entity && f.company !== FIL_F.entity) return false;
+    if(FIL_F.timing === 'late' && !f.late) return false;
+    if(FIL_F.timing === 'ontime' && f.late) return false;
+    if(FIL_F.timing === 'nodoc' && f.hasDocument) return false;
+    if(FIL_F.timing === 'noref' && f.reference) return false;
+    if(FIL_F.q){
+      var q = FIL_F.q.toLowerCase();
+      if((f.obligation+' '+f.company+' '+(f.reference||'')+' '+(f.section||'')).toLowerCase().indexOf(q) < 0)
+        return false;
+    }
+    return true;
+  });
+
+  var entities = {};
+  all.forEach(function(f){ entities[f.company] = 1; });
+
+  var head = '<div class="cc-pagehead"><div>'+
+    '<div class="cc-crumb">Workspace &rsaquo; Filings &amp; Records</div>'+
+    '<h1 class="cc-h1">Filings &amp; Records</h1>'+
+    '<p class="cc-sub">Every filing recorded against an obligation. These are your own records: '+
+    'no outside source has confirmed them, so none is shown as verified.</p></div></div>';
+
+  if(!all.length){
+    root.innerHTML = head + '<div class="cc-empty"><h2>Nothing recorded yet</h2>'+
+      '<p>Use <b>Record filing</b> on any obligation. What you enter appears here with its date, '+
+      'reference and whether it went in on time.</p>'+
+      '<button class="cc-btn-primary" onclick="sw(\'universe\')">Open the register</button></div>';
+    return;
+  }
+
+  var nLate = all.filter(function(f){ return f.late; }).length;
+  var nNoRef = all.filter(function(f){ return !f.reference; }).length;
+  var nNoDoc = all.filter(function(f){ return !f.hasDocument; }).length;
+
+  var filters = '<div class="cu-filters">'+
+    '<div class="cu-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+
+      '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>'+
+      '<input id="fil-q" placeholder="Obligation, entity or reference" value="'+entEsc(FIL_F.q)+'" '+
+      'oninput="FIL_F.q=this.value;renderFilings();"></div>'+
+    (Object.keys(entities).length > 1
+      ? '<select onchange="FIL_F.entity=this.value;renderFilings();"><option value="">All entities</option>'+
+        Object.keys(entities).sort().map(function(e){
+          return '<option value="'+entEsc(e)+'"'+(FIL_F.entity===e?' selected':'')+'>'+entEsc(e)+'</option>';
+        }).join('')+'</select>' : '')+
+    '<select onchange="FIL_F.timing=this.value;renderFilings();">'+
+      ['','ontime','late','noref','nodoc'].map(function(v){
+        var l = {'':'All records','ontime':'On time','late':'Filed late',
+                 'noref':'No reference recorded','nodoc':'No document attached'}[v];
+        return '<option value="'+v+'"'+(FIL_F.timing===v?' selected':'')+'>'+l+'</option>';
+      }).join('')+'</select>'+
+    '<button class="cu-clear" onclick="FIL_F={entity:\'\',timing:\'\',q:\'\'};renderFilings();">Clear</button>'+
+  '</div>';
+
+  var chips = '<div class="cu-summary">'+
+    '<div class="cu-sum-chip" onclick="FIL_F.timing=\'\';renderFilings();"><b>'+all.length+'</b> recorded</div>'+
+    '<div class="cu-sum-chip warn" onclick="FIL_F.timing=\'late\';renderFilings();"><b>'+nLate+'</b> filed late</div>'+
+    '<div class="cu-sum-chip" onclick="FIL_F.timing=\'noref\';renderFilings();"><b>'+nNoRef+'</b> without a reference</div>'+
+    '<div class="cu-sum-chip" onclick="FIL_F.timing=\'nodoc\';renderFilings();"><b>'+nNoDoc+'</b> without a document</div>'+
+  '</div>';
+
+  var body = rows.length
+    ? '<div class="cu-tablewrap"><table class="cu-table"><thead><tr>'+
+      '<th>Obligation</th><th>Entity</th><th>Filed on</th><th>Due</th><th>Reference</th>'+
+      '<th>Timing</th><th>Status</th></tr></thead><tbody>'+
+      rows.map(function(f){
+        return '<tr onclick="lgWhy('+lgArg(f.entityId)+','+lgArg(f.key)+')">'+
+          '<td data-label="Obligation"><div class="cu-oblig">'+entEsc(f.obligation)+'</div>'+
+            (ccForm(f.form)?'<div class="cu-oblig-sub mono">'+entEsc(ccForm(f.form))+'</div>':'')+'</td>'+
+          '<td data-label="Entity">'+entEsc(f.company)+'</td>'+
+          '<td data-label="Filed on" class="mono">'+(f.filedOn?ccFmtDate(f.filedOn):'—')+'</td>'+
+          '<td data-label="Due" class="mono">'+(f.due?ccFmtDate(f.due):'—')+'</td>'+
+          '<td data-label="Reference" class="mono">'+(f.reference?entEsc(f.reference):
+            '<span style="color:var(--ink-soft)">none</span>')+'</td>'+
+          '<td data-label="Timing">'+(f.due&&f.filedOn
+            ? (f.late?'<span style="color:var(--warn);font-weight:600;">'+
+                ccDaysBetween(f.due,f.filedOn)+'d late</span>'
+                    :'<span style="color:var(--ok);font-weight:600;">On time</span>')
+            : '<span style="color:var(--ink-soft)">—</span>')+'</td>'+
+          '<td data-label="Status">'+lgPill(f.state)+'</td></tr>';
+      }).join('')+'</tbody></table></div>'+
+      '<div class="cu-foot">Showing '+rows.length+' of '+ccPlural(all.length,'record','records')+'.</div>'
+    : '<div class="cc-card"><div class="cc-card-b"><div class="cc-none">Nothing matches those filters.</div></div></div>';
+
+  root.innerHTML = head + chips + filters + body;
+}
+
+// ═══════════════════════════════════════════════════
+// DOCUMENTS
+// ═══════════════════════════════════════════════════
+// The private evidence bucket, listed with the retention and consent trail
+// db/007 records. Links are short-lived signed URLs; the bucket is never public.
+function docRows(){
+  var out = [];
+  if(typeof CLIENTS === 'undefined') return out;
+  CLIENTS.forEach(function(c){
+    var rows = [];
+    try{ rows = getComplianceChart(c); }catch(e){ return; }
+    rows.forEach(function(r){
+      var ev = (c.chart && c.chart[r.key]) || {};
+      if(!ev.evidenceFile) return;
+      var st = lgResolveStatus(r, c);
+      out.push({company:c.name, entityId:c.id, key:r.key, obligation:r.obligation,
+                path:ev.evidenceFile, name:lgFileLabel(ev.evidenceFile),
+                retention:ev.docRetention || 'permanent',
+                expires:ev.docExpiresAt || null,
+                expired:(typeof lgDocExpired === 'function') ? lgDocExpired(ev) : false,
+                consentBy:ev.docConsentBy || null,
+                uploadedBy:ev.recordedBy || ev.verifiedBy || null,
+                state:st.state});
+    });
+  });
+  return out;
+}
+
+function renderDocuments(){
+  var root = document.getElementById('doc-root');
+  if(!root) return;
+  var docs = docRows();
+
+  var head = '<div class="cc-pagehead"><div>'+
+    '<div class="cc-crumb">Workspace &rsaquo; Documents</div>'+
+    '<h1 class="cc-h1">Documents</h1>'+
+    '<p class="cc-sub">Files attached to obligations, held in a private bucket. Links are signed '+
+    'and expire after five minutes &mdash; nothing here is publicly reachable.</p></div>'+
+    '<div class="cc-headbtns">'+
+      '<button class="cc-btn" onclick="lgPurgeExpired().then(renderDocuments)">Purge expired</button>'+
+    '</div></div>';
+
+  if(!docs.length){
+    root.innerHTML = head + '<div class="cc-empty"><h2>No documents attached</h2>'+
+      '<p>Attach a file when you record a filing and it is listed here with who uploaded it, '+
+      'how long it is kept, and who consented to it being stored.</p>'+
+      '<button class="cc-btn-primary" onclick="sw(\'universe\')">Open the register</button></div>';
+    return;
+  }
+
+  var nTemp = docs.filter(function(d){ return d.retention === 'temporary'; }).length;
+  var nExp  = docs.filter(function(d){ return d.expired; }).length;
+
+  root.innerHTML = head +
+    '<div class="cu-summary">'+
+      '<div class="cu-sum-chip"><b>'+docs.length+'</b> stored</div>'+
+      '<div class="cu-sum-chip"><b>'+nTemp+'</b> on a retention limit</div>'+
+      (nExp?'<div class="cu-sum-chip crit"><b>'+nExp+'</b> past their retention date</div>':'')+
+    '</div>'+
+    '<div class="cu-tablewrap"><table class="cu-table"><thead><tr>'+
+      '<th>File</th><th>Obligation</th><th>Entity</th><th>Retention</th><th>Uploaded by</th><th></th>'+
+    '</tr></thead><tbody>'+
+    docs.map(function(d){
+      return '<tr'+(d.expired?' style="opacity:.55;"':'')+'>'+
+        '<td data-label="File"><div class="cu-oblig">'+entEsc(d.name)+'</div></td>'+
+        '<td data-label="Obligation">'+entEsc(d.obligation)+'</td>'+
+        '<td data-label="Entity">'+entEsc(d.company)+'</td>'+
+        '<td data-label="Retention">'+(d.retention === 'temporary'
+          ? '<span style="color:var(--warn)">Until '+entEsc(String(d.expires||'').slice(0,10))+'</span>'
+          : 'Kept until deleted')+
+          (d.expired?' <span class="cmd-chip crit">expired</span>':'')+'</td>'+
+        '<td data-label="Uploaded by">'+entEsc(d.uploadedBy||'—')+
+          (d.consentBy?'<div class="cu-oblig-sub">consent: '+entEsc(d.consentBy)+'</div>':'')+'</td>'+
+        '<td data-label="" style="text-align:right;white-space:nowrap;">'+
+          (d.expired ? '<span style="font-size:11.5px;color:var(--ink-soft)">past retention</span>'
+                     : '<a class="cc-link" onclick="lgOpenEvidence('+lgArg(d.path)+')">Open</a>')+
+        '</td></tr>';
+    }).join('')+
+    '</tbody></table></div>'+
+    '<div class="cu-foot">'+ccPlural(docs.length,'document','documents')+
+    '. A file past its retention date is treated as gone before the purge runs.</div>';
+}
+
+// ═══════════════════════════════════════════════════
 // GOVERNANCE REGISTERS
 // ═══════════════════════════════════════════════════
 // Directors, shareholders, meetings and law changes are the same object: a
@@ -6707,6 +6896,15 @@ function renderSettings(){
           return '<label class="set-chk"><input type="checkbox"'+(on?' checked':'')+
             ' onchange="ccCardToggle('+lgArg(c.id)+',this.checked)"> '+entEsc(c.label)+'</label>';
         }).join('')+
+      '</div>'+
+    '</div>'+
+
+    '<div class="cc-card" style="max-width:720px;">'+
+      '<div class="cc-card-h"><h3>Database</h3></div>'+
+      '<div class="cc-card-b">'+
+        '<div class="set-n" style="margin-bottom:11px;">Checks every migration has landed and each '+
+        'table is readable. Run it after applying a new SQL file.</div>'+
+        '<button class="cc-btn" onclick="lgSystemCheck()">Run system check</button>'+
       '</div>'+
     '</div>'+
 
@@ -9010,6 +9208,46 @@ async function lgSystemCheck(){
       rows.push(lgCheckRow('Document storage (005)','fail', entEsc(bm)));
       if(/bucket|not found/i.test(bm))
         notes.push('Run <b>db/005_maker_checker_and_documents.sql</b> — it creates the evidence bucket.');
+    }
+  }
+
+  // ── 6b2. governance registers (010) and director attributes (011) ──
+  if(supaClient && CURRENT_USER){
+    var regs = [['directors','Directors & KMP'],['shareholders','Shareholders'],
+                ['meetings','Board & Meetings'],['law_changes','Change Tracker']];
+    var regMissing = false;
+    for(var ri=0; ri<regs.length; ri++){
+      try{
+        var rr = await supaClient.from(regs[ri][0]).select('id').limit(1);
+        if(rr.error) throw rr.error;
+        rows.push(lgCheckRow(regs[ri][1]+' (010)','ok', regs[ri][0]+' readable'));
+      }catch(e){
+        var rm = (e && e.message) || String(e);
+        rows.push(lgCheckRow(regs[ri][1]+' (010)','fail', entEsc(rm)));
+        if(/does not exist|schema cache/i.test(rm)) regMissing = true;
+      }
+    }
+    if(regMissing) notes.push('Run <b>db/010_governance_registers.sql</b> in the Supabase SQL editor.');
+
+    // 011 splits the person attribute out of designation. Without it a woman
+    // who is also an independent director cannot be recorded, and one of the
+    // two Section 149 tests reports a breach that is not real.
+    try{
+      var dw = await supaClient.from('directors').select('is_woman').limit(1);
+      if(dw.error) throw dw.error;
+      rows.push(lgCheckRow('Director attributes (011)','ok','is_woman present'));
+      var legacy = await supaClient.from('directors').select('id').eq('designation','woman_director');
+      var nleg = (!legacy.error && legacy.data) ? legacy.data.length : 0;
+      if(nleg) {
+        rows.push(lgCheckRow('Legacy designation','warn',
+          ccPlural(nleg,'director','directors')+' still on the old woman_director value'));
+        notes.push('Re-run <b>db/011_director_attributes.sql</b> — it carries those rows across.');
+      }
+    }catch(e){
+      var wm = (e && e.message) || String(e);
+      rows.push(lgCheckRow('Director attributes (011)','fail', entEsc(wm)));
+      if(/does not exist|schema cache|column/i.test(wm))
+        notes.push('Run <b>db/011_director_attributes.sql</b> in the Supabase SQL editor.');
     }
   }
 
