@@ -944,7 +944,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v58">
+      <meta id="build-version" content="v59">
     </div>
   </div>
   <div class="cc-search">
@@ -5124,6 +5124,10 @@ function ccComputeStats(){
   return stats;
 }
 
+// "across all 1 entities" reads badly. Singular/plural, and the count is
+// dropped entirely when there is only one thing to count.
+function ccPlural(n, one, many){ return n + ' ' + (n === 1 ? one : many); }
+
 function ccHealthLabel(score){
   // This is EVIDENCE COVERAGE — the share of obligations we can vouch for.
   // It is deliberately not called compliance: the system cannot verify filings.
@@ -5221,7 +5225,7 @@ function renderCommandCenter(){
   '<div class="cc-pagehead">'+
     '<div><div class="cc-crumb">Intelligence › Dashboard</div>'+
     '<h1 class="cc-h1">Compliance Dashboard</h1>'+
-    '<p class="cc-sub">Know what applies · what\'s due · what changed · what to do — across all '+s.entities+' entities.</p></div>'+
+    '<p class="cc-sub">Know what applies · what\'s due · what changed · what to do — '+(s.entities === 1 ? 'for your entity' : 'across all '+s.entities+' entities')+'.</p></div>'+
     '<div class="cc-headbtns"><button class="cc-btn" onclick="sw(\'entities\')">Manage entities</button>'+
     '<button class="cc-btn-primary" onclick="sw(\'chat\')">◈ Ask AI</button></div>'+
   '</div>'+
@@ -5244,7 +5248,7 @@ function renderCommandCenter(){
     '</div>'+
 
     '<div class="cc-metrics">'+
-      ccMetric('blue','Total compliances',s.totalObligations,'across '+s.entities+' entities','',"ccGo('','')")+
+      ccMetric('blue','Total compliances',s.totalObligations,'across '+ccPlural(s.entities,'entity','entities'),'',"ccGo('','')")+
       ccMetric('ok','Filed / verified',s.verified,(s.verified>0?'confirmed by a source':'none source-confirmed'),'ok',"ccGo('vstatus','FILED')")+
       ccMetric('warn','Verification pending',s.verificationPending,'reference recorded, unconfirmed','warn',"ccGo('vstatus','FILED_PENDING')")+
       ccMetric('warn','Due',s.dueThisWeek,'due now or within 7 days','warn',"ccGo('vstatus','DUE_SOON')")+
@@ -5446,7 +5450,7 @@ function renderUniverse(){
     '<div class="cc-pagehead">'+
       '<div><div class="cc-crumb">Intelligence › Compliance Universe</div>'+
       '<h1 class="cc-h1">Compliance Universe</h1>'+
-      '<p class="cc-sub">Master register of <b>'+all.length+'</b> applicable obligations across <b>'+Object.keys(entities).length+'</b> entities.</p></div>'+
+      '<p class="cc-sub">Master register of <b>'+all.length+'</b> applicable obligations across <b>'+Object.keys(entities).length+'</b> '+(Object.keys(entities).length===1?'entity':'entities')+'.</p></div>'+
       '<div class="cc-headbtns"><button class="cc-btn" onclick="cuExport()">↓ Export CSV</button></div>'+
     '</div>'+
     '<div class="cu-summary">'+
