@@ -145,6 +145,16 @@
 .cc-hl i{width:9px;height:9px;border-radius:3px;display:block;}
 
 .cc-metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;align-content:start;}
+.cc-strip{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}
+.cc-stat{display:inline-flex;align-items:baseline;gap:6px;padding:8px 14px;background:var(--paper);border:1px solid var(--line);border-radius:10px;font-size:12.5px;color:var(--ink-mid);cursor:pointer;transition:.14s;}
+.cc-stat:hover{border-color:var(--blue);color:var(--blue);}
+.cc-stat b{font-family:'IBM Plex Mono';font-size:16px;font-weight:800;color:var(--navy);}
+.cc-stat.crit b{color:var(--crit);} .cc-stat.warn b{color:var(--warn);} .cc-stat.ok b{color:var(--ok);}
+.cc-rowacts{display:flex;gap:10px;justify-content:flex-end;margin-top:3px;font-size:11.5px;}
+.cc-none{text-align:center;padding:22px 4px;color:var(--ink-soft);font-size:13px;}
+.cc-taglist{display:flex;flex-wrap:wrap;gap:7px;}
+.cc-tag{font-size:12px;color:var(--ink-mid);background:var(--bg);border:1px solid var(--line);padding:5px 10px;border-radius:8px;}
+.cc-tag-more{color:var(--ink-soft);}
 .cc-quiet{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-top:14px;padding:11px 15px;background:var(--bg);border:1px solid var(--line);border-radius:11px;font-size:12.5px;color:var(--ink-mid);}
 .cc-quiet b{font-family:'IBM Plex Mono';font-size:15px;color:var(--navy);}
 .cc-quiet-note{color:var(--ink-soft);flex:1;min-width:180px;}
@@ -472,6 +482,9 @@ body.nav-locked{overflow:hidden;}
   .cu-table tr:hover{background:var(--paper);}
   .cu-table td{padding:3px 0;border:none;display:flex;justify-content:space-between;align-items:center;gap:10px;}
   .cu-table td:first-child{border-bottom:1px solid var(--line-soft);padding-bottom:8px;margin-bottom:6px;display:block;}
+  /* A cell with no value should not contribute a labelled empty row when the
+     table stacks into cards. */
+  .cu-table td:empty{display:none;}
   .cu-table td::before{content:attr(data-label);font-size:11px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.03em;}
   .cu-table td:first-child::before{display:none;}
   .cu-oblig{font-size:14px;}
@@ -958,7 +971,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v67">
+      <meta id="build-version" content="v68">
     </div>
   </div>
   <div class="cc-search">
@@ -5387,7 +5400,7 @@ function ccComputeStats(){
     manualConfirmation:0, verificationPending:0, partiallyVerified:0,
     dueNow:0, overdueConfirmed:0, notFound:0, unknown:0, dueIn30:0,
     pastDue:0, awaitingConfirmation:0, evidenceOnRecord:0,
-    byState:{}, items:[],
+    byState:{}, items:[], late:[], agenda:[], standingNames:[],
     // legacy aliases kept so older callers do not break
     compliant:0, atRisk:0, breach:0, overdue:0
   };
@@ -5426,8 +5439,24 @@ function ccComputeStats(){
       if(days >= 0 && days <= 30 && st.state !== 'STANDING' &&
          lgStateMeta(st.state).asserts !== 'compliant') stats.dueIn30++;
 
-      // Attention list: anything past due or close to it, that we cannot vouch for.
       var claimed = (lgStateMeta(st.state).asserts === 'compliant');
+
+      // The two lists the dashboard actually reads from.
+      var entry = {
+        company:c.name, entityId:c.id, key:r.key,
+        obligation:r.obligation, form:r.form, section:r.section,
+        law:r.law, owner:r.owner, due:r.due, days:days, risk:r.risk,
+        penalty:r.penalty, state:st.state
+      };
+      if(st.state === 'STANDING'){
+        if(stats.standingNames.length < 6) stats.standingNames.push(r.obligation);
+      } else if(!claimed && days < 0 && days !== 9999){
+        stats.late.push(entry);
+      } else if(!claimed && days >= 0 && days <= 90){
+        stats.agenda.push(entry);
+      }
+
+      // Attention list: anything past due or close to it, that we cannot vouch for.
       if(!claimed && st.state !== 'STANDING' && days <= 45){
         stats.items.push({
           company:c.name, entityId:c.id, key:r.key,
@@ -5439,6 +5468,9 @@ function ccComputeStats(){
     });
   });
   // What the CS actually has to do something about today.
+  stats.late.sort(function(a,b){ return a.days - b.days; });          // most overdue first
+  stats.agenda.sort(function(a,b){ return a.days - b.days; });        // soonest first
+
   // Past due, however it is described. OVERDUE and NOT_FOUND both need a live
   // connector; VERIFICATION_UNAVAILABLE is the only one reachable today, so a
   // tile bound to any single one of them would read 0 forever.
@@ -5559,82 +5591,117 @@ function renderCommandCenter(){
     return;
   }
 
-  var uname = (typeof CURRENT_USER!=='undefined' && CURRENT_USER) ? (CURRENT_USER.email||'') : '';
-  var health = s.health;
-  var hLabel = ccHealthLabel(health), hColor = ccHealthColor(health);
+  var entityLine = s.entities === 1
+    ? (CLIENTS[0] ? CLIENTS[0].name : 'your entity')
+    : ccPlural(s.entities, 'entity', 'entities');
 
-  // Attention items (max 6)
-  var attHtml = '';
-  s.items.slice(0,6).forEach(function(it){
-    attHtml += '<div class="cc-att-row">'+
-      ccSig(it.risk,it.days)+
+  // ── what is late ───────────────────────────────────────────────
+  var lateHtml = '';
+  s.late.slice(0, 8).forEach(function(it){
+    lateHtml += '<div class="cc-att-row">'+
+      ccSig(it.risk, it.days)+
       '<div class="cc-att-main">'+
-        '<div class="cc-att-title">'+it.obligation+(it.form&&it.form!=='—'?' <span class="cc-att-code mono">'+it.form+'</span>':'')+'</div>'+
-        '<div class="cc-att-meta">'+it.company+' · '+it.section+' · Owner: '+it.owner+
-          (it.entityId!==undefined?' · <a class="cc-link" style="cursor:pointer;" onclick="lgWhy('+
-            lgArg(it.entityId)+','+lgArg(it.key)+')">Why?</a>':'')+'</div>'+
+        '<div class="cc-att-title">'+entEsc(it.obligation)+
+          (ccForm(it.form) ? ' <span class="cc-att-code mono">'+entEsc(ccForm(it.form))+'</span>' : '')+'</div>'+
+        '<div class="cc-att-meta">'+entEsc(it.company)+' &middot; '+entEsc(it.section)+
+          ' &middot; was due '+ccFmtDate(it.due)+' &middot; nothing recorded</div>'+
       '</div>'+
-      '<div class="cc-att-right"><div class="cc-att-due mono">'+ccFmtDate(it.due)+'</div>'+ccTag(it.days)+'</div>'+
+      '<div class="cc-att-right">'+
+        '<div class="cc-att-due mono" style="color:var(--crit);">'+Math.abs(it.days)+'d late</div>'+
+        '<div class="cc-rowacts">'+
+          '<a class="cc-link" onclick="lgRecordOpen('+lgArg(it.entityId)+','+lgArg(it.key)+')">Record filing</a>'+
+          '<a class="cc-link" onclick="lgWhy('+lgArg(it.entityId)+','+lgArg(it.key)+')">Why?</a>'+
+        '</div>'+
+      '</div>'+
     '</div>';
   });
-  if(!attHtml) attHtml = '<div style="text-align:center;padding:30px;color:var(--ink-soft);font-size:13px;">✓ Nothing urgent in the next 45 days. You\'re in good shape.</div>';
+  if(!lateHtml) lateHtml = '<div class="cc-none">Nothing is past its date.</div>';
+
+  // ── what is coming ─────────────────────────────────────────────
+  var agHtml = '';
+  s.agenda.slice(0, 12).forEach(function(it){
+    var soon = it.days <= 7;
+    agHtml += '<tr onclick="cuOpenDetail('+lgArg(it.entityId)+','+lgArg(it.key)+')">'+
+      '<td data-label="Date" class="mono" style="white-space:nowrap;'+(soon?'color:var(--warn);font-weight:700;':'')+'">'+
+        ccFmtDate(it.due)+'</td>'+
+      '<td data-label="Obligation"><div class="cu-oblig">'+entEsc(it.obligation)+'</div>'+
+        '<div class="cu-oblig-sub">'+entEsc(it.company)+' &middot; '+entEsc(it.section)+'</div></td>'+
+      '<td data-label="Form" class="mono" style="white-space:nowrap;">'+
+        entEsc(ccForm(it.form))+'</td>'+
+      '<td data-label="In" class="mono" style="white-space:nowrap;'+(soon?'color:var(--warn);font-weight:700;':'color:var(--ink-soft);')+'">'+
+        it.days+'d</td></tr>';
+  });
 
   root.innerHTML =
   '<div class="cc-pagehead">'+
-    '<div><div class="cc-crumb">Intelligence › Dashboard</div>'+
+    '<div><div class="cc-crumb">Intelligence &rsaquo; Dashboard</div>'+
     '<h1 class="cc-h1">Compliance Dashboard</h1>'+
-    '<p class="cc-sub">Know what applies · what\'s due · what changed · what to do — '+(s.entities === 1 ? 'for your entity' : 'across all '+s.entities+' entities')+'.</p></div>'+
+    '<p class="cc-sub">'+entEsc(entityLine)+' &middot; '+
+      ccPlural(s.totalObligations,'applicable obligation','applicable obligations')+'</p></div>'+
     '<div class="cc-headbtns"><button class="cc-btn" onclick="sw(\'entities\')">Manage entities</button>'+
-    '<button class="cc-btn-primary" onclick="sw(\'chat\')">◈ Ask AI</button></div>'+
+    '<button class="cc-btn-primary" onclick="sw(\'chat\')">&#9670; Ask AI</button></div>'+
   '</div>'+
 
-  '<div class="cc-topgrid">'+
-    '<div class="cc-card cc-health">'+
-      '<div class="cc-gauge">'+ccRenderGauge(s)+
-        '<div class="cc-gauge-center">'+
-          '<div class="cc-gauge-score" style="color:var(--navy);">'+s.needAction+'</div>'+
-          '<div class="cc-gauge-max">'+(s.needAction===1?'needs action':'need action')+'</div>'+
-          '<div class="cc-gauge-label" style="color:var(--ink-soft);">of '+s.totalObligations+' tracked</div>'+
-        '</div>'+
-      '</div>'+
-      '<div class="cc-legend">'+
-        '<div class="cc-hl"><i style="background:var(--ok)"></i>Filed '+s.verified+'</div>'+
-        '<div class="cc-hl"><i style="background:#93C5FD"></i>Scheduled '+s.upcoming+'</div>'+
-        '<div class="cc-hl"><i style="background:var(--warn)"></i>Due soon '+s.dueThisWeek+'</div>'+
-        '<div class="cc-hl"><i style="background:#CBD5E1"></i>To confirm '+(s.noEvidence+s.unverified+s.needsCheck)+'</div>'+
-        // Without this the legend accounted for 24 of 52 and the rest just vanished.
-        '<div class="cc-hl"><i style="background:#E2E8F0"></i>Ongoing '+s.standing+'</div>'+
-      '</div>'+
-    '</div>'+
-
-    '<div class="cc-metrics">'+
-      ccMetric('crit','Past due',s.pastDue,
-        (s.pastDue ? 'no filing recorded &mdash; chase or record it' : 'nothing past its date'),
-        (s.pastDue?'crit':''),"ccGo('vstatus','OVERDUE,NOT_FOUND,VERIFICATION_UNAVAILABLE')")+
-      ccMetric('warn','Due in 30 days',s.dueIn30,
-        (s.dueThisWeek ? '<b>'+s.dueThisWeek+'</b> of them within 7 days' : 'none inside a week'),
-        (s.dueIn30?'warn':''),"ccGo('within','30')")+
-      ccMetric('cyan','Awaiting confirmation',s.awaitingConfirmation,
-        'recorded, not yet confirmed','',"ccGo('vstatus','AWAITING_CHECK,CHECK_REJECTED,FILED_PENDING')")+
-      ccMetric('ok','Evidence on record',s.evidenceOnRecord,
-        'of '+s.totalObligations+' applicable',(s.evidenceOnRecord?'ok':''),
-        "ccGo('vstatus','FILED,FILED_LATE,MANUAL_CONFIRMATION,FILED_PENDING,AWAITING_CHECK')")+
-    '</div>'+
-    // Not a tile. 28 of 52 obligations for a private company sit here, and none
-    // of them needs doing today — a number that large deserves saying, but not
-    // a card competing with the four that are actionable.
-    '<div class="cc-quiet">'+
-      '<span>Ongoing / event-driven <b>'+s.standing+'</b></span>'+
-      '<span class="cc-quiet-note">No fixed date &mdash; always in force, or starts when the event occurs.</span>'+
-      '<span class="cc-link" onclick="ccGo(\'vstatus\',\'STANDING\')">Show</span>'+
-    '</div>'+
+  // One line, not four cards. Each figure opens the register filtered to it.
+  '<div class="cc-strip">'+
+    '<span class="cc-stat'+(s.late.length?' crit':'')+'" onclick="ccGo(\'vstatus\',\'OVERDUE,NOT_FOUND,VERIFICATION_UNAVAILABLE\')">'+
+      '<b>'+s.late.length+'</b> past due</span>'+
+    '<span class="cc-stat'+(s.agenda.length?' warn':'')+'" onclick="ccGo(\'within\',\'90\')">'+
+      '<b>'+s.agenda.length+'</b> in the next 90 days</span>'+
+    '<span class="cc-stat" onclick="ccGo(\'vstatus\',\'STANDING\')">'+
+      '<b>'+s.standing+'</b> ongoing</span>'+
+    '<span class="cc-stat'+(s.evidenceOnRecord?' ok':'')+'" onclick="ccGo(\'vstatus\',\'FILED,FILED_LATE,MANUAL_CONFIRMATION,FILED_PENDING,AWAITING_CHECK\')">'+
+      '<b>'+s.evidenceOnRecord+'</b> with a filing on record</span>'+
   '</div>'+
 
-  '<div class="cc-card cc-attention">'+
-    '<div class="cc-card-h"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3L12 3z"/><path d="M12 10v4" stroke-linecap="round"/></svg>Requires your attention</h3>'+
-    '<span class="cc-link" onclick="sw(\'mywork\')">View all</span></div>'+
-    '<div class="cc-card-b">'+attHtml+'</div>'+
+  '<div class="cc-card" style="margin-top:16px;">'+
+    '<div class="cc-card-h"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+
+      '<path d="M12 3l9 16H3L12 3z"/><path d="M12 10v4" stroke-linecap="round"/></svg>'+
+      'Past due'+(s.late.length?' &mdash; '+ccPlural(s.late.length,'item','items'):'')+'</h3>'+
+      (s.late.length>8?'<span class="cc-link" onclick="ccGo(\'vstatus\',\'OVERDUE,NOT_FOUND,VERIFICATION_UNAVAILABLE\')">View all</span>':'')+
+    '</div>'+
+    '<div class="cc-card-b">'+lateHtml+'</div>'+
+  '</div>'+
+
+  '<div class="cc-card" style="margin-top:16px;">'+
+    '<div class="cc-card-h"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+
+      '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>'+
+      'Next 90 days</h3>'+
+      '<span class="cc-link" onclick="sw(\'cal\')">Open calendar</span></div>'+
+    (agHtml
+      ? '<div class="cu-tablewrap" style="border:none;box-shadow:none;border-radius:0;">'+
+        '<table class="cu-table"><thead><tr><th>Date</th><th>Obligation</th><th>Form</th><th>In</th>'+
+        '</tr></thead><tbody>'+agHtml+'</tbody></table></div>'+
+        (s.agenda.length>12?'<div class="cu-foot">Showing 12 of '+s.agenda.length+'. '+
+          '<a class="cc-link" onclick="ccGo(\'within\',\'90\')">See the rest</a></div>':'')
+      : '<div class="cc-card-b"><div class="cc-none">Nothing falls due in the next 90 days.</div></div>')+
+  '</div>'+
+
+  // Nearly a third of the register lives here and none of it is dated. Naming a
+  // few makes it obvious what kind of duty this is, rather than an opaque count.
+  '<div class="cc-card" style="margin-top:16px;">'+
+    '<div class="cc-card-h"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+
+      '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round"/></svg>'+
+      'Ongoing &amp; event-driven &mdash; '+s.standing+'</h3>'+
+      '<span class="cc-link" onclick="ccGo(\'vstatus\',\'STANDING\')">View all</span></div>'+
+    '<div class="cc-card-b">'+
+      '<div class="cc-none" style="text-align:left;padding:0 0 10px;">No fixed date: these run continuously, '+
+        'or the clock starts when the event happens.</div>'+
+      '<div class="cc-taglist">'+
+        s.standingNames.map(function(n){ return '<span class="cc-tag">'+entEsc(n)+'</span>'; }).join('')+
+        (s.standing > s.standingNames.length
+          ? '<span class="cc-tag cc-tag-more">+'+(s.standing - s.standingNames.length)+' more</span>' : '')+
+      '</div>'+
+    '</div>'+
   '</div>';
+}
+
+// The rules data uses '-', an en dash and an em dash interchangeably for
+// "no form". Testing against only one of them printed a stray dash in the
+// Form column of every row that had no form.
+function ccForm(f){
+  var t = String(f == null ? '' : f).trim();
+  return (t === '' || t === '-' || t === '–' || t === '—') ? '' : t;
 }
 
 function ccMetric(color,label,value,sub,vClass,action){
