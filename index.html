@@ -1173,7 +1173,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v84">
+      <meta id="build-version" content="v85">
     </div>
   </div>
   <div class="cc-search">
@@ -4529,17 +4529,27 @@ function regDerivedRows(c, ctx){
   // stated outright rather than left unverified.
   if(dirs.length){
     var minNeeded = c.type === 'opc' ? 1 : (c.type === 'public' || c.type === 'listed') ? 3 : 2;
-    var women = dirs.filter(function(d){ return d.designation === 'woman_director'; }).length;
-    var indep = dirs.filter(function(d){ return d.designation === 'independent'; }).length;
-    var problems = [];
+    // A person can be a woman AND independent AND managing director. These are
+    // three separate tests over the same board, not one enum.
+    var women     = dirs.filter(function(d){ return d.is_woman; }).length;
+    var indep     = dirs.filter(function(d){ return d.designation === 'independent'; }).length;
+    var indepWomen= dirs.filter(function(d){ return d.is_woman && d.designation === 'independent'; }).length;
+    var problems = [], review = [];
     if(dirs.length < minNeeded)
       problems.push('Board has '+dirs.length+' director'+(dirs.length===1?'':'s')+
                     '; Section 149(1) requires at least '+minNeeded+'.');
     if(c.type === 'listed' && !women)
-      problems.push('No woman director recorded; the proviso to Section 149(1) requires one.');
+      problems.push('No woman director recorded; the second proviso to Section 149(1) requires one.');
     if(c.type === 'listed' && indep < Math.ceil(dirs.length/3))
       problems.push('Independent directors: '+indep+' of '+Math.ceil(dirs.length/3)+
                     ' required under Section 149(4).');
+    // Whether the entity is in the top 1000 by market capitalisation is not
+    // something this app knows, so this is raised for review rather than
+    // asserted as a breach.
+    if(c.type === 'listed' && women && !indepWomen)
+      review.push('A woman director is on the board but none is independent. If this entity is in '+
+                  'the top 1000 by market capitalisation, LODR Reg 17(1) requires an independent '+
+                  'woman director.');
     rows.push({
       key:'board-composition',
       law:'Companies Act 2013', section:'Sec 149', form:'-',
@@ -4548,7 +4558,10 @@ function regDerivedRows(c, ctx){
       penalty:'Rs.50,000 + Rs.500/day continuing',
       derived:'directors',
       shortfall: problems.length ? problems.join(' ') : null,
-      derivedNote: problems.length ? problems.join(' ') : 'Meets the minimum strength on record.'
+      review: review.length ? review.join(' ') : null,
+      derivedNote: problems.length ? problems.join(' ')
+                 : review.length ? review.join(' ')
+                 : 'Meets the composition requirements on record.'
     });
   }
 
@@ -6049,7 +6062,7 @@ var LG_REG = {
        hint:'8 digits. Leave blank for a KMP without a DIN.'},
       {f:'designation', l:'Designation', t:'select', list:true, def:'director',
        opts:[['director','Director'],['independent','Independent Director'],
-             ['woman_director','Woman Director'],['managing_director','Managing Director'],
+             ['managing_director','Managing Director'],
              ['whole_time','Whole-time Director'],['nominee','Nominee Director'],
              ['additional','Additional Director'],['alternate','Alternate Director'],
              ['cs','Company Secretary'],['cfo','CFO'],['ceo','CEO'],['manager','Manager']]},
@@ -6059,6 +6072,10 @@ var LG_REG = {
       {f:'din_kyc_on',  l:'Last DIR-3 KYC', t:'date', list:true,
        hint:'DIR-3 KYC is due by 30 September each year for every DIN holder.'},
       {f:'email',       l:'Email',       t:'text'},
+      {f:'is_woman',    l:'Woman director', t:'bool', list:true,
+       hint:'Kept separate from the designation on purpose. The second proviso to Sec 149(1) '+
+            'requires a woman director, and LODR Reg 17(1) requires one who is ALSO independent '+
+            'for the top 1000 listed entities — a person who has to be both at once.'},
       {f:'is_kmp',      l:'Is KMP under Sec 203', t:'bool'},
       {f:'notes',       l:'Notes',       t:'textarea'}
     ]
@@ -8231,6 +8248,8 @@ var LG_STATE = {
   // Derived from the practice's own register, so it states a fact rather than
   // a status we cannot verify.
   SHORTFALL:         {label:'Below the requirement',        tone:'crit',    asserts:'none',      sourceBacked:false},
+  // The test depends on a fact the app does not hold, so it is put to a person.
+  NEEDS_REVIEW:      {label:'Needs review',                tone:'warn',    asserts:'none',      sourceBacked:false},
   UNKNOWN:           {label:'Unknown',                     tone:'neutral', asserts:'none',      sourceBacked:false},
 
   // Maker-checker, when the policy is switched on.
@@ -8418,6 +8437,14 @@ function lgResolveStatus(row, company){
     out.late = (days !== null && _fd !== null && _fd > days);
     out.state = out.autoState = 'FILED_PENDING';
     out.confidence = 'low';
+    return out;
+  }
+
+  // Raised for review: the test depends on something the app does not know,
+  // so it is surfaced without asserting a breach.
+  if(row.review && !row.shortfall){
+    out.state = out.autoState = 'NEEDS_REVIEW';
+    out.confidence = 'medium';
     return out;
   }
 
