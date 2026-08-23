@@ -955,7 +955,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v65">
+      <meta id="build-version" content="v66">
     </div>
   </div>
   <div class="cc-search">
@@ -5379,7 +5379,7 @@ function ccComputeStats(){
     totalObligations:0, dueThisWeek:0, upcoming:0,
     entities: (typeof CLIENTS!=='undefined'?CLIENTS.length:0),
     // Evidence-based counters. "verified" is the ONLY one that claims compliance.
-    verified:0, filedLate:0, noEvidence:0, unverified:0, needsCheck:0, notApplicable:0,
+    verified:0, filedLate:0, noEvidence:0, unverified:0, needsCheck:0, notApplicable:0, standing:0,
     awaitingCheck:0, rejected:0, missingDoc:0,
     manualConfirmation:0, verificationPending:0, partiallyVerified:0,
     dueNow:0, overdueConfirmed:0, notFound:0, unknown:0,
@@ -5408,6 +5408,7 @@ function ccComputeStats(){
       else if(st.state==='PARTIALLY_VERIFIED'){ stats.partiallyVerified++; }
       else if(st.state==='AWAITING_CHECK'){ stats.awaitingCheck++; }
       else if(st.state==='CHECK_REJECTED'){ stats.rejected++; }
+      else if(st.state==='STANDING'){ stats.standing++; }
       else if(st.state==='UPCOMING'){ stats.upcoming++; }
       else if(st.state==='DUE_SOON'){ stats.dueThisWeek++; }
       else if(st.state==='DUE'){ stats.dueThisWeek++; stats.dueNow++; }
@@ -5418,7 +5419,7 @@ function ccComputeStats(){
 
       // Attention list: anything past due or close to it, that we cannot vouch for.
       var claimed = (lgStateMeta(st.state).asserts === 'compliant');
-      if(!claimed && days <= 45){
+      if(!claimed && st.state !== 'STANDING' && days <= 45){
         stats.items.push({
           company:c.name, entityId:c.id, key:r.key,
           obligation:r.obligation, form:r.form, section:r.section,
@@ -5429,6 +5430,8 @@ function ccComputeStats(){
     });
   });
   // What the CS actually has to do something about today.
+  // Standing and upcoming duties are deliberately absent: neither needs doing
+  // today. `unknown` stays in, because a genuine gap IS something to look at.
   stats.needAction = stats.dueThisWeek + stats.notFound + stats.unverified +
                      stats.overdueConfirmed + stats.unknown +
                      stats.awaitingCheck + stats.rejected;
@@ -5578,6 +5581,8 @@ function renderCommandCenter(){
         '<div class="cc-hl"><i style="background:#93C5FD"></i>Scheduled '+s.upcoming+'</div>'+
         '<div class="cc-hl"><i style="background:var(--warn)"></i>Due soon '+s.dueThisWeek+'</div>'+
         '<div class="cc-hl"><i style="background:#CBD5E1"></i>To confirm '+(s.noEvidence+s.unverified+s.needsCheck)+'</div>'+
+        // Without this the legend accounted for 24 of 52 and the rest just vanished.
+        '<div class="cc-hl"><i style="background:#E2E8F0"></i>Ongoing '+s.standing+'</div>'+
       '</div>'+
     '</div>'+
 
@@ -6644,6 +6649,10 @@ var LG_STATE = {
   OVERDUE:           {label:'Overdue',                     tone:'crit',    asserts:'none',      sourceBacked:true},
   NOT_FOUND:         {label:'Not Found',                   tone:'warn',    asserts:'none',      sourceBacked:true},
   VERIFICATION_UNAVAILABLE:{label:'Verification Unavailable',tone:'neutral',asserts:'none',     sourceBacked:false},
+  // No due date because none is fixed: the duty runs continuously, or it starts
+  // when a trigger occurs. Asserts nothing and needs nothing today — counting
+  // these as "action required" overstated the workload by more than half.
+  STANDING:          {label:'Ongoing / event-driven',      tone:'neutral', asserts:'none',      sourceBacked:false},
   UNKNOWN:           {label:'Unknown',                     tone:'neutral', asserts:'none',      sourceBacked:false},
 
   // Maker-checker, when the policy is switched on.
@@ -6821,7 +6830,9 @@ function lgResolveStatus(row, company){
   }
 
   // ── 2. No filing record ────────────────────────────────────────
-  if(days === null){ out.state = out.autoState = 'UNKNOWN'; return out; }
+  // A duty with no due date is not an unknown; it is one that runs continuously
+  // or waits on a trigger. UNKNOWN is now reserved for a genuine gap.
+  if(days === null){ out.state = out.autoState = 'STANDING'; return out; }
   if(days  >  7)   { out.state = out.autoState = 'UPCOMING'; return out; }
   if(days  >  0)   { out.state = out.autoState = 'DUE_SOON'; return out; }
   if(days === 0)   { out.state = out.autoState = 'DUE';      return out; }
