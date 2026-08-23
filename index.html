@@ -144,7 +144,10 @@
 .cc-hl{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink-soft);font-weight:500;}
 .cc-hl i{width:9px;height:9px;border-radius:3px;display:block;}
 
-.cc-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-content:start;}
+.cc-metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;align-content:start;}
+.cc-quiet{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-top:14px;padding:11px 15px;background:var(--bg);border:1px solid var(--line);border-radius:11px;font-size:12.5px;color:var(--ink-mid);}
+.cc-quiet b{font-family:'IBM Plex Mono';font-size:15px;color:var(--navy);}
+.cc-quiet-note{color:var(--ink-soft);flex:1;min-width:180px;}
 @media(max-width:640px){.cc-metrics{grid-template-columns:1fr 1fr;}}
 .cc-metric{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:0 1px 2px rgba(11,18,32,.04);transition:.15s;}
 .cc-metric:hover{box-shadow:0 8px 24px rgba(11,18,32,.06);transform:translateY(-2px);}
@@ -955,7 +958,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v66">
+      <meta id="build-version" content="v67">
     </div>
   </div>
   <div class="cc-search">
@@ -5382,7 +5385,8 @@ function ccComputeStats(){
     verified:0, filedLate:0, noEvidence:0, unverified:0, needsCheck:0, notApplicable:0, standing:0,
     awaitingCheck:0, rejected:0, missingDoc:0,
     manualConfirmation:0, verificationPending:0, partiallyVerified:0,
-    dueNow:0, overdueConfirmed:0, notFound:0, unknown:0,
+    dueNow:0, overdueConfirmed:0, notFound:0, unknown:0, dueIn30:0,
+    pastDue:0, awaitingConfirmation:0, evidenceOnRecord:0,
     byState:{}, items:[],
     // legacy aliases kept so older callers do not break
     compliant:0, atRisk:0, breach:0, overdue:0
@@ -5417,6 +5421,11 @@ function ccComputeStats(){
       else if(st.state==='VERIFICATION_UNAVAILABLE'){ stats.unverified++; }
       else { stats.unknown++; }
 
+      // Everything landing inside a month, so "what is coming" is one number
+      // rather than a 7-day tile that reads 0 for three weeks out of four.
+      if(days >= 0 && days <= 30 && st.state !== 'STANDING' &&
+         lgStateMeta(st.state).asserts !== 'compliant') stats.dueIn30++;
+
       // Attention list: anything past due or close to it, that we cannot vouch for.
       var claimed = (lgStateMeta(st.state).asserts === 'compliant');
       if(!claimed && st.state !== 'STANDING' && days <= 45){
@@ -5430,6 +5439,18 @@ function ccComputeStats(){
     });
   });
   // What the CS actually has to do something about today.
+  // Past due, however it is described. OVERDUE and NOT_FOUND both need a live
+  // connector; VERIFICATION_UNAVAILABLE is the only one reachable today, so a
+  // tile bound to any single one of them would read 0 forever.
+  stats.pastDue = stats.overdueConfirmed + stats.notFound + stats.unverified;
+
+  // Recorded by someone, confirmed by nobody — the queue you work through.
+  stats.awaitingConfirmation = stats.awaitingCheck + stats.rejected + stats.verificationPending;
+
+  // Anything with a filing record against it, whatever its confirmation state.
+  stats.evidenceOnRecord = stats.verified + stats.manualConfirmation +
+                           stats.verificationPending + stats.awaitingCheck;
+
   // Standing and upcoming duties are deliberately absent: neither needs doing
   // today. `unknown` stays in, because a genuine gap IS something to look at.
   stats.needAction = stats.dueThisWeek + stats.notFound + stats.unverified +
@@ -5587,21 +5608,31 @@ function renderCommandCenter(){
     '</div>'+
 
     '<div class="cc-metrics">'+
-      ccMetric('blue','Total compliances',s.totalObligations,'across '+ccPlural(s.entities,'entity','entities'),'',"ccGo('','')")+
-      ccMetric('ok','Filed / verified',s.verified,(s.verified>0?'confirmed by a source':'none source-confirmed'),'ok',"ccGo('vstatus','FILED')")+
-      ccMetric('warn','Verification pending',s.verificationPending,'reference recorded, unconfirmed','warn',"ccGo('vstatus','FILED_PENDING')")+
-      ccMetric('warn','Due',s.dueThisWeek,'due now or within 7 days','warn',"ccGo('vstatus','DUE_SOON')")+
-      ccMetric('crit','Overdue',s.overdueConfirmed,(s.overdueConfirmed>0?'source confirms no filing':'none confirmed'),'crit',"ccGo('vstatus','OVERDUE')")+
-      ccMetric('warn','Not found',s.notFound,'source queried, nothing returned','warn',"ccGo('vstatus','NOT_FOUND')")+
-      ccMetric('cyan','Verification unavailable',s.unverified,'no source could be queried','',"ccGo('vstatus','VERIFICATION_UNAVAILABLE')")+
-      ccMetric('ok','Manual confirmation',s.manualConfirmation,'attested by an authorised user','ok',"ccGo('vstatus','MANUAL_CONFIRMATION')")+
-      ccMetric('blue','Entities',s.entities,'companies managed','',"sw('entities')")+
+      ccMetric('crit','Past due',s.pastDue,
+        (s.pastDue ? 'no filing recorded &mdash; chase or record it' : 'nothing past its date'),
+        (s.pastDue?'crit':''),"ccGo('vstatus','OVERDUE,NOT_FOUND,VERIFICATION_UNAVAILABLE')")+
+      ccMetric('warn','Due in 30 days',s.dueIn30,
+        (s.dueThisWeek ? '<b>'+s.dueThisWeek+'</b> of them within 7 days' : 'none inside a week'),
+        (s.dueIn30?'warn':''),"ccGo('within','30')")+
+      ccMetric('cyan','Awaiting confirmation',s.awaitingConfirmation,
+        'recorded, not yet confirmed','',"ccGo('vstatus','AWAITING_CHECK,CHECK_REJECTED,FILED_PENDING')")+
+      ccMetric('ok','Evidence on record',s.evidenceOnRecord,
+        'of '+s.totalObligations+' applicable',(s.evidenceOnRecord?'ok':''),
+        "ccGo('vstatus','FILED,FILED_LATE,MANUAL_CONFIRMATION,FILED_PENDING,AWAITING_CHECK')")+
+    '</div>'+
+    // Not a tile. 28 of 52 obligations for a private company sit here, and none
+    // of them needs doing today — a number that large deserves saying, but not
+    // a card competing with the four that are actionable.
+    '<div class="cc-quiet">'+
+      '<span>Ongoing / event-driven <b>'+s.standing+'</b></span>'+
+      '<span class="cc-quiet-note">No fixed date &mdash; always in force, or starts when the event occurs.</span>'+
+      '<span class="cc-link" onclick="ccGo(\'vstatus\',\'STANDING\')">Show</span>'+
     '</div>'+
   '</div>'+
 
   '<div class="cc-card cc-attention">'+
     '<div class="cc-card-h"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3L12 3z"/><path d="M12 10v4" stroke-linecap="round"/></svg>Requires your attention</h3>'+
-    '<span class="cc-link" onclick="sw(\'cl\')">View all</span></div>'+
+    '<span class="cc-link" onclick="sw(\'mywork\')">View all</span></div>'+
     '<div class="cc-card-b">'+attHtml+'</div>'+
   '</div>';
 }
@@ -5635,7 +5666,7 @@ function ccFmtDate(d){
 // COMPLIANCE UNIVERSE — master table of all obligations
 // ══════════════════════════════════════════════════════════
 // §19 filter set. vstatus / vmethod / listing are the verification-aware additions.
-var CU_FILTERS = { entity:'', law:'', risk:'', status:'', freq:'', q:'', vstatus:'', vmethod:'', listing:'' };
+var CU_FILTERS = { within:'', entity:'', law:'', risk:'', status:'', freq:'', q:'', vstatus:'', vmethod:'', listing:'' };
 var CU_SORT = { col:'due', dir:1 };
 
 function cuBuildRows(){
@@ -5760,7 +5791,10 @@ function renderUniverse(){
     if(f.risk && !(r.risk===f.risk || (f.risk==='high'&&(r.risk==='critical'||r.risk==='high')))) return false;
     if(f.status && r.status!==f.status) return false;
     if(f.freq && r.freq!==f.freq) return false;
-    if(f.vstatus && r.vstate!==f.vstatus) return false;
+    if(f.vstatus && f.vstatus.split(',').indexOf(r.vstate) < 0) return false;
+    if(f.within !== '' && f.within !== undefined && f.within !== null){
+      if(!(r.days >= 0 && r.days <= +f.within)) return false;
+    }
     if(f.vmethod && r.vmethod!==f.vmethod) return false;
     if(f.listing && r.listing!==f.listing) return false;
     if(f.q){
@@ -5830,7 +5864,7 @@ function renderUniverse(){
             if(f.entity  && r.entity !== f.entity) return;
             if(f.law     && cuLawShort(r.law) !== f.law) return;
             if(f.status  && r.status !== f.status) return;
-            if(f.vstatus && r.vstate !== f.vstatus) return;
+            if(f.vstatus && f.vstatus.split(',').indexOf(r.vstate) < 0) return;
             if(f.vmethod && r.vmethod !== f.vmethod) return;
             if(f.listing && r.listing !== f.listing) return;
             if(r.freq) counts[r.freq] = (counts[r.freq]||0)+1;
@@ -5910,7 +5944,7 @@ function cuSetFilter(k,v){ CU_FILTERS[k]=v; if(k==='q'){ // keep focus
   } else renderUniverse();
 }
 function cuQuick(k,v){ CU_FILTERS[k]=v; renderUniverse(); }
-function cuClear(){ CU_FILTERS={entity:'',law:'',risk:'',status:'',freq:'',q:'',vstatus:'', vmethod:'', listing:''}; renderUniverse(); }
+function cuClear(){ CU_FILTERS={within:'',entity:'',law:'',risk:'',status:'',freq:'',q:'',vstatus:'', vmethod:'', listing:''}; renderUniverse(); }
 function cuSort(col){ if(CU_SORT.col===col) CU_SORT.dir*=-1; else {CU_SORT.col=col;CU_SORT.dir=1;} renderUniverse(); }
 
 function cuOpenDetail(entityId,key){
