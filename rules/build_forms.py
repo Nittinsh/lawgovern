@@ -104,6 +104,67 @@ def law_of(form, category):
     return 'Companies Act 2013'
 
 
+# "Physical" described a filing mode MCA V3 no longer has, so the label is stale
+# wherever it appears. But it cannot simply become "e-Form": most rows carrying
+# it were never filings at all — registers kept at the registered office,
+# certificates the ROC issues to you, declarations annexed to some other form,
+# notices published in a newspaper. Calling those e-Forms would replace a stale
+# answer with a wrong one, so each is classified by what it actually is, from
+# the description already on the row. Anything the description does not place
+# is left explicitly unverified rather than guessed.
+TYPE_RULES = [
+    (r'\bregister of\b|\bregister\b[^.]*bought back',          'Register (kept at RO)'),
+    (r'certificate of incorporation|charge certificate|'
+     r'licen[cs]e issued|new incorporation certificate',        'Issued by ROC'),
+    (r'advertisement|newspaper',                                'Newspaper notice'),
+    (r'\bproxy\b|polling paper|scrutin',                        'Meeting document'),
+    (r'^(the )?(memorandum|articles) of association',           'Constitutional document'),
+    (r'^\s*(the )?format (of|for)|\breport\b[^.]*\bformat\b',   'Report format'),
+    (r'declaration|consent given|responsibility statement',     'Declaration / consent'),
+    (r'annexed|statement including|statements encapsulate|'
+     r'^\s*(the )?statement\b',                                'Statement (annexed)'),
+    (r'\bnotice\b|\bintimation\b',                              'Notice / intimation'),
+    (r'maintenance of the cost records',                        'Record kept by company'),
+]
+
+TYPE_NOTES = {
+    'Register (kept at RO)':
+        'Maintained at the registered office and produced on inspection \u2014 not filed with the ROC.',
+    'Issued by ROC':
+        'Issued to the company by the Registrar. Nothing is filed by you.',
+    'Newspaper notice':
+        'Published in the press; proof of publication is annexed to the related application.',
+    'Meeting document':
+        'Used at or around a general meeting. Not filed on its own.',
+    'Constitutional document':
+        'A constitutional document of the company, filed as an attachment where required.',
+    'Report format':
+        'The prescribed format of a report. It is annexed to the relevant filing, not filed alone.',
+    'Declaration / consent':
+        "A declaration or consent annexed to the filing it supports.",
+    'Statement (annexed)':
+        "Annexed to the financial statements or the Board's Report.",
+    'Notice / intimation':
+        'A notice or intimation. Check whether it is filed on MCA V3 or served directly.',
+    'Record kept by company':
+        'Maintained by the company; produced when called for.',
+    'Not verified':
+        'The source list marked this "Physical", a filing mode MCA V3 no longer has, and the '
+        'description does not say what it actually is. Confirm on the MCA portal before relying on it.',
+}
+
+
+def derive_type(form, old, desc, purpose):
+    o = str(old or '').strip().lower().replace('-', '').rstrip(',')
+    if o.startswith('eform'):
+        return 'e-Form (MCA V3)'
+    t = (str(desc or '') + ' ' + str(purpose or '')).lower()
+    for pat, label in TYPE_RULES:
+        if re.search(pat, t):
+            return label
+    return 'Not verified'
+
+
 def rows_of(path):
     """These files are sometimes a bare list, sometimes {meta, rules|events}."""
     d = json.load(io.open(path, encoding='utf-8'))
@@ -166,7 +227,8 @@ def main():
             'category': re.sub(r'^\d+\.\s*', '', row.get('category') or 'Other'),
             'law': law_of(form, row.get('category')),
             'referencedBy': sorted({t['law'] for t in trg if t.get('law')}),
-            'type': (row.get('type') or d.get('type') or '').strip().rstrip(',').lstrip('>') or 'e-Form',
+            'type': derive_type(form, (row.get('type') or d.get('type') or '').lstrip('>'),
+                                row.get('desc'), d.get('title')),
             # A form the rules call for but neither list describes still gets a
             # purpose — the obligation that calls for it, from the owner's own
             # sheet. Attributed via purposeFrom so it is never mistaken for the
@@ -175,6 +237,7 @@ def main():
                        or (trg[0]['obligation'] if trg else ''),
             'purposeFrom': ('official' if (d.get('title') or row.get('desc'))
                             else ('rule' if trg else '')),
+            'typeNote': None,   # filled in below, once type is known
             'description': row.get('desc') or '',
             'whenRequired': d.get('applies') or '',
             'timeline': d.get('timeline') or (trg[0]['timeline'] if trg else ''),
@@ -196,6 +259,8 @@ def main():
             rec['detailLevel'] = 'linked'
         else:
             rec['detailLevel'] = 'basic'
+
+        rec['typeNote'] = TYPE_NOTES.get(rec['type'])
 
         if note:
             rec['status'] = 'withdrawn'
