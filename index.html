@@ -415,6 +415,9 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 .cu-search input{border:none;background:none;outline:none;font-family:'Manrope';font-size:13px;color:var(--ink);width:100%;}
 .cu-filters select{font-family:'Manrope';font-size:12.5px;font-weight:500;color:var(--ink-mid);background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:8px 11px;cursor:pointer;outline:none;}
 .cu-filters select:hover{border-color:var(--blue);}
+.cu-na{font-family:'Manrope';font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:7px;border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);cursor:pointer;margin-left:6px;white-space:nowrap;transition:.14s;}
+.cu-na:hover{border-color:var(--ink-soft);color:var(--ink-mid);}
+.cu-na.on{background:var(--blue-wash);border-color:transparent;color:var(--blue);}
 .cu-clear{font-family:'Manrope';font-size:12.5px;font-weight:600;color:var(--red);background:var(--rose-bg);border:1px solid transparent;border-radius:9px;padding:8px 12px;cursor:pointer;}
 
 .cu-tablewrap{background:var(--paper);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(11,18,32,.05),0 8px 24px rgba(11,18,32,.04);}
@@ -1174,7 +1177,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v91">
+      <meta id="build-version" content="v94">
     </div>
   </div>
   <div class="cc-search">
@@ -4597,7 +4600,10 @@ function regDerivedRows(c, ctx){
   return rows;
 }
 
-function getComplianceChart(c){
+// opts.includeNA keeps obligations a user has marked not applicable. Only the
+// register (so they can be reinstated), the stats (so they can be counted) and
+// the marking dialog itself pass it — everything else should never see them.
+function getComplianceChart(c, opts){
   var y  = new Date().getFullYear();
 
   // fyend arrives either as 'MM-DD' (legacy) or 'YYYY-MM-DD' (Supabase date column).
@@ -4724,6 +4730,19 @@ function getComplianceChart(c){
     }
   }catch(e){ console.error('[registers]', e); }
 
+  // A user's "not applicable" overrides the engine, which cannot know whether
+  // this company accepts deposits, has a subsidiary or holds foreign assets.
+  // Applied here so every consumer inherits it rather than each re-checking.
+  var _chart = (c && c.chart) || {};
+  rows.forEach(function(r){
+    var ev = _chart[r.key];
+    if(ev && ev.notApplicable){
+      r.userNA = true;
+      r.naReason = ev.naReason || null;
+      r.naBy = ev.naBy || null;
+    }
+  });
+
   // Belt and braces against duplicates across the three generated sets.
   var seenKeys = {};
   rows = rows.filter(function(r){
@@ -4732,7 +4751,11 @@ function getComplianceChart(c){
     return true;
   });
 
-  return rows.filter(function(r){return r.applicable;});
+  return rows.filter(function(r){
+    if(!r.applicable) return false;
+    if(r.userNA && !(opts && opts.includeNA)) return false;
+    return true;
+  });
 }
 
 function daysLeft(dateStr){
@@ -5415,7 +5438,10 @@ async function loadCloudClients(){
           // §8/§9 document privacy (db/007). Absent until that migration runs.
           docStorage:s.doc_storage||null, docRetention:s.doc_retention||null,
           docExpiresAt:s.doc_expires_at||null,
-          docConsentBy:s.doc_consent_by||null, docConsentAt:s.doc_consent_at||null
+          docConsentBy:s.doc_consent_by||null, docConsentAt:s.doc_consent_at||null,
+          // Marked not applicable by a user (db/012). Absent until that runs.
+          notApplicable:s.not_applicable===true, naReason:s.na_reason||null,
+          naBy:s.na_by||null, naAt:s.na_at||null
         };
       });
     }
@@ -5866,9 +5892,10 @@ function ccComputeStats(){
   if(typeof CLIENTS==='undefined' || !CLIENTS.length) return stats;
   CLIENTS.forEach(function(c){
     var rows = [];
-    try{ rows = getComplianceChart(c); }catch(e){ return; }
+    try{ rows = getComplianceChart(c, {includeNA:true}); }catch(e){ return; }
     rows.forEach(function(r){
-      if(r.applicable===false){ stats.notApplicable++; return; }
+      // Out of the totals entirely: not pending, not due, not evidence-bearing.
+      if(r.applicable===false || r.userNA){ stats.notApplicable++; return; }
       stats.totalObligations++;
 
       // Single source of truth for status. Evidence decides; a date alone never does.
@@ -7775,16 +7802,18 @@ function ccFmtDate(d){
 // COMPLIANCE UNIVERSE — master table of all obligations
 // ══════════════════════════════════════════════════════════
 // §19 filter set. vstatus / vmethod / listing are the verification-aware additions.
-var CU_FILTERS = { within:'', entity:'', law:'', risk:'', status:'', freq:'', q:'', vstatus:'', vmethod:'', listing:'' };
+var CU_FILTERS = { na:'', within:'', entity:'', law:'', risk:'', status:'', freq:'', q:'', vstatus:'', vmethod:'', listing:'' };
 var CU_SORT = { col:'due', dir:1 };
 
 function cuBuildRows(){
   var all = [];
   if(typeof CLIENTS==='undefined' || !CLIENTS.length) return all;
   CLIENTS.forEach(function(c){
-    var rows=[]; try{ rows=getComplianceChart(c); }catch(e){ return; }
+    var rows=[]; try{ rows=getComplianceChart(c, {includeNA:true}); }catch(e){ return; }
     rows.forEach(function(r){
-      if(r.applicable===false) return;
+      // The engine's own "not applicable" stays out. A user's decision keeps the
+      // row, hidden by default but reachable — otherwise it could never be undone.
+      if(r.applicable===false && !r.userNA) return;
       // Single source of truth — the same resolver the dashboard uses, so the
       // table can never disagree with the metric cards.
       var st = lgResolveStatus(r, c);
@@ -7804,6 +7833,7 @@ function cuBuildRows(){
         vmethod:(st.verification && st.verification.method) || 'None',
         vsource:(st.verification && st.verification.source) || null,
         listing:(c.type==='listed' ? 'listed' : 'unlisted'),
+        userNA:!!r.userNA, naReason:r.naReason||null, naBy:r.naBy||null,
         // Generated rules carry their own frequency; cuFreq only knows the old
         // hardcoded keys and would label every one of them Annual.
         // Structural fallback: an obligation with no due date that matched no
@@ -7900,6 +7930,10 @@ function renderUniverse(){
     if(f.risk && !(r.risk===f.risk || (f.risk==='high'&&(r.risk==='critical'||r.risk==='high')))) return false;
     if(f.status && r.status!==f.status) return false;
     if(f.freq && r.freq!==f.freq) return false;
+    // Not applicable is a decision already taken; it should not sit in the way
+    // of the work. Shown only when explicitly asked for.
+    if(r.userNA && f.na !== 'show') return false;
+    if(f.na === 'only' && !r.userNA) return false;
     if(f.vstatus && f.vstatus.split(',').indexOf(r.vstate) < 0) return false;
     if(f.within !== '' && f.within !== undefined && f.within !== null){
       if(!(r.days >= 0 && r.days <= +f.within)) return false;
@@ -8030,10 +8064,18 @@ function renderUniverse(){
         '<td data-label="Due" class="mono cu-due">'+ccFmtDate(r.due)+'</td>'+
         '<td data-label="Risk">'+cuRiskPill(r.risk)+'</td>'+
         '<td data-label="Status">'+cuStatusPill(r.status,r.days)+'</td>'+
-        '<td data-label="" class="cu-act"><button onclick="event.stopPropagation();cuOpenDetail(\''+r.entityId+'\',\''+r.key+'\')">Open →</button></td>'+
+        '<td data-label="" class="cu-act">'+
+          '<button onclick="event.stopPropagation();cuOpenDetail('+lgArg(r.entityId)+','+lgArg(r.key)+')">Open &rarr;</button>'+
+          '<button class="cu-na'+(r.userNA?' on':'')+'" onclick="event.stopPropagation();lgNAOpen('+
+            lgArg(r.entityId)+','+lgArg(r.key)+')" title="'+
+            (r.userNA?'Put this back into the register':'Mark as not applying to this entity')+'">'+
+            (r.userNA?'Reinstate':'N/A')+'</button>'+
+        '</td>'+
       '</tr>';
     });
   }
+
+  var naCount = all.filter(function(x){ return x.userNA; }).length;
 
   var table=
     '<div class="cu-tablewrap"><table class="cu-table"><thead><tr>'+
@@ -8042,7 +8084,12 @@ function renderUniverse(){
       th('Risk','risk')+th('Status','status')+'<th></th>'+
     '</tr></thead><tbody>'+body+'</tbody></table></div>'+
     '<div class="cu-foot">Showing <b>'+rows.length+'</b> of '+
-      ccPlural(all.length,'obligation','obligations')+'</div>';
+      ccPlural(all.filter(function(x){return !x.userNA;}).length,'obligation','obligations')+
+      (naCount
+        ? ' &middot; <a class="cc-link" onclick="cuSetFilter(\'na\',\''+
+          (CU_FILTERS.na==='show'?'':'show')+'\')">'+
+          (CU_FILTERS.na==='show' ? 'hide' : 'show')+' '+naCount+' marked not applicable</a>'
+        : '')+'</div>';
 
   root.innerHTML = head + filters + table;
 }
@@ -8053,7 +8100,7 @@ function cuSetFilter(k,v){ CU_FILTERS[k]=v; if(k==='q'){ // keep focus
   } else renderUniverse();
 }
 function cuQuick(k,v){ CU_FILTERS[k]=v; renderUniverse(); }
-function cuClear(){ CU_FILTERS={within:'',entity:'',law:'',risk:'',status:'',freq:'',q:'',vstatus:'', vmethod:'', listing:''}; renderUniverse(); }
+function cuClear(){ CU_FILTERS={na:'',within:'',entity:'',law:'',risk:'',status:'',freq:'',q:'',vstatus:'', vmethod:'', listing:''}; renderUniverse(); }
 function cuSort(col){ if(CU_SORT.col===col) CU_SORT.dir*=-1; else {CU_SORT.col=col;CU_SORT.dir=1;} renderUniverse(); }
 
 function cuOpenDetail(entityId,key){
@@ -8920,9 +8967,12 @@ function lgResolveStatus(row, company){
     evidence: null, checkState: ev.checkState || 'unchecked', late: false
   };
 
-  if(row.applicable === false){
+  if(row.applicable === false || row.userNA){
     out.state = out.autoState = 'NOT_APPLICABLE';
     out.confidence = 'high';
+    out.naReason = row.naReason || null;
+    out.naBy = row.naBy || null;
+    out.userMarked = !!row.userNA;
     return out;
   }
 
@@ -9033,6 +9083,103 @@ function lgPill(code, extra){
 }
 
 // ── Evidence panel: "Why?" / "How do you know?" ──────────────────
+// ═══════════════════════════════════════════════════
+// NOT APPLICABLE
+// ═══════════════════════════════════════════════════
+// The engine works from company class, capital, turnover and listing status.
+// Whether a company accepts deposits, has a subsidiary, holds foreign assets or
+// issued debentures are facts it does not hold, so those obligations are
+// generated and someone who knows the company marks the ones that do not apply.
+//
+// Recorded as a decision — who, when, and why — not a deletion. The obligation
+// stays in the register and can be reinstated, because applicability changes
+// when the company does.
+function lgNAOpen(entityId, key){
+  var c = null;
+  if(typeof CLIENTS!=='undefined')
+    for(var i=0;i<CLIENTS.length;i++) if(String(CLIENTS[i].id)===String(entityId)) c = CLIENTS[i];
+  if(!c) return;
+  var row = null;
+  try{ getComplianceChart(c, {includeNA:true})
+        .forEach(function(r){ if(r.key===key) row = r; }); }catch(e){}
+  if(!row) return;
+
+  var already = !!row.userNA;
+  var old = document.getElementById('lg-na-modal'); if(old) old.remove();
+  var mo = document.createElement('div');
+  mo.className='cd-modal'; mo.id='lg-na-modal'; mo.style.display='flex';
+  mo.onclick=function(e){ if(e.target===mo) lgNAClose(); };
+
+  mo.innerHTML = '<div class="cd-inner" style="max-width:560px;"><div class="cd-body">'+
+    '<div class="cd-head"><div><h2 style="font-size:19px;font-weight:800;color:var(--navy);">'+
+      (already ? 'Reinstate this obligation' : 'Mark not applicable')+'</h2>'+
+      '<div style="font-size:12.5px;color:var(--ink-soft);margin-top:3px;">'+entEsc(c.name)+'</div></div>'+
+      '<button onclick="lgNAClose()" style="background:none;border:none;color:var(--ink-soft);cursor:pointer;font-size:26px;line-height:1;">&times;</button></div>'+
+    '<div class="cc-card" style="box-shadow:none;margin-bottom:14px;"><div class="cc-card-b">'+
+      '<div style="font-weight:600;color:var(--navy);font-size:13.5px;">'+entEsc(row.obligation)+'</div>'+
+      '<div style="font-size:12px;color:var(--ink-soft);margin-top:3px;">'+
+        entEsc(row.law||'')+(row.section?' &middot; <span class="mono">'+entEsc(row.section)+'</span>':'')+'</div>'+
+    '</div></div>'+
+    (already
+      ? '<div class="set-n">Marked not applicable'+
+          (row.naBy?' by '+entEsc(row.naBy):'')+
+          (row.naReason?'. Reason given: &ldquo;'+entEsc(row.naReason)+'&rdquo;':'')+
+        '. Reinstating puts it back into the register and it will be tracked again.</div>'
+      : '<label class="lg-label" for="lg-na-why">Why does this not apply?</label>'+
+        '<textarea id="lg-na-why" class="lg-field" style="width:100%;min-height:74px;resize:vertical;" '+
+          'placeholder="For example: the company has never accepted deposits; no subsidiary; no foreign assets."></textarea>'+
+        '<div class="reg-hint">Recorded against your name so the decision can be explained later. '+
+        'It stays in the register and can be reinstated at any time.</div>')+
+    '<div id="lg-na-err" class="reg-err" style="display:none;"></div>'+
+    '<div class="cc-headbtns" style="margin-top:18px;justify-content:flex-end;">'+
+      '<button class="cc-btn" onclick="lgNAClose()">Cancel</button>'+
+      (already
+        ? '<button class="cc-btn-primary" id="lg-na-go" onclick="lgNASave('+lgArg(entityId)+','+lgArg(key)+',false)">Reinstate</button>'
+        : '<button class="cc-btn-primary" id="lg-na-go" onclick="lgNASave('+lgArg(entityId)+','+lgArg(key)+',true)">Mark not applicable</button>')+
+    '</div></div></div>';
+  document.body.appendChild(mo);
+  var t = document.getElementById('lg-na-why'); if(t) t.focus();
+}
+
+function lgNAClose(){ var m=document.getElementById('lg-na-modal'); if(m) m.remove(); }
+
+async function lgNASave(entityId, key, on){
+  var why = '';
+  if(on){
+    why = (document.getElementById('lg-na-why')||{}).value || '';
+    if(!why.trim()){
+      var e = document.getElementById('lg-na-err');
+      if(e){ e.textContent = 'Give a reason — it is what makes this defensible later.'; e.style.display='block'; }
+      return;
+    }
+  }
+  var btn = document.getElementById('lg-na-go');
+  if(btn){ btn.disabled = true; btn.textContent = 'Saving…'; }
+  try{
+    await lgPersist(entityId, key, on
+      ? {notApplicable:true, naReason:why.trim(),
+         naBy:(CURRENT_USER&&CURRENT_USER.email)||'', naAt:new Date().toISOString()}
+      : {notApplicable:false, naReason:null, naBy:null, naAt:null});
+    lgNAClose();
+    lgRefreshAll();
+  }catch(err){
+    var e2 = document.getElementById('lg-na-err');
+    if(e2){
+      e2.textContent = /not_applicable|column/i.test(err.message)
+        ? 'Run db/012_not_applicable.sql in the Supabase SQL editor first.'
+        : err.message;
+      e2.style.display='block';
+    }
+    if(btn){ btn.disabled = false; btn.textContent = on ? 'Mark not applicable' : 'Reinstate'; }
+  }
+}
+
+// One place to re-render whatever is on screen after a change.
+function lgRefreshAll(){
+  var fns = ['renderCommandCenter','renderUniverse','renderMyWork','renderFilings','rc'];
+  fns.forEach(function(f){ try{ if(typeof window[f]==='function') window[f](); }catch(e){} });
+}
+
 function lgWhy(entityId, key){
   var c = null, row = null;
   if(typeof CLIENTS!=='undefined')
@@ -9324,6 +9471,12 @@ async function lgPersist(entityId, key, patch, quiet){
 
   if(c){
     if(!c.chart) c.chart={};
+    if(patch.notApplicable !== undefined){
+      if(!c.chart[key]) c.chart[key] = {};
+      c.chart[key].notApplicable = !!patch.notApplicable;
+      c.chart[key].naReason = patch.naReason || null;
+      c.chart[key].naBy = patch.naBy || null;
+    }
     c.chart[key] = Object.assign({}, c.chart[key]||{}, patch);
   }
   if(supaClient && CURRENT_USER){
@@ -9349,7 +9502,15 @@ async function lgPersist(entityId, key, patch, quiet){
         doc_retention:  patch.docRetention || null,
         doc_expires_at: patch.docExpiresAt || null,
         doc_consent_by: patch.docConsentBy || null,
-        doc_consent_at: patch.docConsentAt || null
+        doc_consent_at: patch.docConsentAt || null,
+        // db/012. Sent only when the patch mentions it, so recording a filing
+        // never quietly clears an applicability decision made earlier.
+        ...(patch.notApplicable !== undefined ? {
+          not_applicable: !!patch.notApplicable,
+          na_reason: patch.naReason || null,
+          na_by:     patch.naBy || null,
+          na_at:     patch.naAt || null
+        } : {})
       });
       var res = await supaClient.from('compliance_status').upsert(rec, {onConflict:'company_id,compliance_key'});
       if(res.error) throw res.error;
