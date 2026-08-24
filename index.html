@@ -239,7 +239,7 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 .cmd-chip.warn{background:var(--warn-wash);border-color:transparent;color:var(--warn);}
 .cmd-chip.info{background:var(--bg);color:var(--ink-soft);}
 
-.cmd-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-items:start;}
+.cmd-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-items:stretch;}
 .cmd-span2{grid-column:span 2;}
 @media(max-width:1250px){.cmd-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
 @media(max-width:760px){.cmd-grid{grid-template-columns:minmax(0,1fr);}.cmd-span2{grid-column:span 1;}}
@@ -250,7 +250,7 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 .cmd-card-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line-soft);}
 .cmd-card-h h3{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft);display:flex;align-items:center;gap:8px;}
 .cmd-card-h h3 svg{width:15px;height:15px;color:var(--crit);}
-.cmd-card-b{padding:14px 16px;flex:1;}
+.cmd-card-b{padding:14px 16px;flex:1;display:flex;flex-direction:column;}.cmd-card-b>.cc-none{margin:auto 0;}
 .cmd-foot{padding-top:10px;margin-top:auto;font-size:12px;}
 .cmd-note{padding:10px 16px 12px;font-size:11.5px;color:var(--ink-soft);border-top:1px solid var(--line-soft);}
 .cmd-help{width:16px;height:16px;border-radius:50%;background:var(--bg);border:1px solid var(--line);color:var(--ink-soft);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:help;flex-shrink:0;}
@@ -290,8 +290,8 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 /* immediate attention */
 .cmd-imm-t{font-size:16px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
 .cmd-imm-s{font-size:12px;color:var(--ink-soft);margin-top:3px;}
-.cmd-imm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:10px;overflow:hidden;margin-top:13px;}
-.cmd-imm-grid>div{background:var(--paper);padding:10px 12px;}
+.cmd-imm-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;border:1px solid var(--line-soft);border-radius:10px;overflow:hidden;margin-top:13px;}
+.cmd-imm-grid>div{background:var(--paper);padding:10px 12px;border-right:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft);}.cmd-imm-grid>div:nth-child(2n){border-right:none;}.cmd-imm-grid>div:nth-last-child(-n+2){border-bottom:none;}@media(min-width:900px){.cmd-imm-grid{grid-template-columns:repeat(4,minmax(0,1fr));}.cmd-imm-grid>div:nth-child(2n){border-right:1px solid var(--line-soft);}.cmd-imm-grid>div:nth-child(4n),.cmd-imm-grid>div:last-child{border-right:none;}.cmd-imm-grid>div{border-bottom:none;}}
 .cmd-imm-grid span{display:block;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px;}
 .cmd-imm-grid b{font-size:13px;font-weight:700;color:var(--navy);}
 .cmd-imm-grid b.crit{color:var(--crit);} .cmd-imm-grid b.warn{color:var(--warn);}
@@ -1174,7 +1174,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v89">
+      <meta id="build-version" content="v91">
     </div>
   </div>
   <div class="cc-search">
@@ -4172,6 +4172,24 @@ function lodrNext(month, day){
   if(cand < t) y += 1;
   return lodrFmt(y, month, day);
 }
+// The financial year in progress. With a 31 March year end, anything from
+// 1 April onward belongs to the year that ends the following 31 March.
+function lodrFYWindow(fyEndMonth){
+  var m = fyEndMonth || 3;
+  var t = new Date(); t.setHours(0,0,0,0);
+  var y = t.getFullYear();
+  var startY = (t.getMonth() + 1) > m ? y : y - 1;
+  return {startY: startY, endY: startY + 1, fyEndMonth: m};
+}
+
+// The occurrence of a month/day that falls INSIDE the financial year in
+// progress. A quarter ending in September belongs to this year; one ending in
+// March belongs to next, because the year straddles the calendar boundary.
+function lodrInFY(month, day, fyEndMonth){
+  var w = lodrFYWindow(fyEndMonth);
+  return lodrFmt(month > w.fyEndMonth ? w.startY : w.endY, month, day);
+}
+
 // Most recent occurrence of a month/day, on or before today.
 function lodrLast(month, day){
   var t = new Date(); t.setHours(0,0,0,0);
@@ -4202,17 +4220,19 @@ function lodrDueDates(rule){
     case 'quarter_end_offset': {
       var qs = d.anchorDates || [];
       return qs.map(function(q){
-        var pe = lodrLast(q.month, q.day);
-        var due = d.type === 'quarterly' ? lodrNext(q.month, q.day)
-                                         : lodrAddDays(pe, d.days||0);
+        // Inside the financial year in progress, not the most recent occurrence
+        // — which for a quarter still ahead of us lands in the previous year.
+        var pe = lodrInFY(q.month, q.day);
+        var due = lodrAddDays(pe, d.days || 0);
         return {due: due, periodEnd: pe, label: q.q + ' (' + q.covers + ')'};
       });
     }
     case 'half_yearly': {
       var hs = d.anchorDates || [];
       return hs.map(function(h){
-        var pe = lodrLast(h.month, h.day);
-        return {due: lodrNext(h.month, h.day), periodEnd: pe, label: h.h + ' (' + h.covers + ')'};
+        var pe = lodrInFY(h.month, h.day);
+        return {due: lodrAddDays(pe, d.days || 0), periodEnd: pe,
+                label: h.h + ' (' + h.covers + ')'};
       });
     }
     case 'event_offset':
@@ -4352,13 +4372,15 @@ function cmDueDates(rule, c, agmIso){
       return [];                                    // needs an actual trigger date
     case 'quarterly': {
       return (d.anchorDates||[]).map(function(q){
-        return {due: lodrNext(q.month, q.day), periodEnd: lodrLast(q.month, q.day),
+        var pe = lodrInFY(q.month, q.day);
+        return {due: lodrAddDays(pe, d.days || 0), periodEnd: pe,
                 label: q.q + ' (' + q.covers + ')'};
       });
     }
     case 'half_yearly': {
       return (d.anchorDates||[]).map(function(h){
-        return {due: lodrNext(h.month, h.day), periodEnd: lodrLast(h.month, h.day),
+        var pe = lodrInFY(h.month, h.day);
+        return {due: lodrAddDays(pe, d.days || 0), periodEnd: pe,
                 label: h.h + ' (' + h.covers + ')'};
       });
     }
@@ -5883,7 +5905,7 @@ function ccComputeStats(){
         company:c.name, entityId:c.id, key:r.key,
         obligation:r.obligation, form:r.form, section:r.section,
         law:r.law, owner:r.owner, due:r.due, days:days, risk:r.risk,
-        penalty:r.penalty, state:st.state
+        penalty:r.penalty, state:st.state, dueConfidence:r.dueConfidence
       };
       // Anything with a filing record against it, whatever its confirmation
       // state — the done list is about what was recorded, not about whether an
@@ -7286,11 +7308,19 @@ function renderCommandCenter(){
 }
 
 // ── page head ────────────────────────────────────────────────────
+// "FY 2026-27" — so it is never in doubt which year the figures cover.
+function lgFYLabel(){
+  var w = (typeof lodrFYWindow === 'function') ? lodrFYWindow(3) : null;
+  if(!w) return '';
+  return w.startY + '-' + String(w.endY).slice(-2);
+}
+
 function ccCmdHead(s, c0, entName, typeLabel){
   return '<div class="cmd-head">'+
     '<div class="cmd-head-l">'+
       '<h1 class="cc-h1">Compliance Command Center</h1>'+
       '<div class="cmd-ent">'+
+        '<span class="cmd-chip">FY '+lgFYLabel()+'</span>'+
         '<span class="cmd-ent-name">'+entEsc(entName)+'</span>'+
         (typeLabel ? '<span class="cmd-chip blue">'+entEsc(typeLabel)+'</span>' : '')+
         (c0 && c0.cin ? '<span class="cmd-ent-cin">CIN: <span class="mono">'+entEsc(c0.cin)+'</span></span>' : '')+
@@ -7464,7 +7494,11 @@ function ccCardImmediate(s){
         '<div><span>Basis</span><b class="mono">'+entEsc(it.section||'')+'</b></div>'+
       '</div>'+
       '<div class="cmd-imm-n">No filing recorded against this obligation. If it was filed, record '+
-        'the date and reference so it stops appearing here.</div>'+
+        'the date and reference so it stops appearing here.'+
+        (it.dueConfidence === 'derived'
+          ? ' <b>The due date here is computed from the period end</b> &mdash; your source sheet did '+
+            'not record an exact deadline for this one, so treat the day count as indicative.'
+          : '')+'</div>'+
       '<div class="cmd-toolrow" style="margin-top:12px;">'+
         '<button class="cc-btn-crit" onclick="lgRecordOpen('+lgArg(it.entityId)+','+lgArg(it.key)+')">Record filing</button>'+
         '<button class="cc-btn" onclick="lgWhy('+lgArg(it.entityId)+','+lgArg(it.key)+')">Why is this flagged?</button>'+
