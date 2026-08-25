@@ -1177,7 +1177,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v94">
+      <meta id="build-version" content="v95">
     </div>
   </div>
   <div class="cc-search">
@@ -9762,6 +9762,26 @@ async function lgSystemCheck(){
       rows.push(lgCheckRow('Director attributes (011)','fail', entEsc(wm)));
       if(/does not exist|schema cache|column/i.test(wm))
         notes.push('Run <b>db/011_director_attributes.sql</b> in the Supabase SQL editor.');
+    }
+  }
+
+  // ── 6b3. applicability overrides (012) ──
+  if(supaClient && CURRENT_USER){
+    try{
+      var na = await supaClient.from('compliance_status')
+        .select('not_applicable,na_reason,na_by').limit(1);
+      if(na.error) throw na.error;
+      var naCount = await supaClient.from('compliance_status')
+        .select('compliance_key').eq('not_applicable', true);
+      var n = (!naCount.error && naCount.data) ? naCount.data.length : 0;
+      rows.push(lgCheckRow('Not applicable (012)','ok',
+        n ? ccPlural(n,'obligation','obligations')+' marked as not applying'
+          : 'columns present — nothing marked yet'));
+    }catch(e){
+      var nm=(e&&e.message)||String(e);
+      rows.push(lgCheckRow('Not applicable (012)','fail', entEsc(nm)));
+      if(/does not exist|schema cache|column/i.test(nm))
+        notes.push('Run <b>db/012_not_applicable.sql</b> in the Supabase SQL editor.');
     }
   }
 
