@@ -1183,7 +1183,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v98">
+      <meta id="build-version" content="v99">
     </div>
   </div>
   <div class="cc-search">
@@ -5681,11 +5681,20 @@ async function adminDeleteUser(userId, email){
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
       body:JSON.stringify({target_id:userId})
     });
-    var data = await res.json();
-    if(data.error) throw new Error(data.error);
+    var data = await res.json().catch(function(){ return null; });
+    if(!data){
+      throw new Error('The admin-actions function did not respond. Deploy it with '+
+        'supabase functions deploy admin-actions.');
+    }
+    if(data.error){
+      throw new Error(data.error + (data.detail ? ' — ' + data.detail : ''));
+    }
+    // An account whose login was already gone is still worth reporting, so a
+    // row disappearing is never a surprise.
+    if(data.note) alert(email + ' removed. ' + data.note);
     loadAdminUsers();
   }catch(e){
-    alert('Error deleting user: '+e.message);
+    alert('Could not delete ' + email + '.\n\n' + e.message);
   }
 }
 
