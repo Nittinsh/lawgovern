@@ -415,6 +415,12 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 .cu-search input{border:none;background:none;outline:none;font-family:'Manrope';font-size:13px;color:var(--ink);width:100%;}
 .cu-filters select{font-family:'Manrope';font-size:12.5px;font-weight:500;color:var(--ink-mid);background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:8px 11px;cursor:pointer;outline:none;}
 .cu-filters select:hover{border-color:var(--blue);}
+.adm-row{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:13px 15px;border:1px solid var(--line);border-radius:11px;margin-bottom:9px;background:var(--paper);}
+.adm-row.pending{border-color:#F2D9A8;background:var(--warn-wash);}
+.adm-main{min-width:0;flex:1;}
+.adm-email{font-size:13.5px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.adm-meta{font-size:12px;color:var(--ink-soft);margin-top:3px;}
+.adm-acts{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;}
 .cu-na{font-family:'Manrope';font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:7px;border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);cursor:pointer;margin-left:6px;white-space:nowrap;transition:.14s;}
 .cu-na:hover{border-color:var(--ink-soft);color:var(--ink-mid);}
 .cu-na.on{background:var(--blue-wash);border-color:transparent;color:var(--blue);}
@@ -1177,7 +1183,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v95">
+      <meta id="build-version" content="v98">
     </div>
   </div>
   <div class="cc-search">
@@ -1542,40 +1548,52 @@ input[type="text"], input[type="password"], textarea, select {
     <h1 class="cc-h1">Administration</h1>
     <p class="cc-sub">Users, approvals and system checks.</p>
   </div>
-  <div class="ps" id="adminpanel" style="max-width:640px;margin:0 auto;padding:22px 16px;overflow-y:auto;flex:1;">
-    <!-- USER MANAGEMENT PANEL (admin only) -->
-    <div id="admin-user-section" style="display:none;">
-      <div style="background:linear-gradient(135deg,var(--ink3),var(--ink4));border:1px solid var(--gold);border-radius:14px;padding:20px;margin-bottom:16px;">
-        <div style="font-family:serif;font-size:18px;color:var(--gold2);margin-bottom:4px;">&#128101; User Management</div>
-        <div style="font-size:12px;color:var(--slate);">Approve new signups, revoke access, and manage all users &mdash; all from here.</div>
-      </div>
-      <div id="admin-users-list"></div>
-    </div>
-    
-    <!-- AI STATUS PANEL -->
-    <div style="background:linear-gradient(135deg,var(--ink3),var(--ink4));border:1px solid var(--ink4);border-radius:14px;padding:20px;margin-bottom:16px;margin-top:16px;">
-      <div style="font-family:serif;font-size:18px;color:var(--gold2);margin-bottom:4px;">&#128274; AI Engine</div>
-      <div style="font-size:12px;color:var(--slate);">AI is powered securely through the server. No API key setup needed &mdash; it works automatically for all approved users.</div>
-      <div style="font-size:12px;color:#5cb85c;margin-top:8px;">&#10003; Active and secured</div>
-    </div>
-    <!-- CORRECTION MEMORY PANEL -->
-    <div style="background:linear-gradient(135deg,var(--ink3),var(--ink4));border:1px solid var(--ink4);border-radius:14px;padding:20px;margin-bottom:16px;margin-top:20px;">
-      <div style="font-family:serif;font-size:18px;color:var(--gold2);margin-bottom:4px;">🧠 Correction Memory</div>
-      <div style="font-size:12px;color:var(--slate);">Corrections saved by professionals when AI gives wrong answers. These are automatically injected into future responses.</div>
-    </div>
-    <div style="background:var(--ink2);border:1px solid var(--ink4);border-radius:12px;padding:16px;margin-bottom:12px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <div style="font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;" id="corr-count">0 corrections</div>
-        <div style="display:flex;gap:6px;">
-          <button onclick="exportCorrections()" style="background:var(--ink3);border:1px solid var(--ink4);color:var(--slate);font-size:11px;border-radius:7px;padding:5px 12px;cursor:pointer;">📤 Export</button>
-          <button onclick="importCorrections()" style="background:var(--ink3);border:1px solid var(--ink4);color:var(--slate);font-size:11px;border-radius:7px;padding:5px 12px;cursor:pointer;">📥 Import</button>
-          <button onclick="clearAllCorrections()" style="background:rgba(224,85,85,.1);border:1px solid #e05555;color:#e05555;font-size:11px;border-radius:7px;padding:5px 12px;cursor:pointer;">🗑 Clear All</button>
-        </div>
-      </div>
-      <div id="corrections-list">
-        <div class="corr-empty">Loading...</div>
+  <div class="ps" id="adminpanel" style="max-width:820px;padding:0 0 30px;overflow-y:auto;flex:1;">
+
+    <div class="cc-card" id="admin-user-section" style="display:none;">
+      <div class="cc-card-h"><h3>Access control</h3>
+        <span class="cc-link" onclick="loadAdminUsers()">Refresh</span></div>
+      <div class="cc-card-b">
+        <div class="set-n" style="margin-bottom:12px;">Nobody reaches the tool until you approve them.
+          A new sign-up sits here until then &mdash; email confirmation is off, so this is the only gate.</div>
+        <div id="admin-users-list"></div>
       </div>
     </div>
+
+    <div class="cc-card" style="margin-top:16px;">
+      <div class="cc-card-h"><h3>AI engine</h3>
+        <span class="cmd-chip blue">Active</span></div>
+      <div class="cc-card-b">
+        <div class="set-n">Answers are generated server-side through the proxy, so the API key never
+          reaches the browser and no key setup is needed for approved users.</div>
+      </div>
+    </div>
+
+    <div class="cc-card" style="margin-top:16px;">
+      <div class="cc-card-h"><h3>Correction memory</h3>
+        <div style="display:flex;gap:7px;">
+          <button class="cc-btn" onclick="exportCorrections()">Export</button>
+          <button class="cc-btn" onclick="importCorrections()">Import</button>
+          <button class="cc-btn" style="color:var(--crit);border-color:#F5C6C6;"
+            onclick="clearAllCorrections()">Clear all</button>
+        </div></div>
+      <div class="cc-card-b">
+        <div class="set-n" style="margin-bottom:12px;">Corrections recorded when an AI answer was wrong.
+          They are fed back into later answers, so the same mistake is not repeated.</div>
+        <div class="lg-label" id="corr-count">0 corrections</div>
+        <div id="corrections-list"></div>
+      </div>
+    </div>
+
+    <div class="cc-card" style="margin-top:16px;">
+      <div class="cc-card-h"><h3>Database</h3></div>
+      <div class="cc-card-b">
+        <div class="set-n" style="margin-bottom:12px;">Confirms every migration has landed and each
+          table is readable. Run it after applying a new SQL file.</div>
+        <button class="cc-btn" onclick="lgSystemCheck()">Run system check</button>
+      </div>
+    </div>
+
   </div>
 </div>
 </div><!-- /panels -->
@@ -2602,6 +2620,7 @@ function sw(id) {
   if (id==='approvals' && typeof renderApprovals==='function') renderApprovals();
   if (id==='audit' && typeof renderAudit==='function') renderAudit();
   if (id==='settings' && typeof renderSettings==='function') renderSettings();
+  if (id==='admin' && typeof renderAdminPanel==='function') renderAdminPanel();
   if (typeof LG_REG !== 'undefined' && LG_REG[id]) regRender(id);
 }
 
@@ -5552,6 +5571,22 @@ async function callAIProxy(messages, maxTokens){
 // ADMIN USER MANAGEMENT PANEL (inside LawGovern)
 // ══════════════════════════════════════════════════════════
 
+// The section was display:none with nothing to unhide it, and the loader was
+// never called on entry — so the only gate on who gets into the tool could not
+// be reached from inside the tool.
+function renderAdminPanel(){
+  var sec = document.getElementById('admin-user-section');
+  var list = document.getElementById('admin-users-list');
+  var isAdmin = !!(CURRENT_USER && CURRENT_USER.is_admin);
+  if(sec) sec.style.display = isAdmin ? '' : 'none';
+  // Corrections are not admin-only, so render them either way.
+  if(typeof renderCorrectionsPanel === 'function') renderCorrectionsPanel();
+  // Hiding the section is not the same as emptying it. Clear the list for a
+  // non-admin so other people's addresses are not left sitting in the DOM.
+  if(!isAdmin){ if(list) list.innerHTML = ''; return; }
+  if(typeof loadAdminUsers === 'function') loadAdminUsers();
+}
+
 async function loadAdminUsers(){
   var container = document.getElementById('admin-users-list');
   if(!container) return;
@@ -5559,7 +5594,7 @@ async function loadAdminUsers(){
     container.innerHTML = '<div style="color:var(--slate);font-size:13px;padding:20px;text-align:center;">Admin access only.</div>';
     return;
   }
-  container.innerHTML = '<div style="text-align:center;padding:30px;"><div class="dots"><span></span><span></span><span></span></div><div style="font-size:12px;color:var(--slate);margin-top:10px;">Loading users...</div></div>';
+  container.innerHTML = '<div class="cc-none">Loading&hellip;</div><div style="display:none;"><div style="font-size:12px;color:var(--slate);margin-top:10px;">Loading users...</div></div>';
 
   try{
     var res = await supaClient.rpc('admin_list_users');
@@ -5570,37 +5605,59 @@ async function loadAdminUsers(){
     var pending = users.filter(function(u){return !u.approved;}).length;
     var active = users.filter(function(u){return u.approved;}).length;
 
-    var html2 = '<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">';
-    html2 += '<div style="background:rgba(240,165,0,0.12);border:1px solid rgba(240,165,0,0.3);border-radius:7px;padding:6px 12px;font-size:12px;color:#f0a500;font-weight:700;">⏳ '+pending+' Pending</div>';
-    html2 += '<div style="background:rgba(92,184,92,0.1);border:1px solid rgba(92,184,92,0.3);border-radius:7px;padding:6px 12px;font-size:12px;color:#5cb85c;font-weight:700;">✓ '+active+' Active</div>';
-    html2 += '<div style="background:var(--ink3);border:1px solid var(--ink4);border-radius:7px;padding:6px 12px;font-size:12px;color:var(--slate2);">👥 '+users.length+' Total</div>';
-    html2 += '<button onclick="loadAdminUsers()" style="background:var(--ink3);color:var(--gold);border:1px solid var(--ink4);border-radius:7px;padding:6px 12px;font-size:12px;cursor:pointer;margin-left:auto;">↻ Refresh</button>';
-    html2 += '</div>';
+    // Pending first: an account waiting on approval is the only thing on this
+    // screen that is actually blocking someone.
+    users.sort(function(a,b){
+      if(!a.approved !== !b.approved) return a.approved ? 1 : -1;
+      return String(a.email||'').localeCompare(String(b.email||''));
+    });
+
+    var html2 = '<div class="cu-summary" style="margin-bottom:14px;">'+
+      '<div class="cu-sum-chip'+(pending?' warn':'')+'"><b>'+pending+'</b> awaiting approval</div>'+
+      '<div class="cu-sum-chip ok"><b>'+active+'</b> active</div>'+
+      '<div class="cu-sum-chip"><b>'+users.length+'</b> total</div>'+
+    '</div>';
+
+    if(!users.length){
+      html2 += '<div class="cc-none">No accounts yet.</div>';
+    }
 
     users.forEach(function(u){
       var isPending = !u.approved;
-      var joined = u.created_at ? u.created_at.substring(0,10) : '';
-      html2 += '<div style="background:var(--ink2);border:1px solid '+(isPending?'rgba(240,165,0,0.4)':'var(--ink4)')+';border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">';
-      html2 += '<div style="flex:1;min-width:180px;">';
-      html2 += '<div style="font-size:13px;color:var(--white);font-weight:600;">'+u.email+(u.is_admin?' <span style="background:var(--gold);color:var(--ink);font-size:9px;padding:1px 6px;border-radius:4px;font-weight:700;">ADMIN</span>':'')+'</div>';
-      html2 += '<div style="font-size:11px;color:var(--slate);margin-top:2px;">Joined '+joined+' · '+(u.approved?'<span style="color:#5cb85c;">Active</span>':'<span style="color:#f0a500;">Pending approval</span>')+'</div>';
-      html2 += '</div>';
-      html2 += '<div style="display:flex;gap:6px;flex-wrap:wrap;">';
-      if(isPending){
-        html2 += '<button onclick="adminApprove(\''+u.id+'\',true)" style="background:linear-gradient(135deg,#5cb85c,#4a9d4a);color:#fff;font-weight:700;font-size:12px;border:none;border-radius:7px;padding:7px 14px;cursor:pointer;">✓ Approve</button>';
-      } else if(!u.is_admin) {
-        html2 += '<button onclick="adminApprove(\''+u.id+'\',false)" style="background:var(--ink3);color:#e05555;font-size:12px;border:1px solid rgba(224,85,85,0.3);border-radius:7px;padding:7px 12px;cursor:pointer;">Revoke</button>';
-      }
-      if(!u.is_admin){
-        html2 += '<button onclick="adminDeleteUser(\''+u.id+'\',\''+u.email+'\')" style="background:none;color:var(--slate);font-size:14px;border:none;cursor:pointer;padding:4px 8px;" title="Delete user">🗑</button>';
-      }
-      html2 += '</div>';
-      html2 += '</div>';
+      var joined = u.created_at ? String(u.created_at).substring(0,10) : '';
+      var me = CURRENT_USER && String(CURRENT_USER.id) === String(u.id);
+      html2 += '<div class="adm-row'+(isPending?' pending':'')+'">'+
+        '<div class="adm-main">'+
+          '<div class="adm-email">'+entEsc(u.email||'')+
+            (u.is_admin?' <span class="cmd-chip blue">Admin</span>':'')+
+            (me?' <span class="cmd-chip">You</span>':'')+'</div>'+
+          '<div class="adm-meta">'+
+            (joined?'Joined '+ccFmtDate(joined)+' &middot; ':'')+
+            (u.approved
+              ? '<span style="color:var(--ok);font-weight:600;">Active</span>'
+              : '<span style="color:var(--warn);font-weight:600;">Waiting for your approval</span>')+
+          '</div>'+
+        '</div>'+
+        '<div class="adm-acts">'+
+          (isPending
+            ? '<button class="cc-btn-primary" onclick="adminApprove('+lgArg(u.id)+',true)">Approve</button>'
+            : (!u.is_admin
+                ? '<button class="cc-btn" onclick="adminApprove('+lgArg(u.id)+',false)">Revoke access</button>'
+                : ''))+
+          (!u.is_admin && !me
+            ? '<button class="cc-btn" style="color:var(--crit);border-color:#F5C6C6;" '+
+              'onclick="adminDeleteUser('+lgArg(u.id)+','+lgArg(u.email)+')">Delete</button>'
+            : '')+
+        '</div>'+
+      '</div>';
     });
 
     container.innerHTML = html2;
   }catch(e){
-    container.innerHTML = '<div style="color:var(--red);font-size:13px;padding:20px;">Error loading users: '+e.message+'</div>';
+    container.innerHTML = '<div class="reg-err">Could not load the user list: '+entEsc(e.message)+
+      (/admin_list_users/i.test(e.message)
+        ? '<br>The <span class="mono">admin_list_users</span> function is missing from the database.'
+        : '')+'</div>';
   }
 }
 
