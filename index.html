@@ -334,14 +334,6 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 .cmd-mon-n span{font-family:'IBM Plex Mono';font-weight:500;color:var(--ink-soft);font-size:11px;}
 .cmd-mon-c{font-size:11.5px;color:var(--ink-soft);}
 
-/* risk matrix */
-.cmd-mx{display:grid;grid-template-columns:16px 1fr;grid-template-rows:1fr 16px;gap:6px;align-items:center;}
-.cmd-mx-y{writing-mode:vertical-rl;transform:rotate(180deg);font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft);text-align:center;}
-.cmd-mx-g{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;}
-.cmd-mx-c{aspect-ratio:1.6;border-radius:7px;background:var(--bg);border:1px solid var(--line-soft);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono';font-size:13px;font-weight:700;color:var(--ink-mid);}
-.cmd-mx-c.on{background:var(--warn-wash);border-color:transparent;color:var(--warn);}
-.cmd-mx-c.hot{background:var(--crit-wash);border-color:transparent;color:var(--crit);}
-.cmd-mx-x{grid-column:2;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft);text-align:right;}
 
 /* ask */
 .cmd-ask{font-size:12.5px;color:var(--ink-mid);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 12px;margin-bottom:7px;cursor:pointer;transition:.14s;}
@@ -1183,7 +1175,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v104">
+      <meta id="build-version" content="v105">
     </div>
   </div>
   <div class="cc-search">
@@ -6961,7 +6953,6 @@ var CMD_CARDS = [
   {id:'quick',     label:'Quick actions'},
   {id:'calendar',  label:'Calendar'},
   {id:'radar',     label:'Regulatory radar'},
-  {id:'matrix',    label:'Risk matrix'},
   {id:'copilot',   label:'Ask compliance'}
 ];
 
@@ -7326,7 +7317,7 @@ function renderCommandCenter(){
       [['coverage',ccCardCoverage],['glance',ccCardGlance],['summary',ccCardSummary],
        ['insights',ccCardInsights],['immediate',ccCardImmediate],['upcoming',ccCardUpcoming],
        ['activity',ccCardActivity],['quick',ccCardQuick],['calendar',ccCardCalendar],
-       ['radar',ccCardRadar],['matrix',ccCardMatrix],['copilot',ccCardCopilot]]
+       ['radar',ccCardRadar],['copilot',ccCardCopilot]]
         .filter(function(p){ return ccCardVisible(p[0]); })
         .map(function(p){ return p[1](s); }).join('')+
     '</div>';
@@ -7667,36 +7658,6 @@ function ccCardRadar(s){
       'are fetched from SEBI, MCA, RBI, IBBI and Income Tax on demand. Open the radar to pull the '+
       'latest.</div>'+
       '<button class="cc-btn" style="width:100%;justify-content:center;" onclick="sw(\'tracker\')">Fetch latest updates</button>'+
-    '</div>'+
-  '</div>';
-}
-
-// ── 11. risk matrix ──────────────────────────────────────────────
-// Impact from the obligation's recorded risk, likelihood from how close it is
-// to its date. Both come from the register; nothing is modelled.
-function ccCardMatrix(s){
-  var cells = {};
-  var impactOf = function(r){ return (r==='critical'||r==='high') ? 2 : (r==='medium' ? 1 : 0); };
-  var likeOf = function(d){ return d < 0 ? 2 : (d <= 30 ? 1 : 0); };
-  s.late.concat(s.agenda).forEach(function(a){
-    var key = impactOf(a.risk)+','+likeOf(a.days);
-    cells[key] = (cells[key]||0) + 1;
-  });
-  var grid = '';
-  for(var i=2;i>=0;i--){
-    for(var l=0;l<3;l++){
-      var n = cells[i+','+l] || 0;
-      var hot = (i>=1 && l>=1);
-      grid += '<div class="cmd-mx-c'+(n?(hot?' hot':' on'):'')+'">'+(n||'')+'</div>';
-    }
-  }
-  return '<div class="cmd-card">'+
-    '<div class="cmd-card-h"><h3>Risk matrix</h3>'+
-      '<span class="cmd-help" title="Impact is the risk recorded against the obligation. Likelihood is how close it is to its due date. Both come from your register.">?</span></div>'+
-    '<div class="cmd-card-b">'+
-      '<div class="cmd-mx"><div class="cmd-mx-y">Impact</div>'+
-        '<div class="cmd-mx-g">'+grid+'</div>'+
-        '<div class="cmd-mx-x">Likelihood &rarr;</div></div>'+
     '</div>'+
   '</div>';
 }
