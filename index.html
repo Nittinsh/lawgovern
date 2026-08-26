@@ -1183,7 +1183,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v102">
+      <meta id="build-version" content="v103">
     </div>
   </div>
   <div class="cc-search">
@@ -11809,7 +11809,11 @@ function openComplianceDetail(entityId,key){
   var stepCount=steps.length, doneCount=Object.keys(doneSteps).filter(function(k){return doneSteps[k];}).length;
   var progress=Math.round(100*doneCount/stepCount);
 
-  var statusPill = days<0?'<span class="cu-pill over">Overdue</span>':(days<=7?'<span class="cu-pill soon">Due soon</span>':'<span class="cu-pill due">Upcoming</span>');
+  // The same resolver the dashboard and the register use, so this screen can
+  // never disagree with them. It was computing its own pill from the due date
+  // and ignoring whether anything had been filed.
+  var cdSt = lgResolveStatus(r, c);
+  var statusPill = lgPill(cdSt.state);
   var riskPill = cuRiskPill(r.risk);
 
   // Steps HTML
@@ -11909,12 +11913,16 @@ function openComplianceDetail(entityId,key){
       '<button class="cd-ev-add" onclick="cdAddEvidence()">+ Add reference</button></div>'+
 
     // Audit trail
-    '<div class="cd-section"><div class="cd-sec-h">Audit Trail</div><div class="cd-audit">'+auditHtml+'</div></div>'+
+    '<div class="cd-section"><div class="cd-sec-h">Working notes</div>'+
+      '<div style="font-size:11.5px;color:var(--ink-soft);margin:-4px 0 9px;">Kept on this browser. '+
+      'The recorded trail is on the Audit Trail screen.</div>'+
+      '<div class="cd-audit">'+auditHtml+'</div></div>'+
 
     // Footer actions
     '<div class="cd-foot">'+
       '<button class="cc-btn-primary" onclick="cdGenerateDoc()">Generate document</button>'+
-      '<button class="cc-btn" onclick="cdMarkComplete()">Mark complete</button>'+
+      '<button class="cc-btn" onclick="cdMarkComplete()">Record filing &amp; close</button>'+
+      '<button class="cc-btn" onclick="cdClose();lgNAOpen('+lgArg(entityId)+','+lgArg(key)+')">Not applicable</button>'+
     '</div>';
 
   document.getElementById('cd-body').innerHTML=body;
@@ -11959,14 +11967,22 @@ function cdDelEvidence(i){
   var st=cdGetState(CD_CURRENT.entityId,CD_CURRENT.key);
   if(st.evidence){ st.evidence.splice(i,1); cdSaveState(CD_CURRENT.entityId,CD_CURRENT.key,st); openComplianceDetail(CD_CURRENT.entityId,CD_CURRENT.key); }
 }
+// Completing an obligation means recording what was filed and when. A
+// completion with no date behind it asserts compliance the app cannot stand
+// behind, and — as this function used to do — writes to a store nothing else
+// reads, so the obligation stayed overdue everywhere.
 function cdMarkComplete(){
-  var st=cdGetState(CD_CURRENT.entityId,CD_CURRENT.key);
-  var steps=cdSteps(CD_CURRENT.r || CD_CURRENT.key); st.steps={};
-  for(var i=0;i<steps.length;i++) st.steps[i]=true;
-  st.completed=true; cdLog(st,'Marked complete');
-  cdSaveState(CD_CURRENT.entityId,CD_CURRENT.key,st);
-  openComplianceDetail(CD_CURRENT.entityId,CD_CURRENT.key);
+  var e = CD_CURRENT.entityId, k = CD_CURRENT.key;
+  var st = cdGetState(e, k);
+  var steps = cdSteps(CD_CURRENT.r || k);
+  st.steps = {};
+  for(var i=0;i<steps.length;i++) st.steps[i] = true;   // the checklist is local, and fine as such
+  cdSaveState(e, k, st);
+  cdClose();
+  lgRecordOpen(e, k);
 }
+// A local working note. The authoritative trail is compliance_audit, written by
+// lgPersist and shown on the Audit Trail screen.
 function cdLog(st,action){
   st.audit=st.audit||[{action:'Obligation identified',user:'System',ts:'On profile setup'}];
   var u=(typeof CURRENT_USER!=='undefined'&&CURRENT_USER)?CURRENT_USER.email:'user';
