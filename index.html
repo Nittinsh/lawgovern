@@ -1183,7 +1183,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v103">
+      <meta id="build-version" content="v104">
     </div>
   </div>
   <div class="cc-search">
@@ -7401,26 +7401,55 @@ function ccLegendRow(color, label, value){
 // is stored, so there is nothing to compare against and no score to report.
 // What IS computable is how much of the register has a filing behind it.
 function ccCardCoverage(s){
-  var pct = s.totalObligations ? Math.round((s.evidenceOnRecord / s.totalObligations) * 100) : 0;
-  var tone = pct >= 80 ? 'var(--ok)' : pct >= 40 ? 'var(--warn)' : 'var(--crit)';
+  // Everything not already in another bucket: applicable, dated further out
+  // than thirty days, nothing recorded. Without this row the legend fell short
+  // of the total by a quarter of the register.
+  var scheduled = Math.max(0, s.totalObligations - s.evidenceOnRecord - s.pastDue
+                              - s.dueIn30 - s.standing);
+  var pct = s.totalObligations
+    ? Math.round((s.evidenceOnRecord / s.totalObligations) * 100) : 0;
+  var tone = pct >= 80 ? 'var(--ok)' : pct >= 40 ? 'var(--warn)'
+           : s.evidenceOnRecord ? 'var(--warn)' : 'var(--ink-soft)';
+
+  // The ring carries the whole register, not just the filed slice against grey.
+  var segs = [
+    {value:s.evidenceOnRecord, color:'var(--ok)',   label:'With a filing on record'},
+    {value:s.pastDue,          color:'var(--crit)', label:'Past due, nothing recorded'},
+    {value:s.dueIn30,          color:'var(--warn)', label:'Due within 30 days'},
+    {value:scheduled,          color:'#93C5FD',     label:'Scheduled, not yet due'},
+    {value:s.standing,         color:'#CBD5E1',     label:'Ongoing or event-driven'}
+  ];
+
   return '<div class="cmd-card">'+
     '<div class="cmd-card-h"><h3>Evidence coverage</h3>'+
-      '<span class="cmd-help" title="The share of applicable obligations with a filing date or reference recorded. It is not a compliance score: nothing here has been confirmed against MCA or the exchanges.">?</span></div>'+
+      '<span class="cmd-help" title="How many applicable obligations have a filing date or reference '+
+        'recorded against them. Not a compliance score — nothing here has been confirmed against MCA '+
+        'or the exchanges.">?</span></div>'+
     '<div class="cmd-card-b cmd-cov">'+
-      ccDonut([{value:s.evidenceOnRecord, color:tone, label:'With a filing on record'},
-               {value:Math.max(0, s.totalObligations - s.evidenceOnRecord), color:'var(--line)', label:'Nothing recorded'}],
-              '<span style="color:'+tone+'">'+pct+'</span><span class="cmd-donut-max">/100</span>',
-              s.evidenceOnRecord ? 'covered' : 'no filings')+
+      ccDonut(segs,
+        '<span style="color:'+tone+'">'+s.evidenceOnRecord+'</span>'+
+        '<span class="cmd-donut-max"> of '+s.totalObligations+'</span>',
+        s.evidenceOnRecord ? 'recorded' : 'none recorded')+
       '<div class="cmd-legs">'+
         ccLegendRow('var(--ok)','With a filing on record', s.evidenceOnRecord)+
         ccLegendRow('var(--crit)','Past due, nothing recorded', s.pastDue)+
         ccLegendRow('var(--warn)','Due within 30 days', s.dueIn30)+
-        ccLegendRow('#93C5FD','Ongoing / event-driven', s.standing)+
-        ccLegendRow('var(--line)','Not applicable', s.notApplicable)+
-        '<div class="cmd-leg total"><span>Applicable obligations</span><b>'+s.totalObligations+'</b></div>'+
+        ccLegendRow('#93C5FD','Scheduled, not yet due', scheduled)+
+        ccLegendRow('#CBD5E1','Ongoing or event-driven', s.standing)+
+        '<div class="cmd-leg total"><span>Applicable obligations</span><b>'+
+          s.totalObligations+'</b></div>'+
+        // Below the line on purpose: something marked not applicable is not an
+        // applicable obligation, so it cannot sit inside that total.
+        (s.notApplicable
+          ? '<div class="cmd-leg" style="color:var(--ink-soft);"><i style="background:var(--line)"></i>'+
+            '<span>Marked not applicable</span><b>'+s.notApplicable+'</b></div>' : '')+
       '</div>'+
     '</div>'+
-    '<div class="cmd-note">No prior period is stored, so there is nothing to compare this against yet.</div>'+
+    '<div class="cmd-note">'+
+      (s.evidenceOnRecord
+        ? pct + '% of the register has a filing recorded. '
+        : 'Nothing recorded yet. ')+
+      'No prior period is stored, so there is nothing to compare against.</div>'+
   '</div>';
 }
 
