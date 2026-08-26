@@ -1,0 +1,22 @@
+-- ============================================================
+-- DROP THE REMOVED REGISTERS   ***  NOT APPLIED  ***
+--
+-- The Shareholders and Change Tracker screens were removed from the app in
+-- v100. Their tables are still in the database, holding whatever was entered
+-- before that.
+--
+-- This file is deliberately left commented out. Dropping a table destroys its
+-- rows and cannot be undone, and an empty table costs nothing to keep. Run it
+-- only when you are certain there is nothing in them you want.
+--
+-- Check what is there first:
+--
+--   select count(*) from shareholders;
+--   select count(*) from law_changes;
+--
+-- If both are zero, or you are content to lose what they hold, uncomment the
+-- two statements and run.
+-- ============================================================
+
+-- drop table if exists shareholders;
+-- drop table if exists law_changes;
