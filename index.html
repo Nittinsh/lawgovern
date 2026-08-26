@@ -1183,7 +1183,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v100">
+      <meta id="build-version" content="v102">
     </div>
   </div>
   <div class="cc-search">
@@ -8153,7 +8153,8 @@ function cuExport(){
 // ══════════════════════════════════════════════════════════
 // MY WORK — personal task center (filters obligations by state)
 // ══════════════════════════════════════════════════════════
-var MW_TAB = 'today';
+var MW_TAB = 'overdue';
+var MW_TAB_CHOSEN = false;
 
 function mwGetTasks(){
   if(typeof cuBuildRows!=='function') return [];
@@ -8182,13 +8183,15 @@ function mwStepProgress(t){
   return {done:n, total:steps.length, pct: Math.round(100*n/steps.length), next: steps[n] || null};
 }
 
+// Which bucket a task belongs in. Anything past thirty days returns null and
+// is left out entirely — that is the register's job, not this screen's.
 function mwBucket(t){
-  // returns which tab a task belongs to
   if(t.done) return 'completed';
   if(t.days < 0) return 'overdue';
   if(t.days === 0) return 'today';
   if(t.days <= 7) return 'duesoon';
-  return 'assigned';
+  if(t.days <= 30) return 'month';
+  return null;
 }
 
 function renderMyWork(){
@@ -8202,18 +8205,25 @@ function renderMyWork(){
   }
 
   // Bucket counts
-  var buckets = {today:[],duesoon:[],overdue:[],assigned:[],completed:[]};
-  all.forEach(function(t){ buckets[mwBucket(t)].push(t); });
+  var buckets = {overdue:[],today:[],duesoon:[],month:[],completed:[]};
+  all.forEach(function(t){ var b = mwBucket(t); if(b) buckets[b].push(t); });
   // sort each by urgency
   Object.keys(buckets).forEach(function(k){ buckets[k].sort(function(a,b){return a.days-b.days;}); });
 
   var tabs = [
-    {id:'today',label:'Today',count:buckets.today.length,color:'warn'},
-    {id:'overdue',label:'Overdue',count:buckets.overdue.length,color:'crit'},
-    {id:'duesoon',label:'Due Soon',count:buckets.duesoon.length,color:'warn'},
-    {id:'assigned',label:'Assigned to Me',count:buckets.assigned.length,color:'blue'},
-    {id:'completed',label:'Completed',count:buckets.completed.length,color:'ok'}
+    {id:'overdue', label:'Overdue',        count:buckets.overdue.length, color:'crit'},
+    {id:'today',   label:'Due today',      count:buckets.today.length,   color:'warn'},
+    {id:'duesoon', label:'Next 7 days',    count:buckets.duesoon.length, color:'warn'},
+    {id:'month',   label:'Next 30 days',   count:buckets.month.length,   color:'blue'},
+    {id:'completed',label:'Recorded',      count:buckets.completed.length,color:'ok'}
   ];
+
+  // Open on the first bucket that has something in it. Landing on an empty
+  // "Due today" while twenty items are overdue reads as a broken screen.
+  if(!MW_TAB_CHOSEN && (!buckets[MW_TAB] || !buckets[MW_TAB].length)){
+    var firstFull = tabs.filter(function(t){ return t.count; })[0];
+    if(firstFull) MW_TAB = firstFull.id;
+  }
 
   var head =
     '<div class="cc-pagehead">'+
@@ -8273,7 +8283,9 @@ function renderMyWork(){
   root.innerHTML = head + tabBar + '<div class="mw-list">'+body+'</div>';
 }
 
-function mwSetTab(id){ MW_TAB=id; renderMyWork(); }
+// A deliberate click stands, even onto an empty bucket. Only the automatic
+// choice below defers to whichever bucket has something in it.
+function mwSetTab(id){ MW_TAB=id; MW_TAB_CHOSEN=true; renderMyWork(); }
 
 // ═══════════════════════════════════════════════════
 // ENTITIES — company master data (the source every module reads)
