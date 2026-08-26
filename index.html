@@ -1175,7 +1175,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v105">
+      <meta id="build-version" content="v107">
     </div>
   </div>
   <div class="cc-search">
@@ -6024,9 +6024,8 @@ function ccComputeStats(){
   // Two more windows the command centre reports on separately.
   stats.dueIn90 = stats.agenda.length;
   stats.due31to90 = stats.agenda.filter(function(a){ return a.days > 30; }).length;
-  // On track: applicable, not past due, and nothing outstanding to action.
-  stats.onTrack = stats.upcoming + stats.standing - stats.due31to90 - (stats.dueIn30 - stats.dueThisWeek);
-  if(stats.onTrack < 0) stats.onTrack = 0;
+  // onTrack was a subtraction dressed as a bucket and only the old summary card
+  // read it. Nothing computes it now; the partitions that remain are real.
 
   // Recorded by someone, confirmed by nobody — the queue you work through.
   stats.awaitingConfirmation = stats.awaitingCheck + stats.rejected + stats.verificationPending;
@@ -6945,7 +6944,7 @@ async function regDelete(key, id){
 var CMD_CARDS = [
   {id:'coverage',  label:'Evidence coverage'},
   {id:'glance',    label:'At a glance'},
-  {id:'summary',   label:'Obligations summary'},
+  {id:'summary',   label:'By law'},
   {id:'insights',  label:'What the data shows'},
   {id:'immediate', label:'Immediate attention'},
   {id:'upcoming',  label:'Upcoming — next 30 days'},
@@ -7466,28 +7465,69 @@ function ccCardGlance(s){
   '</div>';
 }
 
-// ── 3. obligations summary ───────────────────────────────────────
+// ── 3. what the register is made of ──────────────────────────────
+// Status is already answered by Evidence coverage. This says which bodies of
+// law the obligations come from, which nothing else on the dashboard shows.
+// Every obligation carries exactly one law, so the parts always sum to the
+// whole — no derived bucket, nothing to fall out of step.
+function ccLawGroup(law){
+  var t = String(law||'');
+  if(/LODR/i.test(t))                 return 'SEBI LODR';
+  if(/PIT|Insider/i.test(t))          return 'SEBI PIT';
+  if(/ICDR/i.test(t))                 return 'SEBI ICDR';
+  if(/SAST|Takeover/i.test(t))        return 'SEBI SAST';
+  if(/SEBI/i.test(t))                 return 'SEBI (other)';
+  if(/Companies Act/i.test(t))        return 'Companies Act';
+  if(/Secretarial Standard|SS-/i.test(t)) return 'Secretarial Standards';
+  if(/FEMA|Master Dir|RBI/i.test(t))  return 'FEMA / RBI';
+  if(/IEPF/i.test(t))                 return 'IEPF';
+  if(/Cost Record/i.test(t))          return 'Cost Records';
+  return t || 'Other';
+}
+
+var CC_LAW_COLOURS = ['#2563EB','#06B6D4','#8B5CF6','#F59E0B','#10B981','#EC4899','#94A3B8'];
+
 function ccCardSummary(s){
-  var segs = [
-    {value:s.onTrack,        color:'var(--ok)',   label:'On track'},
-    {value:s.dueIn30,        color:'var(--warn)', label:'Due soon'},
-    {value:s.pastDue,        color:'var(--crit)', label:'Past due'},
-    {value:s.due31to90,      color:'#93C5FD',     label:'Due 31-90 days'},
-    {value:s.notApplicable,  color:'var(--line)', label:'Not applicable'}
-  ];
+  var byLaw = {};
+  (typeof CLIENTS !== 'undefined' ? CLIENTS : []).forEach(function(c){
+    var rows = [];
+    try{ rows = getComplianceChart(c); }catch(e){ return; }
+    rows.forEach(function(r){
+      if(r.applicable === false || r.userNA) return;
+      // Finer than cuLawShort, which collapses everything SEBI into one label.
+      // LODR and PIT are different regimes with different owners and deadlines,
+      // and lumping 186 obligations under "SEBI" tells a CS nothing.
+      var k = ccLawGroup(r.law);
+      byLaw[k] = (byLaw[k] || 0) + 1;
+    });
+  });
+
+  var laws = Object.keys(byLaw).sort(function(a,b){ return byLaw[b] - byLaw[a]; });
+  var segs = laws.map(function(k, i){
+    return {value:byLaw[k], color:CC_LAW_COLOURS[i % CC_LAW_COLOURS.length], label:k};
+  });
+
+  if(!laws.length){
+    return '<div class="cmd-card">'+
+      '<div class="cmd-card-h"><h3>By law</h3></div>'+
+      '<div class="cmd-card-b"><div class="cc-none">Nothing applicable yet.</div></div></div>';
+  }
+
   return '<div class="cmd-card">'+
-    '<div class="cmd-card-h"><h3>Obligations summary</h3></div>'+
+    '<div class="cmd-card-h"><h3>By law</h3></div>'+
     '<div class="cmd-card-b cmd-cov">'+
-      ccDonut(segs, s.totalObligations, 'total')+
+      ccDonut(segs, s.totalObligations, laws.length === 1 ? 'obligations' : 'across '+laws.length)+
       '<div class="cmd-legs">'+
-        ccLegendRow('var(--ok)','On track', s.onTrack)+
-        ccLegendRow('var(--warn)','Due soon', s.dueIn30)+
-        ccLegendRow('var(--crit)','Past due', s.pastDue)+
-        ccLegendRow('#93C5FD','Due 31-90 days', s.due31to90)+
-        ccLegendRow('var(--line)','Not applicable', s.notApplicable)+
+        laws.map(function(k, i){
+          return '<div class="cmd-leg" style="cursor:pointer;" onclick="sw(\'universe\')">'+
+            '<i style="background:'+CC_LAW_COLOURS[i % CC_LAW_COLOURS.length]+'"></i>'+
+            '<span>'+entEsc(k)+'</span><b>'+byLaw[k]+'</b></div>';
+        }).join('')+
+        '<div class="cmd-leg total"><span>Applicable obligations</span><b>'+
+          s.totalObligations+'</b></div>'+
       '</div>'+
     '</div>'+
-    '<div class="cmd-foot"><span class="cc-link" onclick="sw(\'universe\')">Open the full register &rarr;</span></div>'+
+    '<div class="cmd-note"><span class="cc-link" onclick="sw(\'universe\')">Open the full register &rarr;</span></div>'+
   '</div>';
 }
 
