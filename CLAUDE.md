@@ -425,6 +425,56 @@ The screen says so.
 
 ---
 
+## 2j. WHAT APPLIES — the conditions nobody had decided (v136, Phase 2 item 14)
+
+Panel `p-applies` -> `renderApplies()`. Nav: Intelligence > What Applies.
+
+**The finding this was built on.** The rules engine matches on entity *class* — listed, public,
+private. But **39 of a listed entity's 237 obligations carry a qualification in their own
+`appliesToText` that nothing in the system can evaluate**, and every one was silently resolved in
+favour of "applies":
+
+| condition | rows |
+|---|---|
+| Equity-listed **with a monitoring agency** | 8 |
+| Equity-listed **with unutilised issue proceeds** | 5 |
+| Equity-listed **with subsidiaries** | 5 |
+| Equity-listed **(incl. SME from 01.04.2025)** | 5 |
+| Equity-listed **under CIRP/implemented plan** | 4 |
+| All listed entities **(except MF units)** | 4 |
+| + 7 more conditions | 8 |
+
+For a listed company with no subsidiaries and no recent issue that is a page of obligations it does
+not owe — **and each sat in the denominator of every coverage figure on the dashboard**, so the
+evidence percentage was measured against work that was never required.
+
+### One answer per condition, not per row
+`appConditions(c)` groups by the exact `appliesToText`; `appResolve(condition, applies)` settles the
+whole group. "This company has no subsidiaries" clears 5 obligations in one click — verified live:
+237 → 232 rows, 39 undecided → 34, and a "5 ruled out" chip appears. Asking row by row is the same
+question five times, and a control that tedious does not get used.
+
+### db/017_applicability_review.sql — the missing third state
+`not_applicable` is `boolean not null default false`, so it could only say "does not apply". It
+could not tell **"somebody checked and it applies"** from **"nobody has looked"**, and those are
+different facts. Adds `applies_confirmed`, `applies_confirmed_by`, `applies_confirmed_at`.
+
+**Bug worth remembering:** `lgPersist` wrote it and the loader read it into `c.chart`, but the chart
+is not what anything renders — `getComplianceChart` copies selected fields onto each row, and a
+field missing from that list round-trips through the database and reaches no screen. `userNA` was
+copied there; `appliesConfirmed` was not. Confirming a condition saved correctly and changed nothing.
+
+### Also on the screen
+Applies-on-class-alone (grouped by law, expandable), ruled-out-by-you with each reason,
+and never-applied via `lgExcludedFor(c)` with `lgWhyNotApplies` reasons.
+
+### Mobile
+The two decision buttons sat beside the condition text and pushed to 396px on a 375px viewport.
+The page did not scroll — the card clipped them — so **the one control this screen exists for was
+unreachable on a phone while looking fine from the outside**. `@media(max-width:640px)` stacks them.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -501,7 +551,7 @@ The screen says so.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v133.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v136.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. All migrations through `db/016` are applied except `db/013` (the drop script, deliberately
 left commented out).
 
@@ -509,7 +559,7 @@ left commented out).
 - [x] 11. Event -> Compliance Impact Engine (section 2f)
 - [x] 12. Compliance impact from board minutes (section 2g)
 - [x] 13. Regulatory change impact analysis (section 2h)
-- [ ] 14. AI applicability engine
+- [x] 14. Applicability engine (section 2j) &mdash; built without a model
 - [ ] 15. AI due-date reasoning
 - [ ] 16. AI compliance gap analysis
 - [x] 17. "What changed / since last review" (section 2i) &mdash; built without a model

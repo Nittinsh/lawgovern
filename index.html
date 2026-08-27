@@ -478,6 +478,31 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 .imp-main{min-width:0;flex:1;}
 .imp-t{font-size:13px;font-weight:600;color:var(--navy);line-height:1.5;}
 .imp-m{font-size:11.5px;color:var(--ink-soft);margin-top:3px;}
+.app-cond{margin:0 0 10px;}
+.app-cond.done{opacity:.6;}
+.app-cond-h{display:flex;gap:14px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;}
+.app-cond-q{font-size:13.5px;font-weight:600;color:var(--navy);line-height:1.5;}
+.app-cond-m{font-size:11.5px;color:var(--ink-soft);margin-top:5px;line-height:1.6;max-width:60ch;}
+.app-acts{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;}
+.app-done{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ok);background:var(--ok-wash);padding:4px 10px;border-radius:6px;}
+.app-toggle{font-size:11.5px;color:var(--blue);cursor:pointer;margin-top:11px;font-weight:600;}
+.app-toggle:hover{text-decoration:underline;}
+.app-list{margin-top:9px;border-top:1px solid var(--line-soft);}
+.app-r{display:flex;gap:11px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--line-soft);font-size:12.5px;color:var(--ink-mid);cursor:pointer;}
+.app-r:last-child{border-bottom:none;}
+.app-r:hover .app-o{color:var(--blue);}
+.app-sec{flex-shrink:0;min-width:96px;font-size:11px;color:var(--ink-soft);padding-top:1px;}
+.app-o{flex:1;min-width:0;line-height:1.5;color:var(--navy);}
+.app-why{font-size:11.5px;color:var(--ink-soft);margin-top:3px;font-style:italic;}
+@media(max-width:640px){
+  /* Side by side, the two buttons pushed past the viewport and were clipped by
+     the card — the one control this screen exists for, unreachable on a phone. */
+  .app-cond-h{flex-direction:column;gap:12px;}
+  .app-acts{width:100%;}
+  .app-acts button{flex:1 1 0;min-width:0;white-space:normal;}
+  .app-sec{min-width:0;flex-basis:100%;}
+  .app-r{flex-wrap:wrap;gap:3px;}
+}
 .aud-lbl{font-size:12px;font-weight:600;color:var(--ink-mid);}
 .aud-days{font-size:11.5px;color:var(--ink-soft);}
 .aud-row{display:flex;gap:12px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line-soft);cursor:pointer;}
@@ -1297,7 +1322,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v133">
+      <meta id="build-version" content="v136">
     </div>
   </div>
   <div class="cc-search">
@@ -1347,6 +1372,7 @@ input[type="text"], input[type="password"], textarea, select {
 <div class="navitem" onclick="sw('internal')" id="t-internal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg><span>Internal Compliance</span></div>
 <div class="navitem" onclick="sw('filings')" id="t-filings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11l5 5v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M15 4v5h5M8 14h8M8 17h5"/></svg><span>Filings &amp; Records</span></div>
 <div class="navitem" onclick="sw('documents')" id="t-documents"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Documents</span></div>
+<div class="navitem" onclick="sw('applies')" id="t-applies"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke-linecap="round"/></svg><span>What Applies</span></div>
 <div class="navitem" onclick="sw('impact')" id="t-impact"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9z" stroke-linejoin="round"/></svg><span>Event Impact</span></div>
 <div class="navitem" onclick="sw('exceptions')" id="t-exceptions"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3L12 3z"/><path d="M12 10v4" stroke-linecap="round"/></svg><span>Exceptions</span><span class="nav-badge" id="nav-exc-n" style="display:none">0</span></div>
 <div class="navitem" onclick="sw('approvals')" id="t-approvals"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Approvals</span><span class="nav-badge" id="nav-approvals-n" style="display:none">0</span></div>
@@ -1464,6 +1490,7 @@ input[type="text"], input[type="password"], textarea, select {
 <div class="panel" id="p-documents"><div class="cc-tool"><div id="doc-root"></div></div></div>
 <div class="panel" id="p-directors"><div class="cc-tool"><div id="reg-root-directors"></div></div></div>
 <div class="panel" id="p-meetings"><div class="cc-tool"><div id="reg-root-meetings"></div></div></div>
+<div class="panel" id="p-applies"><div class="cc-tool"><div id="app-root"></div></div></div>
 <div class="panel" id="p-impact"><div class="cc-tool"><div id="imp-root"></div></div></div>
 <div class="panel" id="p-exceptions"><div class="cc-tool"><div id="exc-root"></div></div></div>
 <div class="panel" id="p-approvals"><div class="cc-tool"><div id="apr-root"></div></div></div>
@@ -2731,6 +2758,7 @@ function sw(id) {
   if (id==='penalty' && typeof renderPenalties==='function') renderPenalties();
   if (id==='filings' && typeof renderFilings==='function') renderFilings();
   if (id==='documents' && typeof renderDocuments==='function') renderDocuments();
+  if (id==='applies' && typeof renderApplies==='function') renderApplies();
   if (id==='impact' && typeof renderImpact==='function') renderImpact();
   if (id==='exceptions' && typeof renderExceptions==='function') renderExceptions();
   if (id==='approvals' && typeof renderApprovals==='function') renderApprovals();
@@ -5153,6 +5181,13 @@ function getComplianceChart(c, opts){
       r.naReason = ev.naReason || null;
       r.naBy = ev.naBy || null;
     }
+    // The mirror of userNA: somebody looked at a condition the engine could not
+    // evaluate and confirmed it holds. Without this on the row it round-trips
+    // through the database and never reaches a screen.
+    if(ev.appliesConfirmed){
+      r.appliesConfirmed = true;
+      r.appliesConfirmedBy = ev.appliesConfirmedBy || null;
+    }
     // The role the rule carries says what kind of person; these say which one.
     r.ownerEmail    = ev.ownerEmail || null;
     r.ownerName     = ev.ownerName || null;
@@ -5864,6 +5899,10 @@ async function loadCloudClients(){
           // Marked not applicable by a user (db/012). Absent until that runs.
           notApplicable:s.not_applicable===true, naReason:s.na_reason||null,
           naBy:s.na_by||null, naAt:s.na_at||null,
+          // db/017. "Nobody has decided" and "somebody checked and it applies"
+          // are different facts, and not_applicable cannot tell them apart.
+          appliesConfirmed:s.applies_confirmed===true,
+          appliesConfirmedBy:s.applies_confirmed_by||null,
           // Ownership, review and workflow (db/014). Absent until that runs.
           ownerEmail:s.owner_email||null, ownerName:s.owner_name||null,
           reviewerEmail:s.reviewer_email||null, reviewerName:s.reviewer_name||null,
@@ -7562,6 +7601,278 @@ document.addEventListener('keydown', function(e){
 function aprRefreshBadge(){
   if(typeof aprQueue !== 'function') return;
   try{ aprBadge(aprQueue().filter(function(i){ return i.can.can; }).length); }catch(e){}
+}
+
+// ═══════════════════════════════════════════════════
+// WHAT APPLIES — AND WHAT NOBODY HAS DECIDED
+// ═══════════════════════════════════════════════════
+// A qualification narrowing the plain entity class. The engine matches on class
+// — listed, public, private — and everything past that is a fact about this
+// particular company that nothing here records.
+var APP_QUALIFIED = /\b(with|without|under|subject to|except|excluding|only if|where|having|that have|incl\.|including)\b|\(/i;
+
+// The plain class this rule was matched on, minus the qualification — used to
+// show what the engine actually decided on.
+function appPlainClass(t){
+  return String(t||'').split(/\s*[\(;]|\s+\b(?:with|without|under|subject to|except|excluding|incl\.|including|only if|where|having|that have)\b/i)[0].trim();
+}
+
+// Obligations whose applicability text carries something the engine could not
+// evaluate, grouped by the condition so it can be answered once.
+function appConditions(c){
+  var rows = [];
+  try{ rows = getComplianceChart(c, {includeNA:true}); }catch(e){ return []; }
+
+  var groups = {};
+  rows.forEach(function(r){
+    var t = r.appliesToText || '';
+    if(!t || !APP_QUALIFIED.test(t)) return;
+    (groups[t] = groups[t] || []).push(r);
+  });
+
+  return Object.keys(groups).map(function(t){
+    var rs = groups[t];
+    return {
+      condition: t,
+      plain: appPlainClass(t),
+      rows: rs,
+      decided: rs.filter(function(r){ return r.userNA || r.appliesConfirmed; }).length,
+      excluded: rs.filter(function(r){ return r.userNA; }).length,
+      confirmed: rs.filter(function(r){ return r.appliesConfirmed; }).length
+    };
+  }).sort(function(a,b){
+    // Undecided first — that is the work.
+    var au = a.rows.length - a.decided, bu = b.rows.length - b.decided;
+    return bu - au || b.rows.length - a.rows.length;
+  });
+}
+
+function appEntity(){
+  if(typeof CLIENTS === 'undefined' || !CLIENTS.length) return null;
+  var sel = document.getElementById('app-entity');
+  var id = sel ? sel.value : CLIENTS[0].id;
+  for(var i=0;i<CLIENTS.length;i++) if(String(CLIENTS[i].id)===String(id)) return CLIENTS[i];
+  return CLIENTS[0];
+}
+
+// One answer settles the whole condition. Asking row by row is the same question
+// five times, and a control that tedious does not get used.
+async function appResolve(condition, applies){
+  var c = appEntity();
+  if(!c) return;
+  var g = appConditions(c).filter(function(x){ return x.condition === condition; })[0];
+  if(!g) return;
+
+  var undecided = g.rows.filter(function(r){ return !r.userNA && !r.appliesConfirmed; });
+  if(!undecided.length) return;
+
+  var btnId = 'app-b-' + appHash(condition) + (applies ? '-y' : '-n');
+  var btn = document.getElementById(btnId);
+  if(btn){ btn.disabled = true; btn.textContent = 'Saving…'; }
+
+  var failed = 0;
+  for(var i=0;i<undecided.length;i++){
+    try{
+      await lgPersist(c.id, undecided[i].key, applies
+        ? {appliesConfirmed:true,
+           appliesConfirmedBy:(CURRENT_USER && CURRENT_USER.email) || 'unknown'}
+        : {notApplicable:true,
+           naReason:'Condition not met for this entity: ' + condition,
+           naBy:(CURRENT_USER && CURRENT_USER.email) || 'unknown',
+           naAt:new Date().toISOString()});
+    }catch(e){ failed++; }
+  }
+
+  if(failed){
+    var err = document.getElementById('app-err');
+    if(err){
+      err.style.display = 'block';
+      err.innerHTML = failed + ' of ' + undecided.length + ' could not be saved. If this says the '+
+        'column does not exist, run <b>db/017_applicability_review.sql</b> in the Supabase SQL editor.';
+    }
+  }
+  if(typeof lgRefreshAll === 'function') lgRefreshAll();
+  renderApplies();
+}
+
+// Stable id for a condition string, so its buttons can be found again.
+function appHash(s){
+  var h = 0;
+  s = String(s||'');
+  for(var i=0;i<s.length;i++){ h = ((h<<5) - h + s.charCodeAt(i)) | 0; }
+  return Math.abs(h).toString(36);
+}
+
+var APP_OPEN = {};
+function appToggle(id){ APP_OPEN[id] = !APP_OPEN[id]; renderApplies(); }
+
+function renderApplies(){
+  var root = document.getElementById('app-root');
+  if(!root) return;
+
+  var head = '<div class="cc-pagehead"><div>'+
+    '<div class="cc-crumb">Intelligence &rsaquo; What Applies</div>'+
+    '<h1 class="cc-h1">What Applies</h1>'+
+    '<p class="cc-sub">What this entity owes, what it does not, and the obligations whose own '+
+    'wording depends on something nobody has recorded.</p></div></div>';
+
+  if(typeof CLIENTS === 'undefined' || !CLIENTS.length){
+    root.innerHTML = head + '<div class="cc-empty"><h2>No entities yet</h2>'+
+      '<p>Applicability is decided per company, so there has to be one.</p>'+
+      '<button class="cc-btn-primary" onclick="entOpen()">+ Add a company</button></div>';
+    return;
+  }
+
+  var c = appEntity();
+  var entSel = CLIENTS.length > 1
+    ? '<select id="app-entity" class="lg-field" onchange="renderApplies()">'+
+      CLIENTS.map(function(x){
+        return '<option value="'+entEsc(x.id)+'"'+(String(c.id)===String(x.id)?' selected':'')+'>'+
+          entEsc(x.name)+'</option>';
+      }).join('')+'</select>'
+    : '';
+
+  var all = [];
+  try{ all = getComplianceChart(c, {includeNA:true}); }catch(e){}
+  var conds = appConditions(c);
+
+  var condKeys = {};
+  conds.forEach(function(g){ g.rows.forEach(function(r){ condKeys[r.key] = 1; }); });
+
+  var plain    = all.filter(function(r){ return !condKeys[r.key] && !r.userNA; });
+  var ruledOut = all.filter(function(r){ return r.userNA; });
+  var undecided = conds.reduce(function(a,g){ return a + (g.rows.length - g.decided); }, 0);
+
+  var excluded = [];
+  try{ excluded = lgExcludedFor(c); }catch(e){}
+
+  var bar = '<div class="cc-card cc-toolbar"><div class="cc-toolrow">'+
+    '<span class="aud-lbl">Entity</span>'+entSel+
+    '<div style="flex:1;"></div>'+
+    '<span class="aud-days">'+entEsc(lgEntityTypeLabel(c.type))+'</span>'+
+  '</div></div>'+
+  '<div id="app-err" class="reg-err" style="display:none;margin-top:12px;"></div>';
+
+  var chips = '<div class="cu-summary" style="margin-top:16px;">'+
+    '<div class="cu-sum-chip"><b>'+plain.length+'</b> applies</div>'+
+    (undecided?'<div class="cu-sum-chip warn"><b>'+undecided+'</b> undecided</div>':'')+
+    (ruledOut.length?'<div class="cu-sum-chip"><b>'+ruledOut.length+'</b> ruled out</div>':'')+
+    (excluded.length?'<div class="cu-sum-chip"><b>'+excluded.length+'</b> never applied</div>':'')+
+  '</div>';
+
+  var section = function(title, note, inner){
+    return '<div class="cc-card" style="margin-top:16px;"><div class="cc-card-h"><h3>'+title+'</h3>'+
+      (note?'<span style="font-size:11.5px;color:var(--ink-soft);max-width:44ch;text-align:right;">'+
+        note+'</span>':'')+'</div><div class="cc-card-b">'+inner+'</div></div>';
+  };
+
+  // ── the undecided ones ─────────────────────────────────────
+  var condBlock;
+  if(!conds.length){
+    condBlock = section('Nothing conditional', '',
+      '<div class="cc-none" style="text-align:left;">Every obligation on this entity applies on its '+
+      'class alone &mdash; none of them carries a qualification the engine could not evaluate.</div>');
+  }else{
+    condBlock = conds.map(function(g){
+      var id = appHash(g.condition);
+      var open = !!APP_OPEN[id];
+      var left = g.rows.length - g.decided;
+      return '<div class="cc-card app-cond'+(left?'':' done')+'">'+
+        '<div class="cc-card-b">'+
+          '<div class="app-cond-h">'+
+            '<div><div class="app-cond-q">&ldquo;'+entEsc(g.condition)+'&rdquo;</div>'+
+              '<div class="app-cond-m">Matched on <b>'+entEsc(g.plain||'class')+'</b>. '+
+                'The rest is a fact about this company that nothing here records. '+
+                '<b>'+g.rows.length+'</b> '+(g.rows.length===1?'obligation':'obligations')+
+                (g.excluded?' &middot; '+g.excluded+' ruled out':'')+
+                (g.confirmed?' &middot; '+g.confirmed+' confirmed':'')+'</div>'+
+            '</div>'+
+            (left
+              ? '<div class="app-acts">'+
+                  '<button class="cc-btn" id="app-b-'+id+'-n" onclick="appResolve('+
+                    lgArg(g.condition)+',false)">Not true of this company</button>'+
+                  '<button class="cc-btn-primary" id="app-b-'+id+'-y" onclick="appResolve('+
+                    lgArg(g.condition)+',true)">It is true &mdash; these apply</button>'+
+                '</div>'
+              : '<span class="app-done">decided</span>')+
+          '</div>'+
+          '<div class="app-toggle" onclick="appToggle('+lgArg(id)+')">'+
+            (open?'Hide':'Show')+' the '+g.rows.length+' '+
+            (g.rows.length===1?'obligation':'obligations')+'</div>'+
+          (open
+            ? '<div class="app-list">'+g.rows.map(function(r){
+                return '<div class="app-r" onclick="cuOpenDetail('+lgArg(c.id)+','+lgArg(r.key)+')">'+
+                  '<span class="mono app-sec">'+entEsc(r.section||'')+'</span>'+
+                  '<span class="app-o">'+entEsc(r.obligation)+'</span>'+
+                  (r.userNA?'<span class="aud-flag no">ruled out</span>'
+                   :r.appliesConfirmed?'<span class="aud-flag ok">applies</span>':'')+
+                '</div>';
+              }).join('')+'</div>'
+            : '')+
+        '</div></div>';
+    }).join('');
+    condBlock = '<div class="cc-card-h" style="margin-top:22px;padding:0 2px 10px;">'+
+      '<h3>Depends on something nobody has recorded &mdash; '+undecided+' undecided</h3>'+
+      '<span style="font-size:11.5px;color:var(--ink-soft);max-width:46ch;text-align:right;">'+
+      'Answered once per condition, not once per row. Until then these count as owed, '+
+      'and sit in the denominator of every coverage figure.</span></div>' + condBlock;
+  }
+
+  // ── the plain ones ─────────────────────────────────────────
+  var plainOpen = !!APP_OPEN.__plain;
+  var byLaw = {};
+  plain.forEach(function(r){ byLaw[r.law] = (byLaw[r.law]||0) + 1; });
+  var plainBlock = section('Applies on class alone &mdash; '+plain.length,
+    'No further condition; nothing to decide.',
+    Object.keys(byLaw).sort(function(a,b){ return byLaw[b]-byLaw[a]; }).map(function(l){
+      return '<div class="app-r"><span class="app-o">'+entEsc(l)+'</span>'+
+        '<b style="color:var(--ink-soft);">'+byLaw[l]+'</b></div>';
+    }).join('')+
+    '<div class="app-toggle" onclick="appToggle(\'__plain\')">'+
+      (plainOpen?'Hide':'Show')+' all '+plain.length+'</div>'+
+    (plainOpen
+      ? '<div class="app-list">'+plain.map(function(r){
+          return '<div class="app-r" onclick="cuOpenDetail('+lgArg(c.id)+','+lgArg(r.key)+')">'+
+            '<span class="mono app-sec">'+entEsc(r.section||'')+'</span>'+
+            '<span class="app-o">'+entEsc(r.obligation)+'</span></div>';
+        }).join('')+'</div>'
+      : ''));
+
+  // ── what never applied ─────────────────────────────────────
+  var exOpen = !!APP_OPEN.__ex;
+  var exBlock = excluded.length
+    ? section('Never applied to this entity &mdash; '+excluded.length,
+        'Excluded by the rule&rsquo;s own applicability, with the reason.',
+        '<div class="app-toggle" onclick="appToggle(\'__ex\')">'+
+          (exOpen?'Hide':'Show')+' all '+excluded.length+'</div>'+
+        (exOpen
+          ? '<div class="app-list">'+excluded.map(function(x){
+              return '<div class="app-r"><span class="mono app-sec">'+entEsc(x.section||'')+'</span>'+
+                '<span class="app-o">'+entEsc(x.title||'')+
+                  '<div class="app-why">'+entEsc((x.reasons||[]).join('; '))+'</div></span></div>';
+            }).join('')+'</div>'
+          : ''))
+    : '';
+
+  // ── ruled out by a person ──────────────────────────────────
+  var naBlock = ruledOut.length
+    ? section('Ruled out by you &mdash; '+ruledOut.length, 'Each carries the reason given.',
+        ruledOut.map(function(r){
+          return '<div class="app-r" onclick="cuOpenDetail('+lgArg(c.id)+','+lgArg(r.key)+')">'+
+            '<span class="mono app-sec">'+entEsc(r.section||'')+'</span>'+
+            '<span class="app-o">'+entEsc(r.obligation)+
+              (r.naReason?'<div class="app-why">'+entEsc(r.naReason)+'</div>':'')+'</span></div>';
+        }).join(''))
+    : '';
+
+  var foot = '<div class="cc-card" style="margin-top:16px;"><div class="cc-card-b"><div class="set-n">'+
+    'The engine matches on entity class. Anything narrower than that &mdash; whether this company '+
+    'has subsidiaries, unutilised issue proceeds, a monitoring agency, or is under CIRP &mdash; is a '+
+    'fact about the company that nothing in this system records, so it is asked rather than assumed. '+
+    'Deciding a condition writes to the audit trail with your name against it.'+
+  '</div></div></div>';
+
+  root.innerHTML = head + bar + chips + condBlock + plainBlock + naBlock + exBlock + foot;
 }
 
 // ═══════════════════════════════════════════════════
@@ -11450,6 +11761,11 @@ async function lgPersist(entityId, key, patch, quiet){
         ...(patch.stage !== undefined ? { stage: patch.stage || null } : {}),
         ...(patch.remarks !== undefined ? { remarks: patch.remarks || null } : {}),
         ...(patch.notApplicable !== undefined ? {
+          ...(patch.appliesConfirmed !== undefined
+            ? {applies_confirmed: !!patch.appliesConfirmed,
+               applies_confirmed_by: patch.appliesConfirmedBy || null,
+               applies_confirmed_at: new Date().toISOString()}
+            : {}),
           not_applicable: !!patch.notApplicable,
           na_reason: patch.naReason || null,
           na_by:     patch.naBy || null,
