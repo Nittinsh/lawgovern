@@ -478,6 +478,21 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 .imp-main{min-width:0;flex:1;}
 .imp-t{font-size:13px;font-weight:600;color:var(--navy);line-height:1.5;}
 .imp-m{font-size:11.5px;color:var(--ink-soft);margin-top:3px;}
+.imp-decs{display:flex;flex-direction:column;gap:12px;margin-top:16px;}
+.imp-dec{margin:0;}
+.imp-dec.quiet{opacity:.62;}
+.imp-dec-h{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.imp-dec-n{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:var(--navy);color:#fff;font-size:11px;font-weight:700;flex-shrink:0;}
+.imp-dec-q{font-size:11.5px;color:var(--ink-soft);font-style:italic;}
+.imp-dec-t{font-size:12.5px;line-height:1.65;color:var(--ink-mid);white-space:pre-wrap;padding:10px 12px;background:var(--bg);border-radius:8px;}
+.imp-mgt{margin-top:12px;padding:12px 14px;border:1px solid var(--crit);border-left-width:3px;border-radius:9px;background:var(--crit-wash);}
+.imp-mgt-h{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--crit);margin-bottom:8px;}
+.imp-limb{font-size:12.5px;line-height:1.6;color:var(--ink-mid);padding:4px 0;}
+.imp-caveat{font-size:11.5px;line-height:1.6;color:var(--ink-soft);margin-top:6px;padding-left:10px;border-left:2px solid var(--line);}
+.imp-sub{margin-top:12px;}
+.imp-sub-h{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px;}
+.imp-sub-r{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;line-height:1.55;color:var(--navy);padding:5px 0;border-bottom:1px solid var(--line-soft);}
+.imp-sub-r:last-child{border-bottom:none;}
 .imp-gap{margin-top:16px;padding:14px 16px;background:var(--warn-wash);border:1px solid var(--warn);border-left-width:3px;border-radius:10px;font-size:12.5px;line-height:1.65;color:var(--ink-mid);}
 .imp-gap b{color:var(--warn);}
 .imp-cut{font-size:11.5px;color:var(--ink-soft);padding:10px 0 2px;font-style:italic;}
@@ -1251,7 +1266,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v126">
+      <meta id="build-version" content="v128">
     </div>
   </div>
   <div class="cc-search">
@@ -7641,6 +7656,13 @@ function impCoverage(c){
 }
 
 var IMP_LAST = null;
+var IMP_MODE = 'event';
+
+function impSetMode(m){
+  IMP_MODE = m;
+  IMP_LAST = null;
+  renderImpact();
+}
 
 // Written to sit alongside the real thing, not to replace judgement.
 var IMP_EXAMPLES = [
@@ -7677,6 +7699,260 @@ function impExample(t){
   if(el){ el.value = String(t).replace(/&rsquo;/g,"'"); impRun(); }
 }
 
+// ── MGT-14: the matrix the register flags but does not hold ──────
+// Section 179(3), the powers a board may exercise only by a resolution passed at
+// a meeting. Section 117(3)(g) then requires those resolutions to be filed.
+// Wording is from the Act text in reference/, so each hit can cite its clause.
+var MGT14_179_3 = [
+  {limb:'179(3)(a)', text:'to make calls on shareholders in respect of money unpaid on their shares',
+   find:/\bcalls?\b[^.]{0,40}\bshareholders?\b|money unpaid on|unpaid call/i},
+  {limb:'179(3)(b)', text:'to authorise buy-back of securities under section 68',
+   find:/buy-?back|repurchase of (?:its own )?(?:shares|securities)/i},
+  {limb:'179(3)(c)', text:'to issue securities, including debentures, whether in or outside India',
+   find:/issu[a-z]*[^.]{0,40}(?:securities|debentures|shares|equity)|(?:securities|debentures|shares|equity)[^.]{0,60}(?:be issued|be allotted)|allot[a-z]*[^.]{0,40}(?:shares|securities)|private placement|preferential (?:issue|allotment)|rights issue|bonus (?:issue|shares)/i},
+  {limb:'179(3)(d)', text:'to borrow monies',
+   find:/borrow|avail[^.]{0,30}(loan|facility|credit)|term loan|working capital|credit facility|raise[^.]{0,20}(debt|finance)/i},
+  {limb:'179(3)(e)', text:'to invest the funds of the company',
+   find:/invest[^.]{0,40}(fund|money|monies|surplus)|make an investment|subscribe to[^.]{0,30}(shares|securities)/i},
+  {limb:'179(3)(f)', text:'to grant loans or give guarantee or provide security in respect of loans',
+   find:/grant[^.]{0,20}loan|give[^.]{0,20}guarantee|provide[^.]{0,20}security|corporate guarantee|inter-?corporate loan/i,
+   ordinaryCourse:true},
+  {limb:'179(3)(g)', text:'to approve financial statement and the Board’s report',
+   // Minutes are written in the passive — "the financial statements ... be and
+   // are hereby approved" — so the words appear in the opposite order to the
+   // section. Matching only the section's order missed the commonest board
+   // resolution there is.
+   find:/(?:approv|adopt)[a-z]*[^.]{0,60}(?:financial statement|balance sheet|board.s report|director.?s.? report|annual account)|(?:financial statement|balance sheet|board.s report|director.?s.? report|annual account)[^.]{0,80}(?:approv|adopt)/i},
+  {limb:'179(3)(h)', text:'to diversify the business of the company',
+   find:/diversif|new line of business|enter into a new business/i},
+  {limb:'179(3)(i)', text:'to approve amalgamation, merger or reconstruction',
+   find:/amalgamat|merger|merge with|reconstruct|scheme of arrangement|demerger/i},
+  {limb:'179(3)(j)', text:'to take over a company or acquire a controlling or substantial stake in another company',
+   find:/take ?over|takeover|acquir[^.]{0,40}(stake|control|shares|company)|controlling (stake|interest)|substantial stake/i},
+  {limb:'179(3)(k)', text:'any other matter which may be prescribed (Rule 8, Companies (Meetings of Board) Rules 2014)',
+   find:/(?!)/, prescribed:true}
+];
+
+// Section 117(3) — the limbs that put a resolution on the register regardless of
+// whether it came from 179(3).
+var MGT14_117_3 = [
+  {limb:'117(3)(a)', text:'special resolutions',
+   find:/special resolution/i},
+  {limb:'117(3)(b)', text:'resolutions agreed to by all members which would otherwise have required a special resolution',
+   find:/agreed to by all (the )?members|unanimous(ly)? (consent|agreed)/i},
+  {limb:'117(3)(c)', text:'board resolution or agreement on the appointment, re-appointment, renewal or variation of terms of appointment of a managing director',
+   find:/(appoint|re-?appoint|renew|variation|terms)[^.]{0,60}managing director|managing director[^.]{0,60}(appoint|re-?appoint|renew|remunerat|terms)/i},
+  {limb:'117(3)(d)', text:'resolutions or agreements agreed to by a class of members',
+   find:/class of (members|shareholders)|class meeting/i},
+  {limb:'117(3)(f)', text:'resolutions requiring the company to be wound up voluntarily under section 59 of the IBC 2016',
+   find:/wound up voluntar|voluntary (winding up|liquidation)|section 59 of the insolvency/i}
+];
+
+// Whether a single decision has to go on MGT-14, and under which limb.
+function mgt14Assess(text, c){
+  var t = String(text || '');
+  var hits = [];
+
+  MGT14_117_3.forEach(function(l){
+    if(l.find.test(t)) hits.push({limb:l.limb, text:l.text, route:'117(3)'});
+  });
+
+  var boardHits = MGT14_179_3.filter(function(l){ return !l.prescribed && l.find.test(t); });
+  boardHits.forEach(function(l){
+    hits.push({limb:l.limb, text:l.text, route:'117(3)(g) r/w 179(3)',
+      // The proviso to 117(3)(g) excludes loans, guarantees and security given
+      // in the ordinary course of business. Whether this one was is a question
+      // about the company, not about the words, so it is asked rather than assumed.
+      caveat: l.ordinaryCourse
+        ? 'The proviso to section 117(3)(g) excludes loans, guarantees and security '+
+          'given in the ordinary course of business. If this was, it is not filed.'
+        : null});
+  });
+
+  if(!hits.length) return null;
+
+  // Private companies are exempted from 117(3)(g) by an MCA notification that is
+  // not among the sources held here. Deciding it either way would be a guess.
+  var privateExempt = c && c.type === 'private' &&
+    hits.some(function(h){ return h.route === '117(3)(g) r/w 179(3)'; });
+
+  return {hits:hits, privateExempt:privateExempt};
+}
+
+// ── splitting a set of minutes into decisions ────────────────────
+// "RESOLVED FURTHER THAT" continues the resolution above it and must stay with
+// it; splitting there would cut a single decision into fragments that each read
+// as a separate one.
+function impSplitMinutes(text){
+  var t = String(text || '').replace(/\r\n/g, '\n').trim();
+  if(!t) return [];
+
+  // Whoever wrote the minutes already divided them into items. Where those
+  // headings exist they ARE the decision boundary, and the heading belongs with
+  // the resolution beneath it — splitting at "RESOLVED THAT" instead stranded
+  // each heading as its own decision and handed the next one to the resolution
+  // above it.
+  var HEAD = /(?:^|\n)[ \t]*(?:ITEM\s*(?:NO\.?|#)?\s*\d+|\d+\s*[.)]\s+(?=[A-Z]{2,}))/g;
+  var heads = t.match(HEAD);
+
+  var parts;
+  if(heads && heads.length >= 2){
+    parts = t.split(/(?=(?:^|\n)[ \t]*(?:ITEM\s*(?:NO\.?|#)?\s*\d+|\d+\s*[.)]\s+(?=[A-Z]{2,})))/);
+  }else{
+    var resolved = t.match(/\bRESOLVED\s+THAT\b/gi);
+    if(resolved && resolved.length >= 2){
+      // Split before the resolution itself, not before the line holding it, and
+      // never before a RESOLVED FURTHER THAT — that continues the one above.
+      parts = t.split(/(?=\bRESOLVED\s+THAT\b)/i);
+    }else{
+      parts = t.split(/\n\s*\n/);
+    }
+  }
+
+  return parts.map(function(p){ return p.trim(); })
+              .filter(function(p){ return p.length > 25; })
+              .slice(0, 40);
+}
+
+function impRunMinutes(){
+  var el = document.getElementById('imp-minutes');
+  var c = impEntity();
+  if(!el || !c){ IMP_LAST = null; renderImpact(); return; }
+  var text = el.value.trim();
+  if(!text){ IMP_LAST = null; renderImpact(); return; }
+
+  var decisions = impSplitMinutes(text).map(function(d, i){
+    return {n:i+1, text:d, res:impAssess(d, c), mgt14:mgt14Assess(d, c)};
+  });
+
+  IMP_LAST = {mode:'minutes', text:text, decisions:decisions, entity:c.name};
+  renderImpact();
+}
+
+function impMinutesBlock(c){
+  var ds = IMP_LAST.decisions;
+  var withImpact = ds.filter(function(d){
+    return d.mgt14 || d.res.disclosures.length || d.res.obligations.length || d.res.forms.length;
+  });
+  var filings = ds.filter(function(d){ return d.mgt14; });
+
+  var head =
+    '<div id="imp-results" class="cu-summary" style="margin-top:16px;">'+
+      '<div class="cu-sum-chip"><b>'+ds.length+'</b> '+(ds.length===1?'decision':'decisions')+' read</div>'+
+      '<div class="cu-sum-chip'+(withImpact.length?' warn':'')+'"><b>'+withImpact.length+
+        '</b> with consequences</div>'+
+      (filings.length?'<div class="cu-sum-chip crit"><b>'+filings.length+
+        '</b> may need MGT-14</div>':'')+
+    '</div>';
+
+  if(filings.length){
+    head += '<div class="imp-gap"><b>MGT-14 runs for thirty days from the date the resolution '+
+      'was passed</b> (section 117(1)), not from the date the minutes are signed. '+
+      filings.length+' of the '+ds.length+' decisions below match a limb of section 117(3).</div>';
+  }
+
+  var conf = function(m){
+    return (m.actions && m.subjects) ? 'close' : m.actions ? 'possible' : 'related';
+  };
+
+  var body = ds.map(function(d){
+    var r = d.res;
+    var n = r.disclosures.length + r.obligations.length + r.forms.length;
+    var quiet = !d.mgt14 && !n;
+
+    var mgt = '';
+    if(d.mgt14){
+      mgt = '<div class="imp-mgt">'+
+        '<div class="imp-mgt-h">MGT-14 &mdash; within 30 days of passing</div>'+
+        d.mgt14.hits.map(function(h){
+          return '<div class="imp-limb"><span class="mono">'+entEsc(h.limb)+'</span> '+
+            entEsc(h.text)+
+            (h.caveat?'<div class="imp-caveat">'+entEsc(h.caveat)+'</div>':'')+'</div>';
+        }).join('')+
+        (d.mgt14.privateExempt
+          ? '<div class="imp-caveat"><b>'+entEsc(c.name)+' is a private company.</b> Private '+
+            'companies are exempted from section 117(3)(g) by an MCA exemption notification, '+
+            'which is not among the sources held here &mdash; so this is flagged, not decided. '+
+            'Check the notification before filing or not filing.</div>'
+          : '')+
+      '</div>';
+    }
+
+    var lists = '';
+    [['Disclosure', r.disclosures, function(x){ return entEsc(String(x.title).slice(0,150)); }],
+     ['Obligation', r.obligations, function(x){ return entEsc(x.title); }],
+     ['Form', r.forms, function(x){ return '<span class="mono">'+entEsc(x.form)+'</span> &mdash; '+
+        entEsc(String(x.purpose||'').slice(0,90)); }]
+    ].forEach(function(g){
+      if(!g[1].length) return;
+      lists += '<div class="imp-sub"><div class="imp-sub-h">'+g[0]+
+        (g[1].length>1?'s':'')+'</div>'+
+        g[1].slice(0,4).map(function(x){
+          return '<div class="imp-sub-r"><span class="imp-conf '+conf(x)+'">'+conf(x)+'</span>'+
+            g[2](x)+'</div>';
+        }).join('')+
+        (g[1].length>4?'<div class="imp-cut">and '+(g[1].length-4)+' more</div>':'')+
+      '</div>';
+    });
+
+    return '<div class="cc-card imp-dec'+(quiet?' quiet':'')+'">'+
+      '<div class="cc-card-b">'+
+        '<div class="imp-dec-h"><span class="imp-dec-n">'+d.n+'</span>'+
+          (quiet?'<span class="imp-dec-q">nothing in the register follows from this</span>':'')+
+        '</div>'+
+        '<div class="imp-dec-t">'+entEsc(d.text.slice(0, 420))+
+          (d.text.length>420?'&hellip;':'')+'</div>'+
+        mgt + lists +
+      '</div></div>';
+  }).join('');
+
+  return head + '<div class="imp-decs">' + body + '</div>' +
+    '<div class="cc-card" style="margin-top:16px;"><div class="cc-card-b"><div class="set-n">'+
+      'This reads the text you pasted and nothing else &mdash; it does not open a document, and it '+
+      'does not know what was discussed but not minuted. The section 179(3) and 117(3) limbs are '+
+      'quoted from the Act text in <span class="mono">reference/</span>, which is amended only to '+
+      '<b>01.04.2021</b>; check any limb against a current compilation before relying on it. '+
+      'Rule 8 of the Companies (Meetings of Board) Rules 2014 adds further matters under '+
+      '179(3)(k) which are not held here.'+
+    '</div></div></div>';
+}
+
+function renderImpactMinutes(root, head, modes, c, entSel){
+  var form = modes + '<div class="cc-card cc-toolbar">'+
+    '<div class="cc-toolrow" style="align-items:flex-start;">'+
+      '<textarea id="imp-minutes" class="lg-field" style="flex:1;min-width:240px;min-height:200px;'+
+        'resize:vertical;font-size:12.5px;line-height:1.6;" '+
+        'placeholder="Paste the minutes, or just the resolutions. Each RESOLVED THAT starts a new '+
+        'decision; RESOLVED FURTHER THAT stays with the one above it.">'+
+        entEsc(IMP_LAST?IMP_LAST.text:'')+'</textarea>'+
+      '<div style="display:flex;flex-direction:column;gap:8px;">'+entSel+
+        '<button class="cc-btn-primary" onclick="impRunMinutes()">Read minutes</button>'+
+      '</div>'+
+    '</div></div>';
+
+  if(!IMP_LAST || IMP_LAST.mode !== 'minutes'){
+    root.innerHTML = head + form +
+      '<div class="cc-card" style="margin-top:16px;"><div class="cc-card-b">'+
+      '<div class="cc-none" style="text-align:left;">Each decision is read on its own and matched '+
+      'against this entity&rsquo;s register, the same way a single event is. On top of that, every '+
+      'decision is tested against <b>section 179(3)</b> and <b>section 117(3)</b> to see whether it '+
+      'has to go on MGT-14 within thirty days.<br><br>'+
+      'Nothing is stored. This reads the text and reports what follows from it.</div>'+
+      '</div></div>';
+    return;
+  }
+
+  if(!IMP_LAST.decisions.length){
+    root.innerHTML = head + form +
+      '<div class="cc-card" style="margin-top:16px;"><div class="cc-card-b">'+
+      '<div class="cc-none" style="text-align:left;">Could not find any decisions in that. '+
+      'Paste the body of the minutes, or the resolutions on their own.</div></div></div>';
+    return;
+  }
+
+  root.innerHTML = head + form + impMinutesBlock(c);
+}
+
 function renderImpact(){
   var root = document.getElementById('imp-root');
   if(!root) return;
@@ -7705,7 +7981,17 @@ function renderImpact(){
       }).join('')+'</select>'
     : '';
 
-  var form = '<div class="cc-card cc-toolbar">'+
+  // Same tab component the rest of the app uses, on divs as it is elsewhere —
+  // a button here would carry its own default chrome.
+  var modes = '<div class="mw-tabs">'+
+    [['event','An event'],['minutes','Board minutes']].map(function(m){
+      return '<div class="mw-tab'+(IMP_MODE===m[0]?' on':'')+'" onclick="impSetMode('+
+        lgArg(m[0])+')">'+m[1]+'</div>';
+    }).join('')+'</div>';
+
+  if(IMP_MODE === 'minutes') return renderImpactMinutes(root, head, modes, c, entSel);
+
+  var form = modes + '<div class="cc-card cc-toolbar">'+
     '<div class="cc-toolrow" style="align-items:flex-start;">'+
       '<textarea id="imp-q" class="lg-field" style="flex:1;min-width:240px;min-height:74px;resize:vertical;" '+
         'placeholder="What happened? For example: the board approved borrowing of Rs 50 crore from a bank, '+

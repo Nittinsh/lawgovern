@@ -294,6 +294,54 @@ rule is what removes the fraud row from a resignation search while keeping every
 
 ---
 
+## 2g. COMPLIANCE IMPACT FROM BOARD MINUTES (v128, Phase 2 item 12)
+
+Second mode on the Event Impact screen (`IMP_MODE`, tabs "An event" / "Board minutes"). Paste the
+minutes; each decision is read on its own through the same concept engine as item 11, plus an
+MGT-14 test that item 11 does not do.
+
+### The MGT-14 matrix is now real data
+The register's row `CA-SECTION-117-AND-APPLICABLE-EXEMPTIONS-33` ("MGT-14 filing matrix") has
+`trigger: "Depends on resolution and company-class exemptions"` — it flags the question and does
+not answer it. So the matrix was extracted from the Act text in `reference/`:
+- **`MGT14_179_3`** — section 179(3)(a)–(k), the powers exercisable only by board resolution.
+- **`MGT14_117_3`** — section 117(3)(a)–(g), the resolutions that must be filed.
+
+Each limb carries its own statutory words, so a hit **cites the clause** and can be checked against
+the bare act. `mgt14Assess(text, company)` returns the hits or null.
+
+### What it refuses to decide
+- **Private companies are exempted from 117(3)(g)** by an MCA exemption notification that is NOT in
+  `reference/`. Applying it would be guessing; ignoring it would flag every private company's
+  borrowing resolution. So the limb matches and the UI says the exemption must be checked. Note the
+  exemption covers only the **179(3) route** — a private company passing a *special* resolution
+  still files under 117(3)(a), and the code distinguishes these.
+- **The proviso to 117(3)(g)** excludes loans/guarantees/security given in the ordinary course of
+  business. Whether this one was is a fact about the company, so `ordinaryCourse:true` on
+  179(3)(f) raises the question rather than answering it.
+- **The Act text is amended only to 01.04.2021** — over five years stale. Stated on screen.
+- **Rule 8 of the Companies (Meetings of Board) Rules 2014** adds further 179(3)(k) matters that
+  are not held. `prescribed:true` marks the limb as present-but-unpopulated.
+
+### Splitting minutes — the bug worth remembering
+The first cut split before the *line* containing "RESOLVED THAT". That stranded each ITEM heading
+as its own decision AND handed the next item's heading to the previous resolution — so
+"ITEM NO. 2 — BORROWING" attached to the financial-statements resolution, which was then reported
+as needing MGT-14 under **179(3)(d), to borrow monies**. A filing flagged against the wrong
+resolution is the one failure this feature cannot have.
+
+Now: where **ITEM headings** exist they are the decision boundary (the author already divided the
+document); otherwise split before `RESOLVED THAT` itself — **never** before `RESOLVED FURTHER
+THAT`, which continues the resolution above it.
+
+### And the limbs must match the passive voice
+Minutes say "the financial statements ... be and are hereby approved", not "approve the financial
+statements". Matching only the section's word order meant **179(3)(g) never fired on an approval of
+accounts** — close to the commonest board resolution there is. 179(3)(c) and (g) now match both
+orders.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -370,13 +418,13 @@ rule is what removes the fraud row from a resignation search while keeping every
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v126.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v128.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. All migrations through `db/016` are applied except `db/013` (the drop script, deliberately
 left commented out).
 
 **Phase 2 — the owner's spec:**
 - [x] 11. Event -> Compliance Impact Engine (section 2f)
-- [ ] 12. Compliance impact from board minutes
+- [x] 12. Compliance impact from board minutes (section 2g)
 - [ ] 13. Regulatory change impact analysis
 - [ ] 14. AI applicability engine
 - [ ] 15. AI due-date reasoning
