@@ -1322,7 +1322,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v141">
+      <meta id="build-version" content="v142">
     </div>
   </div>
   <div class="cc-search">
@@ -8755,8 +8755,13 @@ var EXC_TYPES = [
    why:'Nobody is answerable for this obligation.'},
   {id:'noReviewer', label:'No reviewer assigned',        tone:'info',
    why:'A recorded filing with nobody named to check it.'},
-  {id:'dateDerived',label:'Due date computed, not stated',tone:'info',
-   why:'The source sheet recorded no exact deadline, so the date is derived from the period end.'},
+  // Was "due date computed, not stated". The engine no longer emits those dates
+  // at all, which left this permanently at zero. The gap moved rather than
+  // closed: these recur on a period and no deadline is recorded for them
+  // anywhere, and this is the list to work through to fix that.
+  {id:'noDeadline',label:'Recurs, but no deadline recorded',tone:'info',
+   why:'The obligation belongs to a period, but the source states no offset from that period end, '+
+       'so no due date can be computed. It cannot go overdue and will not appear in Due Soon.'},
   {id:'needsReview',label:'Applicability needs review',  tone:'info',
    why:'The rule was flagged for review when the source sheet was converted.'}
 ];
@@ -8785,8 +8790,8 @@ function excBuild(){
       if(!r.ownerEmail && st.state !== 'NOT_APPLICABLE' && !lgNoDate(st.state))
         out.unassigned.push(base);
       if(filed && !r.reviewerEmail) out.noReviewer.push(base);
-      if(r.dueConfidence === 'derived' && st.days !== null && st.days < 0)
-        out.dateDerived.push(base);
+      if(st.state === 'NO_DEADLINE')
+        out.noDeadline.push(base);
       if(r.needsReview || r.unconfirmed) out.needsReview.push(base);
     });
   });

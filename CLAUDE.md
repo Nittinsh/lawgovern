@@ -527,6 +527,15 @@ Reg 33(3)(a) 14 Aug, FLA 15 Jul).
   the states it represents, and any remainder gets its own visible band
   ("Not covered by the bands above") instead of being folded into a neighbour.
 
+### The Exceptions module (item 16) followed from this
+`dateDerived` ("Due date computed, not stated") became unsatisfiable — it tests `dueConfidence ===
+'derived'` **and** a past-due date, and a derived rule no longer has a date at all. Permanently
+zero: a control that cannot fire. Repurposed to **`noDeadline`** ("Recurs, but no deadline
+recorded"), which reports the 111 rows that are now the stage-2 worklist.
+
+Verified consistent with the dashboard on one listed entity: unassigned 21 = 21, overdue 5 = 5.
+(An earlier reading of 396 unassigned was duplicated test entities in `CLIENTS`, not a defect.)
+
 ### Stage 2 — not done
 Put real offsets into `rules/` for the 79 `derived` rules, worst first: the **20 quarterly** ones
 currently reading as undated are the priority (several state their offset in plain words —
@@ -611,7 +620,7 @@ dates automatically, with no engine change.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v141.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v142.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. Migrations through `db/016` are applied. **`db/017_applicability_review.sql` is new and has not been run** — until it is, confirming an applicability condition fails with a message naming the file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**
@@ -620,7 +629,7 @@ progress. Migrations through `db/016` are applied. **`db/017_applicability_revie
 - [x] 13. Regulatory change impact analysis (section 2h)
 - [x] 14. Applicability engine (section 2j) &mdash; built without a model
 - [x] 15. Due-date reasoning (section 2k) &mdash; stage 1 done, stage 2 is data work
-- [ ] 16. AI compliance gap analysis
+- [x] 16. Compliance gap analysis (section 2k) &mdash; the Exceptions module, audited and corrected
 - [x] 17. "What changed / since last review" (section 2i) &mdash; built without a model
 - [x] 18. Regulatory Radar impact analysis (section 2h)
 
