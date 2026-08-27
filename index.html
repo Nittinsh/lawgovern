@@ -1322,7 +1322,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v136">
+      <meta id="build-version" content="v141">
     </div>
   </div>
   <div class="cc-search">
@@ -4555,7 +4555,9 @@ function lodrLast(month, day){
 
 // Turn a rule's due descriptor into concrete dates. Returns an array, because a
 // quarterly obligation produces four in a year.
-function lodrDueDates(rule){
+// Renamed: the wrapper below decides whether the dates it produces are real
+// deadlines or merely the ends of the periods they relate to.
+function lodrDueDatesRaw(rule){
   var d = rule.due || {};
   switch(d.type){
     case 'continuous':
@@ -4652,7 +4654,9 @@ function lodrObligations(c){
         risk: lodrRisk(rule.regulation),
         penalty: 'SEBI LODR - Reg 98 / SOP for non-compliance',
         applicable: true,
-        lodr: true, standing: false,
+        // A dated occurrence with no deadline is still standing: it belongs to
+        // a period, but it cannot be overdue.
+        lodr: true, standing: !dd.due,
         dueConfidence: rule.dueConfidence,
         needsReview: !!rule.needsReview,
         unconfirmed: ap === 'unconfirmed',
@@ -4689,7 +4693,7 @@ function cmApplies(rule, c){
 }
 
 // Concrete dates from a generated due descriptor. Reuses the LODR helpers.
-function cmDueDates(rule, c, agmIso){
+function cmDueDatesRaw(rule, c, agmIso){
   var d = rule.due || {};
   // The generated rules carry 31 March because that is the sheet's assumption.
   // The entity's own year end wins — otherwise a December year end silently
@@ -4749,6 +4753,45 @@ function cmDueDates(rule, c, agmIso){
   }
 }
 
+
+// Does the source actually establish a deadline for this rule?
+//
+// Every rule marked `exact` carries a real offset — event_offset,
+// quarter_end_offset, agm_offset, fy_end_offset — or is a genuine fixed date.
+// Every rule marked `derived` carries none, and for those the only date the
+// engine can produce is the end of the period the obligation relates to.
+//
+// Emitting that as a due date put 63 of a listed entity's 132 dated obligations
+// on 31 March 2027, including Reg 47(1) ("within 48 hours of conclusion of the
+// board meeting"), Reg 52(8) ("within 2 working days") and Reg 23(2) ("prior to
+// the transaction") — two of which are not calendar-driven at all.
+//
+// Tested on the offset rather than the confidence flag deliberately: giving a
+// rule a real offset in rules/ is all it takes to bring its date back.
+function lgHasDeadline(rule){
+  var d = rule.due || {};
+  return !!(d.days || d.months) || String(rule.dueConfidence || '') !== 'derived';
+}
+
+// That an obligation relates to the quarter ending 30 June is true. That it is
+// due on 30 June is not. So the occurrences survive — each keeps its period and
+// its own row to be evidenced against — and only the invented deadline goes.
+function lgStripDeadlines(dates){
+  return dates.map(function(x){
+    return {due: null, periodEnd: x.periodEnd || x.due, label: x.label};
+  });
+}
+
+function lodrDueDates(rule){
+  var dates = lodrDueDatesRaw(rule);
+  return lgHasDeadline(rule) ? dates : lgStripDeadlines(dates);
+}
+
+function cmDueDates(rule, c, agmIso){
+  var dates = cmDueDatesRaw(rule, c, agmIso);
+  return lgHasDeadline(rule) ? dates : lgStripDeadlines(dates);
+}
+
 function cmRows(dataset, c, agmIso, tag){
   var rules = (dataset && dataset.rules) || [];
   var out = [];
@@ -4788,7 +4831,10 @@ function cmRows(dataset, c, agmIso, tag){
       out.push(Object.assign({}, base, {
         key: rule.id + (dates.length > 1 ? '-' + String(dd.label||'').split(' ')[0] : ''),
         obligation: rule.title + (dates.length > 1 ? ' - ' + dd.label : ''),
-        due: dd.due, periodEnd: dd.periodEnd, standing: false
+        due: dd.due, periodEnd: dd.periodEnd,
+        // A dated occurrence with no deadline is still standing: it belongs to
+        // a period, but it cannot be overdue.
+        standing: !dd.due
       }));
     });
   });
@@ -6396,6 +6442,7 @@ function ccComputeStats(){
     entities: (typeof CLIENTS!=='undefined'?CLIENTS.length:0),
     // Evidence-based counters. "verified" is the ONLY one that claims compliance.
     verified:0, filedLate:0, noEvidence:0, unverified:0, needsCheck:0, notApplicable:0, standing:0,
+    noDeadline:0,
     awaitingCheck:0, rejected:0, missingDoc:0,
     manualConfirmation:0, verificationPending:0, partiallyVerified:0,
     dueNow:0, overdueConfirmed:0, notFound:0, unknown:0, dueIn30:0, unassignedAll:0,
@@ -6430,6 +6477,7 @@ function ccComputeStats(){
       else if(st.state==='AWAITING_CHECK'){ stats.awaitingCheck++; }
       else if(st.state==='CHECK_REJECTED'){ stats.rejected++; }
       else if(st.state==='STANDING'){ stats.standing++; }
+      else if(st.state==='NO_DEADLINE'){ stats.noDeadline++; }
       else if(st.state==='UPCOMING'){ stats.upcoming++; }
       else if(st.state==='DUE_SOON'){ stats.dueThisWeek++; }
       else if(st.state==='DUE'){ stats.dueThisWeek++; stats.dueNow++; }
@@ -6440,7 +6488,7 @@ function ccComputeStats(){
 
       // Everything landing inside a month, so "what is coming" is one number
       // rather than a 7-day tile that reads 0 for three weeks out of four.
-      if(days >= 0 && days <= 30 && st.state !== 'STANDING' &&
+      if(days >= 0 && days <= 30 && !lgNoDate(st.state) &&
          lgStateMeta(st.state).asserts !== 'compliant') stats.dueIn30++;
 
       var claimed = (lgStateMeta(st.state).asserts === 'compliant');
@@ -6471,7 +6519,7 @@ function ccComputeStats(){
         });
       }
 
-      if(st.state === 'STANDING'){
+      if(lgNoDate(st.state)){
         if(stats.standingNames.length < 6) stats.standingNames.push(r.obligation);
       } else if(!claimed && days < 0 && days !== 9999){
         stats.late.push(entry);
@@ -6480,7 +6528,7 @@ function ccComputeStats(){
       }
 
       // Attention list: anything past due or close to it, that we cannot vouch for.
-      if(!claimed && st.state !== 'STANDING' && days <= 45){
+      if(!claimed && !lgNoDate(st.state) && days <= 45){
         stats.items.push({
           company:c.name, entityId:c.id, key:r.key,
           obligation:r.obligation, form:r.form, section:r.section,
@@ -6679,6 +6727,14 @@ async function lgAuditFields(entityId, key, before, patch){
       });
     }catch(e){ /* the trail must never block the write it is describing */ }
   }
+}
+
+// No due date, for either reason: it runs continuously, or the source states no
+// offset so no deadline could be computed. Both assert nothing and neither can
+// be overdue — every date-driven count has to skip them, and `days` is null, so
+// a bare `days >= 0` test would silently swallow them (null >= 0 is true).
+function lgNoDate(state){
+  return state === 'STANDING' || state === 'NO_DEADLINE';
 }
 
 // The header chip follows the register, so it cannot drift from the data.
@@ -8726,7 +8782,7 @@ function excBuild(){
       if(filed && st.late) out.lateFiled.push(base);
       if(filed && meta.asserts !== 'compliant') out.unconfirmed.push(base);
       if(filed && !filed.reference && !filed.exchangeRef) out.noRef.push(base);
-      if(!r.ownerEmail && st.state !== 'NOT_APPLICABLE' && st.state !== 'STANDING')
+      if(!r.ownerEmail && st.state !== 'NOT_APPLICABLE' && !lgNoDate(st.state))
         out.unassigned.push(base);
       if(filed && !r.reviewerEmail) out.noReviewer.push(base);
       if(r.dueConfidence === 'derived' && st.days !== null && st.days < 0)
@@ -9504,8 +9560,18 @@ function ccCardHealth(s){
 }
 
 function ccCardCoverage(s){
-  var scheduled = Math.max(0, s.totalObligations - s.evidenceOnRecord - s.pastDue
-                              - s.dueIn30 - s.standing);
+  // Counted from the states it stands for, not by subtracting the other bands.
+  // A residual cannot report a miscount — it absorbs one — and that is how
+  // adding the "deadline not established" band made this legend read 348 of 237.
+  var scheduled = (s.upcoming || 0) + (s.dueThisWeek || 0);
+
+  // Whatever no band claims. Should be zero; if it is not, a state exists that
+  // this legend does not describe, and that belongs on screen rather than
+  // rolled into whichever neighbour happens to be a subtraction.
+  var legendBands = (s.confirmed || 0) + (s.pendingConf || 0) + (s.pastDue || 0) +
+                    scheduled + (s.standing || 0) + (s.noDeadline || 0) +
+                    (s.notApplicable || 0);
+  var unbanded = Math.max(0, s.totalObligations - legendBands);
   var pct = s.totalObligations
     ? Math.round((s.evidenceOnRecord / s.totalObligations) * 100) : 0;
 
@@ -9541,6 +9607,13 @@ function ccCardCoverage(s){
             "ccGo('vstatus','OVERDUE,NOT_FOUND,VERIFICATION_UNAVAILABLE')")+
         row('#93C5FD','Scheduled, not yet due', scheduled, "ccGo('within','90')")+
         row('#CBD5E1','Ongoing or event-driven', s.standing, "ccGo('vstatus','STANDING')")+
+        // Without this band the legend summed to 117 of 237. A legend has to
+        // partition the whole, not list the interesting parts of it.
+        row('#E2E8F0','Deadline not established', s.noDeadline,
+            "ccGo('vstatus','NO_DEADLINE')")+
+        (unbanded
+          ? row('#F1F5F9','Not covered by the bands above', unbanded, "sw('universe')")
+          : '')+
         '<div class="cmd-leg total" style="cursor:pointer;" onclick="sw(\'universe\')">'+
           '<span>Applicable obligations</span><b>'+s.totalObligations+'</b></div>'+
         (s.notApplicable
@@ -11010,6 +11083,11 @@ var LG_STATE = {
   // when a trigger occurs. Asserts nothing and needs nothing today — counting
   // these as "action required" overstated the workload by more than half.
   STANDING:          {label:'Ongoing / event-driven',      tone:'neutral', asserts:'none',      sourceBacked:false},
+  // Recurs on a period, but the source states no offset from that period end,
+  // so no deadline can be computed. Asserts nothing and cannot be overdue, like
+  // STANDING — but it is a gap in the rule data rather than a property of the
+  // obligation, and saying "ongoing" for a quarterly return hides that.
+  NO_DEADLINE:       {label:'Deadline not established',    tone:'neutral', asserts:'none',      sourceBacked:false},
   // Derived from the practice's own register, so it states a fact rather than
   // a status we cannot verify.
   SHORTFALL:         {label:'Below the requirement',        tone:'crit',    asserts:'none',      sourceBacked:false},
@@ -11263,7 +11341,12 @@ function lgResolveStatus(row, company){
 
   // A duty with no due date is not an unknown; it is one that runs continuously
   // or waits on a trigger. UNKNOWN is now reserved for a genuine gap.
-  if(days === null){ out.state = out.autoState = 'STANDING'; return out; }
+  // A period without a deadline is not the same as no period at all: a Q1
+  // return recurs every quarter, and only the offset is missing.
+  if(days === null){
+    out.state = out.autoState = row.periodEnd ? 'NO_DEADLINE' : 'STANDING';
+    return out;
+  }
   if(days  >  7)   { out.state = out.autoState = 'UPCOMING'; return out; }
   if(days  >  0)   { out.state = out.autoState = 'DUE_SOON'; return out; }
   if(days === 0)   { out.state = out.autoState = 'DUE';      return out; }

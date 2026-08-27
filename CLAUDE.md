@@ -475,6 +475,66 @@ unreachable on a phone while looking fine from the outside**. `@media(max-width:
 
 ---
 
+## 2k. A PERIOD END IS NOT A DEADLINE (v141, Phase 2 item 15, stage 1)
+
+**The finding.** 63 of a listed entity's 132 dated obligations — nearly half — all sat on
+**31 March 2027**. Not computed from any rule: it is the end of the period the obligation relates
+to, emitted as if it were the date the filing is owed.
+
+| provision | what the source actually says | what was shown |
+|---|---|---|
+| Reg 47(1) | "Within 48 hours of conclusion of the board meeting" | 31 Mar 2027 |
+| Reg 52(8) | "Within 2 working days of conclusion of the board meeting" | 31 Mar 2027 |
+| Reg 23(2) | "Prior to the transaction" | 31 Mar 2027 |
+| SS-2 | "21 clear days unless valid shorter-notice consent" | 31 Mar 2027 |
+| Sec 184(1) | "First Board meeting of each FY" | 31 Mar 2027 |
+
+Wrong by months, and two of them are not calendar-driven at all — driving the calendar, Due Soon,
+and every overdue count.
+
+### The rule data makes the split unambiguous
+Every rule marked **`exact`** carries a real offset (`event_offset`, `quarter_end_offset`,
+`agm_offset`, `fy_end_offset`) or is a genuine fixed date. Every rule marked **`derived`** carries
+**no offset at all** — 79 of them — so the only date the engine can produce is the period end.
+
+`lgHasDeadline(rule)` decides; `lgStripDeadlines()` nulls the due date. **Tested on the offset, not
+the confidence flag, deliberately** — adding a real offset in `rules/` is all it takes to bring a
+date back. That is stage 2.
+
+### The occurrences survive
+The first cut returned `[]`, which also threw away the occurrences: quarterly collapsed 4 rows to 1
+and the register went 237 → 188. That is a functional loss — evidence is recorded per row, so one
+row means one filing per year could be recorded for a quarterly return. Now each occurrence keeps
+its `periodEnd` and its own row; only the invented `due` goes. Register stays at 237.
+
+### NO_DEADLINE vs STANDING
+`STANDING` = no date because none is fixed (continuous or event-driven) — right for Reg 10(1),
+wrong for a Q1 return, which recurs quarterly and is merely missing its offset. `NO_DEADLINE`
+("Deadline not established") says which it is, asserts nothing, and cannot be overdue.
+Result for a listed entity: **105 STANDING, 111 NO_DEADLINE, 16 UPCOMING, 5 past due** — and every
+remaining date is a real statutory deadline (AGM 30 Sep, AOC-4 30 Oct, MSME-1 31 Oct,
+Reg 33(3)(a) 14 Aug, FLA 15 Jul).
+
+### Two bugs the new state exposed
+- **`null >= 0` is `true` in JavaScript.** The late/upcoming split tests `days < 0` / `days >= 0`,
+  and `days` is null for an undated row — so all 111 would have fallen into the **upcoming agenda**,
+  listed as work coming up with no date against it. `lgNoDate(state)` now guards every date-driven
+  count.
+- **The gauge legend read 348 of 237.** "Scheduled, not yet due" was a *residual* —
+  `total − everything else` — so the new band's rows were still inside it. This is the same shape as
+  the `onTrack` subtraction removed from these cards once before. **A residual always sums, which is
+  exactly its danger: it cannot report a miscount, it absorbs one.** Each band is now counted from
+  the states it represents, and any remainder gets its own visible band
+  ("Not covered by the bands above") instead of being folded into a neighbour.
+
+### Stage 2 — not done
+Put real offsets into `rules/` for the 79 `derived` rules, worst first: the **20 quarterly** ones
+currently reading as undated are the priority (several state their offset in plain words —
+Reg 33(3)(b) says "45 days", Reg 47(1) says "48 hours"). Each offset added restores that rule's
+dates automatically, with no engine change.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -551,7 +611,7 @@ unreachable on a phone while looking fine from the outside**. `@media(max-width:
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v136.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v141.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. Migrations through `db/016` are applied. **`db/017_applicability_review.sql` is new and has not been run** — until it is, confirming an applicability condition fails with a message naming the file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**
@@ -559,7 +619,7 @@ progress. Migrations through `db/016` are applied. **`db/017_applicability_revie
 - [x] 12. Compliance impact from board minutes (section 2g)
 - [x] 13. Regulatory change impact analysis (section 2h)
 - [x] 14. Applicability engine (section 2j) &mdash; built without a model
-- [ ] 15. AI due-date reasoning
+- [x] 15. Due-date reasoning (section 2k) &mdash; stage 1 done, stage 2 is data work
 - [ ] 16. AI compliance gap analysis
 - [x] 17. "What changed / since last review" (section 2i) &mdash; built without a model
 - [x] 18. Regulatory Radar impact analysis (section 2h)
