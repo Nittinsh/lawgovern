@@ -342,6 +342,52 @@ orders.
 
 ---
 
+## 2h. REGULATORY CHANGE IMPACT (v131, Phase 2 items 13 + 18)
+
+The radar fetched circulars and asked a model for generic action points. The owner's brief lists
+**"news feed without entity-level impact analysis"** among the things he explicitly does not want,
+and that is exactly what it was. Every circular now says which of his entities it reaches and which
+of their obligations it touches — from the register, not from a model.
+
+`trkImpact(item, sourceKey)` → `trkItemCard()`, used by **both** render paths (`renderCirculars`
+and the AI-summary path), so the two cannot drift apart.
+
+### Three filters, cheapest first
+1. **Regime** (`TRK_REGIME`) — a SEBI circular is matched against SEBI obligations, an MCA
+   notification against the Companies Act. Matching across would produce confident nonsense.
+2. **Entity type** — `listedOnly:true` on the SEBI sources. A listing regulation cannot reach a
+   private company, and on a book of 30 companies with 3 listed this answers most items alone.
+3. **Subject** — citation first, concepts second.
+
+### Citation matching beats concept matching, and it was sitting in plain sight
+A circular names the provision it amends; the register records the provision each obligation comes
+from (`Reg 30`, `Reg. 2(1)(n)`, `Section 184(1)`, `Sections 12, 15`). `trkParseCites()` parses both
+sides into reg/section/rule numbers and intersects them. **Where a circular cites something, that
+decides it and the concepts are not consulted.**
+
+"Amendments to Regulation 30 of LODR" — the most consequential kind of SEBI circular a listed
+client gets — resolved to *no concept at all* and returned nothing. By citation it finds exactly
+the **14 rows that cite Reg 30**.
+
+**The bug worth remembering:** the suffix pattern was `(\d+\s*[A-Z]?)` under the `i` flag. `[A-Z]`
+matches lowercase when case-insensitive, and `\s*` let it cross the space — so "Regulation 30 **of**
+LODR" parsed as reg `30O` and "Section 117 **and** Rule 24" as section `117A`. *Every citation
+followed by an ordinary English word was corrupted.* Fixed with the suffix glued to the digits plus
+`(?![A-Za-z])`. Verified: `129A`, `73-76A`, `Reg. 2(1)(n)`, `Section 117 and Rule 24` all parse.
+
+### Refusing to answer
+- `TRK_TOO_BROAD = 15` — "SEBI Board Meeting outcome" (a press release about SEBI's own board)
+  matched **41 obligations** via the words "meeting" and "approved". 41 matches is not a finding;
+  it means the headline was generic enough to touch everything. Past the threshold the card says it
+  cannot be narrowed and needs reading. **Citation matches bypass this** — naming a provision that
+  appears on 30 rows is still naming that provision.
+- `held:false` on `incometax` and `ibbi` — the register holds no obligation under either, so those
+  items say the register cannot see them rather than reporting nothing found. Different claims.
+- `trkReadNote()` — stated once per fetch: matching only ever saw the headline and the feed
+  summary, never the circular.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -418,19 +464,19 @@ orders.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v128.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v131.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. All migrations through `db/016` are applied except `db/013` (the drop script, deliberately
 left commented out).
 
 **Phase 2 — the owner's spec:**
 - [x] 11. Event -> Compliance Impact Engine (section 2f)
 - [x] 12. Compliance impact from board minutes (section 2g)
-- [ ] 13. Regulatory change impact analysis
+- [x] 13. Regulatory change impact analysis (section 2h)
 - [ ] 14. AI applicability engine
 - [ ] 15. AI due-date reasoning
 - [ ] 16. AI compliance gap analysis
 - [ ] 17. AI "what changed / since last review"
-- [ ] 18. Regulatory Radar impact analysis
+- [x] 18. Regulatory Radar impact analysis (section 2h)
 
 **Phase 3 (not started):** board compliance dashboard, board-ready reports, client portal,
 information-request workflow, management certification, obligation version history, dependency

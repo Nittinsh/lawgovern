@@ -478,6 +478,24 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 .imp-main{min-width:0;flex:1;}
 .imp-t{font-size:13px;font-weight:600;color:var(--navy);line-height:1.5;}
 .imp-m{font-size:11.5px;color:var(--ink-soft);margin-top:3px;}
+.trk-card{background:var(--paper);border:1px solid var(--line);border-radius:11px;padding:15px 16px;margin-bottom:10px;}
+.trk-card-h{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
+.trk-t{font-size:13px;font-weight:600;color:var(--navy);line-height:1.45;}
+.trk-d{font-size:10.5px;color:var(--ink-soft);white-space:nowrap;padding-top:2px;}
+.trk-desc{font-size:12px;color:var(--ink-mid);margin-top:7px;line-height:1.55;}
+.trk-imp{margin-top:12px;padding:12px 14px;background:var(--blue-wash);border-radius:9px;}
+.trk-imp.none{background:var(--bg);font-size:11.5px;color:var(--ink-soft);line-height:1.6;}
+.trk-imp-h{font-size:11.5px;color:var(--blue);font-weight:600;margin-bottom:9px;}
+.trk-ent{margin-top:9px;}
+.trk-ent:first-of-type{margin-top:0;}
+.trk-ent-n{font-size:12px;font-weight:600;color:var(--navy);display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.trk-ent-t{font-size:10px;font-weight:600;color:var(--ink-soft);background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:1px 6px;}
+.trk-hit{font-size:12px;color:var(--ink-mid);line-height:1.5;padding:4px 0 4px 11px;border-left:2px solid var(--line);margin-top:4px;cursor:pointer;}
+.trk-hit:hover{color:var(--blue);border-left-color:var(--blue);}
+.trk-cite{color:var(--ink-soft);font-weight:500;}
+.trk-more{font-size:11px;color:var(--ink-soft);padding-left:11px;margin-top:4px;font-style:italic;}
+.trk-link{font-size:11.5px;color:var(--blue);margin-top:10px;display:inline-block;font-weight:600;}
+.trk-note{font-size:11.5px;color:var(--ink-soft);line-height:1.6;margin-bottom:12px;padding:10px 12px;background:var(--bg);border-radius:8px;}
 .imp-decs{display:flex;flex-direction:column;gap:12px;margin-top:16px;}
 .imp-dec{margin:0;}
 .imp-dec.quiet{opacity:.62;}
@@ -1266,7 +1284,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v128">
+      <meta id="build-version" content="v131">
     </div>
   </div>
   <div class="cc-search">
@@ -3241,12 +3259,11 @@ async function aiSummarizeCirculars(items,label){
     var html2='<div style="margin-bottom:16px;background:linear-gradient(135deg,var(--ink2),var(--ink3));border:1px solid var(--gold);border-radius:12px;padding:16px;">';
     html2+='<div style="font-size:11px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">⚡ AI Action Points — '+label+'</div>';
     html2+='<div style="font-size:13px;color:var(--slate2);line-height:1.8;">'+formatAI(summary)+'</div></div>';
-    html2+='<div style="font-size:11px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">📎 Source Documents</div>';
-    items.forEach(function(it){
-      html2+='<div style="background:var(--ink2);border:1px solid var(--ink4);border-radius:8px;padding:10px 14px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;gap:8px;">';
-      html2+='<div><div style="font-size:12px;color:var(--white);line-height:1.4;">'+it.title+'</div><div style="font-size:10px;color:var(--slate);margin-top:2px;">'+it.date+'</div></div>';
-      html2+='<a href="'+it.link+'" target="_blank" style="font-size:11px;color:var(--gold2);white-space:nowrap;">View →</a></div>';
-    });
+    // The summary says what changed; this says who it reaches. The second is the
+    // part that was missing, so it gets the same treatment on both paths.
+    html2+='<div style="font-size:11px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">What this reaches</div>';
+    html2+=trkReadNote();
+    items.forEach(function(it){ html2+=trkItemCard(it, TRK_SOURCE); });
     out.innerHTML=html2;
   }catch(e){
     renderCirculars(items,label,false);
@@ -3254,16 +3271,205 @@ async function aiSummarizeCirculars(items,label){
   if(st)st.style.display='none';
 }
 
+// ═══════════════════════════════════════════════════
+// WHAT A REGULATORY CHANGE MEANS FOR THESE ENTITIES
+// ═══════════════════════════════════════════════════
+// Which law each source speaks for, and who that law can reach. Matching a SEBI
+// circular against the Companies Act would produce confident nonsense, and a
+// listing regulation cannot reach a private company however it is worded.
+var TRK_REGIME = {
+  sebi:        {laws:/SEBI/i,                             listedOnly:true,  label:'SEBI'},
+  'sebi-reg':  {laws:/SEBI/i,                             listedOnly:true,  label:'SEBI'},
+  mca:         {laws:/Companies Act|IEPF|Cost Records/i,  listedOnly:false, label:'MCA'},
+  ibbi:        {laws:/IBC|Insolven|IBBI/i,                listedOnly:false, label:'IBBI',
+                held:false, heldNote:'the IBC and the IBBI regulations'},
+  rbi:         {laws:/FEMA|RBI/i,                         listedOnly:false, label:'RBI',
+                thin:true},
+  incometax:   {laws:/Income.?tax/i,                      listedOnly:false, label:'Income Tax',
+                held:false, heldNote:'the Income-tax Act'}
+};
+
+// Provisions named in a piece of text. The register stores them as "Reg 30",
+// "Reg. 2(1)(n)", "Section 184(1)", "Sections 12, 15" — so both sides are parsed
+// the same way and compared as numbers rather than as strings.
+function trkParseCites(s){
+  s = String(s || '');
+  var regs = [], secs = [], rules = [], m;
+
+  // The suffix is glued to the number — "Section 129A", never "Section 129 A".
+  // Allowing a space before it let a case-insensitive [A-Z] swallow the first
+  // letter of the following word, turning "Regulation 30 of" into "30O".
+  var reReg = /\bReg(?:ulation)?s?\.?\s*(\d+[A-Z]?)(?![A-Za-z])/gi;
+  while((m = reReg.exec(s))) regs.push(m[1].replace(/\s+/g,'').toUpperCase());
+
+  // "Sections 12, 15" and "Sections 73-76A" both name more than one.
+  var reSec = /\bSec(?:tion)?s?\.?\s*(\d+[A-Z]?(?![A-Za-z])(?:\s*(?:,|and|&|-|to)\s*\d+[A-Z]?(?![A-Za-z]))*)/gi;
+  while((m = reSec.exec(s)))
+    m[1].split(/\s*(?:,|and|&|-|to)\s*/).forEach(function(x){
+      x = x.replace(/\s+/g,'').toUpperCase();
+      if(x) secs.push(x);
+    });
+
+  var reRule = /\bRules?\.?\s*(\d+[A-Z]?)(?![A-Za-z])/gi;
+  while((m = reRule.exec(s))) rules.push(m[1].replace(/\s+/g,'').toUpperCase());
+
+  return {regs:regs, secs:secs, rules:rules,
+          any: !!(regs.length || secs.length || rules.length)};
+}
+
+function trkCiteHit(rowSection, cites){
+  var r = trkParseCites(rowSection);
+  var shared = [];
+  ['regs','secs','rules'].forEach(function(k){
+    r[k].forEach(function(x){ if(cites[k].indexOf(x) >= 0 && shared.indexOf(x) < 0) shared.push(x); });
+  });
+  return shared.length ? shared : null;
+}
+
+// Beyond this a match is not a match — a headline generic enough to touch this
+// much of the register has told us nothing about which rows matter.
+var TRK_TOO_BROAD = 15;
+
+// A circular reaches an entity when the regime applies to it and the subject
+// matches one of its own obligations. Everything returned is a register row.
+function trkImpact(item, sourceKey){
+  var reg = TRK_REGIME[sourceKey] || {laws:/(?!)/, listedOnly:false, label:sourceKey};
+  var text = String(item.title||'') + ' ' + String(item.desc||'');
+
+  var found    = impConceptsIn(text);
+  var actions  = found.filter(function(k){ return k.kind === 'action'; });
+  var subjects = found.filter(function(k){ return k.kind === 'subject'; });
+
+  // What the circular names. A provision it cites is exact; a concept it
+  // suggests is a guess. Where there is a citation, it decides.
+  var cites = trkParseCites(text);
+
+  var out = {regime:reg, concepts:found, cites:cites, byCitation:cites.any,
+             entities:[], scanned:0, skippedType:0};
+
+  // A source whose law this register does not carry cannot be assessed at all,
+  // and saying "nothing found" would be a different claim entirely.
+  if(reg.held === false){ out.notHeld = true; return out; }
+  if(!cites.any && !found.length){ out.unclear = true; return out; }
+  if(typeof CLIENTS === 'undefined' || !CLIENTS.length) return out;
+
+  CLIENTS.forEach(function(c){
+    if(reg.listedOnly && c.type !== 'listed'){ out.skippedType++; return; }
+    out.scanned++;
+
+    var rows = [];
+    try{ rows = getComplianceChart(c); }catch(e){ return; }
+
+    var hits = [];
+    rows.forEach(function(r){
+      if(!reg.laws.test(String(r.law||''))) return;
+
+      if(cites.any){
+        var shared = trkCiteHit(r.section, cites);
+        if(!shared) return;
+        hits.push({score:10, why:['cites '+shared.join(', ')], actions:1, subjects:1,
+                   key:r.key, title:r.obligation, law:r.law, section:r.section, due:r.due});
+        return;
+      }
+
+      var m = impMatch(impRecordText([r.obligation, r.section, r.timelineText, r.notes]),
+                       actions, subjects);
+      if(!m) return;
+      hits.push({score:m.score, why:m.why, actions:m.actions, subjects:m.subjects,
+                 key:r.key, title:r.obligation, law:r.law, section:r.section, due:r.due});
+    });
+
+    if(!hits.length) return;
+
+    // A concept match that reaches this far has stopped discriminating. A
+    // citation match has not — naming a provision that appears on thirty rows
+    // is still naming that provision.
+    if(!cites.any && hits.length > TRK_TOO_BROAD){ out.tooBroad = true; return; }
+
+    hits.sort(function(a,b){ return b.score - a.score; });
+    out.entities.push({id:c.id, name:c.name, type:c.type, hits:hits.slice(0, 6),
+                       total:hits.length});
+  });
+
+  out.entities.sort(function(a,b){ return b.total - a.total; });
+  return out;
+}
+
+// One card per circular, with what it reaches underneath it.
+function trkItemCard(it, sourceKey){
+  var imp = null;
+  try{ imp = trkImpact(it, sourceKey); }catch(e){}
+
+  var body = '';
+  if(!imp){
+    body = '';
+  }else if(imp.notHeld){
+    body = '<div class="trk-imp none">This register holds no obligations under '+
+      entEsc(imp.regime.heldNote || imp.regime.label)+', so it cannot say what this affects. '+
+      'That is a gap in the register, not a finding about your entities.</div>';
+  }else if(imp.unclear){
+    body = '<div class="trk-imp none">Could not tell what this is about from the headline. '+
+      'Open the circular itself.</div>';
+  }else if(imp.tooBroad){
+    body = '<div class="trk-imp none">This touches too much of the register to point anywhere '+
+      'in particular &mdash; the headline is general enough to match most of it. Narrowing that '+
+      'down would be guesswork, so it needs reading.</div>';
+  }else if(!imp.entities.length){
+    body = '<div class="trk-imp none">No obligation on any of your entities matches this'+
+      (imp.skippedType
+        ? ' &mdash; and '+imp.skippedType+' '+(imp.skippedType===1?'entity is':'entities are')+
+          ' outside '+entEsc(imp.regime.label)+'&rsquo;s listing regulations altogether'
+        : '')+'.</div>';
+  }else{
+    var totalRows = imp.entities.reduce(function(a,e){ return a + e.total; }, 0);
+    body = '<div class="trk-imp">'+
+      '<div class="trk-imp-h">Reaches <b>'+imp.entities.length+'</b> of your '+
+        (imp.scanned)+' '+(imp.scanned===1?'entity':'entities')+
+        ' &middot; <b>'+totalRows+'</b> '+(totalRows===1?'obligation':'obligations')+
+        (imp.byCitation
+          ? ' &middot; <span class="trk-cite">matched on the provision it cites</span>'
+          : '')+'</div>'+
+      imp.entities.map(function(e){
+        return '<div class="trk-ent">'+
+          '<div class="trk-ent-n">'+entEsc(e.name)+
+            '<span class="trk-ent-t">'+entEsc(lgEntityTypeLabel(e.type))+'</span></div>'+
+          e.hits.map(function(h){
+            return '<div class="trk-hit" onclick="cuOpenDetail('+lgArg(e.id)+','+lgArg(h.key)+')">'+
+              entEsc(h.title)+' <span class="mono">'+entEsc(h.section||'')+'</span></div>';
+          }).join('')+
+          (e.total > e.hits.length
+            ? '<div class="trk-more">and '+(e.total - e.hits.length)+' more</div>' : '')+
+        '</div>';
+      }).join('')+
+    '</div>';
+  }
+
+  return '<div class="trk-card">'+
+    '<div class="trk-card-h">'+
+      '<div class="trk-t">'+(it.title||'')+'</div>'+
+      '<div class="trk-d">'+entEsc(it.date||'')+'</div>'+
+    '</div>'+
+    (it.desc?'<div class="trk-desc">'+it.desc+'</div>':'')+
+    body+
+    '<a href="'+entEsc(it.link||'#')+'" target="_blank" rel="noopener" class="trk-link">'+
+      'Open the circular &rarr;</a>'+
+  '</div>';
+}
+
+// Said once per fetch rather than on every card: the feed carries a headline and
+// a summary, and the matching only ever saw those.
+function trkReadNote(){
+  return '<div class="trk-note">Matched on each item&rsquo;s headline and feed summary &mdash; '+
+    'not the circular itself, which the feed does not carry. Treat this as a shortlist of what to '+
+    'read, and open anything that touches an entity.</div>';
+}
+
 function renderCirculars(items,label,fromCache){
   var out=document.getElementById('tracker-out');
   var note=fromCache?' <span style="font-size:10px;color:var(--slate);">(cached)</span>':'';
   var html2='<div style="font-size:11px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">'+label+note+'</div>';
-  items.forEach(function(it){
-    html2+='<div style="background:var(--ink2);border:1px solid var(--ink4);border-radius:10px;padding:14px;margin-bottom:8px;">';
-    html2+='<div style="display:flex;justify-content:space-between;gap:8px;"><div style="font-size:13px;color:var(--white);font-weight:600;line-height:1.4;">'+it.title+'</div><div style="font-size:10px;color:var(--slate);white-space:nowrap;">'+it.date+'</div></div>';
-    if(it.desc)html2+='<div style="font-size:12px;color:var(--slate2);margin-top:6px;line-height:1.5;">'+it.desc+'</div>';
-    html2+='<a href="'+it.link+'" target="_blank" style="font-size:11px;color:var(--gold2);margin-top:6px;display:inline-block;">View →</a></div>';
-  });
+  html2+=trkReadNote();
+  items.forEach(function(it){ html2+=trkItemCard(it, TRK_SOURCE); });
   out.innerHTML=html2;
   var st=document.getElementById('trk-status');if(st)st.style.display='none';
 }
