@@ -569,6 +569,38 @@ by the owner — they are not recoverable by parsing.
 
 ---
 
+## 2l. DEADLINES THAT RUN FROM A MEETING (v146)
+
+Reg 47(1) is *"within 48 hours of conclusion of the board meeting at which the financial results
+were approved"*. Reg 34(1)(b) is *"not later than 48 hours after the AGM"*. Neither is anchored to a
+quarter end — which is why both correctly lost their invented dates in 2k, and why neither had any
+date afterwards.
+
+**The anchor was not missing; it was in the meetings register.** `LG_EVENT_ANCHOR` + `lgAnchorDue()`
+compute the deadline from a row the user entered. Verified live: results board meeting recorded
+5 Aug 2026 -> Reg 47(1) **Q1 due 7 Aug**; AGM 25 Sep -> Reg 34(1)(b) **due 27 Sep**; the non-results
+board meeting on 10 Jul correctly ignored; **Q2-Q4 stay undated** because no results meeting is
+recorded for them.
+
+### db/018_meeting_outcomes.sql — NOT YET RUN
+Adds `meetings.approved_results boolean`. The register recorded *that* a board meeting happened, not
+*what it transacted*, so the engine could not tell the results meeting from any other. Attaching the
+deadline to every board meeting would have invented deadlines for meetings that never considered
+results — the 31 March defect arriving by a different road.
+
+Register field added (`t:'bool'`, "Financial results approved"). Until the migration runs, saving
+names the file: `regSave` now maps a missing *column* to its migration, not just a missing table.
+
+### Stated limits
+- `held_on` is a **date**, not a timestamp, so "48 hours from conclusion" is computed as the second
+  day after and each row says so. The register does not hold the hour the meeting closed.
+- **Reg 52(8)** ("two *working* days") is deliberately not wired — there is no holiday calendar
+  here, and a working-day count without one is a guess.
+- Matching is earliest-qualifying-meeting-on-or-after the period end, so one recorded results
+  meeting settles the quarter it belongs to and leaves later quarters undated.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -645,7 +677,7 @@ by the owner — they are not recoverable by parsing.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v144.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v146.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. Migrations through `db/016` are applied. **`db/017_applicability_review.sql` is new and has not been run** — until it is, confirming an applicability condition fails with a message naming the file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

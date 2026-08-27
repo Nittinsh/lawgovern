@@ -1322,7 +1322,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v144">
+      <meta id="build-version" content="v146">
     </div>
   </div>
   <div class="cc-search">
@@ -4624,6 +4624,54 @@ function lodrRisk(reg){
   return 'medium';
 }
 
+
+// Obligations whose clock starts at a meeting rather than at a period end. The
+// anchor is a row in the meetings register, so the deadline is computed from
+// something the user recorded rather than assumed from the calendar.
+var LG_EVENT_ANCHOR = {
+  'LODR-REG-47-1': {
+    kind:'board', needsResults:true, days:2,
+    what:'the board meeting that approved the results',
+    why:'Reg 47(1): within 48 hours of conclusion of that meeting.'},
+  'LODR-REG-34-1-B': {
+    kind:'agm', needsResults:false, days:2,
+    what:'the AGM',
+    why:'Reg 34(1)(b): not later than 48 hours after the AGM.'}
+};
+
+// The earliest qualifying meeting held on or after the period the occurrence
+// reports on. Ordering by date means one recorded results meeting settles the
+// quarter it belongs to and leaves the later quarters undated, rather than
+// stamping the same date on all four.
+function lgAnchorDue(rule, c, occ){
+  var a = LG_EVENT_ANCHOR[rule.id];
+  if(!a || !c) return null;
+
+  var mtgs = [];
+  try{ mtgs = regRowsFor('meetings', c.id) || []; }catch(e){ return null; }
+
+  var found = mtgs.filter(function(m){
+    if(m.kind !== a.kind || !m.held_on) return false;
+    if(a.needsResults && m.approved_results !== true) return false;
+    // A meeting held before the period ended cannot be the one that approved
+    // that period's results.
+    if(occ && occ.periodEnd && String(m.held_on) < String(occ.periodEnd)) return false;
+    return true;
+  }).sort(function(x, y){
+    return String(x.held_on).localeCompare(String(y.held_on));
+  })[0];
+
+  if(!found) return null;
+
+  return {
+    due: lodrAddDays(String(found.held_on), a.days),
+    heldOn: String(found.held_on),
+    note: a.why + ' Computed from ' + a.what + ' recorded on ' +
+          ccFmtDate(String(found.held_on)) + '. The register holds the date and '+
+          'not the hour the meeting closed, so this is the second day after.'
+  };
+}
+
 // Rows in the same shape getComplianceChart already returns, so every existing
 // module (Universe, My Work, dashboard, evidence engine) works unchanged.
 function lodrObligations(c){
@@ -4662,6 +4710,13 @@ function lodrObligations(c){
     }
 
     dates.forEach(function(dd, i){
+      // An occurrence with no deadline may still have an anchor the register
+      // holds. Nothing is invented when it does not.
+      var anchored = null;
+      if(!dd.due){
+        anchored = lgAnchorDue(rule, c, dd);
+        if(anchored) dd = Object.assign({}, dd, {due: anchored.due});
+      }
       out.push({
         key: rule.id + (dates.length > 1 ? '-' + (dd.label||'').split(' ')[0] : ''),
         law: rule.law, section: rule.regulation, form: '—',
@@ -4674,6 +4729,10 @@ function lodrObligations(c){
         // A dated occurrence with no deadline is still standing: it belongs to
         // a period, but it cannot be overdue.
         lodr: true, standing: !dd.due,
+        // Where the date came from a meeting the user recorded, say which one.
+        derived: anchored ? 'meetings' : undefined,
+        derivedNote: anchored ? anchored.note : undefined,
+        anchoredTo: anchored ? anchored.heldOn : null,
         dueConfidence: rule.dueConfidence,
         needsReview: !!rule.needsReview,
         unconfirmed: ap === 'unconfirmed',
@@ -7365,6 +7424,12 @@ var LG_REG = {
       {f:'attendees',   l:'Attendees',   t:'number', list:true},
       {f:'total_eligible', l:'Eligible to attend', t:'number'},
       {f:'quorum_met',  l:'Quorum met',  t:'bool', list:true, def:true},
+      // Starts the Reg 47(1) clock. Without it the engine cannot tell the
+      // results meeting from any other board meeting, and guessing would invent
+      // a deadline for every meeting that never considered results.
+      {f:'approved_results', l:'Financial results approved', t:'bool', list:true,
+       hint:'Tick where this meeting approved the financial results. Reg 47(1) then '+
+            'runs 48 hours from it, and Reg 52(8) two working days.'},
       {f:'minutes_state', l:'Minutes',   t:'select', list:true, def:'pending',
        opts:[['pending','Pending'],['drafted','Drafted'],['circulated','Circulated'],
              ['signed','Signed'],['entered','Entered in the minute book']]},
@@ -7590,9 +7655,16 @@ async function regSave(key, id){
     regRender(key);
     if(typeof renderCommandCenter === 'function') renderCommandCenter();
   }catch(e){
+    // Which migration adds which column, so the message says what to run
+    // rather than repeating Postgres at someone who did not write the schema.
+    var COLUMN_FIX = {approved_results:'db/018_meeting_outcomes.sql'};
+    var missingCol = (e.message.match(/'([a-z_]+)' column/i) || [])[1];
     regErr(/relation .* does not exist|could not find the table/i.test(e.message)
       ? 'The '+cfg.table+' table does not exist yet. Run db/010_governance_registers.sql first.'
-      : e.message);
+      : (missingCol && COLUMN_FIX[missingCol])
+        ? 'The '+cfg.table+' table has no '+missingCol+' column yet. Run '+
+          COLUMN_FIX[missingCol]+' in the Supabase SQL editor.'
+        : e.message);
     if(btn){ btn.disabled = false; btn.textContent = 'Save'; }
   }
 }
