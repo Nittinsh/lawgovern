@@ -293,6 +293,7 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 /* insights */
 .cmd-ins{list-style:none;display:flex;flex-direction:column;gap:9px;}
 .cmd-ins li{font-size:12.5px;line-height:1.6;color:var(--ink-mid);padding-left:15px;position:relative;}
+.cmd-ins li:hover{color:var(--blue);}
 .cmd-ins li:before{content:'';position:absolute;left:0;top:7px;width:6px;height:6px;border-radius:50%;background:var(--blue);}
 .cmd-ins b{color:var(--navy);font-family:'IBM Plex Mono';}
 
@@ -462,6 +463,9 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 .ob-logic-s.ok{color:var(--ok);} .ob-logic-s.warn{color:var(--warn);}
 .ob-empty{font-size:12.5px;color:var(--ink-soft);grid-column:1/-1;}
 .ob-acts{display:flex;gap:9px;flex-wrap:wrap;margin-top:22px;padding-top:16px;border-top:1px solid var(--line-soft);}
+.lg-filed3{display:flex;gap:8px;flex-wrap:wrap;}
+.lg-f3{display:flex;align-items:center;gap:7px;padding:8px 13px;border:1px solid var(--line);border-radius:9px;cursor:pointer;font-size:12.5px;color:var(--ink-mid);background:var(--paper);}
+.lg-f3.on{border-color:var(--blue);background:var(--blue-wash);color:var(--blue);font-weight:600;}
 .ob-prio{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:7px;cursor:pointer;font-size:13px;color:var(--ink-mid);}
 .ob-prio.on{border-color:var(--blue);background:var(--blue-wash);}
 .exc-pri{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
@@ -1232,7 +1236,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v115">
+      <meta id="build-version" content="v118">
     </div>
   </div>
   <div class="cc-search">
@@ -5612,7 +5616,9 @@ async function loadCloudClients(){
           ownerEmail:s.owner_email||null, ownerName:s.owner_name||null,
           reviewerEmail:s.reviewer_email||null, reviewerName:s.reviewer_name||null,
           escalationTo:s.escalation_to||null,
-          priority:s.priority||null, stage:s.stage||null, remarks:s.remarks||null
+          priority:s.priority||null, stage:s.stage||null, remarks:s.remarks||null,
+          // db/016. Whether it was filed at all, and who filed it.
+          filedFlag:s.filed_flag||null, filedBy:s.filed_by||null
         };
       });
     }
@@ -6200,8 +6206,15 @@ function ccComputeStats(){
   });
   stats.filedLateCount = stats.filed.filter(function(f){ return f.late; }).length;
 
-  stats.late.sort(function(a,b){ return a.days - b.days; });          // most overdue first
-  stats.agenda.sort(function(a,b){ return a.days - b.days; });        // soonest first
+  // Priority first, then how late. Sorting by date alone put a low-priority item
+  // one day overdue above a critical one three months overdue.
+  var byPriorityThenDate = function(a,b){
+    return lgPriorityRank(a) - lgPriorityRank(b) || a.days - b.days;
+  };
+  stats.late.sort(byPriorityThenDate);
+  // Upcoming stays in date order — it is a schedule, and reordering a calendar
+  // by priority makes it unreadable. Priority shows on the row instead.
+  stats.agenda.sort(function(a,b){ return a.days - b.days; });
 
   // Past due, however it is described. OVERDUE and NOT_FOUND both need a live
   // connector; VERIFICATION_UNAVAILABLE is the only one reachable today, so a
@@ -6334,6 +6347,47 @@ function ccTag(days){
 function ccSig(risk,days){
   var cls = days<0?'crit':(days<=7?'warn':'blue');
   return '<div class="cc-sig '+cls+'"></div>';
+}
+
+// Which fields are worth a trail entry, and what to call them. Only changes a
+// reviewer would ask about — not every keystroke.
+var LG_AUDITED_FIELDS = [
+  {k:'ownerEmail',     label:'Owner'},
+  {k:'reviewerEmail',  label:'Reviewer'},
+  {k:'escalationTo',   label:'Escalation'},
+  {k:'priority',       label:'Priority'},
+  {k:'stage',          label:'Stage'},
+  {k:'notApplicable',  label:'Applicability'},
+  {k:'filedOn',        label:'Filing date'},
+  {k:'filingRef',      label:'Filing reference'},
+  {k:'checkState',     label:'Confirmation'}
+];
+
+// Compares what is being written against what was there and records each real
+// change. Writing the same value twice is not a change and leaves no row.
+async function lgAuditFields(entityId, key, before, patch){
+  before = before || {};
+  for(var i=0;i<LG_AUDITED_FIELDS.length;i++){
+    var f = LG_AUDITED_FIELDS[i];
+    if(!(f.k in patch)) continue;
+    var oldV = before[f.k], newV = patch[f.k];
+    var norm = function(v){
+      if(v === null || v === undefined || v === '') return '';
+      if(v === true) return 'yes';
+      if(v === false) return 'no';
+      return String(v);
+    };
+    if(norm(oldV) === norm(newV)) continue;
+    try{
+      await lgAuditWrite(entityId, key, null, 'field_change', {
+        field: f.label,
+        oldValue: norm(oldV) || '(none)',
+        newValue: norm(newV) || '(none)',
+        note: patch.naReason || patch.checkNote || null,
+        __noStatus: true
+      });
+    }catch(e){ /* the trail must never block the write it is describing */ }
+  }
 }
 
 // The header chip follows the register, so it cannot drift from the data.
@@ -7558,8 +7612,13 @@ function renderAudit(){
       '<td data-label="Entity">'+entEsc(nameOf(a.company_id))+'</td>'+
       '<td data-label="Obligation" class="mono">'+entEsc(a.compliance_key||'')+'</td>'+
       '<td data-label="Change">'+
-        (a.previous_status?'<span style="color:var(--ink-soft)">'+entEsc(a.previous_status)+'</span> &rarr; ':'')+
-        '<b>'+entEsc(a.new_status||'')+'</b></td>'+
+        (a.field
+          ? '<b>'+entEsc(a.field)+'</b><div class="cu-oblig-sub">'+
+            '<span style="color:var(--ink-soft)">'+entEsc(a.old_value||'(none)')+'</span> &rarr; '+
+            entEsc(a.new_value||'(none)')+'</div>'+
+            (a.note?'<div class="cu-oblig-sub">&ldquo;'+entEsc(a.note)+'&rdquo;</div>':'')
+          : (a.previous_status?'<span style="color:var(--ink-soft)">'+entEsc(a.previous_status)+
+              '</span> &rarr; ':'')+'<b>'+entEsc(a.new_status||'')+'</b>')+'</td>'+
       '<td data-label="By">'+entEsc(a.actor||'')+'</td>'+
       '<td data-label="Reference" class="mono">'+entEsc(a.filing_reference||'')+'</td>'+
     '</tr>';
@@ -7877,8 +7936,8 @@ function ccCardCoverage(s){
             "ccGo('vstatus','OVERDUE,NOT_FOUND,VERIFICATION_UNAVAILABLE')")+
         row('#93C5FD','Scheduled, not yet due', scheduled, "ccGo('within','90')")+
         row('#CBD5E1','Ongoing or event-driven', s.standing, "ccGo('vstatus','STANDING')")+
-        '<div class="cmd-leg total"><span>Applicable obligations</span><b>'+
-          s.totalObligations+'</b></div>'+
+        '<div class="cmd-leg total" style="cursor:pointer;" onclick="sw(\'universe\')">'+
+          '<span>Applicable obligations</span><b>'+s.totalObligations+'</b></div>'+
         (s.notApplicable
           ? '<div class="cmd-leg" style="color:var(--ink-soft);cursor:pointer;" '+
             'onclick="ccGo(\'na\',\'only\')"><i style="background:var(--line)"></i>'+
@@ -7974,8 +8033,8 @@ function ccCardSummary(s){
             '<i style="background:'+CC_LAW_COLOURS[i % CC_LAW_COLOURS.length]+'"></i>'+
             '<span>'+entEsc(k)+'</span><b>'+byLaw[k]+'</b></div>';
         }).join('')+
-        '<div class="cmd-leg total"><span>Applicable obligations</span><b>'+
-          s.totalObligations+'</b></div>'+
+        '<div class="cmd-leg total" style="cursor:pointer;" onclick="sw(\'universe\')">'+
+          '<span>Applicable obligations</span><b>'+s.totalObligations+'</b></div>'+
       '</div>'+
     '</div>'+
     '<div class="cmd-note"><span class="cc-link" onclick="sw(\'universe\')">Open the full register &rarr;</span></div>'+
@@ -7985,22 +8044,32 @@ function ccCardSummary(s){
 // ── 4. what the data supports ────────────────────────────────────
 function ccCardInsights(s){
   var soon = s.agenda.filter(function(a){ return a.days <= 14; });
+  // Each line names a count and then has to lead somewhere. A statement of fact
+  // you cannot act on is a dead end.
   var lines = [];
-  if(soon.length) lines.push('<b>'+ccPlural(soon.length,'obligation','obligations')+
-    '</b> fall due within the next 14 days.');
-  if(s.pastDue) lines.push('<b>'+ccPlural(s.pastDue,'item','items')+
-    '</b> '+(s.pastDue===1?'is':'are')+' past '+(s.pastDue===1?'its':'their')+
-    ' date with no filing recorded.');
-  if(!s.evidenceOnRecord) lines.push('No filing has been recorded yet, so nothing here can be '+
-    'evidenced if it is questioned.');
-  if(s.standing) lines.push('<b>'+s.standing+'</b> duties have no fixed date &mdash; they run '+
-    'continuously or start on an event.');
-  if(!lines.length) lines.push('Nothing needs attention in the next 90 days.');
+  if(soon.length) lines.push({go:"ccGo('within','14')",
+    t:'<b>'+ccPlural(soon.length,'obligation','obligations')+'</b> fall due within the next 14 days.'});
+  if(s.pastDue) lines.push({go:"ccGo('vstatus','OVERDUE,NOT_FOUND,VERIFICATION_UNAVAILABLE')",
+    t:'<b>'+ccPlural(s.pastDue,'item','items')+'</b> '+(s.pastDue===1?'is':'are')+' past '+
+      (s.pastDue===1?'its':'their')+' date with no filing recorded.'});
+  if(s.criticalOverdue) lines.push({go:"sw('exceptions')",
+    t:'<b>'+ccPlural(s.criticalOverdue,'item','items')+'</b> of those '+
+      (s.criticalOverdue===1?'is':'are')+' critical.'});
+  if(s.unassigned) lines.push({go:"sw('exceptions')",
+    t:'<b>'+ccPlural(s.unassigned,'obligation','obligations')+'</b> '+
+      (s.unassigned===1?'has':'have')+' nobody answerable for '+(s.unassigned===1?'it':'them')+'.'});
+  if(!s.evidenceOnRecord) lines.push({go:"sw('universe')",
+    t:'No filing has been recorded yet, so nothing here can be evidenced if it is questioned.'});
+  if(s.standing) lines.push({go:"ccGo('vstatus','STANDING')",
+    t:'<b>'+s.standing+'</b> duties have no fixed date &mdash; they run continuously or start on an event.'});
+  if(!lines.length) lines.push({go:"sw('universe')", t:'Nothing needs attention in the next 90 days.'});
 
   return '<div class="cmd-card cmd-card-accent">'+
     '<div class="cmd-card-h"><h3>What the data shows</h3></div>'+
     '<div class="cmd-card-b">'+
-      '<ul class="cmd-ins">'+lines.map(function(l){ return '<li>'+l+'</li>'; }).join('')+'</ul>'+
+      '<ul class="cmd-ins">'+lines.map(function(l){
+        return '<li style="cursor:pointer;" onclick="'+l.go+'">'+l.t+'</li>';
+      }).join('')+'</ul>'+
       '<div class="cmd-note" style="padding:0;margin-top:10px;">Computed from your register. '+
         'No trend or forecast is shown because no prior period is stored.</div>'+
     '</div>'+
@@ -9860,6 +9929,20 @@ function lgWhy(entityId, key){
 function lgWhyClose(){ var m=document.getElementById('lg-why-modal'); if(m) m.remove(); }
 
 // ── Add filing reference (manual verification) ─────────────────
+// "Not filed" and "not known" need no SRN, so the fields that only make sense
+// for a completed filing are hidden rather than sitting there unanswered.
+function lgFiledToggle(){
+  var sel = document.querySelector('input[name=lg-filed]:checked');
+  var box = document.getElementById('lg-filed-detail');
+  if(!box) return;
+  var v = sel ? sel.value : '';
+  box.style.display = (v === 'yes' || v === '') ? '' : 'none';
+  document.querySelectorAll('.lg-f3').forEach(function(l){
+    var i = l.querySelector('input');
+    l.classList.toggle('on', !!(i && i.checked));
+  });
+}
+
 function lgRecordOpen(entityId, key){
   lgWhyClose();
   var c=null;
@@ -9882,8 +9965,25 @@ function lgRecordOpen(entityId, key){
       '<div style="font-size:12px;color:var(--ink-soft);margin-bottom:16px;line-height:1.6;">'+
         'What you record here is kept as <b>your</b> record. The system keeps its own '+
         'automated conclusion separately and never overwrites it.</div>'+
-      entField('lg-filedon','Date filed / completed','',ev.filedOn||ev.completedOn||'','date')+
-      entField('lg-ref','Filing / SRN reference','(recommended — raises confidence to high)',ev.filingRef||'')+
+      // Filed / not filed / unknown are three different answers. Only one of
+      // them used to be recordable, so "we have not checked" looked exactly
+      // like "nothing here".
+      '<div class="ent-f"><label class="lg-label">Has this been filed?</label>'+
+        '<div class="lg-filed3">'+
+          ['yes','no','unknown'].map(function(v){
+            var cur = ev.filedFlag || (ev.filedOn ? 'yes' : '');
+            return '<label class="lg-f3'+(cur===v?' on':'')+'">'+
+              '<input type="radio" name="lg-filed" value="'+v+'"'+(cur===v?' checked':'')+
+              ' onchange="lgFiledToggle()">'+
+              {yes:'Yes, filed', no:'Not filed', unknown:'Not known yet'}[v]+'</label>';
+          }).join('')+
+        '</div></div>'+
+      '<div id="lg-filed-detail">'+
+        entField('lg-ref','SRN / acknowledgement reference',
+          '(the thing that identifies the filing — raises confidence to high)', ev.filingRef||'')+
+        entField('lg-filedon','Date filed','',ev.filedOn||ev.completedOn||'','date')+
+        entField('lg-filedby','Filed by','(who made the filing, if not you)', ev.filedBy||'')+
+      '</div>'+
       entField('lg-note','Note','(optional)',ev.evidenceNote||'')+
       '<div style="margin-bottom:12px;">'+
         '<div style="font-size:11px;color:var(--ink-soft);font-weight:600;margin-bottom:4px;">'+
@@ -9958,6 +10058,8 @@ async function lgRecordSave(entityId, key){
   }
 
   await lgPersist(entityId, key, {
+    status:'done', filedOn:filedOn||null, filedFlag: (document.querySelector('input[name=lg-filed]:checked')||{}).value || null,
+    status:'done', filedOn:filedOn||null, filedBy: ((document.getElementById('lg-filedby')||{}).value || '').trim() || null,
     status:'done', filedOn:filedOn||null, filingRef:ref||null,
     evidenceNote:note||null, evidenceSource:'Entered by you',
     confidence:v.confidence,
@@ -9988,6 +10090,10 @@ async function lgPersist(entityId, key, patch, quiet){
   var c=null;
   if(typeof CLIENTS!=='undefined')
     for(var i=0;i<CLIENTS.length;i++) if(String(CLIENTS[i].id)===String(entityId)) c=CLIENTS[i];
+
+  // The values BEFORE the write, so the trail can say what each field changed
+  // from. Taken here because the in-memory chart is updated further down.
+  var _before = (c && c.chart && c.chart[key]) ? Object.assign({}, c.chart[key]) : {};
 
   // Capture the status BEFORE the change so the trail records a real transition.
   var _prevState = null;
@@ -10037,6 +10143,8 @@ async function lgPersist(entityId, key, patch, quiet){
         // never quietly clears an applicability decision made earlier.
         // Sent only when the patch mentions them, so recording a filing never
         // clears an owner and assigning an owner never clears a filing.
+        ...(patch.filedFlag !== undefined ? { filed_flag: patch.filedFlag || null } : {}),
+        ...(patch.filedBy !== undefined ? { filed_by: patch.filedBy || null } : {}),
         ...(patch.ownerEmail !== undefined ? {
           owner_email: patch.ownerEmail || null, owner_name: patch.ownerName || null
         } : {}),
@@ -10065,6 +10173,13 @@ async function lgPersist(entityId, key, patch, quiet){
     }
   }
   // Write the transition, unless the caller already wrote its own audit line.
+  // Field changes are recorded whether or not the status moved — naming an
+  // owner does not change a status, and is exactly the kind of change that used
+  // to leave no trace at all.
+  if(!patch.__noAudit){
+    try{ await lgAuditFields(entityId, key, _before, patch); }catch(e){}
+  }
+
   if(!patch.__noAudit){
     var _newState = null;
     if(c){
@@ -10662,7 +10777,14 @@ async function lgAuditWrite(entityId, key, prevState, newState, extra){
     source_url: extra.sourceUrl || null,
     source_response: extra.sourceResponse || null,
     confidence: extra.confidence || null,
-    override_reason: extra.overrideReason || null
+    override_reason: extra.overrideReason || null,
+    // db/015. A change to a field rather than a status transition.
+    field:     extra.field || null,
+    old_value: extra.oldValue === undefined || extra.oldValue === null
+                 ? null : String(extra.oldValue),
+    new_value: extra.newValue === undefined || extra.newValue === null
+                 ? null : String(extra.newValue),
+    note:      extra.note || null
   };
   // Keep a local copy so the trail shows even when the table is not yet created.
   var ck = entityId + '|' + key;
