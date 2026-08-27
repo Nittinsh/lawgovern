@@ -478,6 +478,19 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 .imp-main{min-width:0;flex:1;}
 .imp-t{font-size:13px;font-weight:600;color:var(--navy);line-height:1.5;}
 .imp-m{font-size:11.5px;color:var(--ink-soft);margin-top:3px;}
+.aud-lbl{font-size:12px;font-weight:600;color:var(--ink-mid);}
+.aud-days{font-size:11.5px;color:var(--ink-soft);}
+.aud-row{display:flex;gap:12px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line-soft);cursor:pointer;}
+.aud-row:last-child{border-bottom:none;}
+.aud-row:hover .aud-t{color:var(--blue);}
+.aud-when{flex-shrink:0;font-size:11px;color:var(--ink-soft);padding-top:2px;min-width:74px;}
+.aud-main{flex:1;min-width:0;}
+.aud-t{font-size:12.5px;font-weight:600;color:var(--navy);line-height:1.5;}
+.aud-m{font-size:11.5px;color:var(--ink-soft);margin-top:3px;}
+.aud-note{font-size:11.5px;color:var(--ink-mid);margin-top:4px;font-style:italic;}
+.aud-flag{flex-shrink:0;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:6px;margin-top:2px;}
+.aud-flag.ok{background:var(--ok-wash);color:var(--ok);}
+.aud-flag.no{background:var(--crit-wash);color:var(--crit);}
 .trk-card{background:var(--paper);border:1px solid var(--line);border-radius:11px;padding:15px 16px;margin-bottom:10px;}
 .trk-card-h{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
 .trk-t{font-size:13px;font-weight:600;color:var(--navy);line-height:1.45;}
@@ -1284,7 +1297,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v131">
+      <meta id="build-version" content="v133">
     </div>
   </div>
   <div class="cc-search">
@@ -8616,6 +8629,242 @@ async function audLoad(){
   }catch(e){ return []; }
 }
 
+// ═══════════════════════════════════════════════════
+// SINCE LAST REVIEW
+// ═══════════════════════════════════════════════════
+var AUD_MODE = 'digest';
+
+// Local parts, never toISOString — round-tripping through UTC shifted every
+// date back a day in IST, which is section 2b of the handoff notes.
+function audIso(d){
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+
+         String(d.getDate()).padStart(2,'0');
+}
+
+// A reading position, not a fact about the company. Kept in this browser
+// deliberately: writing it to the record would make one person's scroll position
+// look like a team-wide review that may never have happened.
+function audReviewPoint(){
+  try{
+    var v = localStorage.getItem('lg_review_point');
+    if(v) return v;
+  }catch(e){}
+  var d = new Date(); d.setDate(d.getDate() - 30);
+  return audIso(d);
+}
+
+function audSetReviewPoint(v){
+  try{ localStorage.setItem('lg_review_point', v); }catch(e){}
+  renderAudit();
+}
+
+function audMarkReviewed(){
+  audSetReviewPoint(audIso(new Date()));
+}
+
+function audSince(){
+  var el = document.getElementById('aud-since');
+  return el && el.value ? el.value : audReviewPoint();
+}
+
+// Field changes are grouped by what they were, because "4 owners named" is a
+// reviewable fact and four separate rows saying "Owner" is not.
+var AUD_GROUPS = [
+  {id:'filing',  label:'Filings recorded',      match:function(a){
+     return a.field === 'Filing date' || a.field === 'Filing reference'; }},
+  {id:'check',   label:'Confirmations',         match:function(a){
+     return a.field === 'Confirmation'; }},
+  {id:'owner',   label:'Ownership',             match:function(a){
+     return a.field === 'Owner' || a.field === 'Reviewer' || a.field === 'Escalation'; }},
+  {id:'na',      label:'Applicability',         match:function(a){
+     return a.field === 'Applicability'; }},
+  {id:'priority',label:'Priority and stage',    match:function(a){
+     return a.field === 'Priority' || a.field === 'Stage'; }},
+  {id:'status',  label:'Status transitions',    match:function(a){ return !a.field; }}
+];
+
+// What crossed its due date, and what is about to. Neither is in the trail:
+// nobody did it, time did.
+function audDateMoves(sinceIso){
+  var today = audIso(new Date());
+  var horizon = new Date(); horizon.setDate(horizon.getDate() + 30);
+  var horizonIso = audIso(horizon);
+
+  var fell = [], coming = [];
+  if(typeof CLIENTS === 'undefined') return {fell:fell, coming:coming};
+
+  CLIENTS.forEach(function(c){
+    var rows = [];
+    try{ rows = getComplianceChart(c); }catch(e){ return; }
+    rows.forEach(function(r){
+      if(!r.due) return;
+      var ev = (c.chart && c.chart[r.key]) || {};
+      var evidenced = !!(ev.filedOn || ev.filingRef);
+      var item = {entityId:c.id, entity:c.name, key:r.key, title:r.obligation,
+                  law:r.law, section:r.section, due:r.due, evidenced:evidenced};
+      if(r.due > sinceIso && r.due <= today) fell.push(item);
+      else if(r.due > today && r.due <= horizonIso) coming.push(item);
+    });
+  });
+
+  fell.sort(function(a,b){ return a.due < b.due ? 1 : -1; });
+  coming.sort(function(a,b){ return a.due < b.due ? -1 : 1; });
+  return {fell:fell, coming:coming};
+}
+
+function audDigest(sinceIso){
+  var rows = (AUD_ROWS || []).filter(function(a){
+    return String(a.occurred_at || '').slice(0, 10) >= sinceIso;
+  });
+
+  var groups = AUD_GROUPS.map(function(g){
+    return {id:g.id, label:g.label, rows:rows.filter(g.match)};
+  }).filter(function(g){ return g.rows.length; });
+
+  var actors = {};
+  rows.forEach(function(a){ if(a.actor) actors[a.actor] = (actors[a.actor]||0) + 1; });
+
+  return {since:sinceIso, rows:rows, groups:groups,
+          actors:Object.keys(actors).map(function(k){ return {who:k, n:actors[k]}; })
+                 .sort(function(a,b){ return b.n - a.n; }),
+          dates:audDateMoves(sinceIso)};
+}
+
+function audEntityName(id){
+  if(typeof CLIENTS === 'undefined') return id;
+  for(var i=0;i<CLIENTS.length;i++) if(String(CLIENTS[i].id)===String(id)) return CLIENTS[i].name;
+  return id;
+}
+
+function audSetMode(m){ AUD_MODE = m; renderAudit(); }
+
+function renderAuditDigest(root, head){
+  var since = audSince();
+  var d = audDigest(since);
+  var nDays = Math.max(0, Math.round(
+    (new Date().getTime() - new Date(since + 'T00:00:00').getTime()) / 86400000));
+
+  var controls = '<div class="cc-card cc-toolbar"><div class="cc-toolrow">'+
+    '<label class="aud-lbl">Since</label>'+
+    '<input type="date" id="aud-since" class="lg-field" style="max-width:180px;" value="'+
+      entEsc(since)+'" onchange="audSetReviewPoint(this.value)">'+
+    '<span class="aud-days">'+nDays+' '+(nDays===1?'day':'days')+'</span>'+
+    '<div style="flex:1;"></div>'+
+    '<button class="cc-btn" onclick="audMarkReviewed()">Mark reviewed to today</button>'+
+  '</div></div>';
+
+  var totalActs = d.rows.length;
+  var chips = '<div class="cu-summary" style="margin-top:16px;">'+
+    '<div class="cu-sum-chip"><b>'+totalActs+'</b> '+
+      (totalActs===1?'change recorded':'changes recorded')+'</div>'+
+    (d.dates.fell.length?'<div class="cu-sum-chip crit"><b>'+d.dates.fell.length+
+      '</b> fell due</div>':'')+
+    (d.dates.coming.length?'<div class="cu-sum-chip warn"><b>'+d.dates.coming.length+
+      '</b> due in 30 days</div>':'')+
+    (d.actors.length?'<div class="cu-sum-chip"><b>'+d.actors.length+'</b> '+
+      (d.actors.length===1?'person':'people')+'</div>':'')+
+  '</div>';
+
+  var section = function(title, note, inner){
+    return '<div class="cc-card" style="margin-top:16px;"><div class="cc-card-h"><h3>'+title+'</h3>'+
+      (note?'<span style="font-size:11.5px;color:var(--ink-soft);">'+note+'</span>':'')+
+      '</div><div class="cc-card-b">'+inner+'</div></div>';
+  };
+
+  // ── what time did ──────────────────────────────────────────
+  var dateBlock = '';
+  if(!d.dates.fell.length){
+    dateBlock = section('Fell due in this period &mdash; none', '',
+      '<div class="cc-none" style="text-align:left;">No obligation crossed its due date in '+
+      'this window.</div>');
+  }
+  if(d.dates.fell.length){
+    var noEv = d.dates.fell.filter(function(x){ return !x.evidenced; }).length;
+    dateBlock += section('Fell due in this period &mdash; '+d.dates.fell.length,
+      noEv ? noEv+' with nothing recorded' : 'all have a filing recorded',
+      d.dates.fell.slice(0, 12).map(function(x){
+        return '<div class="aud-row" onclick="cuOpenDetail('+lgArg(x.entityId)+','+lgArg(x.key)+')">'+
+          '<span class="aud-when mono">'+ccFmtDate(x.due)+'</span>'+
+          '<div class="aud-main"><div class="aud-t">'+entEsc(x.title)+'</div>'+
+          '<div class="aud-m">'+entEsc(x.entity)+' &middot; '+entEsc(x.law||'')+'</div></div>'+
+          '<span class="aud-flag '+(x.evidenced?'ok':'no')+'">'+
+            (x.evidenced?'recorded':'nothing recorded')+'</span></div>';
+      }).join('')+
+      (d.dates.fell.length > 12
+        ? '<div class="imp-cut">and '+(d.dates.fell.length-12)+' more</div>' : ''));
+  }
+
+  // ── what people did ────────────────────────────────────────
+  var actBlock = '';
+  if(!d.groups.length){
+    actBlock = section('What people did', '',
+      '<div class="cc-none" style="text-align:left;">Nothing was recorded in this period. '+
+      'That means no filing, confirmation, ownership change or applicability decision was '+
+      'entered &mdash; not that nothing happened at the companies.</div>');
+  }else{
+    actBlock = d.groups.map(function(g){
+      return section(g.label + ' &mdash; ' + g.rows.length, '',
+        g.rows.slice(0, 10).map(function(a){
+          var when = String(a.occurred_at||'').slice(0,10);
+          return '<div class="aud-row" onclick="cuOpenDetail('+lgArg(a.company_id)+','+
+              lgArg(a.compliance_key)+')">'+
+            '<span class="aud-when mono">'+ccFmtDate(when)+'</span>'+
+            '<div class="aud-main"><div class="aud-t">'+
+              (a.field
+                ? entEsc(a.old_value||'(none)')+' &rarr; '+entEsc(a.new_value||'(none)')
+                : entEsc(a.previous_status||'')+' &rarr; '+entEsc(a.new_status||''))+'</div>'+
+              '<div class="aud-m">'+entEsc(audEntityName(a.company_id))+' &middot; '+
+                '<span class="mono">'+entEsc(a.compliance_key||'')+'</span>'+
+                (a.actor?' &middot; '+entEsc(a.actor):'')+'</div>'+
+              (a.note?'<div class="aud-note">&ldquo;'+entEsc(a.note)+'&rdquo;</div>':'')+
+            '</div></div>';
+        }).join('')+
+        (g.rows.length > 10
+          ? '<div class="imp-cut">and '+(g.rows.length-10)+' more &mdash; '+
+            '<span class="cc-link" onclick="audSetMode(\'trail\')">open the full trail</span></div>'
+          : ''));
+    }).join('');
+  }
+
+  // ── what is coming ─────────────────────────────────────────
+  var comingBlock = d.dates.coming.length
+    ? section('Due in the next 30 days &mdash; '+d.dates.coming.length, 'so the review ends looking forward',
+        d.dates.coming.slice(0, 12).map(function(x){
+          return '<div class="aud-row" onclick="cuOpenDetail('+lgArg(x.entityId)+','+lgArg(x.key)+')">'+
+            '<span class="aud-when mono">'+ccFmtDate(x.due)+'</span>'+
+            '<div class="aud-main"><div class="aud-t">'+entEsc(x.title)+'</div>'+
+            '<div class="aud-m">'+entEsc(x.entity)+' &middot; '+entEsc(x.law||'')+'</div></div></div>';
+        }).join('')+
+        (d.dates.coming.length > 12
+          ? '<div class="imp-cut">and '+(d.dates.coming.length-12)+' more</div>' : ''))
+    // An empty forward view is a finding. Omitting the section would make it
+    // indistinguishable from a section that was never built.
+    : section('Due in the next 30 days &mdash; none', '',
+        '<div class="cc-none" style="text-align:left;">Nothing on the register falls due in the '+
+        'next 30 days. Dates further out are on the '+
+        '<span class="cc-link" onclick="sw(\'cal\')">calendar</span>.</div>');
+
+  var limits = '<div class="cc-card" style="margin-top:16px;"><div class="cc-card-b"><div class="set-n">'+
+    'This is the audit trail plus the register&rsquo;s own dates &mdash; nothing is inferred. '+
+    'The register is not snapshotted, so if an entity&rsquo;s figures changed and obligations '+
+    'became applicable as a result, that shows as the field change that caused it and not as '+
+    '&ldquo;3 obligations became applicable&rdquo;. '+
+    'The review date is remembered in this browser only: it is where <b>you</b> have read to, '+
+    'not a record that a review took place.'+
+  '</div></div></div>';
+
+  root.innerHTML = head + audModeTabs() + controls + chips +
+    dateBlock + actBlock + comingBlock + limits;
+}
+
+function audModeTabs(){
+  return '<div class="mw-tabs">'+
+    [['digest','Since last review'],['trail','Full trail']].map(function(m){
+      return '<div class="mw-tab'+(AUD_MODE===m[0]?' on':'')+'" onclick="audSetMode('+
+        lgArg(m[0])+')">'+m[1]+'</div>';
+    }).join('')+'</div>';
+}
+
 function renderAudit(){
   var root = document.getElementById('aud-root');
   if(!root) return;
@@ -8632,8 +8881,13 @@ function renderAudit(){
     return;
   }
 
+  // The digest still has something to say with an empty trail — obligations fall
+  // due whether or not anybody records anything, and that is the more useful
+  // half of a review.
+  if(AUD_MODE === 'digest') return renderAuditDigest(root, head);
+
   if(!AUD_ROWS.length){
-    root.innerHTML = head + '<div class="cc-card"><div class="cc-card-b">'+
+    root.innerHTML = head + audModeTabs() + '<div class="cc-card"><div class="cc-card-b">'+
       '<div class="cc-none">No changes recorded yet. Recording or confirming a filing writes here.</div>'+
       '</div></div>';
     return;
@@ -8664,7 +8918,7 @@ function renderAudit(){
     '</tr>';
   }).join('');
 
-  root.innerHTML = head +
+  root.innerHTML = head + audModeTabs() +
     '<div class="cu-tablewrap"><table class="cu-table"><thead><tr>'+
     '<th>When</th><th>Entity</th><th>Obligation</th><th>Change</th><th>By</th><th>Reference</th>'+
     '</tr></thead><tbody>'+rows+'</tbody></table></div>'+

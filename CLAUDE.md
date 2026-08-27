@@ -388,6 +388,43 @@ followed by an ordinary English word was corrupted.* Fixed with the suffix glued
 
 ---
 
+## 2i. SINCE LAST REVIEW (v133, Phase 2 item 17)
+
+Tab on the Audit Trail panel (`AUD_MODE` = `digest` | `trail`; `renderAuditDigest`).
+
+**No model is involved, deliberately.** The brief files this under the AI items, but the audit
+trail already records every status transition and every field change with actor, timestamp and
+old/new value — that IS the answer. Asking a model to summarise records held exactly would add a
+paraphrase and a chance of being wrong.
+
+### Three kinds of change; only one comes from the trail
+1. **What people did** — grouped by `AUD_GROUPS` into Filings / Confirmations / Ownership /
+   Applicability / Priority and stage / Status transitions. Grouping matters: "4 owners named" is
+   reviewable, four rows each saying "Owner" is not.
+2. **What time did** — `audDateMoves()` computes what crossed its due date inside the window from
+   the register's own dates. Nobody did it, so it is in no trail, and it is the change most worth
+   seeing. Each row says whether anything is recorded against it.
+3. **What is coming** — the next 30 days, so a review ends looking forward.
+
+### Rules carried over from earlier sections
+- `audIso()` formats from local parts. **Never `toISOString()`** — section 2b: it shifted every
+  date back a day in IST.
+- **Empty sections state themselves** ("Fell due in this period — none", "Due in the next 30 days —
+  none"). A vanished section is indistinguishable from one that was never built. This is the same
+  defect class as the legends that didn't sum to their own total.
+
+### The review point is per browser, on purpose
+`localStorage['lg_review_point']`, defaulting to 30 days back. It is a reading position, not a fact
+about the company — writing it to the record would make one person's scroll position look like a
+team-wide review that may never have happened.
+
+### Stated limit
+The register is not snapshotted. If an entity's figures change and obligations become applicable as
+a result, this shows the field change that caused it, **not** "3 obligations became applicable".
+The screen says so.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -464,7 +501,7 @@ followed by an ordinary English word was corrupted.* Fixed with the suffix glued
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v131.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v133.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. All migrations through `db/016` are applied except `db/013` (the drop script, deliberately
 left commented out).
 
@@ -475,8 +512,28 @@ left commented out).
 - [ ] 14. AI applicability engine
 - [ ] 15. AI due-date reasoning
 - [ ] 16. AI compliance gap analysis
-- [ ] 17. AI "what changed / since last review"
+- [x] 17. "What changed / since last review" (section 2i) &mdash; built without a model
 - [x] 18. Regulatory Radar impact analysis (section 2h)
+
+
+**On the three remaining Phase 2 items (14, 15, 16).** All three are framed in the brief as "AI"
+features, and items 11, 12, 13, 17 and 18 were all built *without* a model — each turned out to be
+answerable from data the app already holds, which is both more accurate and traceable. Before
+reaching for `callAIProxy` on the rest, note what already exists:
+
+- **14. AI applicability engine** — `getComplianceChart()` already decides applicability, and
+  `lgWhyApplies()` / `lgWhyNotApplies()` already explain it per rule. What is genuinely missing is a
+  *review screen* over the **21 rules with unconfirmed applicability** and the ones flagged
+  `needsReview`, so the gaps are visible rather than silently defaulted.
+- **15. AI due-date reasoning** — `lgWhy()` already shows the due-date calculation. The real gap is
+  the **29 event timings flagged `needsReview`**.
+- **16. AI compliance gap analysis** — the Exceptions module (`excBuild`, `EXC_TYPES`) is this,
+  already deterministic.
+
+The owner's NOT-wanted list includes "random AI scorecards" and a "risk score that cannot explain
+its calculation". A model summarising records we hold exactly is the same failure in a different
+coat. Use AI where it maps free text onto the register's own vocabulary (as item 11's concept layer
+does, without an API call) — not to generate conclusions the data can already support.
 
 **Phase 3 (not started):** board compliance dashboard, board-ready reports, client portal,
 information-request workflow, management certification, obligation version history, dependency
