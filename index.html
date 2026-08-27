@@ -1236,7 +1236,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v118">
+      <meta id="build-version" content="v119">
     </div>
   </div>
   <div class="cc-search">
@@ -10438,6 +10438,52 @@ async function lgSystemCheck(){
       rows.push(lgCheckRow('Not applicable (012)','fail', entEsc(nm)));
       if(/does not exist|schema cache|column/i.test(nm))
         notes.push('Run <b>db/012_not_applicable.sql</b> in the Supabase SQL editor.');
+    }
+  }
+
+  // ── 6b4. ownership (014), field audit (015), filing flag (016) ──
+  if(supaClient && CURRENT_USER){
+    try{
+      var own = await supaClient.from('compliance_status')
+        .select('owner_email,reviewer_email,priority,stage').limit(1);
+      if(own.error) throw own.error;
+      var assigned = await supaClient.from('compliance_status')
+        .select('compliance_key').not('owner_email','is',null);
+      var na = (!assigned.error && assigned.data) ? assigned.data.length : 0;
+      rows.push(lgCheckRow('Ownership & priority (014)','ok',
+        na ? ccPlural(na,'obligation','obligations')+' with an owner named'
+           : 'columns present — nothing assigned yet'));
+    }catch(e){
+      var om=(e&&e.message)||String(e);
+      rows.push(lgCheckRow('Ownership & priority (014)','fail', entEsc(om)));
+      if(/does not exist|schema cache|column/i.test(om))
+        notes.push('Run <b>db/014_ownership_and_priority.sql</b> in the Supabase SQL editor.');
+    }
+    try{
+      var fa = await supaClient.from('compliance_audit')
+        .select('field,old_value,new_value,note').limit(1);
+      if(fa.error) throw fa.error;
+      var fc = await supaClient.from('compliance_audit')
+        .select('id').not('field','is',null);
+      var nf = (!fc.error && fc.data) ? fc.data.length : 0;
+      rows.push(lgCheckRow('Field-level audit (015)','ok',
+        nf ? ccPlural(nf,'field change','field changes')+' recorded'
+           : 'columns present — no field changes yet'));
+    }catch(e){
+      var fm=(e&&e.message)||String(e);
+      rows.push(lgCheckRow('Field-level audit (015)','fail', entEsc(fm)));
+      if(/does not exist|schema cache|column/i.test(fm))
+        notes.push('Run <b>db/015_audit_field_changes.sql</b> in the Supabase SQL editor.');
+    }
+    try{
+      var ff = await supaClient.from('compliance_status').select('filed_flag,filed_by').limit(1);
+      if(ff.error) throw ff.error;
+      rows.push(lgCheckRow('Filing flag (016)','ok','filed_flag and filed_by present'));
+    }catch(e){
+      var gm=(e&&e.message)||String(e);
+      rows.push(lgCheckRow('Filing flag (016)','fail', entEsc(gm)));
+      if(/does not exist|schema cache|column/i.test(gm))
+        notes.push('Run <b>db/016_filing_flag.sql</b> in the Supabase SQL editor.');
     }
   }
 
