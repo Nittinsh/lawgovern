@@ -552,8 +552,7 @@ unreachable on a phone while looking fine from the outside**. `@media(max-width:
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
 **Header is at v136.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
-progress. All migrations through `db/016` are applied except `db/013` (the drop script, deliberately
-left commented out).
+progress. Migrations through `db/016` are applied. **`db/017_applicability_review.sql` is new and has not been run** — until it is, confirming an applicability condition fails with a message naming the file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**
 - [x] 11. Event -> Compliance Impact Engine (section 2f)
