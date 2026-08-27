@@ -1322,7 +1322,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v142">
+      <meta id="build-version" content="v144">
     </div>
   </div>
   <div class="cc-search">
@@ -4572,6 +4572,19 @@ function lodrDueDatesRaw(rule){
       var pe = lodrLast(a2.month, a2.day);
       return [{due: lodrAddDays(pe, d.days||0), periodEnd: pe, label: 'FY'}];
     }
+    case 'fy_end_month_offset': {
+      var a3 = d.anchorDate || {month:3, day:31};
+      var pe3 = lodrLast(a3.month, a3.day);
+      var p3 = pe3.split('-').map(Number);
+      // setMonth overflows: 31 March + 5 months would become 31 August only by
+      // luck, and 31 October + 4 months becomes 3 March. Clamp to the last day
+      // of the target month, as cmDueDates already does.
+      var tm = p3[1] - 1 + (d.months || 0);
+      var ty = p3[0] + Math.floor(tm / 12);
+      tm = ((tm % 12) + 12) % 12;
+      var last = new Date(ty, tm + 1, 0).getDate();
+      return [{due: lodrFmt(ty, tm + 1, Math.min(p3[2], last)), periodEnd: pe3, label:'FY'}];
+    }
     case 'quarterly':
     case 'quarter_end_offset': {
       var qs = d.anchorDates || [];
@@ -4619,6 +4632,10 @@ function lodrObligations(c){
   rules.forEach(function(rule){
     var ap = lodrApplies(rule, c);
     if(ap === false) return;
+    // Patch here, not in the date builder: the row is what every screen reads,
+    // and a row built from the unpatched rule reports "derived" while carrying
+    // a stated deadline.
+    rule = lgPatchRule(rule);
     var dates = lodrDueDates(rule);
 
     if(!dates.length){
@@ -4661,6 +4678,9 @@ function lodrObligations(c){
         needsReview: !!rule.needsReview,
         unconfirmed: ap === 'unconfirmed',
         timelineText: rule.timelineText,
+        // Where the offset was read from the rule's own wording rather than
+        // supplied by the sheet, say which words it came from.
+        duePatchedFrom: (LG_DUE_PATCH[rule.id] || {}).from || null,
         submitTo: rule.submitTo, notes: rule.notes,
         appliesToText: rule.appliesToText, appliesTo: rule.appliesTo,
         trigger: rule.trigger, signedBy: rule.signedBy,
@@ -4754,6 +4774,45 @@ function cmDueDatesRaw(rule, c, agmIso){
 }
 
 
+
+// Offsets a rule states in its own timeline wording, which the converter did not
+// parse. Only where the clock runs from the period end the engine already
+// computes — a rule whose clock starts at a board meeting or an AGM stays
+// undated, because that date lives in the registers, not in the calendar.
+//
+// rules/*.json is generated from the owner's spreadsheet and must not be
+// hand-edited, so this sits in code and quotes the source wording for each
+// entry. It belongs in build_lodr.py the next time that sheet is available.
+var LG_DUE_PATCH = {
+  'LODR-REG-33-3-B': {
+    due:{days:45},
+    from:'Along with standalone results (45 days)'},
+  'LODR-REG-31-1-B-PROVISO': {
+    due:{days:21},
+    from:'Within 21 days from the end of each half year'},
+  'LODR-REG-24A-2': {
+    due:{type:'fy_end_offset', days:60},
+    from:'Within 60 days from the end of each financial year'},
+  'LODR-REG-44-5': {
+    due:{type:'fy_end_month_offset', months:5},
+    from:'Within 5 months of FY close (i.e. by 31 August for a 31 March FY end)'}
+};
+
+// Applied before the date is computed, so lgHasDeadline sees a real offset and
+// the obligation stops being "deadline not established" on its own merits.
+function lgPatchRule(rule){
+  var p = rule && LG_DUE_PATCH[rule.id];
+  if(!p) return rule;
+  var out = Object.assign({}, rule);
+  out.due = Object.assign({}, rule.due || {}, p.due);
+  // The offset came from the rule's own stated timeline, so the date is no
+  // longer derived from the period end — but it is flagged as read from the
+  // wording rather than supplied by the sheet.
+  out.dueConfidence = 'exact';
+  out.duePatchedFrom = p.from;
+  return out;
+}
+
 // Does the source actually establish a deadline for this rule?
 //
 // Every rule marked `exact` carries a real offset — event_offset,
@@ -4783,11 +4842,13 @@ function lgStripDeadlines(dates){
 }
 
 function lodrDueDates(rule){
+  rule = lgPatchRule(rule);
   var dates = lodrDueDatesRaw(rule);
   return lgHasDeadline(rule) ? dates : lgStripDeadlines(dates);
 }
 
 function cmDueDates(rule, c, agmIso){
+  rule = lgPatchRule(rule);
   var dates = cmDueDatesRaw(rule, c, agmIso);
   return lgHasDeadline(rule) ? dates : lgStripDeadlines(dates);
 }
@@ -4797,6 +4858,7 @@ function cmRows(dataset, c, agmIso, tag){
   var out = [];
   rules.forEach(function(rule){
     if(!cmApplies(rule, c)) return;
+    rule = lgPatchRule(rule);
     var dates = cmDueDates(rule, c, agmIso);
     var base = {
       law: rule.law, section: rule.regulation, form: '-',
