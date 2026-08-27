@@ -591,6 +591,22 @@ results — the 31 March defect arriving by a different road.
 Register field added (`t:'bool'`, "Financial results approved"). Until the migration runs, saving
 names the file: `regSave` now maps a missing *column* to its migration, not just a missing table.
 
+### Section 118 minutes — one obligation per meeting (v147)
+The register carried this as a single undated row reading *"Prepare, enter and preserve within
+statutory framework"* — true, and useless. Section 118(1), verbatim from `reference/`:
+
+> "...to be prepared and signed in such manner as may be prescribed and kept **within thirty days
+> of the conclusion of every such meeting** concerned"
+
+It covers **every** board, committee, general and class meeting, so it is one duty per meeting, not
+one per year. Now emitted from `regDerivedRows` per meeting (same shape as DIR-3 KYC per director):
+due = `held_on` + 30, and **`minutes_state` supplies the evidence automatically** — `signed` or
+`entered` closes the row, `minutes_signed_on` shows whether that happened inside the thirty days.
+Scoped to the FY in progress, matching the board-cadence row above it.
+
+Verified: meeting 20 May -> due 19 Jun, signed 10 Jun -> evidence on record; meetings 5 Aug -> due
+4 Sep, UPCOMING; an audit-committee meeting gets its own row; a meeting in the previous FY excluded.
+
 ### Stated limits
 - `held_on` is a **date**, not a timestamp, so "48 hours from conclusion" is computed as the second
   day after and each row says so. The register does not hold the hour the meeting closed.
@@ -677,7 +693,7 @@ names the file: `regSave` now maps a missing *column* to its migration, not just
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v146.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v147.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. Migrations through `db/016` are applied. **`db/017_applicability_review.sql` is new and has not been run** — until it is, confirming an applicability condition fails with a message naming the file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

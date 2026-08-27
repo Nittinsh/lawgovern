@@ -1322,7 +1322,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v146">
+      <meta id="build-version" content="v147">
     </div>
   </div>
   <div class="cc-search">
@@ -5016,6 +5016,48 @@ function regDerivedRows(c, ctx){
       penalty:'DIN deactivated; Rs.5,000 to reactivate',
       derived:'directors',
       autoEvidence: done ? {filedOn:String(d.din_kyc_on), source:'Directors register'} : null
+    });
+  });
+
+
+  // ── Minutes of each meeting, Sec 118(1) ────────────────────────
+  // "...to be prepared and signed ... and kept within thirty days of the
+  // conclusion of every such meeting" — every board, committee, general and
+  // class meeting, so one obligation per meeting rather than one for the year.
+  var MTG_LABEL = {board:'Board meeting', agm:'AGM', egm:'EGM',
+    audit_committee:'Audit Committee', nrc:'Nomination & Remuneration',
+    csr:'CSR Committee', stakeholders:'Stakeholders Relationship',
+    rmc:'Risk Management', class:'Class meeting', creditors:'Creditors meeting'};
+
+  regRowsFor('meetings', c.id).filter(function(m){
+    return m.held_on && String(m.held_on) >= fyStart && String(m.held_on) <= fyEnd;
+  }).forEach(function(m){
+    var held = String(m.held_on);
+    var due  = lodrAddDays(held, 30);
+    // "Signed" and "entered" are the two states that satisfy the section;
+    // drafted and circulated do not.
+    var done = m.minutes_state === 'signed' || m.minutes_state === 'entered';
+    var signed = m.minutes_signed_on ? String(m.minutes_signed_on) : null;
+
+    rows.push({
+      key:'minutes-' + m.id,
+      law:'Companies Act 2013', section:'Sec 118(1)', form:'-',
+      obligation:'Minutes - ' + (MTG_LABEL[m.kind] || m.kind || 'meeting') +
+                 ' held ' + ccFmtDate(held),
+      owner:'CS', due:due, risk:'high', applicable:true,
+      penalty:'Rs.25,000 company; Rs.5,000 every officer in default',
+      derived:'meetings',
+      derivedNote:'Section 118(1): prepared, signed and kept within thirty days of the ' +
+                  'conclusion of the meeting held ' + ccFmtDate(held) + '.' +
+                  (done
+                    ? (signed ? ' Signed ' + ccFmtDate(signed) + '.' : ' Recorded as ' +
+                       m.minutes_state + ' in the meetings register.')
+                    : ' Minutes are ' + (m.minutes_state || 'pending') + '.'),
+      // The register is the practice's own record, so it can close this row
+      // without anyone re-entering the same fact as evidence.
+      autoEvidence: done
+        ? {filedOn: signed || held, source:'Meetings register'}
+        : null
     });
   });
 
