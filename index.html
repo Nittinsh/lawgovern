@@ -422,6 +422,48 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 .adm-email{font-size:13.5px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .adm-meta{font-size:12px;color:var(--ink-soft);margin-top:3px;}
 .adm-acts{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;}
+/* obligation detail */
+.ob-crumb{font-size:11.5px;color:var(--ink-soft);margin-bottom:5px;}
+.ob-title{font-size:19px;font-weight:800;color:var(--navy);line-height:1.35;}
+.ob-pills{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:9px;}
+.ob-pri{font-size:11.5px;font-weight:600;color:var(--ink-mid);}
+.ob-stages{display:flex;gap:4px;margin:18px 0 4px;overflow-x:auto;padding-bottom:4px;}
+.ob-stage{flex:1;min-width:78px;text-align:center;cursor:pointer;font-size:10.5px;font-weight:600;color:var(--ink-soft);}
+.ob-stage i{display:block;height:4px;border-radius:2px;background:var(--line);margin-bottom:6px;transition:.15s;}
+.ob-stage.done i{background:#93C5FD;} .ob-stage.done{color:var(--ink-mid);}
+.ob-stage.on i{background:var(--blue);} .ob-stage.on{color:var(--blue);font-weight:700;}
+.ob-stage:hover i{background:var(--blue);}
+.ob-sec{margin-top:20px;padding-top:16px;border-top:1px solid var(--line-soft);}
+.ob-sec-h{font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px;}
+.ob-sec-n{font-size:11.5px;color:var(--ink-soft);margin:-6px 0 10px;}
+.ob-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px;}
+@media(max-width:620px){.ob-grid{grid-template-columns:1fr;}}
+.ob-f.wide{grid-column:1/-1;}
+.ob-f-l{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:3px;}
+.ob-f-v{font-size:13px;color:var(--ink);line-height:1.55;}
+.ob-mail{font-size:11.5px;color:var(--ink-soft);}
+.ob-none{color:var(--ink-soft);font-style:normal;}
+.ob-chain{display:flex;gap:12px;padding:7px 0;border-bottom:1px solid var(--line-soft);font-size:12.5px;color:var(--ink-mid);line-height:1.6;}
+.ob-chain:last-child{border-bottom:none;}
+.ob-chain-k{flex-shrink:0;width:150px;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);padding-top:2px;}
+@media(max-width:620px){.ob-chain{flex-direction:column;gap:2px;}.ob-chain-k{width:auto;}}
+.ob-warn{margin-top:10px;padding:9px 12px;background:var(--warn-wash);border-radius:8px;font-size:12px;color:var(--warn);}
+.ob-na{padding:12px 14px;background:var(--bg);border:1px solid var(--line);border-radius:10px;font-size:12.5px;color:var(--ink-mid);}
+.ob-due{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;}
+.ob-due-d{font-size:20px;font-weight:800;color:var(--navy);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+.ob-due-r{font-size:12px;font-weight:600;color:var(--ink-soft);}
+.ob-due-r.crit{color:var(--crit);} .ob-due-r.warn{color:var(--warn);}
+.ob-logic{flex:1;min-width:230px;}
+.ob-logic-l{font-size:12.5px;color:var(--ink-mid);line-height:1.6;}
+.ob-logic-c{font-size:12.5px;color:var(--ink-mid);margin-top:5px;}
+.ob-arrow{color:var(--ink-soft);}
+.ob-logic-d{color:var(--ink-soft);font-size:11.5px;}
+.ob-logic-s{font-size:11.5px;margin-top:6px;line-height:1.55;}
+.ob-logic-s.ok{color:var(--ok);} .ob-logic-s.warn{color:var(--warn);}
+.ob-empty{font-size:12.5px;color:var(--ink-soft);grid-column:1/-1;}
+.ob-acts{display:flex;gap:9px;flex-wrap:wrap;margin-top:22px;padding-top:16px;border-top:1px solid var(--line-soft);}
+.ob-prio{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:7px;cursor:pointer;font-size:13px;color:var(--ink-mid);}
+.ob-prio.on{border-color:var(--blue);background:var(--blue-wash);}
 .exc-pri{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
 .exc-pri.critical{background:var(--crit);}
 .exc-pri.high{background:#F97316;}
@@ -1190,7 +1232,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v112">
+      <meta id="build-version" content="v115">
     </div>
   </div>
   <div class="cc-search">
@@ -4309,6 +4351,8 @@ function lodrObligations(c){
         unconfirmed: ap === 'unconfirmed',
         timelineText: rule.timelineText,
         submitTo: rule.submitTo, notes: rule.notes,
+        appliesToText: rule.appliesToText, appliesTo: rule.appliesTo,
+        trigger: rule.trigger, signedBy: rule.signedBy,
         frequency: rule.frequency
       });
       return;
@@ -4330,6 +4374,8 @@ function lodrObligations(c){
         unconfirmed: ap === 'unconfirmed',
         timelineText: rule.timelineText,
         submitTo: rule.submitTo, notes: rule.notes,
+        appliesToText: rule.appliesToText, appliesTo: rule.appliesTo,
+        trigger: rule.trigger, signedBy: rule.signedBy,
         frequency: rule.frequency
       });
     });
@@ -4438,7 +4484,15 @@ function cmRows(dataset, c, agmIso, tag){
       evidenceNeeded: rule.evidence,
       category: rule.category || rule.area,
       notes: rule.detail || rule.trigger,
-      frequency: rule.frequency
+      frequency: rule.frequency,
+      // The conditions the rule itself states. Dropped until now, which is why
+      // the register could say what was due but never why it was on the list.
+      appliesToText: rule.appliesToText,
+      appliesTo: rule.appliesTo,
+      trigger: rule.trigger,
+      submitTo: rule.submitTo,
+      signedBy: rule.signedBy,
+      unconfirmed: !!rule.unconfirmed
     };
     base[tag] = true;
 
@@ -4613,6 +4667,97 @@ function regDerivedRows(c, ctx){
 // opts.includeNA keeps obligations a user has marked not applicable. Only the
 // register (so they can be reinstated), the stats (so they can be counted) and
 // the marking dialog itself pass it — everything else should never see them.
+// ═══════════════════════════════════════════════════
+// WHY THIS APPLIES
+// ═══════════════════════════════════════════════════
+// The chain a reviewer asks for: what condition brought this onto the register,
+// which provision imposes it, and what rule decided it applies to THIS entity.
+// Everything here comes from the rule's own stated conditions and the entity's
+// own recorded facts — nothing is inferred.
+function lgEntityTypeLabel(t){
+  return ({listed:'a listed company', public:'an unlisted public company',
+           private:'a private company', opc:'a One Person Company',
+           sec8:'a Section 8 company', llp:'an LLP'})[t] || ('of type ' + (t || 'unknown'));
+}
+
+function lgWhyApplies(row, c){
+  var out = {trigger:null, provision:null, rule:null, facts:[], stated:null};
+  if(!row) return out;
+
+  out.provision = (row.law || '') + (row.section ? ' — ' + row.section : '');
+  out.stated = row.appliesToText || null;
+  out.trigger = row.trigger || (row.standing ? 'Applies continuously, with no single trigger date.'
+                                             : null);
+
+  // Which limb of the applicability test this entity meets.
+  var at = row.appliesTo || {};
+  var types = at.entityType || at.listingType || null;
+  if(types && types.length){
+    out.rule = 'Applies to: ' + types.join(', ') + '.';
+    if(c) out.facts.push('This entity is ' + lgEntityTypeLabel(c.type) + '.');
+  } else if(row.appliesToText){
+    out.rule = row.appliesToText;
+  }
+
+  // The financial facts a threshold would have been tested against, stated with
+  // their values so the test can be checked rather than trusted.
+  if(c){
+    var money = function(v){
+      if(v === null || v === undefined || v === '') return null;
+      var n = Number(v);
+      if(!isFinite(n) || n <= 0) return null;
+      return n >= 10000000 ? ('Rs ' + (n / 10000000).toFixed(2).replace(/\.00$/,'') + ' crore')
+                           : ('Rs ' + n.toLocaleString('en-IN'));
+    };
+    var cap = money(c.capital), tov = money(c.turnover);
+    if(cap) out.facts.push('Paid-up capital ' + cap + '.');
+    if(tov) out.facts.push('Turnover ' + tov + '.');
+    if(!tov && /turnover/i.test(row.appliesToText || '')) {
+      out.facts.push('Turnover is not recorded for this entity, so any test that depends on it '+
+                     'was skipped rather than passed.');
+    }
+  }
+  return out;
+}
+
+// The mirror: what an obligation that is NOT on the register failed. Asked in
+// every review, and the register could not answer it.
+function lgWhyNotApplies(rule, c){
+  var at = (rule && rule.appliesTo) || {};
+  var types = at.entityType || at.listingType || null;
+  var reasons = [];
+  if(types && types.length && c && types.indexOf(c.type) < 0){
+    reasons.push('It applies to ' + types.join(', ') + '. This entity is ' +
+                 lgEntityTypeLabel(c.type) + '.');
+  }
+  if(rule && rule.appliesToText && !reasons.length){
+    reasons.push('Stated applicability: ' + rule.appliesToText);
+  }
+  return reasons;
+}
+
+// Every obligation the engine considered and left out, with the reason. This is
+// the audit answer: not "it is not on the list" but "it is not on the list
+// because".
+function lgExcludedFor(c){
+  var out = [];
+  ['CA_DATA','PIT_DATA','LODR_DATA'].forEach(function(nm){
+    var ds = (typeof window[nm] !== 'undefined') ? window[nm] : null;
+    var rules = (ds && ds.rules) || [];
+    rules.forEach(function(rule){
+      var applies = true;
+      try{ applies = cmApplies(rule, c); }catch(e){ return; }
+      if(applies) return;
+      out.push({
+        law: rule.law, section: rule.regulation, title: rule.title,
+        reasons: lgWhyNotApplies(rule, c),
+        appliesToText: rule.appliesToText || null
+      });
+    });
+  });
+  return out;
+}
+
 function getComplianceChart(c, opts){
   var y  = new Date().getFullYear();
 
@@ -12180,139 +12325,337 @@ function cdSaveState(entityId,key,st){ try{ localStorage.setItem(cdStateKey(enti
 
 var CD_CURRENT = null;
 
-function openComplianceDetail(entityId,key){
-  var c=(CLIENTS||[]).find(function(x){return x.id===entityId;});
-  if(!c) return;
-  var rows=getComplianceChart(c); var r=rows.find(function(x){return x.key===key;});
-  if(!r) return;
-  CD_CURRENT={entityId:entityId,key:key,c:c,r:r};
-  var days=ccDaysUntil(r.due);
-  var st=cdGetState(entityId,key);
-  var steps=cdSteps(r);
-  var chain=cdApprovalChain(r.risk,r.law);
-  var doneSteps=st.steps||{};
-  var stepCount=steps.length, doneCount=Object.keys(doneSteps).filter(function(k){return doneSteps[k];}).length;
-  var progress=Math.round(100*doneCount/stepCount);
+// ═══════════════════════════════════════════════════
+// ASSIGNMENT AND PRIORITY
+// ═══════════════════════════════════════════════════
+// The reviewer is not decoration: a maker cannot confirm their own entry, so
+// naming who checks the work is what lets a filing ever reach Confirmed.
+function cdAssignOpen(){
+  if(!CD_CURRENT) return;
+  var r = CD_CURRENT.r;
+  var old = document.getElementById('cd-assign'); if(old) old.remove();
+  var mo = document.createElement('div');
+  mo.className='cd-modal'; mo.id='cd-assign'; mo.style.display='flex';
+  mo.onclick=function(e){ if(e.target===mo) cdAssignClose(); };
+  mo.innerHTML = '<div class="cd-inner" style="max-width:520px;"><div class="cd-body">'+
+    '<div class="cd-head"><div><h2 style="font-size:19px;font-weight:800;color:var(--navy);">'+
+      'Assign</h2><div style="font-size:12.5px;color:var(--ink-soft);margin-top:3px;">'+
+      entEsc(r.obligation.slice(0,70))+'</div></div>'+
+      '<button onclick="cdAssignClose()" style="background:none;border:none;color:var(--ink-soft);cursor:pointer;font-size:26px;line-height:1;">&times;</button></div>'+
+    (r.owner ? '<div class="set-n" style="margin-bottom:12px;">The rule expects this to sit with '+
+      '<b>'+entEsc(r.owner)+'</b>. That is the kind of person; name which one.</div>' : '')+
+    '<div class="reg-grid">'+
+      '<div class="reg-f"><label class="lg-label" for="cd-own-e">Owner email</label>'+
+        '<input id="cd-own-e" class="lg-field" style="width:100%" value="'+entEsc(r.ownerEmail||'')+'"></div>'+
+      '<div class="reg-f"><label class="lg-label" for="cd-own-n">Owner name</label>'+
+        '<input id="cd-own-n" class="lg-field" style="width:100%" value="'+entEsc(r.ownerName||'')+'"></div>'+
+      '<div class="reg-f"><label class="lg-label" for="cd-rev-e">Reviewer email</label>'+
+        '<input id="cd-rev-e" class="lg-field" style="width:100%" value="'+entEsc(r.reviewerEmail||'')+'"></div>'+
+      '<div class="reg-f"><label class="lg-label" for="cd-rev-n">Reviewer name</label>'+
+        '<input id="cd-rev-n" class="lg-field" style="width:100%" value="'+entEsc(r.reviewerName||'')+'"></div>'+
+      '<div class="reg-f"><label class="lg-label" for="cd-esc">Escalates to</label>'+
+        '<input id="cd-esc" class="lg-field" style="width:100%" value="'+entEsc(r.escalationTo||'')+'" '+
+        'placeholder="Partner or director"></div>'+
+    '</div>'+
+    '<div class="reg-hint">The reviewer is who confirms a filing. It cannot be the same person who '+
+      'recorded it &mdash; that rule is enforced here and again in the database.</div>'+
+    '<div id="cd-assign-err" class="reg-err" style="display:none;"></div>'+
+    '<div class="cc-headbtns" style="margin-top:18px;justify-content:flex-end;">'+
+      '<button class="cc-btn" onclick="cdAssignClose()">Cancel</button>'+
+      '<button class="cc-btn-primary" id="cd-assign-go" onclick="cdAssignSave()">Save</button>'+
+    '</div></div></div>';
+  document.body.appendChild(mo);
+  var i = document.getElementById('cd-own-e'); if(i) i.focus();
+}
+function cdAssignClose(){ var m=document.getElementById('cd-assign'); if(m) m.remove(); }
 
-  // The same resolver the dashboard and the register use, so this screen can
-  // never disagree with them. It was computing its own pill from the due date
-  // and ignoring whether anything had been filed.
-  var cdSt = lgResolveStatus(r, c);
-  var statusPill = lgPill(cdSt.state);
-  var riskPill = cuRiskPill(r.risk);
-
-  // Steps HTML
-  var stepsHtml='';
-  steps.forEach(function(s,i){
-    var done=doneSteps[i];
-    stepsHtml+='<div class="cd-step '+(done?'done':'')+'" onclick="cdToggleStep('+i+')">'+
-      '<div class="cd-step-check">'+(done?'✓':(i+1))+'</div>'+
-      '<div class="cd-step-txt">'+s+'</div>'+
-    '</div>';
-  });
-
-  // Documents (state machine)
-  var docStates=st.docs||{required:true,draft:false,uploaded:false,approved:false,final:false};
-  var docHtml='';
-  [['required','Required'],['draft','Draft'],['uploaded','Uploaded'],['approved','Approved'],['final','Final']].forEach(function(d){
-    var active=docStates[d[0]];
-    docHtml+='<div class="cd-doc '+(active?'active':'')+'" onclick="cdToggleDoc(\''+d[0]+'\')">'+d[1]+'</div>';
-  });
-
-  // Approval chain
-  var apprState=st.approvals||{};
-  var chainHtml='';
-  chain.forEach(function(role,i){
-    var approved=apprState[i];
-    chainHtml+='<div class="cd-appr '+(approved?'done':(i===0||apprState[i-1]?'active':'wait'))+'">'+
-      '<div class="cd-appr-node">'+(approved?'✓':i+1)+'</div>'+
-      '<div class="cd-appr-role">'+role+'</div>'+
-    '</div>';
-    if(i<chain.length-1) chainHtml+='<div class="cd-appr-line '+(approved?'done':'')+'"></div>';
-  });
-
-  // Evidence
-  var evidence=st.evidence||[];
-  var evHtml='';
-  if(evidence.length){
-    evidence.forEach(function(e,i){
-      evHtml+='<div class="cd-ev-item"><span class="cd-ev-icon">📎</span><span class="cd-ev-name">'+e.name+'</span><span class="cd-ev-date mono">'+e.date+'</span><button class="cd-ev-del" onclick="cdDelEvidence('+i+')">✕</button></div>';
+async function cdAssignSave(){
+  var g = function(id){ return (document.getElementById(id)||{}).value || ''; };
+  var oe = g('cd-own-e').trim(), re = g('cd-rev-e').trim();
+  var err = document.getElementById('cd-assign-err');
+  if(oe && re && oe.toLowerCase() === re.toLowerCase()){
+    if(err){ err.textContent = 'The reviewer must be a different person from the owner — '+
+      'otherwise nobody is checking the work.'; err.style.display='block'; }
+    return;
+  }
+  var btn = document.getElementById('cd-assign-go');
+  if(btn){ btn.disabled = true; btn.textContent = 'Saving…'; }
+  try{
+    await lgPersist(CD_CURRENT.entityId, CD_CURRENT.key, {
+      ownerEmail: oe || null, ownerName: g('cd-own-n').trim() || null,
+      reviewerEmail: re || null, reviewerName: g('cd-rev-n').trim() || null,
+      escalationTo: g('cd-esc').trim() || null,
+      stage: oe ? 'assigned' : undefined
     });
+    cdAssignClose();
+    openComplianceDetail(CD_CURRENT.entityId, CD_CURRENT.key);
+    lgRefreshAll();
+  }catch(e){
+    if(err){ err.textContent = /owner_email|column/i.test(e.message)
+      ? 'Run db/014_ownership_and_priority.sql in the Supabase SQL editor first.' : e.message;
+      err.style.display='block'; }
+    if(btn){ btn.disabled = false; btn.textContent = 'Save'; }
+  }
+}
+
+// Priority is the firm's decision for this entity. The risk the provision
+// carries is shown alongside so a deliberate departure from it is visible.
+function cdPriorityOpen(){
+  if(!CD_CURRENT) return;
+  var r = CD_CURRENT.r;
+  var old = document.getElementById('cd-pri'); if(old) old.remove();
+  var cur = lgPriority(r);
+  var mo = document.createElement('div');
+  mo.className='cd-modal'; mo.id='cd-pri'; mo.style.display='flex';
+  mo.onclick=function(e){ if(e.target===mo) cdPriorityClose(); };
+  mo.innerHTML = '<div class="cd-inner" style="max-width:480px;"><div class="cd-body">'+
+    '<div class="cd-head"><div><h2 style="font-size:19px;font-weight:800;color:var(--navy);">'+
+      'Priority</h2><div style="font-size:12.5px;color:var(--ink-soft);margin-top:3px;">'+
+      'The provision carries risk: <b>'+entEsc(r.risk||'medium')+'</b></div></div>'+
+      '<button onclick="cdPriorityClose()" style="background:none;border:none;color:var(--ink-soft);cursor:pointer;font-size:26px;line-height:1;">&times;</button></div>'+
+    '<div class="set-n" style="margin-bottom:12px;">Set what this obligation is worth to this entity. '+
+      'It drives the order things appear in, and what a lapse costs the health score.</div>'+
+    ['critical','high','medium','low'].map(function(p){
+      return '<label class="ob-prio'+(cur===p?' on':'')+'">'+
+        '<input type="radio" name="cd-prio" value="'+p+'"'+(cur===p?' checked':'')+'>'+
+        '<span class="exc-pri '+p+'"></span>'+
+        '<b>'+p.charAt(0).toUpperCase()+p.slice(1)+'</b></label>';
+    }).join('')+
+    '<div id="cd-pri-err" class="reg-err" style="display:none;"></div>'+
+    '<div class="cc-headbtns" style="margin-top:18px;justify-content:flex-end;">'+
+      '<button class="cc-btn" onclick="cdPriorityClose()">Cancel</button>'+
+      '<button class="cc-btn-primary" onclick="cdPrioritySave()">Save</button>'+
+    '</div></div></div>';
+  document.body.appendChild(mo);
+}
+function cdPriorityClose(){ var m=document.getElementById('cd-pri'); if(m) m.remove(); }
+
+async function cdPrioritySave(){
+  var sel = document.querySelector('input[name=cd-prio]:checked');
+  if(!sel) return;
+  try{
+    await lgPersist(CD_CURRENT.entityId, CD_CURRENT.key, {priority:sel.value});
+    cdPriorityClose();
+    openComplianceDetail(CD_CURRENT.entityId, CD_CURRENT.key);
+    lgRefreshAll();
+  }catch(e){
+    var err = document.getElementById('cd-pri-err');
+    if(err){ err.textContent = /priority|column/i.test(e.message)
+      ? 'Run db/014_ownership_and_priority.sql first.' : e.message; err.style.display='block'; }
+  }
+}
+
+function openComplianceDetail(entityId, key){
+  var c = (CLIENTS||[]).find(function(x){ return String(x.id)===String(entityId); });
+  if(!c) return;
+  var rows = getComplianceChart(c, {includeNA:true});
+  var r = rows.find(function(x){ return x.key === key; });
+  if(!r) return;
+
+  CD_CURRENT = {entityId:entityId, key:key, c:c, r:r};
+  var st   = lgResolveStatus(r, c);
+  var why  = lgWhyApplies(r, c);
+  var pri  = lgPriority(r);
+  var stg  = lgStage(r, st);
+  var days = st.days;
+  var localSt = cdGetState(entityId, key);
+
+  // ── a field, omitted when there is nothing to say ──────────────
+  var f = function(label, value, opts){
+    if(value === null || value === undefined || value === '') return '';
+    opts = opts || {};
+    return '<div class="ob-f'+(opts.wide?' wide':'')+'">'+
+      '<div class="ob-f-l">'+label+'</div>'+
+      '<div class="ob-f-v'+(opts.mono?' mono':'')+'"'+
+        (opts.tone?' style="color:var(--'+opts.tone+');font-weight:700;"':'')+'>'+
+        value+'</div></div>';
+  };
+  var section = function(title, inner, note){
+    if(!inner) return '';
+    return '<div class="ob-sec"><div class="ob-sec-h">'+title+'</div>'+
+      (note?'<div class="ob-sec-n">'+note+'</div>':'')+
+      '<div class="ob-grid">'+inner+'</div></div>';
+  };
+
+  // ── due date, and separately how it was arrived at ─────────────
+  var dueLogic = '';
+  if(r.timelineText) dueLogic += '<div class="ob-logic-l">'+entEsc(r.timelineText)+'</div>';
+  if(r.periodEnd && r.due && r.periodEnd !== r.due){
+    dueLogic += '<div class="ob-logic-c"><span class="mono">'+ccFmtDate(r.periodEnd)+'</span>'+
+      ' <span class="ob-arrow">&rarr;</span> <span class="mono">'+ccFmtDate(r.due)+'</span>'+
+      ' <span class="ob-logic-d">'+ccDaysBetween(r.periodEnd, r.due)+' days from the period end</span></div>';
+  }
+  dueLogic += '<div class="ob-logic-s '+(r.dueConfidence==='exact'?'ok':'warn')+'">'+
+    (r.dueConfidence === 'exact'
+      ? 'Deadline taken from your source sheet.'
+      : r.dueConfidence === 'derived'
+        ? 'Computed from the period end &mdash; your source sheet recorded no exact deadline for this '+
+          'one, so treat the day count as indicative.'
+        : r.dueConfidence === 'trigger'
+          ? 'Starts when the event occurs; there is no fixed calendar date.'
+          : 'No dated deadline on record.')+'</div>';
+
+  // ── who is answerable ──────────────────────────────────────────
+  var person = function(label, email, name, roleHint){
+    return '<div class="ob-f"><div class="ob-f-l">'+label+'</div>'+
+      '<div class="ob-f-v">'+
+        (email
+          ? '<b>'+entEsc(name||email)+'</b>'+(name?' <span class="ob-mail">'+entEsc(email)+'</span>':'')
+          : '<span class="ob-none">Not assigned'+(roleHint?' &middot; rule expects '+entEsc(roleHint):'')+'</span>')+
+      '</div></div>';
+  };
+
+  // ── the workflow ───────────────────────────────────────────────
+  var stageHtml = LG_STAGES.map(function(sg, i){
+    var atIdx = LG_STAGES.findIndex(function(x){ return x.id === stg; });
+    var cls = i < atIdx ? 'done' : (i === atIdx ? 'on' : '');
+    return '<div class="ob-stage '+cls+'" onclick="cdSetStage('+lgArg(sg.id)+')" title="Set to '+
+      entEsc(sg.label)+'"><i></i><span>'+entEsc(sg.label)+'</span></div>';
+  }).join('');
+
+  // ── applicability ──────────────────────────────────────────────
+  var applic = '';
+  if(r.userNA){
+    applic = '<div class="ob-na"><b>Marked not applicable</b>'+
+      (r.naBy?' by '+entEsc(r.naBy):'')+
+      (r.naReason?'<div style="margin-top:4px;">&ldquo;'+entEsc(r.naReason)+'&rdquo;</div>':'')+
+      '<div style="margin-top:8px;"><a class="cc-link" onclick="cdClose();lgNAOpen('+
+        lgArg(entityId)+','+lgArg(key)+')">Reinstate</a></div></div>';
   } else {
-    evHtml='<div class="cd-ev-empty">Nothing attached yet. Add filing acknowledgements, SRN receipts, or approval records.</div>';
+    applic =
+      (why.trigger  ? '<div class="ob-chain"><span class="ob-chain-k">Triggering condition</span>'+
+                      '<span>'+entEsc(why.trigger)+'</span></div>' : '')+
+      (why.provision? '<div class="ob-chain"><span class="ob-chain-k">Legal provision</span>'+
+                      '<span class="mono">'+entEsc(why.provision)+'</span></div>' : '')+
+      (why.rule     ? '<div class="ob-chain"><span class="ob-chain-k">Applicability rule</span>'+
+                      '<span>'+entEsc(why.rule)+'</span></div>' : '')+
+      (why.stated && why.stated !== why.rule
+                    ? '<div class="ob-chain"><span class="ob-chain-k">As stated</span>'+
+                      '<span>'+entEsc(why.stated)+'</span></div>' : '')+
+      (why.facts.length
+        ? '<div class="ob-chain"><span class="ob-chain-k">This entity</span><span>'+
+          why.facts.map(entEsc).join(' ')+'</span></div>' : '')+
+      (r.needsReview || r.unconfirmed
+        ? '<div class="ob-warn">Flagged for review when the source sheet was converted &mdash; '+
+          'the applicability of this one has not been confirmed.</div>' : '');
   }
 
-  // Audit trail
-  var audit=st.audit||[{action:'Obligation identified',user:'System',ts:'On profile setup'}];
-  var auditHtml='';
-  audit.slice().reverse().forEach(function(a){
-    auditHtml+='<div class="cd-audit-row"><div class="cd-audit-dot"></div><div class="cd-audit-main"><b>'+a.action+'</b><span class="cd-audit-meta mono">'+a.user+' · '+a.ts+'</span></div></div>';
-  });
+  // ── filing on record ───────────────────────────────────────────
+  var ev = (c.chart && c.chart[key]) || {};
+  var filing = st.filing;
+  var filingHtml = filing
+    ? f('Filed on', ccFmtDate(filing.filingDate), {mono:true}) +
+      f('SRN / reference', filing.reference || filing.exchangeRef ||
+        '<span class="ob-none">None recorded</span>', {mono:true}) +
+      f('Timing', r.due && filing.filingDate
+          ? (st.late ? ccDaysBetween(r.due, filing.filingDate)+' days late' : 'On time')
+          : null, {tone: st.late ? 'warn' : 'ok'}) +
+      f('Recorded by', filing.enteredBy) +
+      f('Confirmed by', (st.verification && st.verification.verifiedBy) ||
+        '<span class="ob-none">Not yet confirmed</span>') +
+      f('Confidence', st.confidence)
+    : '<div class="ob-empty">No filing recorded. '+
+      '<a class="cc-link" onclick="cdClose();lgRecordOpen('+lgArg(entityId)+','+lgArg(key)+')">'+
+      'Record one</a>.</div>';
 
-  var body=
-    '<div class="cd-head">'+
-      '<div><div class="cd-oblig">'+r.obligation+'</div>'+
-      '<div class="cd-entity">'+c.name+' · <span class="mono">'+(c.cin||'')+'</span></div></div>'+
-      '<button class="cd-close" onclick="cdClose()">✕</button>'+
+  var docHtml = st.document
+    ? f('Document', '<a class="cc-link" onclick="lgOpenEvidence('+lgArg(st.document.path)+')">'+
+        entEsc(st.document.name)+'</a>', {wide:true}) +
+      f('Retention', st.document.retention) +
+      f('Consent recorded by', st.document.consentBy)
+    : '';
+
+  // ── working notes, kept local ──────────────────────────────────
+  var audit = localSt.audit || [{action:'Obligation identified', user:'System', ts:'On profile setup'}];
+  var auditHtml = audit.slice().reverse().map(function(a){
+    return '<div class="cd-audit-row"><div class="cd-audit-dot"></div><div class="cd-audit-main">'+
+      '<b>'+entEsc(a.action)+'</b><span class="cd-audit-meta">'+entEsc(a.user)+' &middot; '+
+      entEsc(a.ts)+'</span></div></div>';
+  }).join('');
+
+  var mo = document.getElementById('cd-modal');
+  mo.innerHTML =
+  '<div class="cd-inner" style="max-width:860px;"><div class="cd-body">'+
+    '<div class="cd-head"><div style="min-width:0;">'+
+      '<div class="ob-crumb">'+entEsc(c.name)+' &middot; <span class="mono">'+
+        entEsc(r.section||'')+'</span></div>'+
+      '<h2 class="ob-title">'+entEsc(r.obligation)+'</h2>'+
+      '<div class="ob-pills">'+lgPill(st.state)+
+        '<span class="exc-pri '+pri+'" style="width:8px;height:8px;"></span>'+
+        '<span class="ob-pri">'+pri.charAt(0).toUpperCase()+pri.slice(1)+' priority</span>'+
+        (ccForm(r.form)?'<span class="cc-att-code mono">'+entEsc(ccForm(r.form))+'</span>':'')+
+      '</div>'+
     '</div>'+
+    '<button onclick="cdClose()" style="background:none;border:none;color:var(--ink-soft);cursor:pointer;font-size:26px;line-height:1;">&times;</button></div>'+
 
-    '<div class="cd-tags">'+statusPill+riskPill+
-      (r.form&&r.form!=='—'?'<span class="cd-form mono">'+r.form+'</span>':'')+
-      '<span class="cd-prog mono">'+progress+'% complete</span>'+
-    '</div>'+
+    '<div class="ob-stages">'+stageHtml+'</div>'+
 
-    // Overview grid
-    '<div class="cd-section"><div class="cd-sec-h">Compliance Overview</div>'+
-      '<div class="cd-grid">'+
-        cdF('Due date','<span class="mono">'+ccFmtDate(r.due)+'</span> · '+(days<0?Math.abs(days)+'d overdue':days+'d left'))+
-        cdF('Owner',r.owner)+
-        cdF('Risk',r.risk)+
-        cdF('Entity',c.name)+
+    section('Why this applies', applic || '<div class="ob-empty">No applicability conditions recorded '+
+      'against this rule.</div>') +
+
+    section('Legal basis',
+      f('Law', entEsc(r.law)) +
+      f('Provision', entEsc(r.section||''), {mono:true}) +
+      f('Form', ccForm(r.form) ? entEsc(ccForm(r.form)) : null, {mono:true}) +
+      f('Frequency', entEsc(r.frequency || '')) +
+      f('Submit to', entEsc(r.submitTo || '')) +
+      f('Penalty for default', entEsc(r.penalty || ''), {wide:true})) +
+
+    '<div class="ob-sec"><div class="ob-sec-h">Due date</div>'+
+      '<div class="ob-due">'+
+        '<div class="ob-due-d"><span class="mono">'+(r.due?ccFmtDate(r.due):'No fixed date')+'</span>'+
+          (days!==null && r.due
+            ? '<span class="ob-due-r '+(days<0?'crit':days<=7?'warn':'')+'">'+
+              (days<0 ? Math.abs(days)+' days ago' : days===0 ? 'today' : 'in '+days+' days')+'</span>'
+            : '')+'</div>'+
+        '<div class="ob-logic">'+dueLogic+'</div>'+
       '</div></div>'+
 
-    // Legal basis
-    '<div class="cd-section"><div class="cd-sec-h">Legal Basis</div>'+
-      '<div class="cd-legal"><div><span class="cd-legal-l">Act / Regulation</span><span class="cd-legal-v">'+r.law+'</span></div>'+
-      '<div><span class="cd-legal-l">Section / Rule</span><span class="cd-legal-v mono">'+r.section+'</span></div>'+
-      '<div><span class="cd-legal-l">Penalty on default</span><span class="cd-legal-v">'+r.penalty+'</span></div></div></div>'+
+    section('Responsible',
+      person('Owner', r.ownerEmail, r.ownerName, r.owner) +
+      person('Reviewer', r.reviewerEmail, r.reviewerName, null) +
+      f('Escalates to', entEsc(r.escalationTo || '')) +
+      '<div class="ob-f wide"><div class="ob-f-v" style="padding-top:4px;">'+
+        '<button class="cc-btn" onclick="cdAssignOpen()">Assign owner &amp; reviewer</button>'+
+        '<button class="cc-btn" style="margin-left:8px;" onclick="cdPriorityOpen()">Set priority</button>'+
+      '</div></div>') +
 
-    // Why applies
-    '<div class="cd-section"><div class="cd-sec-h">Why This Applies</div>'+
-      '<div class="cd-why">This obligation applies to <b>'+c.name+'</b> as a <b>'+(c.type||'company')+'</b> under '+r.law+', '+r.section+'. The requirement is triggered by the entity\'s profile (type, capital, turnover). <span class="cd-why-verify">Verify current thresholds and form version on the MCA/SEBI portal before filing.</span></div>'+
-      '<button class="cd-ai-btn" onclick="cdAskAI()">◈ Ask AI to explain this in detail</button></div>'+
+    section('Filing on record', filingHtml + docHtml) +
 
-    // Execution steps
-    '<div class="cd-section"><div class="cd-sec-h">What Needs To Be Done <span class="cd-sec-count">'+doneCount+'/'+stepCount+'</span></div>'+
-      '<div class="cd-progress-bar"><div class="cd-progress-fill" style="width:'+progress+'%"></div></div>'+
-      '<div class="cd-steps">'+stepsHtml+'</div></div>'+
+    (r.remarks ? section('Remarks', f('', entEsc(r.remarks), {wide:true})) : '') +
 
-    // Documents
-    '<div class="cd-section"><div class="cd-sec-h">Documents</div><div class="cd-docs">'+docHtml+'</div></div>'+
-
-    // Approvals
-    '<div class="cd-section"><div class="cd-sec-h">Approval Chain</div><div class="cd-approvals">'+chainHtml+'</div>'+
-      '<button class="cd-appr-btn" onclick="cdAdvanceApproval()">Advance approval →</button></div>'+
-
-    // Evidence
-    '<div class="cd-section"><div class="cd-sec-h">Filing References &amp; Acknowledgements</div><div class="cd-evidence">'+evHtml+'</div>'+
-      '<button class="cd-ev-add" onclick="cdAddEvidence()">+ Add reference</button></div>'+
-
-    // Audit trail
-    '<div class="cd-section"><div class="cd-sec-h">Working notes</div>'+
-      '<div style="font-size:11.5px;color:var(--ink-soft);margin:-4px 0 9px;">Kept on this browser. '+
-      'The recorded trail is on the Audit Trail screen.</div>'+
+    '<div class="ob-sec"><div class="ob-sec-h">Working notes</div>'+
+      '<div class="ob-sec-n">Kept on this browser. The recorded trail is on the Audit Trail screen.</div>'+
       '<div class="cd-audit">'+auditHtml+'</div></div>'+
 
-    // Footer actions
-    '<div class="cd-foot">'+
-      '<button class="cc-btn-primary" onclick="cdGenerateDoc()">Generate document</button>'+
-      '<button class="cc-btn" onclick="cdMarkComplete()">Record filing &amp; close</button>'+
-      '<button class="cc-btn" onclick="cdClose();lgNAOpen('+lgArg(entityId)+','+lgArg(key)+')">Not applicable</button>'+
-    '</div>';
+    '<div class="ob-acts">'+
+      '<button class="cc-btn-primary" onclick="cdMarkComplete()">Record filing</button>'+
+      '<button class="cc-btn" onclick="cdClose();lgWhy('+lgArg(entityId)+','+lgArg(key)+')">How do you know?</button>'+
+      '<button class="cc-btn" onclick="cdAskAI()">Ask AI</button>'+
+      (!r.userNA
+        ? '<button class="cc-btn" onclick="cdClose();lgNAOpen('+lgArg(entityId)+','+lgArg(key)+')">Not applicable</button>'
+        : '')+
+      '<button class="cc-btn" onclick="cdClose()">Close</button>'+
+    '</div>'+
+  '</div></div>';
 
-  document.getElementById('cd-body').innerHTML=body;
-  document.getElementById('cd-modal').style.display='flex';
+  mo.style.display = 'flex';
 }
+
+// Moving an obligation along the workflow. Recorded on compliance_status, so it
+// is the same fact everywhere rather than a note on one screen.
+async function cdSetStage(id){
+  if(!CD_CURRENT) return;
+  try{
+    await lgPersist(CD_CURRENT.entityId, CD_CURRENT.key, {stage:id});
+    openComplianceDetail(CD_CURRENT.entityId, CD_CURRENT.key);
+    lgRefreshAll();
+  }catch(e){
+    alert('Could not set the stage.\n\n' + (/stage|column/i.test(e.message)
+      ? 'Run db/014_ownership_and_priority.sql in the Supabase SQL editor first.' : e.message));
+  }
+}
+
 
 function cdF(l,v){ return '<div class="cd-f"><div class="cd-f-l">'+l+'</div><div class="cd-f-v">'+v+'</div></div>'; }
 function cdClose(){ document.getElementById('cd-modal').style.display='none'; }
