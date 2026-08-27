@@ -256,6 +256,15 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 .cmd-help{width:16px;height:16px;border-radius:50%;background:var(--bg);border:1px solid var(--line);color:var(--ink-soft);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:help;flex-shrink:0;}
 
 /* donut */
+.cc-health-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
+.cc-health-n{font-family:'IBM Plex Mono';font-size:38px;font-weight:800;line-height:1;}
+.cc-health-max{font-size:15px;font-weight:600;color:var(--ink-soft);}
+.cc-health-w{font-size:12.5px;font-weight:700;}
+.cc-health-bar{height:7px;border-radius:4px;background:var(--bg);border:1px solid var(--line-soft);overflow:hidden;margin-top:11px;}
+.cc-health-bar i{display:block;height:100%;transition:width .3s;}
+.cc-health-d{font-family:'IBM Plex Mono';font-size:11.5px;color:var(--ink-soft);min-width:26px;text-align:right;}
+.cmd-leg.zero{opacity:.5;}
+.cmd-leg[onclick]:hover span{color:var(--blue);}
 .cmd-cov{display:flex;gap:16px;align-items:center;flex-wrap:wrap;}
 .cmd-donut{position:relative;flex-shrink:0;}
 .cmd-donut svg{width:100%;height:100%;display:block;}
@@ -413,6 +422,12 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 .adm-email{font-size:13.5px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .adm-meta{font-size:12px;color:var(--ink-soft);margin-top:3px;}
 .adm-acts{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;}
+.exc-pri{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.exc-pri.critical{background:var(--crit);}
+.exc-pri.high{background:#F97316;}
+.exc-pri.medium{background:var(--warn);}
+.exc-pri.low{background:#93C5FD;}
+.cu-sum-chip.on{border-color:var(--blue);background:var(--blue-wash);}
 .cu-na{font-family:'Manrope';font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:7px;border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);cursor:pointer;margin-left:6px;white-space:nowrap;transition:.14s;}
 .cu-na:hover{border-color:var(--ink-soft);color:var(--ink-mid);}
 .cu-na.on{background:var(--blue-wash);border-color:transparent;color:var(--blue);}
@@ -1175,7 +1190,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v107">
+      <meta id="build-version" content="v112">
     </div>
   </div>
   <div class="cc-search">
@@ -1225,6 +1240,7 @@ input[type="text"], input[type="password"], textarea, select {
 <div class="navitem" onclick="sw('internal')" id="t-internal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg><span>Internal Compliance</span></div>
 <div class="navitem" onclick="sw('filings')" id="t-filings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11l5 5v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M15 4v5h5M8 14h8M8 17h5"/></svg><span>Filings &amp; Records</span></div>
 <div class="navitem" onclick="sw('documents')" id="t-documents"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Documents</span></div>
+<div class="navitem" onclick="sw('exceptions')" id="t-exceptions"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3L12 3z"/><path d="M12 10v4" stroke-linecap="round"/></svg><span>Exceptions</span><span class="nav-badge" id="nav-exc-n" style="display:none">0</span></div>
 <div class="navitem" onclick="sw('approvals')" id="t-approvals"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Approvals</span><span class="nav-badge" id="nav-approvals-n" style="display:none">0</span></div>
 <div class="navhead">Document Studio</div>
 <div class="navitem" onclick="sw('res')" id="t-res"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg><span>Resolutions</span></div>
@@ -1340,6 +1356,7 @@ input[type="text"], input[type="password"], textarea, select {
 <div class="panel" id="p-documents"><div class="cc-tool"><div id="doc-root"></div></div></div>
 <div class="panel" id="p-directors"><div class="cc-tool"><div id="reg-root-directors"></div></div></div>
 <div class="panel" id="p-meetings"><div class="cc-tool"><div id="reg-root-meetings"></div></div></div>
+<div class="panel" id="p-exceptions"><div class="cc-tool"><div id="exc-root"></div></div></div>
 <div class="panel" id="p-approvals"><div class="cc-tool"><div id="apr-root"></div></div></div>
 <div class="panel" id="p-audit"><div class="cc-tool"><div id="aud-root"></div></div></div>
 <div class="panel" id="p-settings"><div class="cc-tool"><div id="set-root"></div></div></div>
@@ -2605,6 +2622,7 @@ function sw(id) {
   if (id==='penalty' && typeof renderPenalties==='function') renderPenalties();
   if (id==='filings' && typeof renderFilings==='function') renderFilings();
   if (id==='documents' && typeof renderDocuments==='function') renderDocuments();
+  if (id==='exceptions' && typeof renderExceptions==='function') renderExceptions();
   if (id==='approvals' && typeof renderApprovals==='function') renderApprovals();
   if (id==='audit' && typeof renderAudit==='function') renderAudit();
   if (id==='settings' && typeof renderSettings==='function') renderSettings();
@@ -4728,11 +4746,22 @@ function getComplianceChart(c, opts){
   var _chart = (c && c.chart) || {};
   rows.forEach(function(r){
     var ev = _chart[r.key];
-    if(ev && ev.notApplicable){
+    if(!ev) return;
+    if(ev.notApplicable){
       r.userNA = true;
       r.naReason = ev.naReason || null;
       r.naBy = ev.naBy || null;
     }
+    // The role the rule carries says what kind of person; these say which one.
+    r.ownerEmail    = ev.ownerEmail || null;
+    r.ownerName     = ev.ownerName || null;
+    r.reviewerEmail = ev.reviewerEmail || null;
+    r.reviewerName  = ev.reviewerName || null;
+    r.escalationTo  = ev.escalationTo || null;
+    // A priority set here overrides the risk the provision carries.
+    r.priority      = ev.priority || null;
+    r.stage         = ev.stage || null;
+    r.remarks       = ev.remarks || null;
   });
 
   // Belt and braces against duplicates across the three generated sets.
@@ -5433,7 +5462,12 @@ async function loadCloudClients(){
           docConsentBy:s.doc_consent_by||null, docConsentAt:s.doc_consent_at||null,
           // Marked not applicable by a user (db/012). Absent until that runs.
           notApplicable:s.not_applicable===true, naReason:s.na_reason||null,
-          naBy:s.na_by||null, naAt:s.na_at||null
+          naBy:s.na_by||null, naAt:s.na_at||null,
+          // Ownership, review and workflow (db/014). Absent until that runs.
+          ownerEmail:s.owner_email||null, ownerName:s.owner_name||null,
+          reviewerEmail:s.reviewer_email||null, reviewerName:s.reviewer_name||null,
+          escalationTo:s.escalation_to||null,
+          priority:s.priority||null, stage:s.stage||null, remarks:s.remarks||null
         };
       });
     }
@@ -5922,7 +5956,7 @@ function ccComputeStats(){
     verified:0, filedLate:0, noEvidence:0, unverified:0, needsCheck:0, notApplicable:0, standing:0,
     awaitingCheck:0, rejected:0, missingDoc:0,
     manualConfirmation:0, verificationPending:0, partiallyVerified:0,
-    dueNow:0, overdueConfirmed:0, notFound:0, unknown:0, dueIn30:0,
+    dueNow:0, overdueConfirmed:0, notFound:0, unknown:0, dueIn30:0, unassignedAll:0,
     pastDue:0, awaitingConfirmation:0, evidenceOnRecord:0,
     byState:{}, items:[], late:[], agenda:[], standingNames:[], filed:[],
     // legacy aliases kept so older callers do not break
@@ -5936,6 +5970,9 @@ function ccComputeStats(){
       // Out of the totals entirely: not pending, not due, not evidence-bearing.
       if(r.applicable===false || r.userNA){ stats.notApplicable++; return; }
       stats.totalObligations++;
+      // Every applicable obligation with nobody answerable for it. Standing
+      // duties are excluded: they have no discrete task to own.
+      if(!r.ownerEmail && !r.standing) stats.unassignedAll++;
 
       // Single source of truth for status. Evidence decides; a date alone never does.
       var st   = lgResolveStatus(r, c);
@@ -5971,7 +6008,10 @@ function ccComputeStats(){
         company:c.name, entityId:c.id, key:r.key,
         obligation:r.obligation, form:r.form, section:r.section,
         law:r.law, owner:r.owner, due:r.due, days:days, risk:r.risk,
-        penalty:r.penalty, state:st.state, dueConfidence:r.dueConfidence
+        penalty:r.penalty, state:st.state, dueConfidence:r.dueConfidence,
+        priority:lgPriority(r), stage:lgStage(r, st),
+        ownerEmail:r.ownerEmail || null, ownerName:r.ownerName || null,
+        reviewerEmail:r.reviewerEmail || null
       };
       // Anything with a filing record against it, whatever its confirmation
       // state — the done list is about what was recorded, not about whether an
@@ -5980,6 +6020,8 @@ function ccComputeStats(){
         stats.filed.push({
           company:c.name, entityId:c.id, key:r.key,
           obligation:r.obligation, form:r.form, section:r.section, law:r.law,
+          priority:lgPriority(r), stage:lgStage(r, st),
+          ownerEmail:r.ownerEmail || null, reviewerEmail:r.reviewerEmail || null,
           due:r.due, filedOn:st.filing.filingDate,
           reference:st.filing.reference || st.filing.exchangeRef || null,
           late:!!st.late, state:st.state, confidence:st.confidence,
@@ -6020,6 +6062,28 @@ function ccComputeStats(){
   // connector; VERIFICATION_UNAVAILABLE is the only one reachable today, so a
   // tile bound to any single one of them would read 0 forever.
   stats.pastDue = stats.overdueConfirmed + stats.notFound + stats.unverified;
+
+  // ── record coverage ──────────────────────────────────────────
+  // "Confirmed" means a second person signed it off, or an outside source did.
+  // "Pending confirmation" means recorded and not yet checked. The distinction
+  // is the whole point: an entry nobody has checked is not a confirmed filing.
+  stats.confirmed  = stats.verified + stats.manualConfirmation;
+  stats.pendingConf = stats.verificationPending + stats.awaitingCheck;
+  stats.completed  = stats.confirmed + stats.pendingConf;
+  // evidenceOnRecord is assigned further down, so derive from the same parts
+  // rather than reading it before it exists — which is how this came out one
+  // too high, reporting the whole register as having no record.
+  stats.noRecord   = Math.max(0, stats.totalObligations - stats.completed);
+
+  // ── things a person has to resolve ───────────────────────────
+  stats.criticalOverdue = stats.late.filter(function(l){
+    return lgPriority(l) === 'critical';
+  }).length;
+  // Counted the same way the Exceptions screen counts it. It was reading the
+  // attention list, which is capped at 45 days out, so the two screens showed
+  // 40 and 132 under the same words.
+  stats.unassigned = stats.unassignedAll;
+  stats.unreviewed = stats.filed.filter(function(f){ return !f.reviewerEmail; }).length;
 
   // Two more windows the command centre reports on separately.
   stats.dueIn90 = stats.agenda.length;
@@ -6942,7 +7006,8 @@ async function regDelete(key, id){
 // CUSTOMISE — which cards the command centre shows
 // ═══════════════════════════════════════════════════
 var CMD_CARDS = [
-  {id:'coverage',  label:'Evidence coverage'},
+  {id:'health',    label:'Compliance health'},
+  {id:'coverage',  label:'Compliance record coverage'},
   {id:'glance',    label:'At a glance'},
   {id:'summary',   label:'By law'},
   {id:'insights',  label:'What the data shows'},
@@ -7046,6 +7111,159 @@ document.addEventListener('keydown', function(e){
 function aprRefreshBadge(){
   if(typeof aprQueue !== 'function') return;
   try{ aprBadge(aprQueue().filter(function(i){ return i.can.can; }).length); }catch(e){}
+}
+
+// ═══════════════════════════════════════════════════
+// EXCEPTIONS
+// ═══════════════════════════════════════════════════
+// Everything on the register that needs someone to intervene, typed by what is
+// wrong with it rather than lumped into one "attention" pile. Every row opens
+// the record behind it.
+//
+// Only conditions the data can establish are listed. "Wrong form recorded" was
+// asked for, but nothing here can tell a wrong form from a right one without a
+// filing source to check against, so it is not claimed.
+var EXC_TYPES = [
+  {id:'overdue',    label:'Past due, nothing recorded',  tone:'crit',
+   why:'The date has passed and no filing has been recorded against it.'},
+  {id:'lateFiled',  label:'Filed after the due date',    tone:'warn',
+   why:'A filing is recorded, but dated after the deadline.'},
+  {id:'unconfirmed',label:'Recorded, not confirmed',     tone:'warn',
+   why:'Someone entered this. Nobody else has checked it.'},
+  {id:'noRef',      label:'No SRN or reference',         tone:'warn',
+   why:'A filing date is recorded with nothing to identify the filing.'},
+  {id:'unassigned', label:'No owner assigned',           tone:'warn',
+   why:'Nobody is answerable for this obligation.'},
+  {id:'noReviewer', label:'No reviewer assigned',        tone:'info',
+   why:'A recorded filing with nobody named to check it.'},
+  {id:'dateDerived',label:'Due date computed, not stated',tone:'info',
+   why:'The source sheet recorded no exact deadline, so the date is derived from the period end.'},
+  {id:'needsReview',label:'Applicability needs review',  tone:'info',
+   why:'The rule was flagged for review when the source sheet was converted.'}
+];
+
+function excBuild(){
+  var out = {};
+  EXC_TYPES.forEach(function(t){ out[t.id] = []; });
+  if(typeof CLIENTS === 'undefined') return out;
+
+  CLIENTS.forEach(function(c){
+    var rows = [];
+    try{ rows = getComplianceChart(c); }catch(e){ return; }
+    rows.forEach(function(r){
+      var st = lgResolveStatus(r, c);
+      var meta = lgStateMeta(st.state);
+      var base = {company:c.name, entityId:c.id, key:r.key, obligation:r.obligation,
+                  section:r.section, law:r.law, form:r.form, due:r.due,
+                  days:st.days, priority:lgPriority(r), state:st.state,
+                  ownerEmail:r.ownerEmail, reviewerEmail:r.reviewerEmail};
+      var filed = st.filing;
+
+      if(!filed && st.days !== null && st.days < 0) out.overdue.push(base);
+      if(filed && st.late) out.lateFiled.push(base);
+      if(filed && meta.asserts !== 'compliant') out.unconfirmed.push(base);
+      if(filed && !filed.reference && !filed.exchangeRef) out.noRef.push(base);
+      if(!r.ownerEmail && st.state !== 'NOT_APPLICABLE' && st.state !== 'STANDING')
+        out.unassigned.push(base);
+      if(filed && !r.reviewerEmail) out.noReviewer.push(base);
+      if(r.dueConfidence === 'derived' && st.days !== null && st.days < 0)
+        out.dateDerived.push(base);
+      if(r.needsReview || r.unconfirmed) out.needsReview.push(base);
+    });
+  });
+
+  Object.keys(out).forEach(function(k){
+    out[k].sort(function(a,b){
+      return lgPriorityRank({priority:a.priority}) - lgPriorityRank({priority:b.priority})
+          || (a.days||0) - (b.days||0);
+    });
+  });
+  return out;
+}
+
+var EXC_FILTER = '';
+
+function excTotal(g){
+  return EXC_TYPES.reduce(function(a,t){ return a + g[t.id].length; }, 0);
+}
+
+function excBadge(){
+  var b = document.getElementById('nav-exc-n');
+  if(!b || typeof CLIENTS === 'undefined' || !CLIENTS.length) return;
+  var g;
+  try{ g = excBuild(); }catch(e){ return; }
+  // The badge counts what genuinely blocks: past due and unconfirmed filings.
+  var n = g.overdue.length + g.unconfirmed.length;
+  b.textContent = n > 99 ? '99+' : n;
+  b.style.display = n ? '' : 'none';
+}
+
+function renderExceptions(){
+  var root = document.getElementById('exc-root');
+  if(!root) return;
+
+  var head = '<div class="cc-pagehead"><div>'+
+    '<div class="cc-crumb">Operate &rsaquo; Exceptions</div>'+
+    '<h1 class="cc-h1">Exceptions</h1>'+
+    '<p class="cc-sub">Everything on the register that needs someone to act, grouped by what is '+
+    'wrong with it. Every row opens the obligation behind it.</p></div></div>';
+
+  if(typeof CLIENTS === 'undefined' || !CLIENTS.length){
+    root.innerHTML = head + '<div class="cc-empty"><h2>No entities yet</h2>'+
+      '<p>Add a company and its exceptions appear here.</p>'+
+      '<button class="cc-btn-primary" onclick="entOpen()">+ Add a company</button></div>';
+    return;
+  }
+
+  var g = excBuild();
+  var total = excTotal(g);
+
+  if(!total){
+    root.innerHTML = head + '<div class="cc-card"><div class="cc-card-b">'+
+      '<div class="cc-none">Nothing outstanding. Every obligation has an owner, and every recorded '+
+      'filing has a reference and a reviewer.</div></div></div>';
+    excBadge();
+    return;
+  }
+
+  var chips = '<div class="cu-summary">'+
+    EXC_TYPES.filter(function(t){ return g[t.id].length; }).map(function(t){
+      return '<div class="cu-sum-chip'+(EXC_FILTER===t.id?' on':'')+
+        (t.tone==='crit'?' crit':t.tone==='warn'?' warn':'')+'" '+
+        'onclick="EXC_FILTER='+lgArg(EXC_FILTER===t.id?'':t.id)+';renderExceptions();">'+
+        '<b>'+g[t.id].length+'</b> '+entEsc(t.label)+'</div>';
+    }).join('')+'</div>';
+
+  var body = EXC_TYPES.filter(function(t){
+    return g[t.id].length && (!EXC_FILTER || EXC_FILTER === t.id);
+  }).map(function(t){
+    return '<div class="cc-card" style="margin-top:16px;">'+
+      '<div class="cc-card-h"><h3>'+entEsc(t.label)+' &mdash; '+g[t.id].length+'</h3>'+
+        '<span style="font-size:11.5px;color:var(--ink-soft);max-width:46ch;text-align:right;">'+
+        entEsc(t.why)+'</span></div>'+
+      '<div class="cc-card-b">'+
+        g[t.id].slice(0,25).map(function(x){
+          return '<div class="cc-att-row" style="cursor:pointer;" onclick="cuOpenDetail('+
+            lgArg(x.entityId)+','+lgArg(x.key)+')">'+
+            '<span class="exc-pri '+x.priority+'" title="'+x.priority+'"></span>'+
+            '<div class="cc-att-main">'+
+              '<div class="cc-att-title">'+entEsc(x.obligation)+
+                (ccForm(x.form)?' <span class="cc-att-code mono">'+entEsc(ccForm(x.form))+'</span>':'')+
+              '</div>'+
+              '<div class="cc-att-meta">'+entEsc(x.company)+' &middot; '+entEsc(x.section||'')+
+                (x.due?' &middot; due '+ccFmtDate(x.due):'')+
+                (x.ownerEmail?' &middot; '+entEsc(x.ownerEmail):'')+'</div>'+
+            '</div>'+
+            '<div class="cc-att-right">'+lgPill(x.state)+'</div>'+
+          '</div>';
+        }).join('')+
+        (g[t.id].length > 25
+          ? '<div class="cu-foot">Showing 25 of '+g[t.id].length+'.</div>' : '')+
+      '</div></div>';
+  }).join('');
+
+  root.innerHTML = head + chips + body;
+  excBadge();
 }
 
 // ═══════════════════════════════════════════════════
@@ -7313,7 +7531,7 @@ function renderCommandCenter(){
     ccCmdHead(s, c0, entName, typeLabel) +
     '<div class="cmd-grid">'+
       // Order fixed, visibility from Settings — a card you hid stays hidden.
-      [['coverage',ccCardCoverage],['glance',ccCardGlance],['summary',ccCardSummary],
+      [['health',ccCardHealth],['coverage',ccCardCoverage],['glance',ccCardGlance],['summary',ccCardSummary],
        ['insights',ccCardInsights],['immediate',ccCardImmediate],['upcoming',ccCardUpcoming],
        ['activity',ccCardActivity],['quick',ccCardQuick],['calendar',ccCardCalendar],
        ['radar',ccCardRadar],['copilot',ccCardCopilot]]
@@ -7322,6 +7540,7 @@ function renderCommandCenter(){
     '</div>';
   notifRefresh();
   aprRefreshBadge();
+  if(typeof excBadge === 'function') excBadge();
 }
 
 // ── page head ────────────────────────────────────────────────────
@@ -7390,56 +7609,143 @@ function ccLegendRow(color, label, value){
 // The reference shows "88/100 Excellent, +6.4% vs last month". No prior period
 // is stored, so there is nothing to compare against and no score to report.
 // What IS computable is how much of the register has a filing behind it.
+// ── Compliance health ────────────────────────────────────────────
+// Starts at 100 and deducts for each unresolved thing, weighted by how much it
+// would matter if someone asked. The weights are a judgement, so they are shown
+// rather than buried — every line states its own deduction and opens the
+// obligations behind it.
+// Each fault carries a weight: how much one obligation in that condition
+// detracts from the register being in good order. The score is the share that
+// remains, so it means the same thing whether an entity has fifty obligations
+// or two hundred. Flat per-item deductions measured size, not health — a
+// register that had simply not been set up scored 6 out of 100.
+var LG_HEALTH_RULES = [
+  {id:'criticalOverdue', label:'Critical, past due',    weight:1.5, tone:'crit',
+   go:"ccGo('vstatus','OVERDUE,NOT_FOUND,VERIFICATION_UNAVAILABLE')"},
+  {id:'otherOverdue',    label:'Past due',              weight:1.0, tone:'crit',
+   go:"ccGo('vstatus','OVERDUE,NOT_FOUND,VERIFICATION_UNAVAILABLE')"},
+  {id:'pendingConf',     label:'Awaiting confirmation', weight:0.5, tone:'warn',
+   go:"ccGo('vstatus','AWAITING_CHECK,CHECK_REJECTED,FILED_PENDING')"},
+  {id:'unassigned',      label:'No owner assigned',     weight:0.3, tone:'warn',
+   go:"sw('exceptions')"},
+  {id:'dueIn30',         label:'Due within 30 days',    weight:0.2, tone:'warn',
+   go:"ccGo('within','30')"},
+  {id:'unreviewed',      label:'Recorded, no reviewer', weight:0.2, tone:'info',
+   go:"sw('exceptions')"}
+];
+
+function ccHealth(s){
+  var counts = {
+    criticalOverdue: s.criticalOverdue,
+    otherOverdue:    Math.max(0, s.pastDue - s.criticalOverdue),
+    pendingConf:     s.pendingConf,
+    unassigned:      s.unassigned,
+    dueIn30:         s.dueIn30,
+    unreviewed:      s.unreviewed
+  };
+  var base = Math.max(1, s.totalObligations);
+  var lines = LG_HEALTH_RULES.map(function(r){
+    var n = counts[r.id] || 0;
+    return {rule:r, count:n, cost:(n * r.weight) / base};
+  });
+  var lost = lines.reduce(function(a,l){ return a + l.cost; }, 0);
+  var score = Math.max(0, Math.round(100 * (1 - lost)));
+  // Rounded to whole points, so the parts shown add up to the total deducted.
+  lines.forEach(function(l){ l.deduct = Math.round(100 * l.cost); });
+  return {score:score, lines:lines, lost:Math.round(100 * lost)};
+}
+
+function ccCardHealth(s){
+  if(!s.totalObligations){
+    return '<div class="cmd-card"><div class="cmd-card-h"><h3>Compliance health</h3></div>'+
+      '<div class="cmd-card-b"><div class="cc-none">Nothing applicable yet.</div></div></div>';
+  }
+  var h = ccHealth(s);
+  var tone = h.score >= 85 ? 'var(--ok)' : h.score >= 60 ? 'var(--warn)' : 'var(--crit)';
+  var word = h.score >= 85 ? 'Good standing' : h.score >= 60 ? 'Needs attention' : 'Action required';
+
+  return '<div class="cmd-card">'+
+    '<div class="cmd-card-h"><h3>Compliance health</h3>'+
+      '<span class="cmd-help" title="Starts at 100 and deducts for each unresolved item, weighted '+
+        'by consequence. Every line below shows its own deduction and opens the obligations behind '+
+        'it. No factor can take more than 30 on its own.">?</span></div>'+
+    '<div class="cmd-card-b">'+
+      '<div class="cc-health-top">'+
+        '<div class="cc-health-n" style="color:'+tone+';">'+h.score+
+          '<span class="cc-health-max">/100</span></div>'+
+        '<div class="cc-health-w" style="color:'+tone+';">'+word+'</div>'+
+      '</div>'+
+      '<div class="cc-health-bar"><i style="width:'+h.score+'%;background:'+tone+';"></i></div>'+
+      '<div class="cmd-legs" style="margin-top:13px;">'+
+        h.lines.map(function(l){
+          return '<div class="cmd-leg'+(l.count?'':' zero')+'" style="cursor:pointer;" onclick="'+
+            l.rule.go+'">'+
+            '<i style="background:var(--'+(l.rule.tone==='crit'?'crit':l.rule.tone==='warn'?'warn':'line')+')"></i>'+
+            '<span>'+l.rule.label+'</span>'+
+            '<b>'+l.count+'</b>'+
+            '<span class="cc-health-d">'+(l.deduct?'&minus;'+l.deduct:'&ndash;')+'</span></div>';
+        }).join('')+
+      '</div>'+
+    '</div>'+
+    '<div class="cmd-note">'+(h.lost
+      ? 'The share of '+ccPlural(s.totalObligations,'obligation','obligations')+
+        ' in good order, weighted by what each fault costs. Counts and their weight are above.'
+      : 'Nothing outstanding on the register.')+'</div>'+
+  '</div>';
+}
+
 function ccCardCoverage(s){
-  // Everything not already in another bucket: applicable, dated further out
-  // than thirty days, nothing recorded. Without this row the legend fell short
-  // of the total by a quarter of the register.
   var scheduled = Math.max(0, s.totalObligations - s.evidenceOnRecord - s.pastDue
                               - s.dueIn30 - s.standing);
   var pct = s.totalObligations
     ? Math.round((s.evidenceOnRecord / s.totalObligations) * 100) : 0;
-  var tone = pct >= 80 ? 'var(--ok)' : pct >= 40 ? 'var(--warn)'
-           : s.evidenceOnRecord ? 'var(--warn)' : 'var(--ink-soft)';
 
-  // The ring carries the whole register, not just the filed slice against grey.
   var segs = [
-    {value:s.evidenceOnRecord, color:'var(--ok)',   label:'With a filing on record'},
-    {value:s.pastDue,          color:'var(--crit)', label:'Past due, nothing recorded'},
-    {value:s.dueIn30,          color:'var(--warn)', label:'Due within 30 days'},
-    {value:scheduled,          color:'#93C5FD',     label:'Scheduled, not yet due'},
-    {value:s.standing,         color:'#CBD5E1',     label:'Ongoing or event-driven'}
+    {value:s.confirmed,   color:'var(--ok)',   label:'Confirmed'},
+    {value:s.pendingConf, color:'var(--warn)', label:'Pending confirmation'},
+    {value:s.pastDue,     color:'var(--crit)', label:'Past due, no record'},
+    {value:scheduled,     color:'#93C5FD',     label:'Scheduled, not yet due'},
+    {value:s.standing,    color:'#CBD5E1',     label:'Ongoing or event-driven'}
   ];
 
+  var row = function(colour, label, n, go){
+    return '<div class="cmd-leg'+(n?'':' zero')+'" style="cursor:pointer;" onclick="'+go+'">'+
+      '<i style="background:'+colour+'"></i><span>'+label+'</span><b>'+n+'</b></div>';
+  };
+
   return '<div class="cmd-card">'+
-    '<div class="cmd-card-h"><h3>Evidence coverage</h3>'+
-      '<span class="cmd-help" title="How many applicable obligations have a filing date or reference '+
-        'recorded against them. Not a compliance score — nothing here has been confirmed against MCA '+
-        'or the exchanges.">?</span></div>'+
+    '<div class="cmd-card-h"><h3>Compliance record coverage</h3>'+
+      '<span class="cmd-help" title="How much of the register has a filing recorded against it, and '+
+        'how much of that has been confirmed by a second person. It is a record of what you have '+
+        'told the system — nothing here has been checked against MCA or the exchanges.">?</span></div>'+
     '<div class="cmd-card-b cmd-cov">'+
       ccDonut(segs,
-        '<span style="color:'+tone+'">'+s.evidenceOnRecord+'</span>'+
-        '<span class="cmd-donut-max"> of '+s.totalObligations+'</span>',
+        '<span style="color:'+(s.evidenceOnRecord?'var(--navy)':'var(--ink-soft)')+'">'+
+          s.evidenceOnRecord+'</span><span class="cmd-donut-max"> of '+s.totalObligations+'</span>',
         s.evidenceOnRecord ? 'recorded' : 'none recorded')+
       '<div class="cmd-legs">'+
-        ccLegendRow('var(--ok)','With a filing on record', s.evidenceOnRecord)+
-        ccLegendRow('var(--crit)','Past due, nothing recorded', s.pastDue)+
-        ccLegendRow('var(--warn)','Due within 30 days', s.dueIn30)+
-        ccLegendRow('#93C5FD','Scheduled, not yet due', scheduled)+
-        ccLegendRow('#CBD5E1','Ongoing or event-driven', s.standing)+
+        row('var(--ok)','Confirmed', s.confirmed,
+            "ccGo('vstatus','FILED,FILED_LATE,MANUAL_CONFIRMATION')")+
+        row('var(--warn)','Pending confirmation', s.pendingConf,
+            "ccGo('vstatus','AWAITING_CHECK,CHECK_REJECTED,FILED_PENDING')")+
+        row('var(--crit)','Past due, no record', s.pastDue,
+            "ccGo('vstatus','OVERDUE,NOT_FOUND,VERIFICATION_UNAVAILABLE')")+
+        row('#93C5FD','Scheduled, not yet due', scheduled, "ccGo('within','90')")+
+        row('#CBD5E1','Ongoing or event-driven', s.standing, "ccGo('vstatus','STANDING')")+
         '<div class="cmd-leg total"><span>Applicable obligations</span><b>'+
           s.totalObligations+'</b></div>'+
-        // Below the line on purpose: something marked not applicable is not an
-        // applicable obligation, so it cannot sit inside that total.
         (s.notApplicable
-          ? '<div class="cmd-leg" style="color:var(--ink-soft);"><i style="background:var(--line)"></i>'+
+          ? '<div class="cmd-leg" style="color:var(--ink-soft);cursor:pointer;" '+
+            'onclick="ccGo(\'na\',\'only\')"><i style="background:var(--line)"></i>'+
             '<span>Marked not applicable</span><b>'+s.notApplicable+'</b></div>' : '')+
       '</div>'+
     '</div>'+
     '<div class="cmd-note">'+
       (s.evidenceOnRecord
-        ? pct + '% of the register has a filing recorded. '
+        ? pct+'% has a filing recorded, of which '+s.confirmed+' '+
+          (s.confirmed===1?'has':'have')+' been confirmed. '
         : 'Nothing recorded yet. ')+
-      'No prior period is stored, so there is nothing to compare against.</div>'+
+      'Nothing here has been checked against MCA or the exchanges.</div>'+
   '</div>';
 }
 
@@ -8987,6 +9293,43 @@ function lgDocumentRecord(ev){
 }
 
 // The single place a compliance status is decided.
+// The firm's decision if one has been recorded, otherwise the risk the
+// provision itself carries. One function so ordering and colour never disagree.
+function lgPriority(row){
+  var p = (row && row.priority) || (row && row.risk) || 'medium';
+  p = String(p).toLowerCase();
+  return (p === 'critical' || p === 'high' || p === 'medium' || p === 'low') ? p : 'medium';
+}
+var LG_PRIORITY_RANK = {critical:0, high:1, medium:2, low:3};
+function lgPriorityRank(row){ return LG_PRIORITY_RANK[lgPriority(row)]; }
+
+// Where an obligation has reached. Recorded explicitly when the user moves it;
+// otherwise inferred from what is on record, so the stage is never blank.
+function lgStage(row, st){
+  if(row && row.stage) return row.stage;
+  if(row && row.userNA) return 'closed';
+  var s = st && st.state;
+  if(s === 'FILED' || s === 'PUBLISHED' || s === 'MANUAL_CONFIRMATION') return 'confirmed';
+  if(s === 'FILED_LATE') return 'confirmed';
+  if(s === 'AWAITING_CHECK' || s === 'FILED_PENDING') return 'confirmation_pending';
+  if(s === 'CHECK_REJECTED') return 'in_progress';
+  if(row && row.ownerEmail) return 'assigned';
+  return 'identified';
+}
+var LG_STAGES = [
+  {id:'identified',          label:'Identified'},
+  {id:'assigned',            label:'Assigned'},
+  {id:'in_progress',         label:'In progress'},
+  {id:'filed',               label:'Filed'},
+  {id:'confirmation_pending',label:'Confirmation pending'},
+  {id:'confirmed',           label:'Confirmed'},
+  {id:'closed',              label:'Closed'}
+];
+function lgStageLabel(id){
+  for(var i=0;i<LG_STAGES.length;i++) if(LG_STAGES[i].id === id) return LG_STAGES[i].label;
+  return id || '';
+}
+
 function lgResolveStatus(row, company){
   var chart = (company && company.chart) || {};
   var ev    = chart[row.key] || {};
@@ -9547,6 +9890,18 @@ async function lgPersist(entityId, key, patch, quiet){
         doc_consent_at: patch.docConsentAt || null,
         // db/012. Sent only when the patch mentions it, so recording a filing
         // never quietly clears an applicability decision made earlier.
+        // Sent only when the patch mentions them, so recording a filing never
+        // clears an owner and assigning an owner never clears a filing.
+        ...(patch.ownerEmail !== undefined ? {
+          owner_email: patch.ownerEmail || null, owner_name: patch.ownerName || null
+        } : {}),
+        ...(patch.reviewerEmail !== undefined ? {
+          reviewer_email: patch.reviewerEmail || null, reviewer_name: patch.reviewerName || null
+        } : {}),
+        ...(patch.escalationTo !== undefined ? { escalation_to: patch.escalationTo || null } : {}),
+        ...(patch.priority !== undefined ? { priority: patch.priority || null } : {}),
+        ...(patch.stage !== undefined ? { stage: patch.stage || null } : {}),
+        ...(patch.remarks !== undefined ? { remarks: patch.remarks || null } : {}),
         ...(patch.notApplicable !== undefined ? {
           not_applicable: !!patch.notApplicable,
           na_reason: patch.naReason || null,
