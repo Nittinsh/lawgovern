@@ -221,6 +221,79 @@ naming the file.
 
 ---
 
+## 2f. EVENT -> COMPLIANCE IMPACT (v126, Phase 2 item 11)
+
+**What it answers.** Something happened at a company; several obligations follow from it across
+different laws. The register already contained the answer and had no way of being asked. Describe
+the event in plain words and it returns the disclosures, obligations and forms that follow.
+
+Panel `p-impact` -> `renderImpact()` -> `#imp-root`. Nav item "Event Impact" under Intelligence.
+
+### Nothing is generated
+Three corpora, all the owner's own data:
+- **125 LODR Schedule III events** (`LODR_EVENT_DATA`) — listed entities only. A private company
+  is not shown LODR disclosures at all, because for it they are not obligations.
+- **The entity's own obligations** (`getComplianceChart(c)`).
+- **155 forms** (`FORMS_MASTER`) — purpose, whenRequired, description.
+
+Every row that appears is a real record and opens. A disclosure row calls `mevLogOpen(id)` with
+that event preselected, so assess -> log -> Reg 30 clock is one click.
+
+### Why it is concept matching and not keyword matching
+The first cut compared the words in the description to the words in each record. It failed in both
+directions at once:
+- *"board approved borrowing of Rs 50 crore"* returned **nothing**. The register never says
+  "borrowing" — it says loans, debentures, charge, security. 19 LODR events and 5 forms were
+  sitting there unreachable.
+- *"a director resigned"* returned **31 rows headed by "FRAUD OR DEFAULTS by the listed entity,
+  its promoter, director..."**, matched on the word "director".
+
+So `IMP_CONCEPTS` holds ~31 concepts, each with **two** regexes: `say` (what a CS types) and
+`find` (what the register actually says). They are deliberately different vocabularies.
+
+`kind` splits **action** (what happened) from **subject** (what it happened to). **Where the
+description contains an action, a record must share that action to appear at all.** That single
+rule is what removes the fraud row from a resignation search while keeping every genuine one.
+
+### The rules that were learned by running it, not by reasoning about it
+- **Disqualification is not resignation.** Folding `disqualif` into resignation put DIR-10
+  ("remove a disqualified director") at the top of a resignation. Now its own concept.
+- **"Board approved X" is a description of X, not of a meeting.** Framing phrases pulled every
+  board-meeting row above the actual event. `meeting.say` no longer matches them.
+- **Bare `securities` matched 21 unrelated LODR events**; bare `order` matched "Specified
+  Companies Order as amended", putting MSME-1 top of a SEBI penalty order. Both narrowed.
+- **A record can share a word and be about something else.** Records expressing actions the
+  description never raised are ranked down, and dropped when they are mostly about those. The
+  threshold **scales with how much matched** — a raw count punished long Schedule III entries,
+  which dropped "Acquisition(s) (including agreement to acquire)" from an acquisition search,
+  the one row that search exists to find.
+- **The confidence chip read "related" on every row** for one release: `impMatch` computed
+  `actions`/`subjects` and the pushed result objects never copied them. A label identical on
+  every row looks like a judgement and is not one.
+
+### Honesty controls
+- Each row shows **which concepts put it there** (`matched on ...`). A match the reader cannot
+  check is just an assertion.
+- Confidence describes **the match, not the law**: `close` (action + subject) / `possible`
+  (action only) / `related`.
+- **The footer names the corpus and its depth**, e.g. `SEBI LODR 2015 (309) · Companies Act 2013
+  (147) · ... · FEMA / RBI (1)`.
+- **`IMP_THIN`** warns *above* the results when the description engages something the register
+  barely holds. FEMA has **one** obligation, and the brief for this feature expects FEMA
+  consequences — so an empty section would read as "checked, nothing required" when the truth is
+  "not covered, look elsewhere". Same rule as the evidence engine: no conclusion without a basis.
+- Truncation at 15 says so ("Showing the 15 closest of N"). A silently cut list reads as complete.
+
+### Known limits
+- FEMA/RBI is one obligation and IBC/IBBI is unmodelled — both are flagged, not fixed. Fixing them
+  means adding those rule sets to `rules/`, not touching this engine.
+- Concepts are hand-written. A transaction nobody has described before will not resolve, and the
+  screen says so rather than guessing ("Could not tell what kind of event that is").
+- No AI call is made. This is deliberate: the user's spec excludes a generic chatbot, and every
+  consequence has to trace to a record.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -297,14 +370,47 @@ naming the file.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Done:** the three-identical-tabs bug is fixed and the diagnostic markers are removed (section 2). Header is at v8. The change is in the working tree — **not yet committed or pushed**, so the live site is still serving v7 until you deploy.
+**Header is at v126.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+progress. All migrations through `db/016` are applied except `db/013` (the drop script, deliberately
+left commented out).
 
-**Next up:**
-1. Deploy v8 (commit + push; GitHub Pages rebuild ~1–2 min; hard-refresh). Confirm the header reads v8 and the three tabs differ on the live site with real Supabase data.
-2. Clean up the dead code / duplicate function definitions found while debugging — several functions are declared twice (later silently wins) and `renderDashboard()` is inert because its target elements no longer exist. Also confirm whether there is any working "add company" UI outside the Supabase/admin path (`showAddClient`/`saveClient` are orphaned and reference markup that does not exist).
-3. Then continue the spec build-out (remaining modules from the owner's brief): Regulatory Radar (real), Workflow Engine, Corporate Governance, Risk & Exceptions, Evidence & Audit, Reports, role-based views, dark mode.
+**Phase 2 — the owner's spec:**
+- [x] 11. Event -> Compliance Impact Engine (section 2f)
+- [ ] 12. Compliance impact from board minutes
+- [ ] 13. Regulatory change impact analysis
+- [ ] 14. AI applicability engine
+- [ ] 15. AI due-date reasoning
+- [ ] 16. AI compliance gap analysis
+- [ ] 17. AI "what changed / since last review"
+- [ ] 18. Regulatory Radar impact analysis
 
-**Running it locally:** `.claude/launch.json` is set up, or just `python -m http.server 8000` in the repo and open http://localhost:8000. Note that login needs real Supabase credentials; to exercise the UI without them, stub `loadCloudClients` to populate `CLIENTS` and call `enterApp()` — but be aware that stubbing around `enterApp()` is exactly what hid the v7 bug, so always test the real login path too.
+**Phase 3 (not started):** board compliance dashboard, board-ready reports, client portal,
+information-request workflow, management certification, obligation version history, dependency
+mapping.
+
+**Standing constraints from the owner — these govern every decision:**
+- *"if anything is not working it should not be there, i dont want any dummy items"*
+- *"Every number on the dashboard must be traceable to an underlying record."*
+- Explicitly NOT wanted: random AI scorecards, decorative charts, "AI-powered" badges, a generic
+  chatbot, fake predictive graphs without historical data, too many dashboards, a document vault
+  with no workflow, generic task counters, excessive colour-coded widgets, a risk score that
+  cannot explain its calculation, a news feed without entity-level impact analysis.
+- *"Do not force clients to upload confidential documents merely to prove compliance."*
+
+**Open data debt:**
+- 70 forms carry only name + description; 16 LODR rules and 29 event timings are `needsReview`;
+  21 rules have unconfirmed applicability.
+- 31 legacy variable names (`--gold`, `--ink2`, `--slate`) remain in `draftRes`/`draftDoc`/
+  `renderCirculars`. Aliased correctly — naming debt only.
+- **Nothing verifies against MCA or the exchanges.** MCA filing documents are paid, NSE/BSE publish
+  no official API, and MCA's terms prohibit bulk collection from MCA21. `FILED` is structurally
+  unreachable; everything reads "Filed — Verification Pending". **This is a purchasing decision,
+  not an engineering one.**
+
+**Running it locally:** `.claude/launch.json` is set up, or `python -m http.server 8000`. Login
+needs real Supabase credentials. To exercise a render path without them, push a company onto
+`CLIENTS` at runtime in the console and call `sw(...)` — but never stub around `enterApp()`, which
+is exactly what hid the v7 bug.
 
 ---
 

@@ -468,6 +468,21 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 .lg-f3.on{border-color:var(--blue);background:var(--blue-wash);color:var(--blue);font-weight:600;}
 .ob-prio{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:7px;cursor:pointer;font-size:13px;color:var(--ink-mid);}
 .ob-prio.on{border-color:var(--blue);background:var(--blue-wash);}
+.imp-row{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line-soft);cursor:pointer;}
+.imp-row:last-child{border-bottom:none;}
+.imp-row:hover .imp-t{color:var(--blue);}
+.imp-conf{flex-shrink:0;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:6px;margin-top:2px;}
+.imp-conf.close{background:var(--crit-wash);color:var(--crit);}
+.imp-conf.possible{background:var(--warn-wash);color:var(--warn);}
+.imp-conf.related{background:var(--bg);color:var(--ink-soft);border:1px solid var(--line);}
+.imp-main{min-width:0;flex:1;}
+.imp-t{font-size:13px;font-weight:600;color:var(--navy);line-height:1.5;}
+.imp-m{font-size:11.5px;color:var(--ink-soft);margin-top:3px;}
+.imp-gap{margin-top:16px;padding:14px 16px;background:var(--warn-wash);border:1px solid var(--warn);border-left-width:3px;border-radius:10px;font-size:12.5px;line-height:1.65;color:var(--ink-mid);}
+.imp-gap b{color:var(--warn);}
+.imp-cut{font-size:11.5px;color:var(--ink-soft);padding:10px 0 2px;font-style:italic;}
+.imp-why{font-size:11px;color:var(--ink-soft);margin-top:4px;font-style:italic;}
+.imp-time{font-size:11.5px;color:var(--ink-mid);margin-top:4px;padding:5px 9px;background:var(--bg);border-radius:7px;line-height:1.5;}
 .exc-pri{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
 .exc-pri.critical{background:var(--crit);}
 .exc-pri.high{background:#F97316;}
@@ -1236,7 +1251,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v119">
+      <meta id="build-version" content="v126">
     </div>
   </div>
   <div class="cc-search">
@@ -1286,6 +1301,7 @@ input[type="text"], input[type="password"], textarea, select {
 <div class="navitem" onclick="sw('internal')" id="t-internal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg><span>Internal Compliance</span></div>
 <div class="navitem" onclick="sw('filings')" id="t-filings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11l5 5v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M15 4v5h5M8 14h8M8 17h5"/></svg><span>Filings &amp; Records</span></div>
 <div class="navitem" onclick="sw('documents')" id="t-documents"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Documents</span></div>
+<div class="navitem" onclick="sw('impact')" id="t-impact"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9z" stroke-linejoin="round"/></svg><span>Event Impact</span></div>
 <div class="navitem" onclick="sw('exceptions')" id="t-exceptions"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3L12 3z"/><path d="M12 10v4" stroke-linecap="round"/></svg><span>Exceptions</span><span class="nav-badge" id="nav-exc-n" style="display:none">0</span></div>
 <div class="navitem" onclick="sw('approvals')" id="t-approvals"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Approvals</span><span class="nav-badge" id="nav-approvals-n" style="display:none">0</span></div>
 <div class="navhead">Document Studio</div>
@@ -1402,6 +1418,7 @@ input[type="text"], input[type="password"], textarea, select {
 <div class="panel" id="p-documents"><div class="cc-tool"><div id="doc-root"></div></div></div>
 <div class="panel" id="p-directors"><div class="cc-tool"><div id="reg-root-directors"></div></div></div>
 <div class="panel" id="p-meetings"><div class="cc-tool"><div id="reg-root-meetings"></div></div></div>
+<div class="panel" id="p-impact"><div class="cc-tool"><div id="imp-root"></div></div></div>
 <div class="panel" id="p-exceptions"><div class="cc-tool"><div id="exc-root"></div></div></div>
 <div class="panel" id="p-approvals"><div class="cc-tool"><div id="apr-root"></div></div></div>
 <div class="panel" id="p-audit"><div class="cc-tool"><div id="aud-root"></div></div></div>
@@ -2668,6 +2685,7 @@ function sw(id) {
   if (id==='penalty' && typeof renderPenalties==='function') renderPenalties();
   if (id==='filings' && typeof renderFilings==='function') renderFilings();
   if (id==='documents' && typeof renderDocuments==='function') renderDocuments();
+  if (id==='impact' && typeof renderImpact==='function') renderImpact();
   if (id==='exceptions' && typeof renderExceptions==='function') renderExceptions();
   if (id==='approvals' && typeof renderApprovals==='function') renderApprovals();
   if (id==='audit' && typeof renderAudit==='function') renderAudit();
@@ -7310,6 +7328,536 @@ document.addEventListener('keydown', function(e){
 function aprRefreshBadge(){
   if(typeof aprQueue !== 'function') return;
   try{ aprBadge(aprQueue().filter(function(i){ return i.can.can; }).length); }catch(e){}
+}
+
+// ═══════════════════════════════════════════════════
+// EVENT -> COMPLIANCE IMPACT
+// ═══════════════════════════════════════════════════
+// Matching is over the practice's own data — the LODR event schedule, this
+// entity's obligations, and the forms master. Nothing is generated: every
+// consequence shown is a record that already exists, and opens.
+// What the description says, and what the register calls the same thing.
+// `say` is the vocabulary a Company Secretary types; `find` is the vocabulary
+// the records were written in. Keeping them apart is the whole point: nobody
+// files "a borrowing", they file a charge over an asset securing a loan.
+//
+// `kind` separates what happened from what it happened to. An action concept is
+// mandatory when the description contains one — that is what stops a fraud
+// disclosure surfacing for a resignation just because both mention directors.
+var IMP_CONCEPTS = [
+  // ── what happened ────────────────────────────────────────────
+  {id:'acquisition', label:'Acquisition or restructuring', kind:'action',
+   say:/acquir|acquisit|takeover|take over|bought|buy|purchas|stake|merger|merge|amalgamat|demerger|restructur|arrangement|absorb/i,
+   find:/acquisit|acquire|acquiring|takeover|stake|amalgamat|merger|demerger|scheme of arrangement|restructur/i},
+
+  {id:'disposal', label:'Disposal or divestment', kind:'action',
+   say:/dispos|divest|sold|sell|sale of|slump sale|hive off|hived|transferr?ed out|exit/i,
+   find:/disposal|divest|slump sale|sale of|transfer of|hive|sold/i},
+
+  {id:'borrowing', label:'Borrowing or debt', kind:'action',
+   say:/borrow|loan|debt|debenture|\bncd\b|credit facility|term loan|working capital|financ(e|ing)|lender|refinanc/i,
+   find:/borrow|\bloan\b|loans|debenture|\bdebt\b|financial institution|working capital|\bncd\b/i},
+
+  {id:'charge', label:'Charge or security', kind:'action',
+   say:/charge|mortgag|hypothec|secur(ed|ity) (over|against|interest)|pledg|lien|collateral|satisfaction/i,
+   find:/\bcharge\b|charges|mortgage|hypothec|satisfaction of charge|security interest/i},
+
+  {id:'allotment', label:'Issue or allotment of securities', kind:'action',
+   say:/allot|issu(e|ed|ing)|private placement|preferential|rights issue|bonus|convert|subscri|raise capital|fund rais/i,
+   // Not the bare word "securities" — it appears in twenty-one LODR events
+   // about unrelated subjects and swamped every genuine allotment.
+   find:/allot|issuance of securities|issue of (shares|securities|capital)|private placement|preferential|rights issue|bonus issue/i},
+
+  {id:'buyback', label:'Buy-back or capital reduction', kind:'action',
+   say:/buy-?back|repurchas|reduction of capital|capital reduction|cancel(lation)? of shares/i,
+   find:/buy-back|buyback|reduction of capital/i},
+
+  {id:'dividend', label:'Dividend', kind:'action',
+   say:/dividend|payout|unclaimed|unpaid|iepf|interim divid|final divid/i,
+   find:/dividend|unpaid|unclaimed|iepf/i},
+
+  {id:'resignation', label:'Resignation, removal or cessation', kind:'action',
+   say:/resign|quit|stepp?ed down|vacat|cessation|ceas|remov|terminat|retire|demise|death/i,
+   find:/resign|vacat|cessation|ceas|removal|remove|retire/i},
+
+  // Kept apart from resignation deliberately. A director who resigns and a
+  // director who is disqualified leave by different routes and file different
+  // forms; DIR-10 is not an answer to "someone resigned".
+  {id:'disqualification', label:'Disqualification', kind:'action',
+   say:/disqualif|debarr|ineligib|struck off|struck-off/i,
+   find:/disqualif|debarr|ineligib|struck off/i},
+
+  {id:'appointment', label:'Appointment or re-appointment', kind:'action',
+   say:/appoint|re-?appoint|induct|hir(e|ed)|elevat|nominat|designat/i,
+   find:/appoint|re-appoint|reappoint|induct|nominat/i},
+
+  {id:'insolvency', label:'Insolvency or winding up', kind:'action',
+   say:/insolven|\bibc\b|\bnclt\b|winding up|liquidat|resolution plan|moratorium|corporate insolvency|\bcirp\b|bankrupt|default(ed)? on/i,
+   find:/insolven|\bibc\b|\bnclt\b|winding up|liquidat|resolution plan/i},
+
+  {id:'fraud', label:'Fraud or default', kind:'action',
+   say:/fraud|siphon|misappropriat|embezzl|defalcat|default|divers(ion)? of funds/i,
+   find:/fraud|default|siphon|misappropriat/i},
+
+  {id:'litigation', label:'Litigation or proceedings', kind:'action',
+   say:/litigat|arbitrat|dispute|\bsuit\b|sued|tribunal|court|case filed|proceeding|claim against/i,
+   find:/litigat|arbitrat|dispute|\bsuit\b|tribunal|court|proceeding/i},
+
+  {id:'regorder', label:'Regulatory order or penalty', kind:'action',
+   say:/penalt|\bfine\b|order (of|by|passed|from|against)|passed an order|show cause|\bscn\b|adjudicat|prosecut|search|seizure|raid|inspect|summons/i,
+   // Not the bare word "order" — "Specified Companies Order as amended" is the
+   // title of a rule, not something a regulator did, and matching it put MSME
+   // Form I at the top of a SEBI penalty order.
+   find:/penalt|\bfine[sd]?\b|orders? (passed|made|issued|of a|against)|passed by any regulator|regulatory action|search|seizure|adjudicat|show cause|prosecut/i},
+
+  {id:'rpt', label:'Related party transaction', kind:'action',
+   say:/related party|\brpt\b|related-party|arm.s length|with a director|with promoter/i,
+   find:/related party|\brpt\b/i},
+
+  {id:'deposit', label:'Deposits', kind:'action',
+   say:/deposit|accept(ed|ing)? money|public deposit|\bdpt\b/i,
+   find:/deposit/i},
+
+  {id:'csr', label:'CSR', kind:'action',
+   say:/\bcsr\b|corporate social responsib|social spend/i,
+   find:/\bcsr\b|corporate social responsibility/i},
+
+  // "The board approved X" is a description of X, not of a meeting. Framing
+  // phrases were pulling every board-meeting row in ahead of the actual event,
+  // so only a description genuinely about the meeting itself counts.
+  {id:'meeting', label:'Board or general meeting', kind:'action',
+   say:/board meeting|general meeting|\bagm\b|\begm\b|committee meeting|committee met|postal ballot|meeting (was|is) held|convened|adjourn/i,
+   find:/board meeting|general meeting|\bagm\b|\begm\b|postal ballot|committee meeting/i},
+
+  {id:'financials', label:'Financial results or accounts', kind:'action',
+   say:/financial (result|statement)|annual report|audited|limited review|quarterly result|balance sheet|accounts (were|are|approved)/i,
+   find:/financial (result|statement)|annual report|audited|limited review|quarterly result/i},
+
+  {id:'nameoffice', label:'Change of name, office or objects', kind:'action',
+   say:/change (of|in) name|renam|registered office|shift(ed|ing)?|relocat|object clause|alter(ation|ed)? of|moved (the )?office/i,
+   find:/change (of|in) name|registered office|shifting|situation of|object clause|alteration of (the )?(memorandum|articles|object|name)/i},
+
+  {id:'forex', label:'Foreign investment or borrowing', kind:'action',
+   say:/foreign|\bfdi\b|\bodi\b|\becb\b|overseas|non-?resident|\bfema\b|external commercial|inbound|outbound|abroad/i,
+   find:/foreign|\bfdi\b|\bodi\b|\becb\b|overseas|non-resident|\bfema\b|external commercial/i},
+
+  {id:'delist', label:'Delisting or trading suspension', kind:'action',
+   say:/delist|suspension of trading|suspend|trading window|freez/i,
+   find:/delist|suspension of trading|trading window|freeze/i},
+
+  {id:'insider', label:'Insider trading / UPSI', kind:'action',
+   say:/insider|\bupsi\b|unpublished price|price sensitive|structured digital|trading plan|contra trade|leak/i,
+   find:/insider|\bupsi\b|unpublished price|structured digital|trading plan|contra trade|price sensitive/i},
+
+  {id:'agreement', label:'Agreement or joint venture', kind:'action',
+   say:/agreement|\bmou\b|joint venture|\bjv\b|contract|tie-?up|partnership|collaborat|entered into/i,
+   find:/agreement|joint venture|\bjv\b|contract|memorandum of understanding/i},
+
+  // ── what it happened to ──────────────────────────────────────
+  {id:'director', label:'Director', kind:'subject',
+   say:/director|\bdin\b|\bmd\b|managing director|whole-?time|independent director|board member|chairman/i,
+   find:/\bdirector\b|\bdirectors\b|\bdin\b|managing director|independent director|whole-time/i},
+
+  {id:'kmp', label:'KMP', kind:'subject',
+   say:/\bkmp\b|key managerial|company secretary|\bcfo\b|\bceo\b|chief (executive|financial)|manager/i,
+   find:/\bkmp\b|key managerial|company secretary|\bcfo\b|\bceo\b|chief (executive|financial)/i},
+
+  {id:'auditor', label:'Auditor', kind:'subject',
+   say:/auditor|audit firm|statutory audit|cost audit|secretarial audit|internal audit/i,
+   find:/auditor|audit firm|statutory audit|cost audit|secretarial audit/i},
+
+  {id:'subsidiary', label:'Subsidiary or associate', kind:'subject',
+   say:/subsidiar|associate|joint venture|\bjv\b|group (company|entity)|holding company|step-?down/i,
+   find:/subsidiar|associate compan|joint venture|\bjv\b|holding company/i},
+
+  {id:'promoter', label:'Promoter or shareholding', kind:'subject',
+   say:/promoter|shareholding|shareholder|substantial acquisition|\bsast\b|encumbr|pledg|stake held/i,
+   find:/promoter|shareholding pattern|substantial acquisition|\bsast\b|encumbr|shareholder/i},
+
+  {id:'employee', label:'Employees or remuneration', kind:'subject',
+   say:/employee|\besop\b|stock option|sweat equity|remunerat|salary|managerial person|payroll/i,
+   find:/employee|esop|stock option|sweat equity|remunerat|managerial person/i},
+
+  {id:'property', label:'Property or assets', kind:'subject',
+   say:/property|asset|plant|machinery|land|building|factory|premises|undertaking/i,
+   find:/property|asset|plant|machinery|land|building|undertaking/i}
+];
+
+function impConceptsIn(text){
+  var t = String(text || '');
+  return IMP_CONCEPTS.filter(function(k){ return k.say.test(t); });
+}
+
+function impRecordText(parts){
+  return parts.filter(Boolean).join(' · ');
+}
+
+// A record scores only against the concepts the description actually raised.
+// Returns null when it matches none of them, so "no match" is a real answer
+// rather than a low number at the bottom of a list.
+function impMatch(text, actions, subjects){
+  var t = String(text || '');
+  if(!t) return null;
+
+  var hitA = actions.filter(function(k){ return k.find.test(t); });
+  var hitS = subjects.filter(function(k){ return k.find.test(t); });
+
+  // Where the description names an action, sharing it is the price of entry.
+  if(actions.length && !hitA.length) return null;
+  if(!actions.length && !hitS.length) return null;
+
+  // A record can share a word with the description and still be about something
+  // else. Where it expresses actions that were never raised, it is ranked down;
+  // where it is overwhelmingly about those, it is not an answer to this question.
+  //
+  // The threshold scales with how much actually matched, because length alone
+  // inflates the count: a Schedule III item runs to hundreds of words and names
+  // several transactions in passing, and judging it by the same raw number as a
+  // form's one-line purpose drops the best rows in the set.
+  var foreign = 0;
+  if(actions.length){
+    for(var i=0;i<IMP_CONCEPTS.length;i++){
+      var k = IMP_CONCEPTS[i];
+      if(k.kind !== 'action' || actions.indexOf(k) >= 0) continue;
+      if(k.find.test(t)) foreign++;
+    }
+    if(foreign > (hitA.length + hitS.length) * 2 + 1) return null;
+  }
+
+  var score = hitA.length * 1.0 + hitS.length * 0.6 - Math.min(foreign * 0.2, 1.0);
+  // Matching every action raised is a stronger signal than matching one of them.
+  if(actions.length && hitA.length === actions.length) score += 0.4;
+  if(score <= 0) return null;
+
+  return {score:score, why:hitA.concat(hitS).map(function(k){ return k.label; }),
+          actions:hitA.length, subjects:hitS.length};
+}
+
+function impAssess(text, c){
+  var found = impConceptsIn(text);
+  var actions  = found.filter(function(k){ return k.kind === 'action'; });
+  var subjects = found.filter(function(k){ return k.kind === 'subject'; });
+
+  var out = {disclosures:[], obligations:[], forms:[],
+             concepts:found, actions:actions, subjects:subjects};
+  if(!found.length) return out;
+
+  // 1. LODR Schedule III. Only for a listed entity — for anyone else these are
+  //    not obligations, and listing them as consequences would be wrong.
+  if(c && c.type === 'listed' && typeof LODR_EVENT_DATA !== 'undefined'){
+    (LODR_EVENT_DATA.events || []).forEach(function(e){
+      var m = impMatch(impRecordText([e.event, e.notes, e.materialityTest]), actions, subjects);
+      if(!m) return;
+      out.disclosures.push({score:m.score, why:m.why, actions:m.actions, subjects:m.subjects,
+        id:e.id, title:e.event,
+        regulation:e.regulation, timeline:e.disclosureTimelineText,
+        materiality:e.materialityTest, automatic:e.materialityIsAutomatic});
+    });
+  }
+
+  // 2. This entity's own obligations.
+  if(c){
+    var rows = [];
+    try{ rows = getComplianceChart(c); }catch(e){}
+    rows.forEach(function(r){
+      var m = impMatch(impRecordText([r.obligation, r.section, r.timelineText, r.notes]),
+                       actions, subjects);
+      if(!m) return;
+      out.obligations.push({score:m.score, why:m.why, actions:m.actions, subjects:m.subjects,
+        key:r.key, entityId:c.id,
+        title:r.obligation, law:r.law, section:r.section, due:r.due, form:r.form,
+        standing:r.standing, timeline:r.timelineText});
+    });
+  }
+
+  // 3. Which form it would go on.
+  if(typeof FORMS_MASTER !== 'undefined'){
+    FORMS_MASTER.forms.forEach(function(f){
+      var m = impMatch(impRecordText([f.purpose, f.whenRequired, f.description]),
+                       actions, subjects);
+      if(!m) return;
+      out.forms.push({score:m.score, why:m.why, actions:m.actions, subjects:m.subjects,
+        form:f.form, purpose:f.purpose,
+        timeline:f.timeline, section:f.section, law:f.law});
+    });
+  }
+
+  // A truncated list that does not say it is truncated reads as the whole
+  // answer, which is exactly what it is not.
+  out.cut = {};
+  ['disclosures','obligations','forms'].forEach(function(k){
+    out[k].sort(function(a,b){ return b.score - a.score; });
+    if(out[k].length > 15){ out.cut[k] = out[k].length; out[k] = out[k].slice(0, 15); }
+  });
+  return out;
+}
+
+// Concepts this register is not equipped to answer, and what it would take to
+// change that. Named individually because "coverage is limited" tells nobody
+// which question just went unanswered.
+var IMP_THIN = {
+  forex: {label:'foreign investment and exchange control',
+          need:'FEMA and the RBI reporting requirements (FC-GPR, FC-TRS, ODI, ECB returns)'},
+  insolvency: {label:'insolvency',
+          need:'the IBC timelines and the IBBI regulations'}
+};
+
+// Which laws were searched, and how deep each one goes. A section that returns
+// nothing means one of two very different things, and the reader is entitled to
+// know which.
+// The obligations and the forms master came from different sources and spell the
+// same statute differently. Counting one law twice makes the whole figure look
+// invented, so the spellings are folded together here.
+function impLawName(law){
+  var s = String(law || '').trim();
+  if(/PIT/i.test(s)) return 'SEBI PIT Regulations 2015';
+  if(/LODR/i.test(s)) return 'SEBI LODR 2015';
+  if(/Foreign Companies/i.test(s)) return 'Companies Act 2013 (foreign companies)';
+  if(/Cost Records/i.test(s)) return 'Companies (Cost Records & Audit) Rules 2014';
+  if(/^Companies Act/i.test(s)) return 'Companies Act 2013';
+  if(/IEPF/i.test(s)) return 'IEPF Rules 2016';
+  if(/FEMA|RBI/i.test(s)) return 'FEMA / RBI';
+  return s;
+}
+
+function impCoverage(c){
+  var by = {};
+  var add = function(law, n){
+    law = impLawName(law);
+    if(!law) return;
+    by[law] = (by[law]||0) + n;
+  };
+  if(c){
+    var rows = [];
+    try{ rows = getComplianceChart(c); }catch(e){}
+    rows.forEach(function(r){ add(r.law, 1); });
+  }
+  if(typeof FORMS_MASTER !== 'undefined')
+    FORMS_MASTER.forms.forEach(function(f){ add(f.law, 1); });
+  if(c && c.type === 'listed' && typeof LODR_EVENT_DATA !== 'undefined')
+    add('SEBI LODR 2015', (LODR_EVENT_DATA.events||[]).length);
+  return Object.keys(by).sort(function(a,b){ return by[b] - by[a]; })
+    .map(function(k){ return {law:k, n:by[k]}; });
+}
+
+var IMP_LAST = null;
+
+// Written to sit alongside the real thing, not to replace judgement.
+var IMP_EXAMPLES = [
+  'Acquired a controlling stake in a subsidiary',
+  'Board approved borrowing of Rs 50 crore',
+  'A director resigned with immediate effect',
+  'Allotted shares on a private placement',
+  'Created a charge over the company&rsquo;s assets',
+  'Statutory auditor resigned mid-term'
+];
+
+function impRun(){
+  var el = document.getElementById('imp-q');
+  if(!el) return;
+  var text = el.value.trim();
+  var c = impEntity();
+  if(!text || !c){ IMP_LAST = null; renderImpact(); return; }
+  IMP_LAST = {text:text, res:impAssess(text, c), entity:c.name};
+  renderImpact();
+  var out = document.getElementById('imp-results');
+  if(out) out.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function impEntity(){
+  if(typeof CLIENTS === 'undefined' || !CLIENTS.length) return null;
+  var sel = document.getElementById('imp-entity');
+  var id = sel ? sel.value : CLIENTS[0].id;
+  for(var i=0;i<CLIENTS.length;i++) if(String(CLIENTS[i].id)===String(id)) return CLIENTS[i];
+  return CLIENTS[0];
+}
+
+function impExample(t){
+  var el = document.getElementById('imp-q');
+  if(el){ el.value = String(t).replace(/&rsquo;/g,"'"); impRun(); }
+}
+
+function renderImpact(){
+  var root = document.getElementById('imp-root');
+  if(!root) return;
+
+  var head = '<div class="cc-pagehead"><div>'+
+    '<div class="cc-crumb">Intelligence &rsaquo; Event Impact</div>'+
+    '<h1 class="cc-h1">Event Impact</h1>'+
+    '<p class="cc-sub">Describe something that has happened and see what follows from it &mdash; '+
+    'matched against the LODR event schedule, this entity&rsquo;s own obligations, and the forms '+
+    'master.</p></div></div>';
+
+  if(typeof CLIENTS === 'undefined' || !CLIENTS.length){
+    root.innerHTML = head + '<div class="cc-empty"><h2>No entities yet</h2>'+
+      '<p>An event is assessed against a particular company&rsquo;s obligations, so there has to be '+
+      'one to assess it against.</p>'+
+      '<button class="cc-btn-primary" onclick="entOpen()">+ Add a company</button></div>';
+    return;
+  }
+
+  var c = impEntity();
+  var entSel = CLIENTS.length > 1
+    ? '<select id="imp-entity" class="lg-field" onchange="impRun()">'+
+      CLIENTS.map(function(x){
+        return '<option value="'+entEsc(x.id)+'"'+(String(c.id)===String(x.id)?' selected':'')+'>'+
+          entEsc(x.name)+'</option>';
+      }).join('')+'</select>'
+    : '';
+
+  var form = '<div class="cc-card cc-toolbar">'+
+    '<div class="cc-toolrow" style="align-items:flex-start;">'+
+      '<textarea id="imp-q" class="lg-field" style="flex:1;min-width:240px;min-height:74px;resize:vertical;" '+
+        'placeholder="What happened? For example: the board approved borrowing of Rs 50 crore from a bank, '+
+        'secured against the company&rsquo;s plant.">'+entEsc(IMP_LAST?IMP_LAST.text:'')+'</textarea>'+
+      '<div style="display:flex;flex-direction:column;gap:8px;">'+entSel+
+        '<button class="cc-btn-primary" onclick="impRun()">Assess</button>'+
+      '</div>'+
+    '</div>'+
+    '<div class="cc-chiprow" style="margin:12px 0 0;">'+
+      IMP_EXAMPLES.map(function(x){
+        return '<button class="rcatb" onclick="impExample('+lgArg(x)+')">'+x+'</button>';
+      }).join('')+
+    '</div></div>';
+
+  if(!IMP_LAST){
+    root.innerHTML = head + form +
+      '<div class="cc-card" style="margin-top:16px;"><div class="cc-card-b">'+
+      '<div class="cc-none" style="text-align:left;">Nothing assessed yet. Describe an event above, '+
+      'or pick one of the examples.<br><br>What comes back are <b>candidates from your own register</b> '+
+      '&mdash; the obligations, disclosures and forms whose own wording matches what you describe. '+
+      'They are a starting point for your judgement, not a legal conclusion.</div>'+
+      '</div></div>';
+    return;
+  }
+
+  var r = IMP_LAST.res;
+  var total = r.disclosures.length + r.obligations.length + r.forms.length;
+
+  if(!total){
+    root.innerHTML = head + form +
+      '<div class="cc-card" style="margin-top:16px;"><div class="cc-card-b">'+
+      '<div class="cc-none" style="text-align:left;">'+
+      (r.concepts.length
+        ? 'Recognised this as <b>'+entEsc(r.concepts.map(function(k){return k.label;})
+            .join(', ').toLowerCase())+'</b>, but no obligation, disclosure or form on file '+
+          'covers it for '+entEsc(c.name)+'.'
+        : 'Could not tell what kind of event that is. Try naming the transaction itself '+
+          '&mdash; an acquisition, a charge, a resignation, an allotment.')+
+      '<br><br>Either way this is not advice that nothing is required. It means this '+
+      'register has nothing matching, and the register is not the whole of the law.'+
+      '</div></div></div>';
+    return;
+  }
+
+  // Confidence describes the match, not the law. Matching the action and who it
+  // happened to is a close fit; matching only one of them is a candidate.
+  // Where the description raises something this register barely holds, say so
+  // above the results. Underneath an empty section it would arrive too late.
+  var cov = impCoverage(c);
+  var covBy = {}; cov.forEach(function(x){ covBy[x.law] = x.n; });
+  var thin = r.concepts.filter(function(k){ return IMP_THIN[k.id]; }).map(function(k){
+    return IMP_THIN[k.id];
+  });
+  var thinNote = thin.length
+    ? '<div class="imp-gap"><b>This register does not cover '+
+      entEsc(thin.map(function(t){ return t.label; }).join(' or '))+'.</b> '+
+      'You described something that engages it, so treat anything below as partial &mdash; '+
+      'the consequences under '+entEsc(thin.map(function(t){ return t.need; }).join(' and '))+
+      ' are not held here and will not appear however the question is worded.</div>'
+    : '';
+
+  var conf = function(m){
+    return (m.actions && m.subjects) ? 'close' : m.actions ? 'possible' : 'related';
+  };
+  var why = function(m){
+    return m.why && m.why.length
+      ? '<div class="imp-why">matched on '+entEsc(m.why.join(', ').toLowerCase())+'</div>' : '';
+  };
+
+  var block = function(title, items, note, renderRow, cutKey){
+    if(!items.length) return '';
+    var cut = r.cut && r.cut[cutKey];
+    return '<div class="cc-card" style="margin-top:16px;">'+
+      '<div class="cc-card-h"><h3>'+title+' &mdash; '+(cut||items.length)+'</h3>'+
+        '<span style="font-size:11.5px;color:var(--ink-soft);max-width:44ch;text-align:right;">'+
+        note+'</span></div>'+
+      '<div class="cc-card-b">'+items.map(renderRow).join('')+
+        (cut?'<div class="imp-cut">Showing the '+items.length+' closest of '+cut+
+          '. Narrow the description to see the rest.</div>':'')+
+      '</div></div>';
+  };
+
+  var body =
+    thinNote+
+    '<div id="imp-results" class="cu-summary" style="margin-top:16px;">'+
+      '<div class="cu-sum-chip"><b>'+total+'</b> possible '+
+        (total===1?'consequence':'consequences')+'</div>'+
+      '<div class="cu-sum-chip" style="background:var(--blue-wash);color:var(--blue);">read as '+
+        entEsc(r.concepts.map(function(k){ return k.label; }).join(', ').toLowerCase())+'</div>'+
+      (r.disclosures.length?'<div class="cu-sum-chip crit"><b>'+r.disclosures.length+
+        '</b> disclosures</div>':'')+
+      (r.obligations.length?'<div class="cu-sum-chip warn"><b>'+r.obligations.length+
+        '</b> obligations</div>':'')+
+      (r.forms.length?'<div class="cu-sum-chip"><b>'+r.forms.length+'</b> forms</div>':'')+
+    '</div>'+
+
+    block('Disclosure under LODR', r.disclosures,
+      'From Schedule III. Click one to log it &mdash; the clock runs from when the '+
+      'event happened, not from when you record it.',
+      function(d){
+        return '<div class="imp-row" onclick="mevLogOpen('+lgArg(d.id)+')">'+
+          '<span class="imp-conf '+conf(d)+'">'+conf(d)+'</span>'+
+          '<div class="imp-main"><div class="imp-t">'+entEsc(String(d.title).slice(0,190))+'</div>'+
+            '<div class="imp-m"><span class="mono">'+entEsc(d.regulation||'')+'</span>'+
+              (d.automatic?' &middot; <b style="color:var(--crit)">deemed material</b>':
+                           ' &middot; materiality test applies')+'</div>'+
+            why(d)+
+            (d.timeline?'<div class="imp-time">'+entEsc(d.timeline)+'</div>':'')+
+          '</div></div>';
+      }, 'disclosures')+
+
+    block('Obligations already on this register', r.obligations,
+      'These are this entity&rsquo;s own rows. Opening one shows why it applies.',
+      function(o){
+        return '<div class="imp-row" onclick="cuOpenDetail('+lgArg(o.entityId)+','+lgArg(o.key)+')">'+
+          '<span class="imp-conf '+conf(o)+'">'+conf(o)+'</span>'+
+          '<div class="imp-main"><div class="imp-t">'+entEsc(o.title)+'</div>'+
+            '<div class="imp-m">'+entEsc(o.law||'')+' &middot; <span class="mono">'+
+              entEsc(o.section||'')+'</span>'+
+              (o.due?' &middot; due '+ccFmtDate(o.due):o.standing?' &middot; ongoing':'')+'</div>'+
+            why(o)+
+            (o.timeline?'<div class="imp-time">'+entEsc(o.timeline)+'</div>':'')+
+          '</div></div>';
+      }, 'obligations')+
+
+    block('Forms that may be required', r.forms,
+      'From the forms master. Check the deadline on the form itself.',
+      function(f){
+        return '<div class="imp-row" onclick="sw(\'ff\');fmOpen('+lgArg(f.form)+')">'+
+          '<span class="imp-conf '+conf(f)+'">'+conf(f)+'</span>'+
+          '<div class="imp-main"><div class="imp-t"><span class="mono">'+entEsc(f.form)+'</span> &mdash; '+
+            entEsc(f.purpose||'')+'</div>'+
+            '<div class="imp-m">'+entEsc(f.law||'')+
+              (f.section?' &middot; <span class="mono">'+entEsc(f.section)+'</span>':'')+'</div>'+
+            why(f)+
+            (f.timeline?'<div class="imp-time">'+entEsc(f.timeline)+'</div>':'')+
+          '</div></div>';
+      }, 'forms')+
+
+    '<div class="cc-card" style="margin-top:16px;"><div class="cc-card-b">'+
+      '<div class="set-n">These are matches against the wording of your own register, ranked by how '+
+      'closely they fit what you described. They are candidates for your judgement, not a legal '+
+      'conclusion, and the absence of a match is not advice that nothing is required. '+
+      (c.type !== 'listed'
+        ? '<br><br>LODR disclosures were not searched because '+entEsc(c.name)+' is not listed.'
+        : '')+
+      '<br><br><b>Searched:</b> '+
+      cov.map(function(x){ return entEsc(x.law)+' ('+x.n+')'; }).join(' &middot; ')+
+      '. Nothing outside those was looked at.'+
+      '</div></div></div>';
+
+  root.innerHTML = head + form + body;
 }
 
 // ═══════════════════════════════════════════════════
