@@ -685,6 +685,30 @@ Months are added by calendar and clamped to the last day of the target month —
 
 ---
 
+## 2o. BENEFICIAL INTEREST — sections 89 and 90 (v151) — db/021 NOT YET RUN
+
+`db/021_beneficial_interests.sql` adds `beneficial_interests`. Panel `p-beneficial`, nav
+"Beneficial Interest". Register key is `beneficial`, table is `beneficial_interests`.
+
+### The anchor is receipt, not the change — and the Act says so
+s.89(6), verbatim: *"the company shall ... file, **within thirty days from the date of receipt of
+declaration by it**, a return in the prescribed form with the Registrar"* -> **MGT-6**.
+
+So `change_on` and `received_on` are separate columns and **only `received_on` produces a filing**.
+The declarant's clock under s.89(3) runs from the change; the company's runs from receipt, and they
+are often weeks apart. Dating MGT-6 from the change would make it overdue before anybody told the
+company anything had happened. A declaration recorded as changed but not received raises nothing.
+
+Verified: change 1 Jul, received 10 Aug -> MGT-6 due **9 Sep**.
+
+### s.90 is the mirror image and less well founded
+s.90(4) states only *"within such time ... as may be prescribed"*. The thirty days for **BEN-2**
+comes from the Companies (Significant Beneficial Owners) Rules 2018, **not in `reference/`**.
+Section label reads `Sec 90(4) r/w SBO Rules` and the row says the period rests on rules not held —
+same treatment as PAS-3 under Rule 12.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -761,7 +785,7 @@ Months are added by calendar and clamped to the last day of the target month —
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v150.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v151.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. Migrations through `db/016` are applied. **`db/017_applicability_review.sql` is new and has not been run** — until it is, confirming an applicability condition fails with a message naming the file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**
