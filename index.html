@@ -478,6 +478,55 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 .imp-main{min-width:0;flex:1;}
 .imp-t{font-size:13px;font-weight:600;color:var(--navy);line-height:1.5;}
 .imp-m{font-size:11.5px;color:var(--ink-soft);margin-top:3px;}
+.brd-doc{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:32px 34px;margin-top:16px;}
+.brd-head{border-bottom:2px solid var(--navy);padding-bottom:16px;margin-bottom:22px;}
+.brd-co{font-size:19px;font-weight:700;color:var(--navy);letter-spacing:-.01em;}
+.brd-meta{font-size:11.5px;color:var(--ink-soft);margin-top:4px;}
+.brd-title{font-size:15px;font-weight:600;color:var(--ink-mid);margin:14px 0 5px;}
+.brd-period{font-size:12px;color:var(--ink-soft);}
+.brd-sec{margin-bottom:26px;}
+.brd-sec h3{font-size:13px;font-weight:700;color:var(--navy);margin:0 0 10px;letter-spacing:-.01em;}
+.brd-lead{font-size:12px;color:var(--ink-mid);line-height:1.65;margin:0 0 10px;}
+.brd-none{font-size:12px;color:var(--ink-soft);font-style:italic;margin:0;}
+.brd-tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.brd-tbl td,.brd-tbl th{padding:7px 10px;border-bottom:1px solid var(--line-soft);text-align:left;vertical-align:top;color:var(--ink-mid);}
+.brd-tbl th{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);border-bottom:1px solid var(--line);}
+.brd-tbl tr:last-child td{border-bottom:none;}
+/* The four-column listing tables: provision and due date are short and should
+   not wrap, so the obligation gets the room it needs. */
+.brd-list td:nth-child(2),.brd-list td:nth-child(3){white-space:nowrap;width:1%;}
+.brd-list td:nth-child(4){width:23%;}
+@media(max-width:640px){
+  .brd-list td:nth-child(2),.brd-list td:nth-child(3){white-space:normal;}
+}
+.brd-n{text-align:right;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums;width:64px;}
+.brd-bad td{color:var(--crit);}
+.brd-bad .brd-n{color:var(--crit);}
+.brd-sub{font-size:11px;color:var(--ink-soft);margin-top:2px;}
+.brd-late{color:var(--warn);}
+.brd-basis ul{margin:0;padding-left:18px;}
+.brd-basis li{font-size:12px;color:var(--ink-mid);line-height:1.7;margin-bottom:7px;}
+.brd-sign{display:flex;gap:46px;margin-top:34px;padding-top:22px;border-top:1px solid var(--line);}
+.brd-sign-b{font-size:11.5px;color:var(--ink-soft);min-width:190px;}
+.brd-sign-l{border-bottom:1px solid var(--navy);height:34px;margin-bottom:6px;}
+@media(max-width:640px){
+  .brd-doc{padding:20px 16px;}
+  .brd-sign{flex-direction:column;gap:20px;}
+  .brd-tbl{font-size:11.5px;}
+  .brd-tbl td,.brd-tbl th{padding:6px 5px;}
+}
+/* The report is the deliverable, so printing gives the document and nothing
+   else — no shell, no navigation, no controls. */
+@media print{
+  .appshell{display:block!important;}
+  .appside,.appheader,.brd-noprint,.cc-pagehead,#mobileNavOverlay{display:none!important;}
+  .panel{display:none!important;}
+  #p-board{display:block!important;}
+  .appmain,.panels,.cc-tool{overflow:visible!important;padding:0!important;margin:0!important;}
+  .brd-doc{border:none;padding:0;margin:0;border-radius:0;}
+  .brd-sec{page-break-inside:avoid;}
+  body{background:#fff!important;}
+}
 .app-cond{margin:0 0 10px;}
 .app-cond.done{opacity:.6;}
 .app-cond-h{display:flex;gap:14px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;}
@@ -1322,7 +1371,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v151">
+      <meta id="build-version" content="v154">
     </div>
   </div>
   <div class="cc-search">
@@ -1375,6 +1424,7 @@ input[type="text"], input[type="password"], textarea, select {
 <div class="navitem" onclick="sw('internal')" id="t-internal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg><span>Internal Compliance</span></div>
 <div class="navitem" onclick="sw('filings')" id="t-filings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11l5 5v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M15 4v5h5M8 14h8M8 17h5"/></svg><span>Filings &amp; Records</span></div>
 <div class="navitem" onclick="sw('documents')" id="t-documents"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Documents</span></div>
+<div class="navitem" onclick="sw('board')" id="t-board"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v13H4z" stroke-linejoin="round"/><path d="M9 21h6M12 17v4M8 12l2.5 2.5L16 9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Board Report</span></div>
 <div class="navitem" onclick="sw('applies')" id="t-applies"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke-linecap="round"/></svg><span>What Applies</span></div>
 <div class="navitem" onclick="sw('impact')" id="t-impact"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9z" stroke-linejoin="round"/></svg><span>Event Impact</span></div>
 <div class="navitem" onclick="sw('exceptions')" id="t-exceptions"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3L12 3z"/><path d="M12 10v4" stroke-linecap="round"/></svg><span>Exceptions</span><span class="nav-badge" id="nav-exc-n" style="display:none">0</span></div>
@@ -1496,6 +1546,7 @@ input[type="text"], input[type="password"], textarea, select {
 <div class="panel" id="p-charges"><div class="cc-tool"><div id="reg-root-charges"></div></div></div>
 <div class="panel" id="p-allotments"><div class="cc-tool"><div id="reg-root-allotments"></div></div></div>
 <div class="panel" id="p-beneficial"><div class="cc-tool"><div id="reg-root-beneficial"></div></div></div>
+<div class="panel" id="p-board"><div class="cc-tool"><div id="brd-root"></div></div></div>
 <div class="panel" id="p-applies"><div class="cc-tool"><div id="app-root"></div></div></div>
 <div class="panel" id="p-impact"><div class="cc-tool"><div id="imp-root"></div></div></div>
 <div class="panel" id="p-exceptions"><div class="cc-tool"><div id="exc-root"></div></div></div>
@@ -2764,6 +2815,7 @@ function sw(id) {
   if (id==='penalty' && typeof renderPenalties==='function') renderPenalties();
   if (id==='filings' && typeof renderFilings==='function') renderFilings();
   if (id==='documents' && typeof renderDocuments==='function') renderDocuments();
+  if (id==='board' && typeof renderBoard==='function') renderBoard();
   if (id==='applies' && typeof renderApplies==='function') renderApplies();
   if (id==='impact' && typeof renderImpact==='function') renderImpact();
   if (id==='exceptions' && typeof renderExceptions==='function') renderExceptions();
@@ -8156,6 +8208,260 @@ document.addEventListener('keydown', function(e){
 function aprRefreshBadge(){
   if(typeof aprQueue !== 'function') return;
   try{ aprBadge(aprQueue().filter(function(i){ return i.can.can; }).length); }catch(e){}
+}
+
+// ═══════════════════════════════════════════════════
+// BOARD COMPLIANCE REPORT
+// ═══════════════════════════════════════════════════
+// One entity, one period, written for the people who have to answer for it.
+// Distinct from the Command Center, which is the CS's worklist across every
+// entity: this is what a board is shown and what a Company Secretary signs.
+
+var BRD_FROM = null, BRD_TO = null;
+
+// The natural window is since the board last met, and the meetings register
+// knows when that was. Ninety days otherwise, said out loud rather than assumed.
+function brdDefaultFrom(c){
+  var mtgs = [];
+  try{ mtgs = regRowsFor('meetings', c.id) || []; }catch(e){}
+  var today = audIso(new Date());
+  var past = mtgs.filter(function(m){
+    return m.kind === 'board' && m.held_on && String(m.held_on) < today;
+  }).sort(function(a,b){ return String(b.held_on).localeCompare(String(a.held_on)); });
+  if(past.length) return {from:String(past[0].held_on), basis:'since the board last met on ' +
+    ccFmtDate(String(past[0].held_on))};
+  var d = new Date(); d.setDate(d.getDate() - 90);
+  return {from:audIso(d), basis:'the last ninety days — no board meeting is recorded to date from'};
+}
+
+function brdEntity(){
+  if(typeof CLIENTS === 'undefined' || !CLIENTS.length) return null;
+  var sel = document.getElementById('brd-entity');
+  var id = sel ? sel.value : CLIENTS[0].id;
+  for(var i=0;i<CLIENTS.length;i++) if(String(CLIENTS[i].id)===String(id)) return CLIENTS[i];
+  return CLIENTS[0];
+}
+
+function brdBuild(c, from, to){
+  var rows = [];
+  try{ rows = getComplianceChart(c); }catch(e){}
+
+  var out = {
+    from:from, to:to, total:rows.length,
+    fellDue:[], filedInPeriod:[], stillOutstanding:[], upcoming:[],
+    noOwner:[], undecided:[], undated:0, standing:0
+  };
+
+  var horizon = new Date(to + 'T00:00:00');
+  horizon.setDate(horizon.getDate() + 90);
+  var horizonIso = audIso(horizon);
+
+  rows.forEach(function(r){
+    var st = lgResolveStatus(r, c);
+    // A filing entered by hand lands on st.filing; one the registers supplied
+    // lands on row.autoEvidence and never reaches it. Both are a record that
+    // the thing was done, and testing only the first put a meeting with signed
+    // minutes under "nothing recorded" next to a status reading "Filed".
+    var filing = st.filing || (r.autoEvidence && r.autoEvidence.filedOn
+      ? {filingDate:r.autoEvidence.filedOn, reference:r.autoEvidence.reference || null,
+         fromRegister:r.autoEvidence.source || 'register'}
+      : null);
+
+    if(lgNoDate(st.state)){
+      if(st.state === 'NO_DEADLINE') out.undated++; else out.standing++;
+    }
+
+    // Filed inside the period, whatever it was due.
+    if(filing && filing.filingDate &&
+       String(filing.filingDate) >= from && String(filing.filingDate) <= to){
+      out.filedInPeriod.push({r:r, st:st, on:String(filing.filingDate),
+        ref:filing.reference || filing.exchangeRef || null, late:!!st.late,
+        from:filing.fromRegister || null});
+    }
+
+    if(r.due && String(r.due) >= from && String(r.due) <= to){
+      out.fellDue.push({r:r, st:st});
+      if(!filing) out.stillOutstanding.push({r:r, st:st});
+    }
+
+    // Past due as at the end of the period, with nothing recorded — this is the
+    // part a board is actually answerable for, so it is not limited to the window.
+    if(r.due && String(r.due) < from && !filing) out.stillOutstanding.push({r:r, st:st});
+
+    if(r.due && String(r.due) > to && String(r.due) <= horizonIso)
+      out.upcoming.push({r:r, st:st});
+
+    if(!r.ownerEmail && !lgNoDate(st.state) && st.state !== 'NOT_APPLICABLE')
+      out.noOwner.push({r:r, st:st});
+  });
+
+  try{
+    appConditions(c).forEach(function(g){
+      var left = g.rows.length - g.decided;
+      if(left) out.undecided.push({condition:g.condition, n:left});
+    });
+  }catch(e){}
+
+  out.fellDue.sort(function(a,b){ return String(a.r.due).localeCompare(String(b.r.due)); });
+  out.stillOutstanding.sort(function(a,b){ return String(a.r.due).localeCompare(String(b.r.due)); });
+  out.upcoming.sort(function(a,b){ return String(a.r.due).localeCompare(String(b.r.due)); });
+  out.filedInPeriod.sort(function(a,b){ return String(b.on).localeCompare(String(a.on)); });
+  return out;
+}
+
+function brdSet(){
+  BRD_FROM = (document.getElementById('brd-from')||{}).value || null;
+  BRD_TO   = (document.getElementById('brd-to')||{}).value || null;
+  renderBoard();
+}
+
+function brdPrint(){ window.print(); }
+
+function renderBoard(){
+  var root = document.getElementById('brd-root');
+  if(!root) return;
+
+  var head = '<div class="cc-pagehead"><div>'+
+    '<div class="cc-crumb">Intelligence &rsaquo; Board Report</div>'+
+    '<h1 class="cc-h1">Board Compliance Report</h1>'+
+    '<p class="cc-sub">One entity, one period &mdash; what fell due, what was filed, what was not, '+
+    'and what needs the Board&rsquo;s decision.</p></div></div>';
+
+  if(typeof CLIENTS === 'undefined' || !CLIENTS.length){
+    root.innerHTML = head + '<div class="cc-empty"><h2>No entities yet</h2>'+
+      '<p>A board report is about one company.</p>'+
+      '<button class="cc-btn-primary" onclick="entOpen()">+ Add a company</button></div>';
+    return;
+  }
+
+  var c = brdEntity();
+  var def = brdDefaultFrom(c);
+  var from = BRD_FROM || def.from;
+  var to   = BRD_TO   || audIso(new Date());
+  var d = brdBuild(c, from, to);
+
+  var entSel = CLIENTS.length > 1
+    ? '<select id="brd-entity" class="lg-field" onchange="renderBoard()">'+
+      CLIENTS.map(function(x){
+        return '<option value="'+entEsc(x.id)+'"'+(String(c.id)===String(x.id)?' selected':'')+'>'+
+          entEsc(x.name)+'</option>';
+      }).join('')+'</select>'
+    : '';
+
+  var bar = '<div class="cc-card cc-toolbar brd-noprint"><div class="cc-toolrow">'+
+    entSel+
+    '<span class="aud-lbl">From</span>'+
+    '<input type="date" id="brd-from" class="lg-field" style="max-width:165px;" value="'+
+      entEsc(from)+'" onchange="brdSet()">'+
+    '<span class="aud-lbl">to</span>'+
+    '<input type="date" id="brd-to" class="lg-field" style="max-width:165px;" value="'+
+      entEsc(to)+'" onchange="brdSet()">'+
+    '<div style="flex:1;"></div>'+
+    '<button class="cc-btn-primary" onclick="brdPrint()">Print / save as PDF</button>'+
+  '</div></div>';
+
+  // ── the report itself ──────────────────────────────────────
+  var title = '<div class="brd-doc">'+
+    '<div class="brd-head">'+
+      '<div class="brd-co">'+entEsc(c.name)+'</div>'+
+      '<div class="brd-meta"><span class="mono">'+entEsc(c.cin||'')+'</span>'+
+        (c.type?' &middot; '+entEsc(lgEntityTypeLabel(c.type)):'')+'</div>'+
+      '<h2 class="brd-title">Compliance report to the Board</h2>'+
+      '<div class="brd-period">For the period '+ccFmtDate(from)+' to '+ccFmtDate(to)+
+        ' &middot; '+entEsc((BRD_FROM||BRD_TO)?'period selected manually':def.basis)+'</div>'+
+    '</div>';
+
+  var num = function(n, one, many){ return '<b>'+n+'</b> '+(n===1?one:(many||one+'s')); };
+
+  var summary =
+    '<div class="brd-sec"><h3>1. Summary</h3>'+
+      '<table class="brd-tbl"><tbody>'+
+      '<tr><td>Obligations on the register for this entity</td><td class="brd-n">'+d.total+'</td></tr>'+
+      '<tr><td>Fell due in the period</td><td class="brd-n">'+d.fellDue.length+'</td></tr>'+
+      '<tr><td>Filings recorded in the period</td><td class="brd-n">'+d.filedInPeriod.length+'</td></tr>'+
+      '<tr'+(d.stillOutstanding.length?' class="brd-bad"':'')+'>'+
+        '<td>Past due with nothing recorded, as at '+ccFmtDate(to)+'</td>'+
+        '<td class="brd-n">'+d.stillOutstanding.length+'</td></tr>'+
+      '<tr><td>Falling due in the next ninety days</td><td class="brd-n">'+d.upcoming.length+'</td></tr>'+
+      '<tr><td>Continuous or event-driven duties, carrying no date</td><td class="brd-n">'+d.standing+'</td></tr>'+
+      '<tr><td>Recurring duties for which no deadline is recorded</td><td class="brd-n">'+d.undated+'</td></tr>'+
+      '</tbody></table></div>';
+
+  var listRows = function(items, empty, extra){
+    if(!items.length) return '<p class="brd-none">'+empty+'</p>';
+    return '<table class="brd-tbl brd-list"><thead><tr>'+
+      '<th>Obligation</th><th>Provision</th><th>Due</th><th>'+(extra||'Status')+'</th>'+
+      '</tr></thead><tbody>'+
+      items.map(function(x){
+        var st = x.st, r = x.r;
+        var right = extra
+          ? ccFmtDate(x.on) + (x.ref?'<div class="brd-sub mono">'+entEsc(x.ref)+'</div>':'') +
+            (x.from?'<div class="brd-sub">from the '+entEsc(x.from)+'</div>':'') +
+            (x.late?'<div class="brd-sub brd-late">after the due date</div>':'')
+          : entEsc(lgStateMeta(st.state).label);
+        return '<tr><td>'+entEsc(r.obligation)+
+            (r.form && r.form!=='-'?'<div class="brd-sub mono">'+entEsc(r.form)+'</div>':'')+'</td>'+
+          '<td class="mono">'+entEsc(r.section||'')+'</td>'+
+          '<td class="mono">'+(r.due?ccFmtDate(r.due):'&mdash;')+'</td>'+
+          '<td>'+right+'</td></tr>';
+      }).join('')+'</tbody></table>';
+  };
+
+  var filed = '<div class="brd-sec"><h3>2. Filings recorded in the period</h3>'+
+    listRows(d.filedInPeriod, 'No filing was recorded against this entity in the period.', 'Filed on')+
+  '</div>';
+
+  var outstanding = '<div class="brd-sec"><h3>3. Past due, nothing recorded</h3>'+
+    (d.stillOutstanding.length
+      ? '<p class="brd-lead">The following were due on or before '+ccFmtDate(to)+
+        ' and no filing has been recorded against them. This states what the register holds, '+
+        'not that the filing was not made.</p>'
+      : '')+
+    listRows(d.stillOutstanding, 'Nothing on the register is past due without a record against it.')+
+  '</div>';
+
+  var decisions = '<div class="brd-sec"><h3>4. Requiring a decision</h3>'+
+    (d.undecided.length
+      ? '<p class="brd-lead">These obligations carry a condition that depends on a fact about the '+
+        'company which has not been recorded. Until it is settled they are counted as owed.</p>'+
+        '<table class="brd-tbl"><tbody>'+d.undecided.map(function(u){
+          return '<tr><td>'+entEsc(u.condition)+'</td><td class="brd-n">'+u.n+'</td></tr>';
+        }).join('')+'</tbody></table>'
+      : '<p class="brd-none">Every conditional obligation has been decided.</p>')+
+    (d.noOwner.length
+      ? '<p class="brd-lead" style="margin-top:14px;">'+num(d.noOwner.length,'dated obligation')+
+        ' '+(d.noOwner.length===1?'has':'have')+' nobody named as answerable.</p>'
+      : '')+
+  '</div>';
+
+  var coming = '<div class="brd-sec"><h3>5. Falling due in the next ninety days</h3>'+
+    listRows(d.upcoming, 'Nothing on the register falls due in the next ninety days.')+
+  '</div>';
+
+  // ── the part that makes it signable ────────────────────────
+  var basis = '<div class="brd-sec brd-basis"><h3>6. Basis of this report, and its limits</h3>'+
+    '<ul>'+
+      '<li>Prepared from this system&rsquo;s register on '+ccFmtDate(audIso(new Date()))+
+        '. Every figure above is counted from that register at the time of preparation.</li>'+
+      '<li><b>Nothing here is verified against MCA21 or the stock exchanges.</b> No connection to '+
+        'either exists. Where a filing is shown as recorded, that means a person entered it in '+
+        'this system &mdash; it is not confirmation from the Registrar or an exchange.</li>'+
+      '<li>&ldquo;Past due, nothing recorded&rdquo; means the register holds no filing against the '+
+        'obligation. It is not a statement that the filing was not made.</li>'+
+      '<li>'+num(d.undated,'recurring obligation')+' '+(d.undated===1?'carries':'carry')+
+        ' no deadline because the rule source states no period to compute one from. '+
+        (d.undated?'Those cannot appear as overdue and are not counted as met.':'')+'</li>'+
+      '<li>Applicability is decided on entity class and on the conditions recorded against this '+
+        'company. Section 4 lists what remains undecided.</li>'+
+    '</ul></div>';
+
+  var sign = '<div class="brd-sign">'+
+    '<div class="brd-sign-b"><div class="brd-sign-l"></div>Company Secretary</div>'+
+    '<div class="brd-sign-b"><div class="brd-sign-l"></div>Date</div>'+
+  '</div>';
+
+  root.innerHTML = head + bar + title + summary + filed + outstanding + decisions +
+                   coming + basis + sign + '</div>';
 }
 
 // ═══════════════════════════════════════════════════

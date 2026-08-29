@@ -709,6 +709,47 @@ same treatment as PAS-3 under Rule 12.
 
 ---
 
+## 2p. BOARD COMPLIANCE REPORT (v154, Phase 3 items 1 + 2)
+
+Panel `p-board` -> `renderBoard()`. Nav: Intelligence > Board Report.
+
+**Items 1 and 2 are one feature.** A board dashboard that cannot be put in front of a board is
+another screen, and a board-ready report built from different numbers will disagree with the
+dashboard in the room.
+
+Deliberately **not** the Command Center. That is the CS's worklist across every entity, ordered by
+what to do next. This is **one entity, one period**, ordered by what a board is answerable for.
+
+### Period defaults to "since the board last met"
+`brdDefaultFrom(c)` reads the meetings register for the latest past `kind:'board'` meeting. No
+meeting recorded -> 90 days, and the header says which basis was used.
+
+### Six sections
+1. **Summary** — every figure counted from the register, none a residual of another
+2. **Filings recorded in the period**
+3. **Past due, nothing recorded** — *not* limited to the window; a board is answerable for
+   everything outstanding as at the report date
+4. **Requiring a decision** — the undecided applicability conditions from `appConditions`, plus
+   obligations with no owner
+5. **Falling due in the next ninety days**
+6. **Basis of this report, and its limits** — states plainly that **nothing is verified against
+   MCA21 or the exchanges**, and that "past due, nothing recorded" describes the register rather
+   than asserting the filing was not made. Then a signature block.
+
+### The bug worth remembering
+Section 3 listed "Minutes — Board meeting held 20 May 2026" as *nothing recorded* while its own
+status cell three columns right read **"Filed"**. A filing entered by hand lands on `st.filing`;
+one supplied by a register lands on `row.autoEvidence` and never reaches it. Testing only the first
+made the report contradict itself inside a single row, in the section a board reads first. Both are
+now honoured, and a register-sourced filing says which register it came from.
+
+### Printing is the deliverable
+`@media print` hides `.appside`, `.appheader`, `.brd-noprint` and every other panel, leaving the
+document alone with `page-break-inside:avoid` on each section. **Print selectors were verified
+against the real DOM** — the first cut targeted `.sidebar`, which does not exist in this app.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -785,7 +826,7 @@ same treatment as PAS-3 under Rule 12.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v151.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v154.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. Migrations through `db/016` are applied. **`db/017_applicability_review.sql` is new and has not been run** — until it is, confirming an applicability condition fails with a message naming the file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**
@@ -818,9 +859,13 @@ its calculation". A model summarising records we hold exactly is the same failur
 coat. Use AI where it maps free text onto the register's own vocabulary (as item 11's concept layer
 does, without an API call) — not to generate conclusions the data can already support.
 
-**Phase 3 (not started):** board compliance dashboard, board-ready reports, client portal,
-information-request workflow, management certification, obligation version history, dependency
-mapping.
+**Phase 3 — in progress:**
+- [x] Board compliance dashboard + board-ready reports (section 2p)
+- [ ] Client portal
+- [ ] Information-request workflow
+- [ ] Management certification
+- [ ] Obligation version history
+- [ ] Dependency mapping
 
 **Standing constraints from the owner — these govern every decision:**
 - *"if anything is not working it should not be there, i dont want any dummy items"*
