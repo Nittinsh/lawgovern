@@ -750,6 +750,38 @@ against the real DOM** — the first cut targeted `.sidebar`, which does not exi
 
 ---
 
+## 2q. ADT-1 FROM THE MEETING (v155) — db/022 NOT YET RUN
+
+**No auditor register was needed for this.** The third proviso to s.139(1) gives the period and the
+anchor in one sentence, verbatim from `reference/`:
+
+> "...file a notice of such appointment with the Registrar **within fifteen days of the meeting in
+> which the auditor is appointed**."
+
+and the Explanation: *"'appointment' includes re-appointment"* — so an annual re-appointment files
+too, which is the one people forget.
+
+`db/022_meeting_auditor.sql` adds `meetings.auditor_appointed`. Same pattern as `approved_results`:
+the register knew a meeting happened, not what it did.
+
+One flag covers both routes because the filing is identical — members appointing at an AGM under
+s.139(1), or the Board filling a casual vacancy under s.139(8). The row says which from
+`meetings.kind`, and adds the s.139(8) thirty-day note for the Board route.
+
+**Not FY-scoped**, unlike the Sec 118 minutes rows: an appointment holds to the conclusion of the
+sixth AGM, so the meeting that made it can sit in an earlier year while ADT-1 is still outstanding.
+Verified: AGM 20 Aug -> due 4 Sep; Board casual vacancy 5 Jul -> due 20 Jul; an ordinary board
+meeting raises nothing; a Sep 2025 AGM still appears.
+
+### Tenure is deliberately NOT modelled
+s.139(1) runs a term to the conclusion of the sixth AGM and s.139(2) forces rotation — five
+consecutive years for an individual, two terms of five for a firm. That is a multi-year clock across
+appointments, cannot be computed from one meeting, and would need its own register. **This is the
+one remaining auditor obligation worth a register**, and the highest-consequence one: miss it and
+the auditor is disqualified.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -826,7 +858,7 @@ against the real DOM** — the first cut targeted `.sidebar`, which does not exi
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v154.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v155.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. Migrations through `db/016` are applied. **`db/017_applicability_review.sql` is new and has not been run** — until it is, confirming an applicability condition fails with a message naming the file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

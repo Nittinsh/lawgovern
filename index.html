@@ -1371,7 +1371,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v154">
+      <meta id="build-version" content="v155">
     </div>
   </div>
   <div class="cc-search">
@@ -5307,6 +5307,41 @@ function regDerivedRows(c, ctx){
     }
   });
 
+
+  // ── ADT-1, third proviso to Sec 139(1) ─────────────────────────
+  // "...file a notice of such appointment with the Registrar within fifteen days
+  // of the meeting in which the auditor is appointed." The period and the anchor
+  // are both in the Act, and the anchor is a row in this register.
+  //
+  // Not scoped to the financial year: an appointment holds office to the
+  // conclusion of the sixth AGM, so the meeting that made it may sit in an
+  // earlier year while the filing is still outstanding.
+  regRowsFor('meetings', c.id).filter(function(m){
+    return m.auditor_appointed === true && m.held_on;
+  }).forEach(function(m){
+    var held = String(m.held_on);
+    var atAgm = m.kind === 'agm';
+    rows.push({
+      key:'adt1-' + m.id,
+      law:'Companies Act 2013', section:'Sec 139(1), third proviso', form:'ADT-1',
+      obligation:'Notice of auditor appointment - ' +
+                 (atAgm ? 'appointed at the AGM' : 'appointed by the Board') +
+                 ' on ' + ccFmtDate(held),
+      owner:'CS', due: lodrAddDays(held, 15), risk:'high', applicable:true,
+      penalty:'Sec 139(1) r/w Sec 450: company and every officer in default',
+      derived:'meetings',
+      derivedNote:'Third proviso to section 139(1): within fifteen days of the meeting in ' +
+        'which the auditor is appointed, ' + ccFmtDate(held) + '. The Explanation to the ' +
+        'section reads "appointment includes re-appointment", so an annual re-appointment ' +
+        'is filed too.' +
+        (atAgm ? '' : ' Where this filled a casual vacancy, section 139(8) also required the ' +
+                      'Board to fill it within thirty days.'),
+      // Nothing here proves ADT-1 was filed — the meetings register records the
+      // appointment, not the filing. Recorded against the obligation as usual.
+      autoEvidence: null
+    });
+  });
+
   // ── Minutes of each meeting, Sec 118(1) ────────────────────────
   // "...to be prepared and signed ... and kept within thirty days of the
   // conclusion of every such meeting" — every board, committee, general and
@@ -7843,6 +7878,12 @@ var LG_REG = {
       {f:'approved_results', l:'Financial results approved', t:'bool', list:true,
        hint:'Tick where this meeting approved the financial results. Reg 47(1) then '+
             'runs 48 hours from it, and Reg 52(8) two working days.'},
+      // The third proviso to s.139(1) runs fifteen days from "the meeting in
+      // which the auditor is appointed", and the Explanation puts re-appointment
+      // inside "appointment" — so an annual re-appointment files too.
+      {f:'auditor_appointed', l:'Auditor appointed / re-appointed', t:'bool', list:true,
+       hint:'Tick for an appointment or re-appointment by members, or a casual vacancy '+
+            'filled by the Board. ADT-1 is then due fifteen days from this meeting.'},
       {f:'minutes_state', l:'Minutes',   t:'select', list:true, def:'pending',
        opts:[['pending','Pending'],['drafted','Drafted'],['circulated','Circulated'],
              ['signed','Signed'],['entered','Entered in the minute book']]},
@@ -8070,7 +8111,8 @@ async function regSave(key, id){
   }catch(e){
     // Which migration adds which column, so the message says what to run
     // rather than repeating Postgres at someone who did not write the schema.
-    var COLUMN_FIX = {approved_results:'db/018_meeting_outcomes.sql'};
+    var COLUMN_FIX = {approved_results:'db/018_meeting_outcomes.sql',
+                      auditor_appointed:'db/022_meeting_auditor.sql'};
     var missingCol = (e.message.match(/'([a-z_]+)' column/i) || [])[1];
     regErr(/relation .* does not exist|could not find the table/i.test(e.message)
       ? 'The '+cfg.table+' table does not exist yet. Run '+
