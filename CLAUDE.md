@@ -654,6 +654,37 @@ Verified: 2023 charge unfiled -> still past due; 2019 charge filed -> dropped of
 
 ---
 
+## 2n. ALLOTMENTS REGISTER (v150) — db/020 NOT YET RUN
+
+Same pattern as charges: three duties run from the date securities are allotted, and nothing
+recorded that an allotment had happened. `db/020_allotments_register.sql` adds `allotments`
+(route, security, `allotted_on`, number, amount, allottees, `pas3_filed_on`/`pas3_srn`,
+`certificates_on`). Panel `p-allotments`, nav "Allotments".
+
+### The periods are NOT equally well founded, and each row says so
+| obligation | period | authority |
+|---|---|---|
+| PAS-3, private placement | **15 days** | **s.42(8), stated in the Act** |
+| PAS-3, every other route | 30 days | **Rule 12** — s.39(4) says only "in such manner as may be prescribed", and that rule is **not in `reference/`**. The row states this. |
+| Certificates, shares | **2 months** | **s.56(4)(b), stated in the Act** |
+| Certificates, debentures | **6 months** | **s.56(4)(d), stated in the Act** |
+
+Section label reflects it: `Sec 42(8)` vs `Sec 39(4) r/w Rule 12`.
+
+### Subscribers to the memorandum raise NO obligation
+Shares taken by subscribing to the memorandum are **subscribed, not allotted** — s.39(4) bites where
+a company "makes any allotment", and s.56(4)(a) runs from *incorporation*, a date this register does
+not hold. The first cut raised a PAS-3 for them, which is a filing that is not owed. **Creating an
+obligation that does not exist is the same defect as inventing a date for one that does.** The row
+is kept as a record and generates nothing.
+
+### lgAddMonths
+Months are added by calendar and clamped to the last day of the target month — 31 Dec + 2 months is
+**28 Feb**, and approximating in days would move the deadline. Verified: `2025-12-31 +2m ->
+2026-02-28`, `2026-08-31 +6m -> 2027-02-28`.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -730,7 +761,7 @@ Verified: 2023 charge unfiled -> still past due; 2019 charge filed -> dropped of
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v148.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v150.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. Migrations through `db/016` are applied. **`db/017_applicability_review.sql` is new and has not been run** — until it is, confirming an applicability condition fails with a message naming the file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

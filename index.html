@@ -1322,7 +1322,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v148">
+      <meta id="build-version" content="v150">
     </div>
   </div>
   <div class="cc-search">
@@ -1368,6 +1368,7 @@ input[type="text"], input[type="password"], textarea, select {
 <div class="navitem" onclick="sw('entities')" id="t-entities"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h2m-2 4h2m-2 4h2m4-8h2m-2 4h2m-2 4h2"/></svg><span>Entities</span></div>
 <div class="navitem" onclick="sw('events')" id="t-events"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 8v5l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>Material Events</span></div>
 <div class="navitem" onclick="sw('directors')" id="t-directors"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-8 0v2"/><circle cx="12" cy="7" r="4"/></svg><span>Directors &amp; KMP</span></div>
+<div class="navitem" onclick="sw('allotments')" id="t-allotments"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M7 8h7a3 3 0 010 6H7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Allotments</span></div>
 <div class="navitem" onclick="sw('charges')" id="t-charges"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10V6z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Charges</span></div>
 <div class="navitem" onclick="sw('meetings')" id="t-meetings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Board &amp; Meetings</span></div>
 <div class="navitem" onclick="sw('internal')" id="t-internal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg><span>Internal Compliance</span></div>
@@ -1492,6 +1493,7 @@ input[type="text"], input[type="password"], textarea, select {
 <div class="panel" id="p-directors"><div class="cc-tool"><div id="reg-root-directors"></div></div></div>
 <div class="panel" id="p-meetings"><div class="cc-tool"><div id="reg-root-meetings"></div></div></div>
 <div class="panel" id="p-charges"><div class="cc-tool"><div id="reg-root-charges"></div></div></div>
+<div class="panel" id="p-allotments"><div class="cc-tool"><div id="reg-root-allotments"></div></div></div>
 <div class="panel" id="p-applies"><div class="cc-tool"><div id="app-root"></div></div></div>
 <div class="panel" id="p-impact"><div class="cc-tool"><div id="imp-root"></div></div></div>
 <div class="panel" id="p-exceptions"><div class="cc-tool"><div id="exc-root"></div></div></div>
@@ -4970,11 +4972,12 @@ function cmRows(dataset, c, agmIso, tag){
 // getComplianceChart is synchronous, so the registers have to be in memory
 // before it runs. They are loaded once after the companies land and refreshed
 // whenever a register row is saved.
-var LG_REGS = {directors:null, meetings:null, charges:null};
+var LG_REGS = {directors:null, meetings:null, charges:null, allotments:null};
 
 async function lgLoadRegisters(){
-  if(!supaClient || !CURRENT_USER){ LG_REGS = {directors:[], meetings:[], charges:[]}; return; }
-  var tables = ['directors','meetings','charges'];
+  if(!supaClient || !CURRENT_USER){
+    LG_REGS = {directors:[], meetings:[], charges:[], allotments:[]}; return; }
+  var tables = ['directors','meetings','charges','allotments'];
   for(var i=0;i<tables.length;i++){
     var t = tables[i];
     try{
@@ -4994,6 +4997,19 @@ function regRowsFor(table, companyId){
 
 function lgDirectorsInOffice(companyId){
   return regRowsFor('directors', companyId).filter(function(d){ return !d.cessation_on; });
+}
+
+// Two months from 31 December is 28 February, not 60 days later. Adding months
+// by calendar and clamping to the last day of the target month keeps a statutory
+// period stated in months from drifting.
+function lgAddMonths(iso, n){
+  var p = String(iso||'').split('-').map(Number);
+  if(p.length !== 3) return null;
+  var m = p[1] - 1 + n;
+  var y = p[0] + Math.floor(m / 12);
+  m = ((m % 12) + 12) % 12;
+  var last = new Date(y, m + 1, 0).getDate();
+  return lodrFmt(y, m + 1, Math.min(p[2], last));
 }
 
 // ── derived obligations ──────────────────────────────────────────
@@ -5023,6 +5039,95 @@ function regDerivedRows(c, ctx){
 
 
 
+
+  // ctx carries the FY window, not today. Formatted from local parts, never
+  // toISOString — that shifted every date back a day in IST.
+  var chgToday = audIso(new Date());
+
+  // ── Allotments: PAS-3 and certificates ─────────────────────────
+  // s.42(8) states fifteen days in the Act for a private placement. s.39(4)
+  // states no period at all — "in such manner as may be prescribed" — and the
+  // thirty days comes from Rule 12, which is not among the sources held here.
+  // Both dates are computed; the row says which of them rests on a rule we have
+  // not read.
+  var ROUTE_LABEL = {private_placement:'Private placement', preferential:'Preferential issue',
+    rights:'Rights issue', bonus:'Bonus issue', esop:'ESOP / sweat equity',
+    conversion:'Conversion', public:'Public issue',
+    subscribers:'Subscribers to the memorandum', other:'Allotment'};
+
+  regRowsFor('allotments', c.id).forEach(function(al){
+    if(!al.allotted_on) return;
+    var on = String(al.allotted_on);
+    var route = al.route || 'other';
+
+    // Shares taken by subscribing to the memorandum are subscribed, not
+    // allotted: they exist from incorporation and are covered by the
+    // incorporation filing. Section 39(4) bites where a company "makes any
+    // allotment", and section 56(4)(a) runs from incorporation rather than from
+    // any allotment date this register holds. So the row is kept as a record and
+    // raises no obligation — inventing one is the same defect as inventing a date.
+    if(route === 'subscribers') return;
+    var label = ROUTE_LABEL[route] || 'Allotment';
+    var count = al.number ? ' - ' + Number(al.number).toLocaleString('en-IN') + ' ' +
+                (al.security === 'debenture' ? 'debentures' : 'securities') : '';
+
+    // ── PAS-3 ──
+    var pp = route === 'private_placement';
+    var filed = al.pas3_filed_on ? String(al.pas3_filed_on) : null;
+    if(!filed || ccDaysBetween(filed, chgToday) <= 365){
+      rows.push({
+        key:'allot-pas3-' + al.id,
+        law:'Companies Act 2013',
+        section: pp ? 'Sec 42(8)' : 'Sec 39(4) r/w Rule 12',
+        form:'PAS-3',
+        obligation:'Return of allotment - ' + label + count,
+        owner:'CS', due: lodrAddDays(on, pp ? 15 : 30),
+        risk:'high', applicable:true,
+        penalty:'Rs.1,000 a day, to Rs.1 lakh (s.39(5)); s.42(9) for private placement',
+        derived:'allotments',
+        derivedNote: (pp
+          ? 'Section 42(8): within fifteen days from the date of the allotment, ' +
+            ccFmtDate(on) + '.'
+          : 'Thirty days from the allotment on ' + ccFmtDate(on) + '. Section 39(4) itself ' +
+            'states only "in such manner as may be prescribed" — the period comes from ' +
+            'Rule 12 of the Companies (Prospectus and Allotment of Securities) Rules 2014, ' +
+            'which is not among the sources held here. Check it before relying on the date.') +
+          (filed ? ' PAS-3 filed ' + ccFmtDate(filed) +
+                   (al.pas3_srn ? ' (SRN ' + al.pas3_srn + ').' : '.') : ''),
+        autoEvidence: filed
+          ? {filedOn:filed, reference:al.pas3_srn || null, source:'Allotments register'}
+          : null
+      });
+    }
+
+    // ── Certificates, s.56(4) ──
+    // (b) two months for shares, (d) six months for debentures.
+    {
+      var deb = al.security === 'debenture';
+      var certDue = lgAddMonths(on, deb ? 6 : 2);
+      var certOn = al.certificates_on ? String(al.certificates_on) : null;
+      if(certDue && (!certOn || ccDaysBetween(certOn, chgToday) <= 365)){
+        rows.push({
+          key:'allot-cert-' + al.id,
+          law:'Companies Act 2013', section: deb ? 'Sec 56(4)(d)' : 'Sec 56(4)(b)', form:'-',
+          obligation:'Deliver certificates - ' + label + count,
+          owner:'CS', due: certDue, risk:'medium', applicable:true,
+          penalty:'Sec 56(6): company and every officer in default',
+          derived:'allotments',
+          derivedNote:'Section 56(4)(' + (deb ? 'd' : 'b') + '): within ' +
+            (deb ? 'six months' : 'two months') + ' from the date of allotment, ' +
+            ccFmtDate(on) + '.' +
+            (certOn ? ' Delivered ' + ccFmtDate(certOn) + '.'
+                    : ' Where the securities are held in a depository, the proviso requires ' +
+                      'the details to be intimated to the depository immediately on allotment.'),
+          autoEvidence: certOn
+            ? {filedOn:certOn, source:'Allotments register'}
+            : null
+        });
+      }
+    }
+  });
+
   // ── Charges, Sec 77 and Sec 82 ─────────────────────────────────
   // "...to register the particulars of the charge ... with the Registrar within
   // thirty days of its creation" (s.77(1)), and intimation of satisfaction
@@ -5033,9 +5138,7 @@ function regDerivedRows(c, ctx){
   // under s.82 — are applications to the Registrar on additional fees, not the
   // date the filing is owed. They are noted, never used as the due date: a
   // deadline that moves when you miss it is not a deadline.
-  // ctx carries the FY window, not today. Formatted from local parts, never
-  // toISOString — that shifted every date back a day in IST.
-  var chgToday = audIso(new Date());
+  // Declared above, alongside the allotment rows that also need it.
   regRowsFor('charges', c.id).forEach(function(ch){
     var who = ch.holder ? String(ch.holder) : 'charge';
     var amt = ch.amount ? ' (Rs.' + Number(ch.amount).toLocaleString('en-IN') + ')' : '';
@@ -7523,6 +7626,34 @@ var LG_REG = {
       {f:'notes',       l:'Notes',       t:'textarea'}
     ]
   },
+  allotments: {
+    table:'allotments', crumb:'Workspace', title:'Allotments', scoped:true,
+    sub:'Securities allotted. PAS-3 is due fifteen days after a private placement under '+
+        'section 42(8), thirty days otherwise, and certificates within two months of '+
+        'allotment under section 56(4).',
+    order:'allotted_on', desc:true, addLabel:'Record an allotment',
+    cols:[
+      {f:'route',      l:'Route', t:'select', list:true, main:true, def:'private_placement',
+       opts:[['private_placement','Private placement'],['preferential','Preferential issue'],
+             ['rights','Rights issue'],['bonus','Bonus issue'],['esop','ESOP / sweat equity'],
+             ['conversion','Conversion'],['public','Public issue'],
+             ['subscribers','Subscribers to the memorandum'],['other','Other']],
+       hint:'Private placement carries the fifteen-day PAS-3 period stated in section 42(8).'},
+      {f:'security',   l:'Security', t:'select', list:true, def:'equity',
+       opts:[['equity','Equity shares'],['preference','Preference shares'],
+             ['debenture','Debentures'],['other','Other']],
+       hint:'Certificates are due within two months, or six months for debentures.'},
+      {f:'allotted_on',l:'Allotted on', t:'date', list:true,
+       hint:'Both clocks run from this date. Without it no deadline is computed.'},
+      {f:'number',     l:'Number of securities', t:'number', list:true},
+      {f:'amount',     l:'Consideration (Rs.)', t:'number'},
+      {f:'allottees',  l:'Number of allottees', t:'number'},
+      {f:'pas3_filed_on', l:'PAS-3 filed on', t:'date', list:true},
+      {f:'pas3_srn',   l:'PAS-3 SRN', t:'text'},
+      {f:'certificates_on', l:'Certificates delivered on', t:'date'},
+      {f:'notes',      l:'Notes', t:'textarea'}
+    ]
+  },
   charges: {
     table:'charges', crumb:'Workspace', title:'Charges', scoped:true,
     sub:'Charges created over the company&rsquo;s property. Section 77 requires registration '+
@@ -7809,8 +7940,9 @@ async function regSave(key, id){
     var missingCol = (e.message.match(/'([a-z_]+)' column/i) || [])[1];
     regErr(/relation .* does not exist|could not find the table/i.test(e.message)
       ? 'The '+cfg.table+' table does not exist yet. Run '+
-        (cfg.table === 'charges' ? 'db/019_charges_register.sql'
-                                 : 'db/010_governance_registers.sql')+' first.'
+        ({charges:'db/019_charges_register.sql',
+          allotments:'db/020_allotments_register.sql'}[cfg.table]
+         || 'db/010_governance_registers.sql')+' first.'
       : (missingCol && COLUMN_FIX[missingCol])
         ? 'The '+cfg.table+' table has no '+missingCol+' column yet. Run '+
           COLUMN_FIX[missingCol]+' in the Supabase SQL editor.'
