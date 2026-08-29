@@ -617,6 +617,43 @@ Verified: meeting 20 May -> due 19 Jun, signed 10 Jun -> evidence on record; mee
 
 ---
 
+## 2m. CHARGES REGISTER (v148) — db/019 NOT YET RUN
+
+Sections 77-87 were the largest group of undated obligations, and not because the deadline was
+unknown. Verbatim from `reference/`:
+
+> **s.77(1)** "...to register the particulars of the charge ... with the Registrar **within thirty
+> days of its creation**"
+> **s.82(1)** "...intimation ... of the payment or satisfaction in full of any charge ... **within a
+> period of thirty days** from the date of such payment or satisfaction"
+
+Thirty days *from what* was the gap. Nothing recorded that a charge had been created or satisfied —
+the same shape as Reg 47(1) before the meetings register was wired to it.
+
+`db/019_charges_register.sql` adds the `charges` table (holder, nature, amount, property,
+`created_on`, `modified_on`, `satisfied_on`, `charge_id`, `chg1_filed_on`/`chg1_srn`,
+`chg4_filed_on`/`chg4_srn`). Panel `p-charges`, nav "Charges" — the register engine dispatches
+generically off `LG_REG[id]`, so no new render function.
+
+### Obligations emitted (`regDerivedRows`)
+- **Sec 77(1) / CHG-1** — due `created_on` + 30. A `modified_on` takes precedence as the anchor and
+  the row switches to "Sec 79 r/w Sec 77".
+- **Sec 82(1) / CHG-4** — due `satisfied_on` + 30.
+- `chg1_filed_on` + `chg1_srn` (and the CHG-4 pair) become `autoEvidence`, so the row closes from
+  the practice's own record.
+
+### The extension routes are deliberately NOT the deadline
+s.77's proviso allows 60 days on additional fees; s.82's allows 300. **Both are applications to the
+Registrar, not the date the filing is owed.** Using them as the due date would tell a CS that a late
+filing is on time. The 30-day date is the deadline; the extension is named in the note.
+
+### Retention
+A row shows while the filing is outstanding **however old the charge**, and for a year after it is
+filed. An unregistered charge from three years ago is still a live problem; a registered one is not.
+Verified: 2023 charge unfiled -> still past due; 2019 charge filed -> dropped off.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -693,7 +730,7 @@ Verified: meeting 20 May -> due 19 Jun, signed 10 Jun -> evidence on record; mee
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v147.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v148.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. Migrations through `db/016` are applied. **`db/017_applicability_review.sql` is new and has not been run** — until it is, confirming an applicability condition fails with a message naming the file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

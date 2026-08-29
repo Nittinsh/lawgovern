@@ -1322,7 +1322,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v147">
+      <meta id="build-version" content="v148">
     </div>
   </div>
   <div class="cc-search">
@@ -1368,6 +1368,7 @@ input[type="text"], input[type="password"], textarea, select {
 <div class="navitem" onclick="sw('entities')" id="t-entities"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h2m-2 4h2m-2 4h2m4-8h2m-2 4h2m-2 4h2"/></svg><span>Entities</span></div>
 <div class="navitem" onclick="sw('events')" id="t-events"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 8v5l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>Material Events</span></div>
 <div class="navitem" onclick="sw('directors')" id="t-directors"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-8 0v2"/><circle cx="12" cy="7" r="4"/></svg><span>Directors &amp; KMP</span></div>
+<div class="navitem" onclick="sw('charges')" id="t-charges"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10V6z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Charges</span></div>
 <div class="navitem" onclick="sw('meetings')" id="t-meetings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Board &amp; Meetings</span></div>
 <div class="navitem" onclick="sw('internal')" id="t-internal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg><span>Internal Compliance</span></div>
 <div class="navitem" onclick="sw('filings')" id="t-filings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11l5 5v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M15 4v5h5M8 14h8M8 17h5"/></svg><span>Filings &amp; Records</span></div>
@@ -1490,6 +1491,7 @@ input[type="text"], input[type="password"], textarea, select {
 <div class="panel" id="p-documents"><div class="cc-tool"><div id="doc-root"></div></div></div>
 <div class="panel" id="p-directors"><div class="cc-tool"><div id="reg-root-directors"></div></div></div>
 <div class="panel" id="p-meetings"><div class="cc-tool"><div id="reg-root-meetings"></div></div></div>
+<div class="panel" id="p-charges"><div class="cc-tool"><div id="reg-root-charges"></div></div></div>
 <div class="panel" id="p-applies"><div class="cc-tool"><div id="app-root"></div></div></div>
 <div class="panel" id="p-impact"><div class="cc-tool"><div id="imp-root"></div></div></div>
 <div class="panel" id="p-exceptions"><div class="cc-tool"><div id="exc-root"></div></div></div>
@@ -4968,11 +4970,11 @@ function cmRows(dataset, c, agmIso, tag){
 // getComplianceChart is synchronous, so the registers have to be in memory
 // before it runs. They are loaded once after the companies land and refreshed
 // whenever a register row is saved.
-var LG_REGS = {directors:null, meetings:null};
+var LG_REGS = {directors:null, meetings:null, charges:null};
 
 async function lgLoadRegisters(){
-  if(!supaClient || !CURRENT_USER){ LG_REGS = {directors:[], meetings:[]}; return; }
-  var tables = ['directors','meetings'];
+  if(!supaClient || !CURRENT_USER){ LG_REGS = {directors:[], meetings:[], charges:[]}; return; }
+  var tables = ['directors','meetings','charges'];
   for(var i=0;i<tables.length;i++){
     var t = tables[i];
     try{
@@ -5019,6 +5021,82 @@ function regDerivedRows(c, ctx){
     });
   });
 
+
+
+  // ── Charges, Sec 77 and Sec 82 ─────────────────────────────────
+  // "...to register the particulars of the charge ... with the Registrar within
+  // thirty days of its creation" (s.77(1)), and intimation of satisfaction
+  // "within a period of thirty days from the date of such payment or
+  // satisfaction" (s.82(1)). Both clocks start at an event this register holds.
+  //
+  // The extension routes — sixty days under the proviso to s.77, three hundred
+  // under s.82 — are applications to the Registrar on additional fees, not the
+  // date the filing is owed. They are noted, never used as the due date: a
+  // deadline that moves when you miss it is not a deadline.
+  // ctx carries the FY window, not today. Formatted from local parts, never
+  // toISOString — that shifted every date back a day in IST.
+  var chgToday = audIso(new Date());
+  regRowsFor('charges', c.id).forEach(function(ch){
+    var who = ch.holder ? String(ch.holder) : 'charge';
+    var amt = ch.amount ? ' (Rs.' + Number(ch.amount).toLocaleString('en-IN') + ')' : '';
+
+    // Registration, and modification if there has been one. A modification
+    // restarts the same duty under s.79, so it takes precedence as the anchor.
+    var anchor = ch.modified_on ? String(ch.modified_on) : (ch.created_on ? String(ch.created_on) : null);
+    var isMod  = !!ch.modified_on;
+    if(anchor){
+      var filed1 = ch.chg1_filed_on ? String(ch.chg1_filed_on) : null;
+      // Outstanding for as long as it is unfiled; a filed one drops off a year on.
+      var keep1 = !filed1 || (ccDaysBetween(filed1, chgToday) <= 365);
+      if(keep1){
+        rows.push({
+          key:'chg-reg-' + ch.id,
+          law:'Companies Act 2013',
+          section: isMod ? 'Sec 79 r/w Sec 77' : 'Sec 77(1)',
+          form:'CHG-1',
+          obligation:(isMod ? 'Register modification of charge - ' : 'Register charge - ') + who + amt,
+          owner:'CS', due: lodrAddDays(anchor, 30), risk:'critical', applicable:true,
+          penalty:'Sec 86: company and every officer in default; charge void against liquidator if unregistered',
+          derived:'charges',
+          derivedNote:'Section 77(1): within thirty days of ' +
+            (isMod ? 'modification' : 'creation') + ', ' + ccFmtDate(anchor) + '.' +
+            (filed1 ? ' CHG-1 filed ' + ccFmtDate(filed1) +
+                      (ch.chg1_srn ? ' (SRN ' + ch.chg1_srn + ').' : '.')
+                    : ' The proviso allows a further sixty days on additional fees, on ' +
+                      'application to the Registrar — that is a remedy, not the deadline.'),
+          autoEvidence: filed1
+            ? {filedOn:filed1, reference:ch.chg1_srn || null, source:'Charges register'}
+            : null
+        });
+      }
+    }
+
+    // Satisfaction.
+    if(ch.satisfied_on){
+      var sat = String(ch.satisfied_on);
+      var filed4 = ch.chg4_filed_on ? String(ch.chg4_filed_on) : null;
+      var keep4 = !filed4 || (ccDaysBetween(filed4, chgToday) <= 365);
+      if(keep4){
+        rows.push({
+          key:'chg-sat-' + ch.id,
+          law:'Companies Act 2013', section:'Sec 82(1)', form:'CHG-4',
+          obligation:'Intimate satisfaction of charge - ' + who + amt,
+          owner:'CS', due: lodrAddDays(sat, 30), risk:'high', applicable:true,
+          penalty:'Sec 86: company and every officer in default',
+          derived:'charges',
+          derivedNote:'Section 82(1): within thirty days of payment or satisfaction, ' +
+            ccFmtDate(sat) + '.' +
+            (filed4 ? ' CHG-4 filed ' + ccFmtDate(filed4) +
+                      (ch.chg4_srn ? ' (SRN ' + ch.chg4_srn + ').' : '.')
+                    : ' The proviso allows up to three hundred days on additional fees, on ' +
+                      'application to the Registrar — that is a remedy, not the deadline.'),
+          autoEvidence: filed4
+            ? {filedOn:filed4, reference:ch.chg4_srn || null, source:'Charges register'}
+            : null
+        });
+      }
+    }
+  });
 
   // ── Minutes of each meeting, Sec 118(1) ────────────────────────
   // "...to be prepared and signed ... and kept within thirty days of the
@@ -7445,6 +7523,34 @@ var LG_REG = {
       {f:'notes',       l:'Notes',       t:'textarea'}
     ]
   },
+  charges: {
+    table:'charges', crumb:'Workspace', title:'Charges', scoped:true,
+    sub:'Charges created over the company&rsquo;s property. Section 77 requires registration '+
+        'within thirty days of creation, and section 82 intimation of satisfaction within '+
+        'thirty days of payment.',
+    order:'created_on', desc:true, addLabel:'Record a charge',
+    cols:[
+      {f:'holder',    l:'Charge holder', t:'text', list:true, main:true,
+       hint:'The bank, financial institution or debenture trustee in whose favour it is created.'},
+      {f:'nature',    l:'Nature',        t:'select', list:true, def:'hypothecation',
+       opts:[['hypothecation','Hypothecation'],['mortgage','Mortgage'],['pledge','Pledge'],
+             ['lien','Lien'],['assignment','Assignment'],['other','Other']]},
+      {f:'amount',    l:'Amount secured (Rs.)', t:'number', list:true},
+      {f:'property',  l:'Property charged', t:'text'},
+      {f:'created_on',l:'Created on',    t:'date', list:true,
+       hint:'Section 77(1) runs thirty days from this date. Without it no deadline is computed.'},
+      {f:'modified_on', l:'Modified on', t:'date',
+       hint:'Fill this in only where the charge has since been modified.'},
+      {f:'satisfied_on',l:'Satisfied on',t:'date', list:true,
+       hint:'Date of payment or satisfaction in full. Section 82 then runs thirty days.'},
+      {f:'charge_id', l:'ROC charge ID', t:'text'},
+      {f:'chg1_filed_on', l:'CHG-1 / CHG-9 filed on', t:'date', list:true},
+      {f:'chg1_srn',  l:'CHG-1 SRN',     t:'text'},
+      {f:'chg4_filed_on', l:'CHG-4 filed on', t:'date'},
+      {f:'chg4_srn',  l:'CHG-4 SRN',     t:'text'},
+      {f:'notes',     l:'Notes',         t:'textarea'}
+    ]
+  },
   meetings: {
     table:'meetings', crumb:'Workspace', title:'Board &amp; Meetings', scoped:true,
     sub:'Board, committee and general meetings. Section 173 requires four board meetings a year '+
@@ -7702,7 +7808,9 @@ async function regSave(key, id){
     var COLUMN_FIX = {approved_results:'db/018_meeting_outcomes.sql'};
     var missingCol = (e.message.match(/'([a-z_]+)' column/i) || [])[1];
     regErr(/relation .* does not exist|could not find the table/i.test(e.message)
-      ? 'The '+cfg.table+' table does not exist yet. Run db/010_governance_registers.sql first.'
+      ? 'The '+cfg.table+' table does not exist yet. Run '+
+        (cfg.table === 'charges' ? 'db/019_charges_register.sql'
+                                 : 'db/010_governance_registers.sql')+' first.'
       : (missingCol && COLUMN_FIX[missingCol])
         ? 'The '+cfg.table+' table has no '+missingCol+' column yet. Run '+
           COLUMN_FIX[missingCol]+' in the Supabase SQL editor.'
