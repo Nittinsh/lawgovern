@@ -901,6 +901,47 @@ half is the only thing that proves the first half works.
 
 ---
 
+## 2u. NAVIGATION CONSOLIDATION (v158, assessment §5.2 / §20)
+
+Thirty destinations across five headings that had stopped meaning anything: **"Operate" held
+eighteen items** including the board report and the applicability review, and **"Reference" held the
+audit trail and Administration**. Both assessments make the same point — the user ends up thinking
+about the product's structure instead of about the compliance problem.
+
+### Nothing was deleted
+All six panels the assessments want demoted (`chat`, `penalty`, `deeplaw`, `ff`, `res`, `docs`) were
+checked first: **all six render and none has a dead button.** The recommendation is to subordinate
+them, not to remove working features.
+
+### Nine groups, named by the question each answers
+| group | items | default |
+|---|---|---|
+| *(ungrouped)* Dashboard | 1 | — |
+| **Compliance** — what applies, what is due, what is evidenced | 5 | open |
+| **Events & change** — what happened, and what changed | 3 | open |
+| **Registers** — what we know about the entity | 7 | open |
+| **Evidence** — can I prove it was done | 3 | open |
+| **Reports** — what can I present | 2 | open |
+| **Drafting** | 2 | **closed** |
+| **Reference** | 4 | **closed** |
+| **Administration** | 3 | **closed** |
+
+**30 items preserved, 21 visible at rest.** State persists in `localStorage['lg_nav_closed']`.
+
+### navReveal — the bit that would have been a bug
+A collapsed group **opens itself when you navigate into it** (`navReveal` called from `sw()`).
+Without it, `ccGo()` or an Event Impact row jumping to a collapsed destination leaves the sidebar
+looking like it lost the page. Verified explicitly: group closed → item hidden → `sw('deeplaw')` →
+group open, item visible, panel shown.
+
+### The patch re-emits rather than retypes
+Existing `.navitem` markup is parsed out by id and re-emitted in the new order, so every SVG icon
+survives byte-for-byte. The script **aborts** if any item would be dropped or any placed id has no
+panel. (First run caught its own regex: `class="navitem on"` on the active item didn't match
+`class="navitem"`, so `home` went missing — 29 of 30.)
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -978,7 +1019,7 @@ half is the only thing that proves the first half works.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v157.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v158.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. Migrations through `db/016` are applied. **`db/017_applicability_review.sql` is new and has not been run** — until it is, confirming an applicability condition fails with a message naming the file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**
