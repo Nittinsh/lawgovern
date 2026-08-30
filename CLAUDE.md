@@ -866,6 +866,41 @@ Same invented-class trap as `.cd-shell` (section 6) and `.sidebar` (section 2p).
 
 ---
 
+## 2t. COMPLIANCE REGRESSION SUITE (assessment P0)
+
+`node tests/compliance.test.js` — **78 assertions**, run against `index.html` itself rather than a
+copy of the logic. `node tests/mutation.js` — proves the suite can fail.
+
+Both assessments ask for "a formal suite of statutory edge cases (month-end, leap year, FY variants,
+prior-year references, event-driven dates)" to prevent silent compliance errors. **A wrong date does
+not look wrong; it looks like a date** — the 63 obligations sitting on 31 Mar 2027 were on screen
+for months.
+
+### Time is frozen
+`harness.js` pins `new Date()` to **29 Aug 2026** (FY 2026-27) while leaving parsing and arithmetic
+real. Every date here is computed relative to now, so a suite asserting real dates against a moving
+clock would rot in days. Change `FROZEN_NOW` and the expected values move with it.
+
+### It loads the shipped app under Node
+The script block is extracted and run in a VM with a small browser shim (`document`, `localStorage`,
+`window.addEventListener` — that last one is what blocked the first attempt). Every engine is then
+directly callable: `getComplianceChart`, `lgAddMonths`, `lodrInFY`, `trkParseCites`, `mgt14Assess`,
+`impAssess`, `appConditions`, `lgResolveStatus`, `ccComputeStats`.
+
+### The mutation check earned its place immediately
+`mutation.js` reintroduces 8 real bugs (§2g, §2h, §2k, §2n, §2o) and reports whether the suite
+noticed. **8 caught, 0 missed** — but only after it found a genuine blind spot: the minutes-split
+test asserted only *how many* decisions came back, and both the correct and broken splitter returned
+two on that input. It now asserts where each ITEM heading lands, which is what the bug got wrong.
+
+**A missed mutation is a blind spot in the suite, not a harmless bug.** Strengthen the assertion.
+
+### When fixing a compliance bug
+Add the assertion that would have caught it **and** the mutation that reintroduces it. The second
+half is the only thing that proves the first half works.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -934,6 +969,7 @@ Same invented-class trap as `.cd-shell` (section 6) and `.sidebar` (section 2p).
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
+- **Run the suite before every deploy:** `node tests/compliance.test.js` (78 assertions, runs against `index.html` itself). `node tests/mutation.js` proves the suite can still fail by reintroducing 8 bugs that actually shipped here. See `tests/README.md`.
 - **No AI model auto-updates to current law.** Staying current = fetch fresh sources (RSS via rss2json/allorigins for SEBI/MCA/IBBI/RBI/IncomeTax) + human curation + (optionally) paid web-search. Vetted human templates + AI drafting is the right model.
 - **Drafting quality:** resolution/notice prompts (`RES_SYS`, `DOC_SYS`) were tuned to a senior-CS standard (exact sub-section citations with read-with clauses, SEBI LODR cross-refs, full RESOLVED THAT/FURTHER THAT cascade, standard severally-authorised CS clause, Certified True Copy headers, Section 102 explanatory statements, MCA form+deadline line). There's an anti-reasoning guard telling the model to output ONLY the final document (some free models leaked their chain-of-thought). Keep these standards.
 - **Child/again:** all AI legal output must carry a "verify on MCA/SEBI portal before filing" caveat — the CS signs and carries professional responsibility.

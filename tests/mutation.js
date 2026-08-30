@@ -1,0 +1,106 @@
+// ============================================================
+// MUTATION CHECK — does the suite actually catch anything?
+//
+// A regression suite that passes is not evidence of much; a suite that cannot
+// fail is worse than none, because it buys confidence it has not earned. This
+// deliberately reintroduces bugs that really happened in this codebase, runs
+// the suite against each broken build, and reports whether it noticed.
+//
+// It found a real weakness the first time it ran: the minutes-splitting test
+// asserted only the number of decisions, and both the correct and the broken
+// splitter produced two on that input. The assertion now checks where each item
+// heading lands, which is what the bug actually got wrong.
+//
+//   node tests/mutation.js
+//
+// index.html is never modified — each mutant is written to a temp copy and the
+// suite is pointed at it through LG_INDEX.
+// ============================================================
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+const { execFileSync, spawnSync } = require('child_process');
+
+const ROOT = path.join(__dirname, '..');
+const INDEX = path.join(ROOT, 'index.html');
+const TMP = path.join(os.tmpdir(), 'lawgovern-mutants');
+
+// Each entry is a bug that actually shipped here once, with the CLAUDE.md
+// section that explains it.
+const MUTATIONS = [
+  { name: 'month clamping removed (§2n — 31 Dec + 2m became 3 Mar)',
+    from: 'return lodrFmt(y, m + 1, Math.min(p[2], last));',
+    to:   'return lodrFmt(y, m + 1, p[2]);' },
+
+  { name: 'citation suffix allows a space (§2h — "Regulation 30 of" parsed as 30O)',
+    from: 'var reReg = /\\bReg(?:ulation)?s?\\.?\\s*(\\d+[A-Z]?)(?![A-Za-z])/gi;',
+    to:   'var reReg = /\\bReg(?:ulation)?s?\\.?\\s*(\\d+\\s*[A-Z]?)/gi;' },
+
+  { name: 'period ends emitted as deadlines (§2k — 63 obligations on 31 Mar 2027)',
+    from: 'return lgHasDeadline(rule) ? dates : lgStripDeadlines(dates);\n}\n\nfunction cmDueDates',
+    to:   'return dates;\n}\n\nfunction cmDueDates' },
+
+  { name: 'PAS-3 private placement widened to 30 days (§2n — s.42(8) says fifteen)',
+    from: 'due: lodrAddDays(on, pp ? 15 : 30),',
+    to:   'due: lodrAddDays(on, 30),' },
+
+  { name: 'subscribers raise a PAS-3 again (§2n — a filing that is not owed)',
+    from: "    if(route === 'subscribers') return;",
+    to:   '    if(false) return;' },
+
+  { name: 'minutes split on every RESOLVED (§2g — headings leaked between items)',
+    from: '  if(heads && heads.length >= 2){',
+    to:   '  if(false){' },
+
+  { name: 'MGT-6 dated from the change, not receipt (§2o — overdue before it arrived)',
+    from: "    if(!b.received_on) return;               // no receipt, nothing to file",
+    to:   "    if(!b.received_on && !b.change_on) return;" },
+
+  { name: 'the no-date guard drops back to a bare comparison (§2k — null >= 0 is true)',
+    from: "  return state === 'STANDING' || state === 'NO_DEADLINE';",
+    to:   "  return state === 'STANDING';" }
+];
+
+const src = fs.readFileSync(INDEX, 'utf8');
+fs.mkdirSync(TMP, { recursive: true });
+
+// A clean build must pass, or nothing below means anything.
+let r = spawnSync(process.execPath, [path.join(__dirname, 'compliance.test.js')],
+                  { encoding: 'utf8' });
+if (r.status !== 0) {
+  console.log('The suite does not pass against the current build — fix that first.\n');
+  console.log(r.stdout);
+  process.exit(1);
+}
+console.log('baseline: suite passes against the current build\n');
+
+let caught = 0, missed = 0, skipped = 0;
+for (const m of MUTATIONS) {
+  const n = src.split(m.from).length - 1;
+  if (n !== 1) {
+    console.log(`  SKIPPED  ${m.name}\n           anchor matched ${n} times — the code moved`);
+    skipped++;
+    continue;
+  }
+  const mutant = path.join(TMP, 'index.html');
+  fs.writeFileSync(mutant, src.replace(m.from, m.to));
+  const run = spawnSync(process.execPath, [path.join(__dirname, 'compliance.test.js')],
+                        { encoding: 'utf8', env: Object.assign({}, process.env, { LG_INDEX: mutant }) });
+  const hits = (run.stdout.match(/(\d+) FAILED/) || [])[1];
+  if (run.status !== 0) {
+    console.log(`  caught   ${m.name}\n           ${hits} assertion(s) failed`);
+    caught++;
+  } else {
+    console.log(`  MISSED   ${m.name}\n           the suite passed against a build with this bug in it`);
+    missed++;
+  }
+}
+
+console.log('\n' + '─'.repeat(64));
+console.log(`  ${caught} caught, ${missed} missed, ${skipped} skipped`);
+console.log('─'.repeat(64));
+if (missed) {
+  console.log('\n  A missed mutation means the suite has a blind spot, not that the');
+  console.log('  bug is harmless. Strengthen the assertion rather than deleting the row.\n');
+}
+process.exit(missed ? 1 : 0);
