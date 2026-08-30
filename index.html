@@ -478,6 +478,31 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 .imp-main{min-width:0;flex:1;}
 .imp-t{font-size:13px;font-weight:600;color:var(--navy);line-height:1.5;}
 .imp-m{font-size:11.5px;color:var(--ink-soft);margin-top:3px;}
+.gov-banner{margin-top:16px;padding:15px 17px;background:var(--warn-wash);border:1px solid var(--warn);border-left-width:3px;border-radius:11px;font-size:12.5px;line-height:1.7;color:var(--ink-mid);}
+.gov-banner b{color:var(--warn);}
+.gov-corpus{padding:11px 0;border-bottom:1px solid var(--line-soft);}
+.gov-corpus:last-child{border-bottom:none;}
+.gov-corpus-h{display:flex;justify-content:space-between;gap:12px;font-size:13px;font-weight:600;color:var(--navy);flex-wrap:wrap;}
+.gov-corpus-n{font-size:11.5px;font-weight:600;color:var(--ink-soft);}
+.gov-corpus-m{font-size:11.5px;color:var(--ink-soft);margin-top:3px;}
+.gov-corpus-note{font-size:11.5px;color:var(--ink-mid);margin-top:5px;line-height:1.6;}
+.gov-row{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line-soft);cursor:pointer;}
+.gov-row:last-child{border-bottom:none;}
+.gov-row:hover .gov-t{color:var(--blue);}
+.gov-chip{flex-shrink:0;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:6px;margin-top:2px;white-space:nowrap;}
+.gov-chip.ok{background:var(--ok-wash);color:var(--ok);}
+.gov-chip.warn{background:var(--warn-wash);color:var(--warn);}
+.gov-chip.crit{background:var(--crit-wash);color:var(--crit);}
+.gov-chip.neutral{background:var(--bg);color:var(--ink-soft);border:1px solid var(--line);}
+.gov-main{flex:1;min-width:0;}
+.gov-t{font-size:12.5px;font-weight:600;color:var(--navy);line-height:1.5;}
+.gov-m{font-size:11.5px;color:var(--ink-soft);margin-top:3px;}
+.gov-note{font-size:11.5px;color:var(--ink-mid);margin-top:4px;font-style:italic;}
+.gov-lead{font-size:12.5px;color:var(--ink-mid);line-height:1.65;margin:0 0 12px;}
+.gov-warn{font-size:11.5px;color:var(--ink-mid);line-height:1.65;background:var(--bg);border-radius:9px;padding:11px 13px;margin-bottom:14px;}
+@media(max-width:640px){
+  .gov-row{flex-wrap:wrap;gap:7px;}
+}
 .brd-doc{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:32px 34px;margin-top:16px;}
 .brd-head{border-bottom:2px solid var(--navy);padding-bottom:16px;margin-bottom:22px;}
 .brd-co{font-size:19px;font-weight:700;color:var(--navy);letter-spacing:-.01em;}
@@ -1367,7 +1392,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v156">
+      <meta id="build-version" content="v157">
     </div>
   </div>
   <div class="cc-search">
@@ -1420,6 +1445,7 @@ input[type="text"], input[type="password"], textarea, select {
 <div class="navitem" onclick="sw('internal')" id="t-internal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg><span>Internal Compliance</span></div>
 <div class="navitem" onclick="sw('filings')" id="t-filings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11l5 5v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M15 4v5h5M8 14h8M8 17h5"/></svg><span>Filings &amp; Records</span></div>
 <div class="navitem" onclick="sw('documents')" id="t-documents"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Documents</span></div>
+<div class="navitem" onclick="sw('governance')" id="t-governance"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16M4 12h16M4 19h10" stroke-linecap="round"/><circle cx="18.5" cy="19" r="2.6"/><path d="M17.3 19l.9.9 1.9-1.9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Rule Governance</span></div>
 <div class="navitem" onclick="sw('board')" id="t-board"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v13H4z" stroke-linejoin="round"/><path d="M9 21h6M12 17v4M8 12l2.5 2.5L16 9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Board Report</span></div>
 <div class="navitem" onclick="sw('applies')" id="t-applies"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke-linecap="round"/></svg><span>What Applies</span></div>
 <div class="navitem" onclick="sw('impact')" id="t-impact"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9z" stroke-linejoin="round"/></svg><span>Event Impact</span></div>
@@ -1542,6 +1568,7 @@ input[type="text"], input[type="password"], textarea, select {
 <div class="panel" id="p-charges"><div class="cc-tool"><div id="reg-root-charges"></div></div></div>
 <div class="panel" id="p-allotments"><div class="cc-tool"><div id="reg-root-allotments"></div></div></div>
 <div class="panel" id="p-beneficial"><div class="cc-tool"><div id="reg-root-beneficial"></div></div></div>
+<div class="panel" id="p-governance"><div class="cc-tool"><div id="gov-root"></div></div></div>
 <div class="panel" id="p-board"><div class="cc-tool"><div id="brd-root"></div></div></div>
 <div class="panel" id="p-applies"><div class="cc-tool"><div id="app-root"></div></div></div>
 <div class="panel" id="p-impact"><div class="cc-tool"><div id="imp-root"></div></div></div>
@@ -2773,6 +2800,7 @@ function sw(id) {
   if (id==='penalty' && typeof renderPenalties==='function') renderPenalties();
   if (id==='filings' && typeof renderFilings==='function') renderFilings();
   if (id==='documents' && typeof renderDocuments==='function') renderDocuments();
+  if (id==='governance' && typeof renderGovernance==='function') renderGovernance();
   if (id==='board' && typeof renderBoard==='function') renderBoard();
   if (id==='applies' && typeof renderApplies==='function') renderApplies();
   if (id==='impact' && typeof renderImpact==='function') renderImpact();
@@ -7881,6 +7909,337 @@ document.addEventListener('keydown', function(e){
 function aprRefreshBadge(){
   if(typeof aprQueue !== 'function') return;
   try{ aprBadge(aprQueue().filter(function(i){ return i.can.can; }).length); }catch(e){}
+}
+
+// ═══════════════════════════════════════════════════
+// RULE VERSION GOVERNANCE
+// ═══════════════════════════════════════════════════
+// What every rule rests on, and when it was last checked against it.
+//
+// The honest starting position: the corpora below were generated from the
+// owner's spreadsheets, not from a published regulation, circular or
+// notification. No rule carries an effective date. Until somebody verifies a
+// rule against a named instrument, this system cannot say the rule is current —
+// only that nobody has looked.
+
+var LG_CORPUS = {
+  'Companies Act 2013': {
+    file:'rules/ca_master.json', built:'master sheet.xlsx',
+    note:'Generated by rules/build_master.py from the owner\'s spreadsheet. The Act text held in '+
+         'reference/ is "as amended upto 01.04.2021" — over five years old — so anything read '+
+         'from it needs checking against a current compilation.'},
+  'SEBI LODR 2015': {
+    file:'rules/lodr_periodic.json + lodr_events.json',
+    built:'LODR Compliance Calendar and Material Events.xlsx',
+    note:'Generated by rules/build_lodr.py from the owner\'s spreadsheet. LODR has been amended '+
+         'repeatedly; no rule here records which amendment it reflects.'},
+  'SEBI PIT Regulations 2015': {
+    file:'rules/pit_master.json', built:'master sheet.xlsx',
+    note:'Generated by rules/build_master.py from the owner\'s spreadsheet.'}
+};
+
+var GOV_STATUS = {
+  current:      {label:'Checked — current',        tone:'ok'},
+  needs_update: {label:'Needs updating',           tone:'warn'},
+  superseded:   {label:'Superseded',               tone:'crit'},
+  not_applicable_anymore: {label:'No longer applies', tone:'neutral'}
+};
+
+var GOV_ROWS = null;      // verification records, loaded once
+var GOV_FILTER = 'todo';
+var GOV_Q = '';
+
+// Every rule the system holds, flattened across the corpora.
+function lgAllRules(){
+  var out = [];
+  var push = function(law, id, section, title, needsReview){
+    if(!id) return;
+    out.push({id:String(id), law:law, section:section||'', title:title||'',
+              needsReview:!!needsReview});
+  };
+  try{
+    (CA_DATA.rules||[]).forEach(function(r){
+      push(r.law||'Companies Act 2013', r.id, r.regulation, r.title, r.needsReview); });
+  }catch(e){}
+  try{
+    (PIT_DATA.rules||[]).forEach(function(r){
+      push(r.law||'SEBI PIT Regulations 2015', r.id, r.regulation, r.title, r.needsReview); });
+  }catch(e){}
+  try{
+    (LODR_DATA.rules||[]).forEach(function(r){
+      push(r.law||'SEBI LODR 2015', r.id, r.regulation, r.title, r.needsReview); });
+  }catch(e){}
+  try{
+    (LODR_EVENT_DATA.events||[]).forEach(function(e){
+      push('SEBI LODR 2015', e.id, e.regulation, e.event, e.needsReview); });
+  }catch(e){}
+  return out;
+}
+
+async function govLoad(){
+  if(!supaClient || !CURRENT_USER){ GOV_ROWS = []; return; }
+  try{
+    var r = await supaClient.from('rule_verifications').select('*');
+    GOV_ROWS = r.error ? [] : (r.data || []);
+  }catch(e){ GOV_ROWS = []; }
+}
+
+function govFor(ruleId){
+  if(!GOV_ROWS) return null;
+  for(var i=0;i<GOV_ROWS.length;i++)
+    if(String(GOV_ROWS[i].rule_id) === String(ruleId)) return GOV_ROWS[i];
+  return null;
+}
+
+// The state of one rule. "Nobody has looked" is its own answer, not a pass.
+function govState(rule){
+  var v = govFor(rule.id);
+  if(!v) return rule.needsReview ? 'flagged' : 'unverified';
+  return v.status || 'current';
+}
+
+function govSetFilter(f){ GOV_FILTER = f; renderGovernance(); }
+function govSearch(v){ GOV_Q = String(v||'').toLowerCase(); renderGovernance(); }
+
+function govOpen(ruleId){
+  var rules = lgAllRules();
+  var rule = null;
+  for(var i=0;i<rules.length;i++) if(rules[i].id === ruleId) rule = rules[i];
+  if(!rule) return;
+  var v = govFor(ruleId) || {};
+
+  var old = document.getElementById('gov-modal'); if(old) old.remove();
+  var mo = document.createElement('div');
+  mo.className = 'cd-modal'; mo.id = 'gov-modal'; mo.style.display = 'flex';
+  mo.onclick = function(e){ if(e.target === mo) govClose(); };
+  // Same shell as regOpen — .cd-title / .cd-sub / .cd-x do not exist in this app.
+  mo.innerHTML =
+    '<div class="cd-inner" style="max-width:620px;"><div class="cd-body">'+
+      '<div class="cd-head"><div>'+
+        '<h2 style="font-size:19px;font-weight:800;color:var(--navy);">Verify this rule</h2>'+
+        '<div class="mono" style="font-size:12.5px;color:var(--ink-soft);margin-top:3px;">'+
+          entEsc(rule.section||rule.id)+'</div>'+
+      '</div><button onclick="govClose()" style="background:none;border:none;'+
+        'color:var(--ink-soft);cursor:pointer;font-size:26px;line-height:1;">&times;</button></div>'+
+        '<p class="gov-lead">'+entEsc(String(rule.title).slice(0,200))+'</p>'+
+        '<div class="gov-warn">This rule came from a spreadsheet, not from a published '+
+          'instrument. Recording a verification below is the first point at which it is tied '+
+          'to an authority you can cite.</div>'+
+        '<div id="gov-err" class="reg-err" style="display:none;"></div>'+
+        '<div style="margin-bottom:12px;">'+
+          '<div style="font-size:11px;color:var(--ink-soft);font-weight:600;margin-bottom:4px;">'+
+            'Status</div>'+
+          '<select id="gov-status" class="lg-field" style="width:100%">'+
+            Object.keys(GOV_STATUS).map(function(k){
+              return '<option value="'+k+'"'+((v.status||'current')===k?' selected':'')+'>'+
+                GOV_STATUS[k].label+'</option>';
+            }).join('')+'</select></div>'+
+        entField('gov-instrument','Checked against',
+          '(the regulation, circular or notification &mdash; e.g. "SEBI LODR Master Circular, 30 Jan 2026")',
+          v.source_instrument||'')+
+        entField('gov-url','Source link','(optional)', v.source_url||'')+
+        entField('gov-eff','Effective from',
+          '(when this version of the rule took effect)', v.effective_from||'','date')+
+        entField('gov-on','Checked on','', v.verified_on||audIso(new Date()),'date')+
+        entField('gov-note','Note','(what changed, or what to watch)', v.change_note||'')+
+      '<div class="cc-headbtns" style="margin-top:20px;justify-content:flex-end;">'+
+        (v.id?'<button class="cc-btn" style="color:var(--crit);border-color:#F5C6C6;" '+
+          'onclick="govClear('+lgArg(ruleId)+')">Remove</button>':'')+
+        '<button class="cc-btn" onclick="govClose()">Cancel</button>'+
+        '<button class="cc-btn-primary" id="gov-go" onclick="govSave('+lgArg(ruleId)+')">Record</button>'+
+      '</div>'+
+    '</div></div>';
+  document.body.appendChild(mo);
+}
+
+function govClose(){ var m=document.getElementById('gov-modal'); if(m) m.remove(); }
+
+function govErr(msg){
+  var e = document.getElementById('gov-err');
+  if(e){ e.style.display='block'; e.innerHTML = msg; }
+  var b = document.getElementById('gov-go');
+  if(b){ b.disabled = false; b.textContent = 'Record'; }
+}
+
+async function govSave(ruleId){
+  var rules = lgAllRules(), rule = null;
+  for(var i=0;i<rules.length;i++) if(rules[i].id === ruleId) rule = rules[i];
+
+  var instrument = ((document.getElementById('gov-instrument')||{}).value || '').trim();
+  if(!instrument){
+    govErr('Name what you checked it against. A verification with no instrument behind it '+
+           'records nothing more than a date.');
+    return;
+  }
+  var b = document.getElementById('gov-go');
+  if(b){ b.disabled = true; b.textContent = 'Saving…'; }
+
+  var rec = {
+    user_id: CURRENT_USER ? CURRENT_USER.id : null,
+    rule_id: ruleId,
+    law: rule ? rule.law : null,
+    status: (document.getElementById('gov-status')||{}).value || 'current',
+    source_instrument: instrument,
+    source_url: ((document.getElementById('gov-url')||{}).value || '').trim() || null,
+    effective_from: (document.getElementById('gov-eff')||{}).value || null,
+    verified_on: (document.getElementById('gov-on')||{}).value || audIso(new Date()),
+    verified_by: (CURRENT_USER && CURRENT_USER.email) || 'unknown',
+    change_note: ((document.getElementById('gov-note')||{}).value || '').trim() || null,
+    updated_at: new Date().toISOString()
+  };
+
+  try{
+    if(!supaClient || !CURRENT_USER) throw new Error('Not signed in.');
+    var r = await supaClient.from('rule_verifications')
+      .upsert(rec, {onConflict:'user_id,rule_id'});
+    if(r.error) throw new Error(r.error.message);
+    await govLoad();
+    govClose();
+    renderGovernance();
+  }catch(e){
+    govErr(/relation .* does not exist|could not find the table/i.test(e.message)
+      ? 'The rule_verifications table does not exist yet. Run '+
+        '<b>db/023_rule_governance.sql</b> in the Supabase SQL editor.'
+      : entEsc(e.message));
+  }
+}
+
+async function govClear(ruleId){
+  try{
+    await supaClient.from('rule_verifications').delete().eq('rule_id', ruleId);
+    await govLoad();
+  }catch(e){}
+  govClose();
+  renderGovernance();
+}
+
+function renderGovernance(){
+  var root = document.getElementById('gov-root');
+  if(!root) return;
+
+  var head = '<div class="cc-pagehead"><div>'+
+    '<div class="cc-crumb">Administration &rsaquo; Rule Governance</div>'+
+    '<h1 class="cc-h1">Rule Governance</h1>'+
+    '<p class="cc-sub">What each rule rests on, and when it was last checked against it.</p>'+
+    '</div></div>';
+
+  if(GOV_ROWS === null){
+    root.innerHTML = head + '<div class="cc-card"><div class="cc-card-b">'+
+      '<div class="cc-none">Loading&hellip;</div></div></div>';
+    govLoad().then(function(){ renderGovernance(); });
+    return;
+  }
+
+  var rules = lgAllRules();
+  var byState = {flagged:[], unverified:[], current:[], needs_update:[], superseded:[],
+                 not_applicable_anymore:[]};
+  rules.forEach(function(r){ (byState[govState(r)] || byState.unverified).push(r); });
+
+  var verified = byState.current.length;
+  var stale = byState.needs_update.length + byState.superseded.length;
+  var unchecked = byState.flagged.length + byState.unverified.length;
+
+  // ── the position, stated ────────────────────────────────────
+  var banner = '<div class="gov-banner">'+
+    '<b>Not one of these '+rules.length+' rules is tied to a published instrument.</b> '+
+    'They were generated from the owner&rsquo;s spreadsheets, they carry no effective date, and '+
+    'until a rule is checked against a regulation, circular or notification this system can only '+
+    'say that nobody has looked. That is different from saying the rule is current.'+
+  '</div>';
+
+  var chips = '<div class="cu-summary" style="margin-top:16px;">'+
+    '<div class="cu-sum-chip"><b>'+rules.length+'</b> rules</div>'+
+    '<div class="cu-sum-chip'+(unchecked?' warn':'')+'"><b>'+unchecked+'</b> never checked</div>'+
+    (byState.flagged.length?'<div class="cu-sum-chip warn"><b>'+byState.flagged.length+
+      '</b> flagged in the source</div>':'')+
+    (verified?'<div class="cu-sum-chip"><b>'+verified+'</b> checked</div>':'')+
+    (stale?'<div class="cu-sum-chip crit"><b>'+stale+'</b> stale</div>':'')+
+  '</div>';
+
+  // ── corpus provenance ───────────────────────────────────────
+  var byLaw = {};
+  rules.forEach(function(r){
+    var k = r.law;
+    byLaw[k] = byLaw[k] || {n:0, ok:0};
+    byLaw[k].n++;
+    if(govState(r) === 'current') byLaw[k].ok++;
+  });
+  var corpus = '<div class="cc-card" style="margin-top:16px;"><div class="cc-card-h">'+
+    '<h3>Where these rules come from</h3></div><div class="cc-card-b">'+
+    Object.keys(byLaw).sort().map(function(law){
+      var meta = LG_CORPUS[law] || {};
+      return '<div class="gov-corpus">'+
+        '<div class="gov-corpus-h">'+entEsc(law)+
+          '<span class="gov-corpus-n">'+byLaw[law].ok+' of '+byLaw[law].n+' checked</span></div>'+
+        (meta.built?'<div class="gov-corpus-m">Built from <span class="mono">'+
+          entEsc(meta.built)+'</span></div>':'')+
+        (meta.note?'<div class="gov-corpus-note">'+meta.note+'</div>':'')+
+      '</div>';
+    }).join('')+'</div></div>';
+
+  // ── the worklist ────────────────────────────────────────────
+  var TABS = [
+    ['todo','To check', byState.flagged.length + byState.unverified.length],
+    ['flagged','Flagged in the source', byState.flagged.length],
+    ['stale','Stale', stale],
+    ['done','Checked', verified],
+    ['all','All', rules.length]
+  ];
+  var tabs = '<div class="mw-tabs">'+TABS.map(function(t){
+    return '<div class="mw-tab'+(GOV_FILTER===t[0]?' on':'')+'" onclick="govSetFilter('+
+      lgArg(t[0])+')">'+t[1]+' <span class="mw-tab-count">'+t[2]+'</span></div>';
+  }).join('')+'</div>';
+
+  var pick = GOV_FILTER === 'flagged' ? byState.flagged
+           : GOV_FILTER === 'stale'   ? byState.needs_update.concat(byState.superseded)
+           : GOV_FILTER === 'done'    ? byState.current
+           : GOV_FILTER === 'all'     ? rules
+           : byState.flagged.concat(byState.unverified);
+
+  if(GOV_Q){
+    pick = pick.filter(function(r){
+      return (r.title+' '+r.section+' '+r.id+' '+r.law).toLowerCase().indexOf(GOV_Q) >= 0;
+    });
+  }
+
+  var bar = '<div class="cc-card cc-toolbar"><div class="cc-toolrow">'+
+    '<input id="gov-q" class="lg-field" style="flex:1;min-width:200px;" placeholder="Search a '+
+      'provision or rule&hellip;" value="'+entEsc(GOV_Q)+'" oninput="govSearch(this.value)">'+
+    '<span class="aud-days">'+pick.length+' shown</span>'+
+  '</div></div>';
+
+  var list = pick.length
+    ? '<div class="cc-card" style="margin-top:16px;"><div class="cc-card-b">'+
+      pick.slice(0, 200).map(function(r){
+        var st = govState(r);
+        var v = govFor(r.id);
+        var meta = GOV_STATUS[st];
+        var chip = meta
+          ? '<span class="gov-chip '+meta.tone+'">'+meta.label+'</span>'
+          : st === 'flagged'
+            ? '<span class="gov-chip warn">Flagged in the source</span>'
+            : '<span class="gov-chip neutral">Never checked</span>';
+        return '<div class="gov-row" onclick="govOpen('+lgArg(r.id)+')">'+
+          chip+
+          '<div class="gov-main">'+
+            '<div class="gov-t">'+entEsc(String(r.title).slice(0,170))+'</div>'+
+            '<div class="gov-m"><span class="mono">'+entEsc(r.section||r.id)+'</span> &middot; '+
+              entEsc(r.law)+
+              (v && v.source_instrument
+                ? ' &middot; against <b>'+entEsc(v.source_instrument)+'</b>'+
+                  (v.verified_on?' on '+ccFmtDate(String(v.verified_on)):'')
+                : '')+'</div>'+
+            (v && v.change_note?'<div class="gov-note">'+entEsc(v.change_note)+'</div>':'')+
+          '</div></div>';
+      }).join('')+
+      (pick.length > 200
+        ? '<div class="imp-cut">Showing the first 200 of '+pick.length+'. Search to narrow.</div>'
+        : '')+
+      '</div></div>'
+    : '<div class="cc-card" style="margin-top:16px;"><div class="cc-card-b">'+
+      '<div class="cc-none" style="text-align:left;">Nothing in this list.</div></div></div>';
+
+  root.innerHTML = head + banner + chips + corpus + tabs + bar + list;
 }
 
 // ═══════════════════════════════════════════════════

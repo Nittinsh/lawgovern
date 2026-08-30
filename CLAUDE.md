@@ -824,6 +824,48 @@ in the DOM found **no handler naming a function that no longer exists**.
 
 ---
 
+## 2s. RULE VERSION GOVERNANCE (v157, assessment P0) — db/023 NOT YET RUN
+
+Panel `p-governance` -> `renderGovernance()`. Nav: Administration > Rule Governance.
+
+Both independent assessments lead with this: a compliance product cannot rest on a static rule
+corpus with no effective dates and no source verification.
+
+### The position it states, out loud
+> **Not one of these 327 rules is tied to a published instrument.**
+
+Verified live: **327 rules** (Companies Act 54, LODR 231, PIT 42), **327 never checked**, **53
+flagged `needsReview`** in the source data. Every corpus traces to a *spreadsheet* —
+`master sheet.xlsx` and `LODR Compliance Calendar and Material Events.xlsx` — not to a regulation.
+`LG_CORPUS` names each corpus, what generated it, and its known weakness (the Act text in
+`reference/` is "as amended upto 01.04.2021").
+
+This does not make the rules current — only reading the law does that. It stops the gap being
+invisible, which is the same rule the evidence engine runs on: **the absence of a check is not a
+pass.** A rule nobody has checked reads "Never checked", not "current".
+
+### Three distinct states, as in db/023
+- **no row** -> nobody has looked (`unverified`, or `flagged` if the source flagged it)
+- **`current`** -> a person checked it against a *named* instrument
+- **`needs_update` / `superseded`** -> known stale, with a reason
+
+### It refuses a verification with no authority behind it
+`govSave` blocks on an empty instrument: *"A verification with no instrument behind it records
+nothing more than a date."* That is the whole point of the record.
+
+### A worklist, not a report
+The assessments ask for `needsReview` to become "a managed review queue rather than remain
+indefinitely unresolved". Tabs: To check (327) / Flagged in the source (53) / Stale / Checked / All,
+with search, and a stated cap at 200 rows.
+
+### Bug worth remembering
+The modal was written against `.cd-title`, `.cd-sub`, `.cd-x`, `.ent-f` — **none of which exist**.
+Same invented-class trap as `.cd-shell` (section 6) and `.sidebar` (section 2p). The real shell is
+`regOpen`'s: `.cd-inner > .cd-body > .cd-head` with inline-styled heading and close button.
+**Check every class against the stylesheet before writing markup in this app.**
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -900,7 +942,7 @@ in the DOM found **no handler naming a function that no longer exists**.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v156.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v157.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. Migrations through `db/016` are applied. **`db/017_applicability_review.sql` is new and has not been run** — until it is, confirming an applicability condition fails with a message naming the file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**
