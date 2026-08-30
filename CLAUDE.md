@@ -782,6 +782,48 @@ the auditor is disqualified.
 
 ---
 
+## 2r. DEAD CODE SPRINT (v156) — 49 functions, 33 KB
+
+Both independent assessments (29 Aug 2026) put a dead-code sprint at **P0**, for the same reason:
+legacy and replacement paths sitting side by side means "one feature, one authoritative
+implementation" is not true, so two answers to one question can both exist.
+
+**Removed: 49 functions over 2 rounds, 2,333,485 -> 2,299,717 chars.**
+
+### The criterion, and why the first attempt was wrong
+First pass built a call graph by matching `name(`. It missed every function passed **by reference** —
+`[['coverage', ccCardCoverage], ...]` — and confidently reported the live dashboard as dead. Acting
+on it would have removed the Command Center.
+
+The criterion actually used: **a function whose name appears exactly once in the whole file** is its
+own definition and nothing else — no inline handler, no dispatch table, no reference by name. That
+cannot be a false positive. Iterated to a fixed point, so removing `askAboutClient` in round 1 made
+`getDeadlines` unreferenced in round 2.
+
+**`getDeadlines` is the "dead twin"** section 2b flagged: same `fyend` and threshold bugs that were
+fixed in the live path, still sitting there as a second, wrong answer. Gone.
+
+Bodies located by brace matching that tracks strings, template literals and comments — not by
+guessing where the next `function` starts. Every round syntax-gated; failure aborts without writing.
+
+### What went
+Old dashboard (`ccRenderGauge`, `ccHealthColor/Label`, `ccLegendRow`, `ccMetric`, `ccSig`, `ccTag`),
+old detail modal (`cdAddEvidence`, `cdAdvanceApproval`, `cdApprovalChain`, `cdDelEvidence`,
+`cdToggle*`, `cdLog`), old client management (`saveClient`, `deleteClient`, `exportClients`,
+`_old_*`), the **legacy access-code path** (`addCode`, `saveKey`, `changeKey`) that assessment §16
+flags as a second competing authentication concept, the **Gemini leftovers**
+(`getGeminiKey`, `setGeminiKey`, `saveGeminiKeyFromAdmin`, `loadGeminiKeyToAdmin`), and the orphaned
+legal-research handlers (`runOpinion`, `runSCN`, `runCompound`, `runCases`, `runXLaw` — their panels
+had already been removed).
+
+### Verified after
+29 panels / 29 nav items, **no orphans either way**. No JS errors. Every engine answers:
+`getComplianceChart` 238, `ccComputeStats` 238, `impAssess` 4, `mgt14Assess` 1, `appConditions` 13,
+`excBuild` 8 types. Both gauge legends still sum to their own total. A sweep of every inline handler
+in the DOM found **no handler naming a function that no longer exists**.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -858,7 +900,7 @@ the auditor is disqualified.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v155.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v156.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. Migrations through `db/016` are applied. **`db/017_applicability_review.sql` is new and has not been run** — until it is, confirming an applicability condition fails with a message naming the file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**
