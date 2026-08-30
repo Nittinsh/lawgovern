@@ -487,6 +487,22 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 .imp-main{min-width:0;flex:1;}
 .imp-t{font-size:13px;font-weight:600;color:var(--navy);line-height:1.5;}
 .imp-m{font-size:11.5px;color:var(--ink-soft);margin-top:3px;}
+.pit-win{margin-top:16px;border-radius:13px;padding:18px 20px;border:1px solid var(--line);}
+.pit-win.shut{background:var(--crit-wash);border-color:var(--crit);border-left-width:4px;}
+.pit-win.open{background:var(--ok-wash);border-color:var(--ok);border-left-width:4px;}
+.pit-win-l{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);}
+.pit-win-s{font-size:26px;font-weight:800;letter-spacing:-.02em;margin-top:2px;}
+.pit-win.shut .pit-win-s{color:var(--crit);}
+.pit-win.open .pit-win-s{color:var(--ok);}
+.pit-why{margin-top:11px;}
+.pit-why-r{font-size:12.5px;line-height:1.65;color:var(--ink-mid);padding:7px 0;border-top:1px solid rgba(11,18,32,.08);}
+.pit-cite{display:inline-block;font-size:10.5px;font-weight:600;color:var(--ink-soft);background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:1px 7px;margin-left:7px;white-space:nowrap;}
+.pit-row{display:flex;gap:12px;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line-soft);}
+.pit-row:last-child{border-bottom:none;}
+.pit-t{font-size:12.5px;font-weight:600;color:var(--navy);line-height:1.5;}
+.pit-m{font-size:11.5px;color:var(--ink-soft);margin-top:3px;}
+.pit-go{font-size:11.5px;color:var(--blue);font-weight:600;cursor:pointer;margin-top:11px;}
+.pit-go:hover{text-decoration:underline;}
 .gov-banner{margin-top:16px;padding:15px 17px;background:var(--warn-wash);border:1px solid var(--warn);border-left-width:3px;border-radius:11px;font-size:12.5px;line-height:1.7;color:var(--ink-mid);}
 .gov-banner b{color:var(--warn);}
 .gov-corpus{padding:11px 0;border-bottom:1px solid var(--line-soft);}
@@ -1402,7 +1418,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v159">
+      <meta id="build-version" content="v161">
     </div>
   </div>
   <div class="cc-search">
@@ -1435,7 +1451,8 @@ input[type="text"], input[type="password"], textarea, select {
 </div>
 <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="closeMobileNav()"></div>
 <div class="appshell">
-<aside class="appside"><div class="navitem on" onclick="sw('home')" id="t-home"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span>Dashboard</span></div><div class="navgrp" id="ng-cmp"><div class="navhead" onclick="navToggle('cmp')"><span>Compliance</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What applies, what is due, what is evidenced</div><div class="navbody"><div class="navitem" onclick="sw('universe')" id="t-universe"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg><span>Compliance Universe</span></div><div class="navitem" onclick="sw('mywork')" id="t-mywork"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3 8-8M20 12v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h9"/></svg><span>My Work</span></div><div class="navitem" onclick="sw('cal')" id="t-cal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Calendar</span></div><div class="navitem" onclick="sw('applies')" id="t-applies"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke-linecap="round"/></svg><span>What Applies</span></div><div class="navitem" onclick="sw('exceptions')" id="t-exceptions"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3L12 3z"/><path d="M12 10v4" stroke-linecap="round"/></svg><span>Exceptions</span><span class="nav-badge" id="nav-exc-n" style="display:none">0</span></div></div></div><div class="navgrp" id="ng-evt"><div class="navhead" onclick="navToggle('evt')"><span>Events & change</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What happened, and what changed</div><div class="navbody"><div class="navitem" onclick="sw('impact')" id="t-impact"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9z" stroke-linejoin="round"/></svg><span>Event Impact</span></div><div class="navitem" onclick="sw('events')" id="t-events"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 8v5l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>Material Events</span></div><div class="navitem" onclick="sw('tracker')" id="t-tracker"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v3M12 18v3"/></svg><span>Regulatory Radar</span></div></div></div><div class="navgrp" id="ng-reg"><div class="navhead" onclick="navToggle('reg')"><span>Registers</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What we know about the entity</div><div class="navbody"><div class="navitem" onclick="sw('entities')" id="t-entities"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h2m-2 4h2m-2 4h2m4-8h2m-2 4h2m-2 4h2"/></svg><span>Entities</span></div><div class="navitem" onclick="sw('directors')" id="t-directors"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-8 0v2"/><circle cx="12" cy="7" r="4"/></svg><span>Directors &amp; KMP</span></div><div class="navitem" onclick="sw('meetings')" id="t-meetings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Board &amp; Meetings</span></div><div class="navitem" onclick="sw('charges')" id="t-charges"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10V6z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Charges</span></div><div class="navitem" onclick="sw('allotments')" id="t-allotments"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M7 8h7a3 3 0 010 6H7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Allotments</span></div><div class="navitem" onclick="sw('beneficial')" id="t-beneficial"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20a6.5 6.5 0 0113 0" stroke-linecap="round"/><path d="M17.5 4.5l2 2 3-3" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Beneficial Interest</span></div><div class="navitem" onclick="sw('internal')" id="t-internal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg><span>Internal Compliance</span></div></div></div><div class="navgrp" id="ng-evd"><div class="navhead" onclick="navToggle('evd')"><span>Evidence</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">Can I prove it was done</div><div class="navbody"><div class="navitem" onclick="sw('filings')" id="t-filings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11l5 5v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M15 4v5h5M8 14h8M8 17h5"/></svg><span>Filings &amp; Records</span></div><div class="navitem" onclick="sw('documents')" id="t-documents"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Documents</span></div><div class="navitem" onclick="sw('approvals')" id="t-approvals"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Approvals</span><span class="nav-badge" id="nav-approvals-n" style="display:none">0</span></div></div></div><div class="navgrp" id="ng-rpt"><div class="navhead" onclick="navToggle('rpt')"><span>Reports</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What can I present</div><div class="navbody"><div class="navitem" onclick="sw('board')" id="t-board"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v13H4z" stroke-linejoin="round"/><path d="M9 21h6M12 17v4M8 12l2.5 2.5L16 9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Board Report</span></div><div class="navitem" onclick="sw('audit')" id="t-audit"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>Audit Trail</span></div></div></div><div class="navgrp closed" id="ng-drf"><div class="navhead" onclick="navToggle('drf')"><span>Drafting</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navbody"><div class="navitem" onclick="sw('res')" id="t-res"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg><span>Resolutions</span></div><div class="navitem" onclick="sw('docs')" id="t-docs"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 5h16M4 12h16M4 19h10"/></svg><span>Notices &amp; Minutes</span></div></div></div><div class="navgrp closed" id="ng-ref"><div class="navhead" onclick="navToggle('ref')"><span>Reference</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navbody"><div class="navitem" onclick="sw('ff')" id="t-ff"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><span>Forms &amp; Filings</span></div><div class="navitem" onclick="sw('chat')" id="t-chat"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3.2"/></svg><span>AI Compliance</span></div><div class="navitem" onclick="sw('penalty')" id="t-penalty"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 3h12M6 8h12M9 3c0 6 6 6 6 11a4 4 0 0 1-8 0"/></svg><span>Penalties</span></div><div class="navitem" onclick="sw('deeplaw')" id="t-deeplaw"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3l9 4v5c0 5-3.5 8-9 9-5.5-1-9-4-9-9V7l9-4z"/></svg><span>Deep Law</span></div></div></div><div class="navgrp closed" id="ng-adm"><div class="navhead" onclick="navToggle('adm')"><span>Administration</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navbody"><div class="navitem" onclick="sw('governance')" id="t-governance"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16M4 12h16M4 19h10" stroke-linecap="round"/><circle cx="18.5" cy="19" r="2.6"/><path d="M17.3 19l.9.9 1.9-1.9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Rule Governance</span></div><div class="navitem" onclick="sw('settings')" id="t-settings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Settings</span></div><div class="navitem" onclick="sw('admin')" id="t-admin" style="display:none"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.3l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2.2-1.3L14 2h-4l-.3 2.2a7 7 0 0 0-2.2 1.3l-2.3-1-2 3.4 2 1.5A7 7 0 0 0 5 12a7 7 0 0 0 .1 1.3l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2.2 1.3L10 22h4l.3-2.2a7 7 0 0 0 2.2-1.3l2.3 1 2-3.4-2-1.5z"/></svg><span>Administration</span></div></div></div>
+<aside class="appside"><div class="navitem on" onclick="sw('home')" id="t-home"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span>Dashboard</span></div><div class="navgrp" id="ng-cmp"><div class="navhead" onclick="navToggle('cmp')"><span>Compliance</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What applies, what is due, what is evidenced</div><div class="navbody"><div class="navitem" onclick="sw('universe')" id="t-universe"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg><span>Compliance Universe</span></div><div class="navitem" onclick="sw('mywork')" id="t-mywork"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3 8-8M20 12v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h9"/></svg><span>My Work</span></div><div class="navitem" onclick="sw('cal')" id="t-cal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Calendar</span></div><div class="navitem" onclick="sw('applies')" id="t-applies"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke-linecap="round"/></svg><span>What Applies</span></div><div class="navitem" onclick="sw('exceptions')" id="t-exceptions"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3L12 3z"/><path d="M12 10v4" stroke-linecap="round"/></svg><span>Exceptions</span><span class="nav-badge" id="nav-exc-n" style="display:none">0</span></div></div></div><div class="navgrp" id="ng-evt"><div class="navhead" onclick="navToggle('evt')"><span>Events & change</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What happened, and what changed</div><div class="navbody"><div class="navitem" onclick="sw('impact')" id="t-impact"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9z" stroke-linejoin="round"/></svg><span>Event Impact</span></div><div class="navitem" onclick="sw('events')" id="t-events"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 8v5l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>Material Events</span></div><div class="navitem" onclick="sw('tracker')" id="t-tracker"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v3M12 18v3"/></svg><span>Regulatory Radar</span></div></div></div><div class="navgrp" id="ng-pit"><div class="navhead" onclick="navToggle('pit')"><span>Insider trading</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">Is the window open, and who knows what</div><div class="navbody"><div class="navitem" onclick="sw('pit')" id="t-pit"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3" stroke-linecap="round"/></svg><span>PIT Control Centre</span></div><div class="navitem" onclick="sw('dp')" id="t-dp"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0112 0M17 11h4M19 9v4" stroke-linecap="round"/></svg><span>Designated Persons</span></div><div class="navitem" onclick="sw('upsi')" id="t-upsi"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3z" stroke-linejoin="round"/><path d="M12 10v4M12 17h.01" stroke-linecap="round"/></svg><span>UPSI Register</span></div><div class="navitem" onclick="sw('sdd')" id="t-sdd"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><span>SDD &mdash; UPSI access</span></div><div class="navitem" onclick="sw('preclear')" id="t-preclear"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9" stroke-linecap="round"/></svg><span>Pre-clearance</span></div></div></div>
+<div class="navgrp" id="ng-reg"><div class="navhead" onclick="navToggle('reg')"><span>Registers</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What we know about the entity</div><div class="navbody"><div class="navitem" onclick="sw('entities')" id="t-entities"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h2m-2 4h2m-2 4h2m4-8h2m-2 4h2m-2 4h2"/></svg><span>Entities</span></div><div class="navitem" onclick="sw('directors')" id="t-directors"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-8 0v2"/><circle cx="12" cy="7" r="4"/></svg><span>Directors &amp; KMP</span></div><div class="navitem" onclick="sw('meetings')" id="t-meetings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Board &amp; Meetings</span></div><div class="navitem" onclick="sw('charges')" id="t-charges"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10V6z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Charges</span></div><div class="navitem" onclick="sw('allotments')" id="t-allotments"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M7 8h7a3 3 0 010 6H7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Allotments</span></div><div class="navitem" onclick="sw('beneficial')" id="t-beneficial"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20a6.5 6.5 0 0113 0" stroke-linecap="round"/><path d="M17.5 4.5l2 2 3-3" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Beneficial Interest</span></div><div class="navitem" onclick="sw('internal')" id="t-internal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg><span>Internal Compliance</span></div></div></div><div class="navgrp" id="ng-evd"><div class="navhead" onclick="navToggle('evd')"><span>Evidence</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">Can I prove it was done</div><div class="navbody"><div class="navitem" onclick="sw('filings')" id="t-filings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11l5 5v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M15 4v5h5M8 14h8M8 17h5"/></svg><span>Filings &amp; Records</span></div><div class="navitem" onclick="sw('documents')" id="t-documents"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Documents</span></div><div class="navitem" onclick="sw('approvals')" id="t-approvals"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Approvals</span><span class="nav-badge" id="nav-approvals-n" style="display:none">0</span></div></div></div><div class="navgrp" id="ng-rpt"><div class="navhead" onclick="navToggle('rpt')"><span>Reports</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What can I present</div><div class="navbody"><div class="navitem" onclick="sw('board')" id="t-board"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v13H4z" stroke-linejoin="round"/><path d="M9 21h6M12 17v4M8 12l2.5 2.5L16 9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Board Report</span></div><div class="navitem" onclick="sw('audit')" id="t-audit"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>Audit Trail</span></div></div></div><div class="navgrp closed" id="ng-drf"><div class="navhead" onclick="navToggle('drf')"><span>Drafting</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navbody"><div class="navitem" onclick="sw('res')" id="t-res"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg><span>Resolutions</span></div><div class="navitem" onclick="sw('docs')" id="t-docs"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 5h16M4 12h16M4 19h10"/></svg><span>Notices &amp; Minutes</span></div></div></div><div class="navgrp closed" id="ng-ref"><div class="navhead" onclick="navToggle('ref')"><span>Reference</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navbody"><div class="navitem" onclick="sw('ff')" id="t-ff"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><span>Forms &amp; Filings</span></div><div class="navitem" onclick="sw('chat')" id="t-chat"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3.2"/></svg><span>AI Compliance</span></div><div class="navitem" onclick="sw('penalty')" id="t-penalty"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 3h12M6 8h12M9 3c0 6 6 6 6 11a4 4 0 0 1-8 0"/></svg><span>Penalties</span></div><div class="navitem" onclick="sw('deeplaw')" id="t-deeplaw"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3l9 4v5c0 5-3.5 8-9 9-5.5-1-9-4-9-9V7l9-4z"/></svg><span>Deep Law</span></div></div></div><div class="navgrp closed" id="ng-adm"><div class="navhead" onclick="navToggle('adm')"><span>Administration</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navbody"><div class="navitem" onclick="sw('governance')" id="t-governance"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16M4 12h16M4 19h10" stroke-linecap="round"/><circle cx="18.5" cy="19" r="2.6"/><path d="M17.3 19l.9.9 1.9-1.9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Rule Governance</span></div><div class="navitem" onclick="sw('settings')" id="t-settings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Settings</span></div><div class="navitem" onclick="sw('admin')" id="t-admin" style="display:none"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.3l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2.2-1.3L14 2h-4l-.3 2.2a7 7 0 0 0-2.2 1.3l-2.3-1-2 3.4 2 1.5A7 7 0 0 0 5 12a7 7 0 0 0 .1 1.3l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2.2 1.3L10 22h4l.3-2.2a7 7 0 0 0 2.2-1.3l2.3 1 2-3.4-2-1.5z"/></svg><span>Administration</span></div></div></div>
 </aside>
 <div class="appmain">
 
@@ -1536,6 +1553,11 @@ input[type="text"], input[type="password"], textarea, select {
 <div class="panel" id="p-documents"><div class="cc-tool"><div id="doc-root"></div></div></div>
 <div class="panel" id="p-directors"><div class="cc-tool"><div id="reg-root-directors"></div></div></div>
 <div class="panel" id="p-meetings"><div class="cc-tool"><div id="reg-root-meetings"></div></div></div>
+<div class="panel" id="p-pit"><div class="cc-tool"><div id="pit-root"></div></div></div>
+<div class="panel" id="p-dp"><div class="cc-tool"><div id="reg-root-dp"></div></div></div>
+<div class="panel" id="p-upsi"><div class="cc-tool"><div id="reg-root-upsi"></div></div></div>
+<div class="panel" id="p-sdd"><div class="cc-tool"><div id="reg-root-sdd"></div></div></div>
+<div class="panel" id="p-preclear"><div class="cc-tool"><div id="reg-root-preclear"></div></div></div>
 <div class="panel" id="p-charges"><div class="cc-tool"><div id="reg-root-charges"></div></div></div>
 <div class="panel" id="p-allotments"><div class="cc-tool"><div id="reg-root-allotments"></div></div></div>
 <div class="panel" id="p-beneficial"><div class="cc-tool"><div id="reg-root-beneficial"></div></div></div>
@@ -2772,6 +2794,7 @@ function sw(id) {
   if (id==='filings' && typeof renderFilings==='function') renderFilings();
   if (id==='documents' && typeof renderDocuments==='function') renderDocuments();
   if (typeof navReveal === 'function') navReveal(id);
+  if (id==='pit' && typeof renderPIT==='function') renderPIT();
   if (id==='governance' && typeof renderGovernance==='function') renderGovernance();
   if (id==='board' && typeof renderBoard==='function') renderBoard();
   if (id==='applies' && typeof renderApplies==='function') renderApplies();
@@ -4758,13 +4781,16 @@ function cmRows(dataset, c, agmIso, tag){
 // before it runs. They are loaded once after the companies land and refreshed
 // whenever a register row is saved.
 var LG_REGS = {directors:null, meetings:null, charges:null, allotments:null,
-               beneficial_interests:null};
+               beneficial_interests:null, designated_persons:null, upsi_events:null,
+               upsi_access:null, pre_clearances:null};
 
 async function lgLoadRegisters(){
   if(!supaClient || !CURRENT_USER){
     LG_REGS = {directors:[], meetings:[], charges:[], allotments:[],
-               beneficial_interests:[]}; return; }
-  var tables = ['directors','meetings','charges','allotments','beneficial_interests'];
+               beneficial_interests:[], designated_persons:[], upsi_events:[],
+               upsi_access:[], pre_clearances:[]}; return; }
+  var tables = ['directors','meetings','charges','allotments','beneficial_interests',
+                'designated_persons','upsi_events','upsi_access','pre_clearances'];
   for(var i=0;i<tables.length;i++){
     var t = tables[i];
     try{
@@ -7496,6 +7522,100 @@ var LG_REG = {
       {f:'notes',      l:'Notes', t:'textarea'}
     ]
   },
+  dp: {
+    table:'designated_persons', crumb:'Insider trading', title:'Designated Persons', scoped:true,
+    sub:'The designated person universe under Reg 9 read with Schedule B cl. 3. Reg 7(1)(b) '+
+        'requires an initial disclosure within seven days of appointment.',
+    order:'designated_on', desc:true, addLabel:'Add a designated person',
+    cols:[
+      {f:'name', l:'Name', t:'text', list:true, main:true},
+      {f:'category', l:'Category', t:'select', list:true, def:'employee',
+       opts:[['director','Director'],['kmp','KMP'],['promoter','Promoter'],
+             ['promoter_group','Promoter group'],['employee','Employee'],
+             ['connected','Connected person'],['other','Other']]},
+      {f:'designation', l:'Designation', t:'text', list:true},
+      {f:'pan', l:'PAN', t:'text', hint:'Reg 3(5) requires PAN in the structured digital database.'},
+      {f:'din', l:'DIN', t:'text'},
+      {f:'email', l:'Email', t:'text'},
+      {f:'designated_on', l:'Designated from', t:'date', list:true},
+      {f:'initial_disclosure_on', l:'Initial disclosure received', t:'date', list:true,
+       hint:'Reg 7(1)(b): within seven days of appointment or becoming a promoter.'},
+      {f:'ceased_on', l:'Ceased on', t:'date'},
+      {f:'relatives', l:'Immediate relatives', t:'textarea',
+       hint:'Schedule B: designated persons and their immediate relatives cannot trade '+
+            'when the window is closed.'},
+      {f:'notes', l:'Notes', t:'textarea'}
+    ]
+  },
+  upsi: {
+    table:'upsi_events', crumb:'Insider trading', title:'UPSI Register', scoped:true,
+    sub:'Unpublished price sensitive information, from when it arose to when it became '+
+        'generally available. The window cannot reopen earlier than 48 hours after that '+
+        '(Schedule B cl. 5).',
+    order:'arose_on', desc:true, addLabel:'Record UPSI',
+    cols:[
+      {f:'particulars', l:'What the information is', t:'text', list:true, main:true},
+      {f:'category', l:'Category', t:'select', list:true, def:'financial_results',
+       opts:[['financial_results','Financial results'],['dividend','Dividend'],
+             ['fund_raising','Fund raising'],['m_and_a','Merger / acquisition'],
+             ['change_kmp','Change in KMP'],['rating','Credit rating'],
+             ['order','Regulatory or court order'],['other','Other']]},
+      {f:'arose_on', l:'Came into existence', t:'date', list:true},
+      {f:'published_on', l:'Became generally available', t:'date', list:true,
+       hint:'Leave empty while it is still unpublished. This is what reopens the window.'},
+      {f:'publication_ref', l:'Publication reference', t:'text',
+       hint:'The exchange filing or announcement that made it generally available.'},
+      {f:'window_closed', l:'This closed the trading window', t:'bool', list:true,
+       hint:'Schedule B cl. 4(1) leaves this to the compliance officer&rsquo;s judgement. '+
+            'The proviso allows the window to stay open for UPSI not emanating from '+
+            'within the company.'},
+      {f:'notes', l:'Notes', t:'textarea'}
+    ]
+  },
+  sdd: {
+    table:'upsi_access', crumb:'Insider trading', title:'SDD &mdash; UPSI access', scoped:true,
+    sub:'The structured digital database required by Reg 3(5): who shared what unpublished '+
+        'price sensitive information, with whom, when, and on what legitimate purpose. '+
+        'Reg 3(6) requires it preserved for eight years.',
+    order:'shared_at', desc:true, addLabel:'Record a sharing',
+    cols:[
+      {f:'shared_by', l:'Shared by', t:'text', list:true, main:true},
+      {f:'shared_by_pan', l:'PAN of sharer', t:'text'},
+      {f:'shared_with', l:'Shared with', t:'text', list:true},
+      {f:'shared_with_pan', l:'PAN of recipient', t:'text'},
+      {f:'shared_at', l:'When', t:'date', list:true,
+       hint:'Reg 3(5) requires time stamps.'},
+      {f:'purpose', l:'Legitimate purpose', t:'text', list:true,
+       hint:'Reg 3(2A) — sharing in furtherance of legitimate purposes.'},
+      {f:'mode', l:'How', t:'select', def:'email',
+       opts:[['email','Email'],['meeting','Meeting'],['call','Call'],
+             ['dataroom','Data room'],['other','Other']]},
+      {f:'notes', l:'Notes', t:'textarea'}
+    ]
+  },
+  preclear: {
+    table:'pre_clearances', crumb:'Insider trading', title:'Pre-clearance', scoped:true,
+    sub:'Trades pre-cleared by the compliance officer, and whether the Reg 7(2) disclosure '+
+        'followed within two trading days.',
+    order:'requested_on', desc:true, addLabel:'Record a request',
+    cols:[
+      {f:'person', l:'Designated person', t:'text', list:true, main:true},
+      {f:'pan', l:'PAN', t:'text'},
+      {f:'requested_on', l:'Requested on', t:'date', list:true},
+      {f:'securities', l:'Securities', t:'text'},
+      {f:'quantity', l:'Quantity', t:'number', list:true},
+      {f:'estimated_value', l:'Estimated value (Rs.)', t:'number'},
+      {f:'decision', l:'Decision', t:'select', list:true, def:'pending',
+       opts:[['pending','Pending'],['approved','Approved'],['rejected','Rejected']]},
+      {f:'decided_on', l:'Decided on', t:'date'},
+      {f:'decided_by', l:'Decided by', t:'text'},
+      {f:'valid_until', l:'Approval valid until', t:'date', list:true},
+      {f:'executed_on', l:'Trade executed on', t:'date', list:true},
+      {f:'disclosed_on', l:'Reg 7(2) disclosure received', t:'date',
+       hint:'Within two trading days of the transaction.'},
+      {f:'notes', l:'Notes', t:'textarea'}
+    ]
+  },
   charges: {
     table:'charges', crumb:'Workspace', title:'Charges', scoped:true,
     sub:'Charges created over the company&rsquo;s property. Section 77 requires registration '+
@@ -7791,7 +7911,11 @@ async function regSave(key, id){
       ? 'The '+cfg.table+' table does not exist yet. Run '+
         ({charges:'db/019_charges_register.sql',
           allotments:'db/020_allotments_register.sql',
-          beneficial_interests:'db/021_beneficial_interests.sql'}[cfg.table]
+          beneficial_interests:'db/021_beneficial_interests.sql',
+          designated_persons:'db/024_pit_control.sql',
+          upsi_events:'db/024_pit_control.sql',
+          upsi_access:'db/024_pit_control.sql',
+          pre_clearances:'db/024_pit_control.sql'}[cfg.table]
          || 'db/010_governance_registers.sql')+' first.'
       : (missingCol && COLUMN_FIX[missingCol])
         ? 'The '+cfg.table+' table has no '+missingCol+' column yet. Run '+
@@ -7923,6 +8047,271 @@ document.addEventListener('keydown', function(e){
 function aprRefreshBadge(){
   if(typeof aprQueue !== 'function') return;
   try{ aprBadge(aprQueue().filter(function(i){ return i.can.can; }).length); }catch(e){}
+}
+
+// ═══════════════════════════════════════════════════
+// PIT CONTROL CENTRE
+// ═══════════════════════════════════════════════════
+// SEBI (Prohibition of Insider Trading) Regulations, 2015, from the text in
+// reference/sebi-pit-2015 (amended upto 12 March 2025).
+
+// Schedule B cl. 4(2): "Trading restriction period shall be made applicable
+// from the end of every quarter till 48 hours after the declaration of
+// financial results."  Schedule B cl. 5: re-opening "shall not be earlier than
+// forty-eight hours after the information becomes generally available."
+//
+// Both ends are computable. The quarter end closes it; the results meeting
+// already in the meetings register reopens it, 48 hours later. The register
+// holds a date and not the hour of declaration, so the second day after is used
+// and the screen says so.
+function pitWindow(c){
+  var today = audIso(new Date());
+  var out = {state:'open', because:[], quarterEnd:null, reopensOn:null, holds:[]};
+  if(!c) return out;
+
+  // The most recent quarter end on or before today.
+  var qs = [[3,31],[6,30],[9,30],[12,31]].map(function(q){
+    return lodrInFY(q[0], q[1]);
+  }).filter(function(d){ return d && d <= today; }).sort();
+  var qEnd = qs.length ? qs[qs.length-1] : null;
+  out.quarterEnd = qEnd;
+
+  if(qEnd){
+    // The earliest results meeting on or after that quarter end.
+    var mtgs = [];
+    try{ mtgs = regRowsFor('meetings', c.id) || []; }catch(e){}
+    var results = mtgs.filter(function(m){
+      return m.approved_results === true && m.held_on && String(m.held_on) >= qEnd;
+    }).sort(function(a,b){ return String(a.held_on).localeCompare(String(b.held_on)); })[0];
+
+    if(!results){
+      out.state = 'closed';
+      out.because.push({why:'Quarter ended '+ccFmtDate(qEnd)+' and no meeting approving the '+
+        'financial results has been recorded since.',
+        cite:'Schedule B cl. 4(2)'});
+    }else{
+      var reopen = lodrAddDays(String(results.held_on), 2);
+      out.reopensOn = reopen;
+      if(today < reopen){
+        out.state = 'closed';
+        out.because.push({why:'Results approved '+ccFmtDate(String(results.held_on))+
+          '. The window reopens 48 hours after declaration — '+ccFmtDate(reopen)+
+          '. The register holds the date and not the hour, so this is the second day after.',
+          cite:'Schedule B cl. 4(2)'});
+      }
+    }
+  }
+
+  // An open UPSI item the compliance officer has marked as closing the window.
+  var upsi = [];
+  try{ upsi = regRowsFor('upsi_events', c.id) || []; }catch(e){}
+  var holding = upsi.filter(function(u){
+    if(!u.window_closed) return false;
+    if(!u.published_on) return true;                    // still unpublished
+    return today < lodrAddDays(String(u.published_on), 2);   // within 48h of publication
+  });
+  holding.forEach(function(u){
+    out.state = 'closed';
+    out.holds.push(u);
+    out.because.push({
+      why:'UPSI held open: '+String(u.particulars||'unspecified').slice(0,90)+
+        (u.published_on
+          ? '. Published '+ccFmtDate(String(u.published_on))+
+            '; cannot reopen before '+ccFmtDate(lodrAddDays(String(u.published_on),2))+'.'
+          : '. Not yet generally available.'),
+      cite:u.published_on ? 'Schedule B cl. 5' : 'Schedule B cl. 4(1)'});
+  });
+
+  return out;
+}
+
+function pitEntity(){
+  if(typeof CLIENTS === 'undefined' || !CLIENTS.length) return null;
+  var sel = document.getElementById('pit-entity');
+  var id = sel ? sel.value : null;
+  var listed = CLIENTS.filter(function(c){ return c.type === 'listed'; });
+  var pool = listed.length ? listed : CLIENTS;
+  for(var i=0;i<pool.length;i++) if(String(pool[i].id)===String(id)) return pool[i];
+  return pool[0];
+}
+
+function renderPIT(){
+  var root = document.getElementById('pit-root');
+  if(!root) return;
+
+  var head = '<div class="cc-pagehead"><div>'+
+    '<div class="cc-crumb">Insider trading &rsaquo; Control Centre</div>'+
+    '<h1 class="cc-h1">PIT Control Centre</h1>'+
+    '<p class="cc-sub">Is the window open, who is designated, what is unpublished, and who has '+
+    'been told.</p></div></div>';
+
+  if(typeof CLIENTS === 'undefined' || !CLIENTS.length){
+    root.innerHTML = head + '<div class="cc-empty"><h2>No entities yet</h2>'+
+      '<p>Insider-trading controls run against a listed company.</p>'+
+      '<button class="cc-btn-primary" onclick="entOpen()">+ Add a company</button></div>';
+    return;
+  }
+
+  var listed = CLIENTS.filter(function(c){ return c.type === 'listed'; });
+  if(!listed.length){
+    root.innerHTML = head + '<div class="cc-card"><div class="cc-card-b">'+
+      '<div class="cc-none" style="text-align:left;">None of your entities is listed. '+
+      'The PIT Regulations bite on companies whose securities are listed or proposed to be '+
+      'listed, so there is nothing here to control. This screen is not hidden, because '+
+      '&ldquo;not applicable&rdquo; is a more useful answer than an empty dashboard.</div>'+
+      '</div></div>';
+    return;
+  }
+
+  var c = pitEntity();
+  var w = pitWindow(c);
+
+  var entSel = listed.length > 1
+    ? '<select id="pit-entity" class="lg-field" onchange="renderPIT()">'+
+      listed.map(function(x){
+        return '<option value="'+entEsc(x.id)+'"'+(String(c.id)===String(x.id)?' selected':'')+'>'+
+          entEsc(x.name)+'</option>';
+      }).join('')+'</select>'
+    : '';
+
+  var bar = '<div class="cc-card cc-toolbar"><div class="cc-toolrow">'+
+    '<span class="aud-lbl">Entity</span>'+entSel+
+    '<div style="flex:1;"></div>'+
+    '<span class="aud-days">'+entEsc(c.name)+'</span>'+
+  '</div></div>';
+
+  // ── the window ─────────────────────────────────────────────
+  var closed = w.state === 'closed';
+  var win = '<div class="pit-win '+(closed?'shut':'open')+'">'+
+    '<div class="pit-win-l">Trading window</div>'+
+    '<div class="pit-win-s">'+(closed?'CLOSED':'OPEN')+'</div>'+
+    (w.because.length
+      ? '<div class="pit-why">'+w.because.map(function(b){
+          return '<div class="pit-why-r">'+entEsc(b.why)+
+            '<span class="pit-cite">'+entEsc(b.cite)+'</span></div>';
+        }).join('')+'</div>'
+      : '<div class="pit-why"><div class="pit-why-r">No quarter end is outstanding and no '+
+        'unpublished information is marked as holding the window shut.'+
+        '<span class="pit-cite">Schedule B cl. 4</span></div></div>')+
+  '</div>';
+
+  // ── the registers, counted ─────────────────────────────────
+  var dps = [], upsi = [], sdd = [], pcs = [];
+  try{ dps  = regRowsFor('designated_persons', c.id) || []; }catch(e){}
+  try{ upsi = regRowsFor('upsi_events', c.id) || []; }catch(e){}
+  try{ sdd  = regRowsFor('upsi_access', c.id) || []; }catch(e){}
+  try{ pcs  = regRowsFor('pre_clearances', c.id) || []; }catch(e){}
+
+  var today = audIso(new Date());
+  var active = dps.filter(function(d){ return !d.ceased_on; });
+  var noDisclosure = active.filter(function(d){ return !d.initial_disclosure_on; });
+  var openUpsi = upsi.filter(function(u){ return !u.published_on; });
+  var pending = pcs.filter(function(p){ return (p.decision||'pending') === 'pending'; });
+  var undisclosed = pcs.filter(function(p){
+    return p.executed_on && !p.disclosed_on;
+  });
+  var lateDisclosure = undisclosed.filter(function(p){
+    return lodrAddDays(String(p.executed_on), 2) < today;
+  });
+
+  var chips = '<div class="cu-summary" style="margin-top:16px;">'+
+    '<div class="cu-sum-chip"><b>'+active.length+'</b> designated</div>'+
+    (openUpsi.length?'<div class="cu-sum-chip warn"><b>'+openUpsi.length+
+      '</b> UPSI unpublished</div>':'')+
+    '<div class="cu-sum-chip"><b>'+sdd.length+'</b> SDD entries</div>'+
+    (pending.length?'<div class="cu-sum-chip warn"><b>'+pending.length+
+      '</b> awaiting pre-clearance</div>':'')+
+    (lateDisclosure.length?'<div class="cu-sum-chip crit"><b>'+lateDisclosure.length+
+      '</b> disclosure overdue</div>':'')+
+  '</div>';
+
+  var card = function(title, note, inner, go, goLabel){
+    return '<div class="cc-card" style="margin-top:16px;"><div class="cc-card-h"><h3>'+title+'</h3>'+
+      (note?'<span style="font-size:11.5px;color:var(--ink-soft);max-width:42ch;text-align:right;">'+
+        note+'</span>':'')+'</div><div class="cc-card-b">'+inner+
+      (go?'<div class="pit-go" onclick="sw('+lgArg(go)+')">'+goLabel+' &rarr;</div>':'')+
+      '</div></div>';
+  };
+
+  var row = function(main, meta, tone){
+    return '<div class="pit-row"><div><div class="pit-t">'+main+'</div>'+
+      (meta?'<div class="pit-m">'+meta+'</div>':'')+'</div>'+
+      (tone?'<span class="gov-chip '+tone[1]+'">'+tone[0]+'</span>':'')+'</div>';
+  };
+
+  // Designated persons
+  var dpBody = active.length
+    ? active.slice(0,6).map(function(d){
+        var late = !d.initial_disclosure_on;
+        return row(entEsc(d.name||'unnamed'),
+          entEsc([d.designation, d.category, d.pan?'PAN '+d.pan:''].filter(Boolean).join(' · ')),
+          late ? ['no initial disclosure','warn'] : null);
+      }).join('') + (active.length>6?'<div class="imp-cut">and '+(active.length-6)+' more</div>':'')
+    : '<div class="cc-none" style="text-align:left;">Nobody is recorded as designated. '+
+      'Schedule B cl. 3 requires the board, in consultation with the compliance officer, to '+
+      'specify who is covered.</div>';
+
+  // UPSI
+  var upsiBody = upsi.length
+    ? upsi.slice(0,6).map(function(u){
+        var open = !u.published_on;
+        return row(entEsc(String(u.particulars||'unspecified').slice(0,110)),
+          entEsc((u.arose_on?'Arose '+ccFmtDate(String(u.arose_on)):'') +
+            (u.published_on?' · published '+ccFmtDate(String(u.published_on)):'')),
+          open ? ['unpublished','warn'] : ['published','ok']);
+      }).join('')
+    : '<div class="cc-none" style="text-align:left;">No unpublished price sensitive information '+
+      'is recorded. That is a statement about this register, not about the company.</div>';
+
+  // SDD — Reg 3(5)
+  var sddBody = sdd.length
+    ? row('<b>'+sdd.length+'</b> sharing'+(sdd.length===1?'':'s')+' recorded',
+        'Reg 3(6) requires the database to be preserved for eight years and to be '+
+        'non-tamperable. Nothing in this app offers to edit an entry.')
+    : '<div class="cc-none" style="text-align:left;">The structured digital database is empty. '+
+      '<b>Reg 3(5) requires one to be maintained</b> by every person handling UPSI &mdash; an '+
+      'empty database is not the same as no UPSI having been shared.</div>';
+
+  // Pre-clearance
+  var pcBody = pcs.length
+    ? pcs.slice(0,6).map(function(p){
+        var d = p.decision || 'pending';
+        var overdue = p.executed_on && !p.disclosed_on &&
+                      lodrAddDays(String(p.executed_on), 2) < today;
+        return row(entEsc(p.person||'unnamed'),
+          entEsc([p.securities, p.quantity?p.quantity+' securities':'',
+                  p.requested_on?'requested '+ccFmtDate(String(p.requested_on)):'']
+                 .filter(Boolean).join(' · ')),
+          overdue ? ['disclosure overdue','crit']
+                  : d==='pending' ? ['pending','warn']
+                  : d==='approved' ? ['approved','ok'] : ['rejected','crit']);
+      }).join('')
+    : '<div class="cc-none" style="text-align:left;">No pre-clearance requests recorded.</div>';
+
+  var foot = '<div class="cc-card" style="margin-top:16px;"><div class="cc-card-b"><div class="set-n">'+
+    'Computed from the SEBI (Prohibition of Insider Trading) Regulations, 2015 as held in '+
+    '<span class="mono">reference/</span>, <b>amended upto 12 March 2025</b>. The window is worked '+
+    'out from the quarter end and the results meeting in your own meetings register &mdash; the '+
+    'same record Reg 47(1) uses.'+
+    '<br><br>Two things this does not know. <b>There is no exchange trading calendar here</b>, so '+
+    '&ldquo;two trading days&rdquo; under Reg 7(2) is counted as two calendar days; that errs '+
+    'early, which is the safe direction for a deadline but is still not the real date. And '+
+    '<b>closing the window for a reason other than the quarter end is the compliance '+
+    'officer&rsquo;s judgement</b> under Schedule B cl. 4(1) &mdash; mark a UPSI item as holding '+
+    'it shut and this screen will say which one.'+
+  '</div></div></div>';
+
+  root.innerHTML = head + bar + win + chips +
+    card('Designated persons &mdash; '+active.length,
+         noDisclosure.length ? noDisclosure.length+' without an initial disclosure (Reg 7(1)(b))' : '',
+         dpBody, 'dp', 'Open the register') +
+    card('Unpublished price sensitive information &mdash; '+openUpsi.length+' open',
+         'Reg 2(1)(n)', upsiBody, 'upsi', 'Open the UPSI register') +
+    card('Structured digital database', 'Reg 3(5)', sddBody, 'sdd', 'Open the SDD') +
+    card('Pre-clearance &mdash; '+pending.length+' pending',
+         lateDisclosure.length ? lateDisclosure.length+' trade(s) executed without a Reg 7(2) disclosure' : '',
+         pcBody, 'preclear', 'Open pre-clearance') +
+    foot;
 }
 
 // ═══════════════════════════════════════════════════

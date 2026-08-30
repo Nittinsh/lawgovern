@@ -985,6 +985,57 @@ citation check is not a professional's sign-off and the screen must not let one 
 
 ---
 
+## 2w. PIT CONTROL CENTRE (v161) — db/024 NOT YET RUN
+
+Panel `p-pit` -> `renderPIT()`, plus four registers on the generic engine:
+`dp` / `upsi` / `sdd` / `preclear`. Nav group **Insider trading**.
+
+Both assessments name this a major differentiator. It is also the
+highest-consequence area in the product — an insider-trading failure is not a
+late-filing penalty. Grounded in `reference/sebi-pit-2015` (**amended upto 12 March 2025**), with
+every number cited on screen.
+
+### The trading window is computed, not typed
+> **Schedule B cl. 4(2)** — "Trading restriction period shall be made applicable from the end of
+> every quarter till 48 hours after the declaration of financial results."
+> **Schedule B cl. 5** — re-opening "shall not be earlier than forty-eight hours after the
+> information becomes generally available."
+
+Both ends come from data already held: the quarter end closes it, and the **results board meeting in
+the meetings register** — the same `approved_results` flag Reg 47(1) uses — reopens it. One recorded
+meeting drives both. `pitWindow(c)` returns the state plus a cited reason per cause.
+
+Verified across every branch (today 30 Aug 2026, Q1 ended 30 Jun):
+| scenario | result |
+|---|---|
+| no results meeting since the quarter end | **CLOSED** — cl. 4(2) |
+| results approved 5 Aug (reopened 7 Aug) | open |
+| results approved 29 Aug | **CLOSED**, reopens 31 Aug — cl. 4(2) |
+| results approved *exactly* on the reopen date | open (correct: `today < reopen`) |
+| unpublished UPSI marked as closing | **CLOSED** — cl. 4(1) |
+| UPSI published 29 Aug | **CLOSED** until 31 Aug — cl. 5 |
+| UPSI **not** marked as closing | open (the 2025 proviso) |
+| a **non-results** board meeting | does not reopen it |
+
+### What it refuses to decide
+- **Closing the window for any other reason is the compliance officer's judgement** — cl. 4(1) says
+  "when the compliance officer determines...". So `window_closed` is a per-item flag on the UPSI
+  register and the screen names which item is holding it shut. The 2025 proviso (UPSI not emanating
+  from within the company) is why it is not automatic.
+- **There is no exchange trading calendar here**, so Reg 7(2)'s "two trading days" is counted as two
+  calendar days and every row says so. That errs early — the safe direction for a deadline, but not
+  the real date.
+
+### The SDD says what an empty database means
+Reg 3(5) requires one to be maintained. An empty `upsi_access` therefore reads *"an empty database is
+not the same as no UPSI having been shared"* rather than showing a reassuring zero.
+
+### Not listed
+The screen is not hidden for an unlisted entity — it says the PIT Regulations do not bite, because
+"not applicable" is a more useful answer than an empty dashboard.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -1062,7 +1113,7 @@ citation check is not a professional's sign-off and the screen must not let one 
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v159.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v161.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. Migrations through `db/016` are applied. **`db/017_applicability_review.sql` is new and has not been run** — until it is, confirming an applicability condition fails with a message naming the file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**
