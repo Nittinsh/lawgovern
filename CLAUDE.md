@@ -942,6 +942,49 @@ panel. (First run caught its own regex: `class="navitem on"` on the active item 
 
 ---
 
+## 2v. RULE AUDIT AGAINST THE HELD TEXTS (v159) — assessment P0 #1
+
+`python tools/rule_audit.py [--detail]`
+
+**Correction to an earlier belief in this project: the 2026 SEBI amendments ARE here.**
+
+| text in `reference/` | as of |
+|---|---|
+| SEBI LODR 2015 | **amended up to 14 July 2026** — the second amendment the assessments name |
+| SEBI PIT 2015 | amended upto 12 March 2025 |
+| Companies Act 2013 | 01.04.2021 — **stale, over five years** |
+
+So the corpus the reports flag hardest *can* be checked. Result:
+
+```
+checked                  273
+citation found           255      citation not found  0
+no citation               18      (Schedule A/B, SDD framework — not checkable this way)
+schedule-derived          92      (period lives in the Schedule, not the cited regulation)
+period mismatch            0
+```
+
+### Every "finding" on the first three runs was the audit's own bug
+- **Reg 91C "missing"** — the heading is `91C. 634[(1)`; a footnote marker sits between the number
+  and the body, and the matcher required `91C.(1)`.
+- **Reg 31(1)(b) "21 days vs 10 days"** — the text says *"within twenty one days"* as **two words**,
+  which the number map (holding only `twenty-one`) could not read; the 10 days came from limb (c).
+  **The 21-day `LG_DUE_PATCH` offset is confirmed correct against the current text.**
+- **Reg 61A(2) "7 days vs 30 days"** — the PDF extraction splits the word: *"within se ven days"*.
+  The rule states exactly what the regulation states.
+- **24 Schedule III entries** — they cite `Reg 87B(1)`, the enabling provision, while their 24-hour
+  timing lives in the Schedule. Counted separately, not reported as questions about the law.
+
+A noisy audit gets ignored, so each was fixed rather than tolerated.
+
+### What it establishes, and what it does not
+Stated on the governance screen in those words: the citations are sound. It does **not** establish
+that a rule's substance is current — **a regulation can be amended in ways that leave its number and
+its deadline untouched.** A rule still reads "never checked" until a person verifies it. A mechanical
+citation check is not a professional's sign-off and the screen must not let one pass for the other.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -1019,7 +1062,7 @@ panel. (First run caught its own regex: `class="navitem on"` on the active item 
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v158.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v159.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. Migrations through `db/016` are applied. **`db/017_applicability_review.sql` is new and has not been run** — until it is, confirming an applicability condition fails with a message naming the file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**
