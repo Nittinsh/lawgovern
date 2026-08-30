@@ -1,8 +1,10 @@
 # Compliance regression suite
 
 ```bash
-node tests/compliance.test.js   # 78 assertions — run before every deploy
+node tests/smoke.test.js        # structural integrity — fastest, run first
+node tests/compliance.test.js   # 99 assertions — run before every deploy
 node tests/mutation.js          # proves the suite can actually fail
+python tools/rule_audit.py      # release gate: rules vs the held regulation texts
 ```
 
 Both run against `index.html` itself, not against a copy of the logic. A test

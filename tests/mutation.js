@@ -58,7 +58,43 @@ const MUTATIONS = [
 
   { name: 'the no-date guard drops back to a bare comparison (§2k — null >= 0 is true)',
     from: "  return state === 'STANDING' || state === 'NO_DEADLINE';",
-    to:   "  return state === 'STANDING';" }
+    to:   "  return state === 'STANDING';" },
+
+  // ── status transitions ──────────────────────────────────────
+  // The status engine is where the product makes its claims — filed, overdue,
+  // or nothing known — and those are the claims a Company Secretary acts on.
+
+  { name: 'a period with no deadline collapses back into STANDING (§2k)',
+    from: "    out.state = out.autoState = row.periodEnd ? 'NO_DEADLINE' : 'STANDING';",
+    to:   "    out.state = out.autoState = 'STANDING';" },
+
+  { name: 'a user marking an obligation not applicable stops being honoured (§2j)',
+    from: '  if(row.applicable === false || row.userNA){',
+    to:   '  if(row.applicable === false){' },
+
+  { name: 'the register stops excluding rows ruled out by the user (§2j)',
+    from: '    if(r.userNA && !(opts && opts.includeNA)) return false;',
+    to:   '    if(false) return false;' },
+
+  // NOT a mutation: "a private company starts receiving LODR obligations" was
+  // tried three ways and passed every time, because the exclusion is guarded
+  // twice independently — the outer gate never calls lodrObligations for an
+  // unlisted entity, and lodrApplies refuses every rule anyway since
+  // lodrListingTypes returns nothing for one. Breaking either alone changes
+  // nothing. That is a property worth having, so it is recorded here rather
+  // than worked around by mutating both at once until something fails.
+
+  { name: 'the trading window reopens on the results date, not 48 hours after (§2w)',
+    from: '      var reopen = lodrAddDays(String(results.held_on), 2);',
+    to:   '      var reopen = String(results.held_on);' },
+
+  { name: 'an unpublished UPSI item stops holding the window shut (§2w cl. 4(1))',
+    from: '    if(!u.window_closed) return false;',
+    to:   '    return false;' },
+
+  { name: 'any board meeting reopens the window, not only a results one (§2w)',
+    from: '      return m.approved_results === true && m.held_on && String(m.held_on) >= qEnd;',
+    to:   '      return m.held_on && String(m.held_on) >= qEnd;' }
 ];
 
 const src = fs.readFileSync(INDEX, 'utf8');
@@ -86,9 +122,12 @@ for (const m of MUTATIONS) {
   fs.writeFileSync(mutant, src.replace(m.from, m.to));
   const run = spawnSync(process.execPath, [path.join(__dirname, 'compliance.test.js')],
                         { encoding: 'utf8', env: Object.assign({}, process.env, { LG_INDEX: mutant }) });
+  // A mutant can also crash rather than fail assertions — still caught, but
+  // there is no "N FAILED" line to read.
   const hits = (run.stdout.match(/(\d+) FAILED/) || [])[1];
+  const how = hits ? `${hits} assertion(s) failed` : 'the mutant crashed under the suite';
   if (run.status !== 0) {
-    console.log(`  caught   ${m.name}\n           ${hits} assertion(s) failed`);
+    console.log(`  caught   ${m.name}\n           ${how}`);
     caught++;
   } else {
     console.log(`  MISSED   ${m.name}\n           the suite passed against a build with this bug in it`);

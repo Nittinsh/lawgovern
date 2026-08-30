@@ -1036,6 +1036,55 @@ The screen is not hidden for an unlisted entity — it says the PIT Regulations 
 
 ---
 
+## 2x. THE CHEAP HARDENING (v162) — from the 30 Aug re-audit
+
+The 30 Aug re-audit scored every dimension I had worked on higher and left **architecture at 5.5**,
+the one item I declined. Three of its asks were cheap; all three found real things.
+
+### `tests/smoke.test.js` — 12 structural checks, no browser
+Codifies what had been run by hand after every change. Each check exists because it caught a bug:
+nav ↔ panel pairing (both ways), `sw()` targets exist, every inline handler names a live function,
+every class used is defined **or addressed by script**, build marker present.
+
+**It found two undefined classes on its first run** — `.ent-f` (the "Has this been filed?" field
+group, which had no spacing) and `.cmd-head-l` (a flex child with no `min-width`). That is the
+fourth time invented class names have reached markup here; now it cannot happen silently.
+
+**Two bugs in the check itself, both worth remembering:**
+- It read only the **last** `<script>` block. The auth functions live in an earlier one, so it
+  reported `lgSignIn`, `lgSignUp` and `lgResetPassword` as missing. A check that cries wolf about
+  the login button is worse than no check.
+- A shell heredoc turned `` into a literal **0x08 backspace** inside a regex — CLAUDE.md §6's
+  recurring failure, twice. The regex silently matched nothing, so every script block vanished and
+  every handler looked dead. **Write patch scripts with the Write tool.**
+
+### `tools/rule_audit.py` — now a release gate
+Exits non-zero on *citation not found* or *period mismatch*. "No citation to check" and
+"schedule-derived" are observations and do **not** block — failing a release over those would teach
+everyone to skip the gate. Currently: `RELEASE GATE: clear — 255 citations checked`.
+
+### Mutation coverage extended to status transitions
+Four new mutations, and **three passed against the bug** — real blind spots:
+- `NO_DEADLINE` collapsing into `STANDING` — the suite asserted the two **together**, so merging one
+  into the other changed nothing it looked at.
+- `userNA` no longer honoured in `lgResolveStatus`, and `userNA` rows no longer excluded from the
+  register — **nothing covered the not-applicable path at all**, the control the whole applicability
+  review exists to drive.
+
+Now closed. Suite is **99 assertions**; mutations **14 caught, 0 missed**.
+
+### One mutation deliberately retired
+"A private company starts receiving LODR obligations" was attempted three ways and passed every
+time. The reason is worth keeping: the exclusion is guarded **twice, independently** — the outer
+`if(isListed)` never calls `lodrObligations`, and `lodrApplies` refuses every rule anyway because
+`lodrListingTypes` returns nothing. Breaking either alone changes nothing. That is defence in depth,
+recorded in `mutation.js` as a note rather than worked around by mutating both until something fails.
+
+Its slot went to the **PIT trading window**, which had no automated coverage at all — 13 assertions
+across cl. 4(1), cl. 4(2) and cl. 5, plus three mutations.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -1113,7 +1162,7 @@ The screen is not hidden for an unlisted entity — it says the PIT Regulations 
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v161.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v162.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. Migrations through `db/016` are applied. **`db/017_applicability_review.sql` is new and has not been run** — until it is, confirming an applicability condition fails with a message naming the file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

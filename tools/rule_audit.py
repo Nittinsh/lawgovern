@@ -201,3 +201,22 @@ for group, rows in findings.items():
 print('\nEvery line above is a question for the CS, not a finding. A citation the')
 print('parser cannot locate may be a heading this extraction mangled; a period')
 print('mismatch may be a proviso the context window missed.')
+
+# ── release gate ────────────────────────────────────────────────
+# Only two categories block. A rule citing a provision that is not in the
+# current text may have been amended out from under us, and a stated period that
+# contradicts its own provision is either wrong or the parser is — both need a
+# person before the build ships.
+#
+# "No citation to check" and "schedule-derived" are observations, not defects.
+# Failing a release over those would teach everyone to skip the gate, which
+# costs more than it saves.
+BLOCKING = counts['citation not found'] + counts['period mismatch']
+print()
+if BLOCKING:
+    print('RELEASE GATE: %d finding(s) need a decision before shipping.' % BLOCKING)
+    print('Run with --detail, and record the outcome on the Rule Governance screen.')
+    sys.exit(1)
+print('RELEASE GATE: clear — %d citations checked, none unresolved.'
+      % counts['citation found'])
+sys.exit(0)

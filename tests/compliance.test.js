@@ -345,7 +345,113 @@ describe('status');
   const undated = rows.filter(r => !r.due);
   const leaked = undated.filter(r => !app.lgNoDate(app.lgResolveStatus(r, LISTED).state));
   check('no undated row escapes the no-date guard', leaked.length, 0);
+
+  // The two undated states are different facts and must be counted separately —
+  // asserting them together let one collapse into the other unnoticed.
+  ok('some obligations are STANDING — no deadline exists',
+     (states.STANDING || 0) > 20, states.STANDING || 0);
+  ok('others are NO_DEADLINE — a period recurs but no deadline is recorded',
+     (states.NO_DEADLINE || 0) > 20, states.NO_DEADLINE || 0);
 }
+
+// ── 11b. Not applicable, as decided by a person (§2j) ───────
+describe('not applicable');
+{
+  const rows = rowsFor(LISTED);
+  const target = rows.filter(r => r.due)[0] || rows[0];
+
+  const marked = Object.assign({}, LISTED, {
+    chart: { [target.key]: { notApplicable: true, naReason: 'No subsidiaries', naBy: 'test' } }
+  });
+
+  // getComplianceChart is what copies notApplicable from the chart onto the row,
+  // and lgResolveStatus reads it from the row — so the row has to come from the
+  // marked company, not from the unmarked one.
+  const markedRow = app.getComplianceChart(marked, { includeNA: true })
+    .filter(r => r.key === target.key)[0];
+
+  ok('the row carries the user decision', !!(markedRow && markedRow.userNA),
+     markedRow ? 'userNA=' + markedRow.userNA : 'row not found');
+
+  // The status engine must honour it...
+  check('a row the user ruled out resolves to NOT_APPLICABLE',
+        app.lgResolveStatus(markedRow, marked).state, 'NOT_APPLICABLE');
+  check('and carries the reason given',
+        app.lgResolveStatus(markedRow, marked).naReason, 'No subsidiaries');
+
+  // ...and the register must drop it, which is what makes the coverage
+  // denominator shrink when a condition is ruled out.
+  const after = app.getComplianceChart(marked);
+  check('and the register no longer returns it', after.filter(r => r.key === target.key).length, 0);
+  check('the register shrinks by exactly that row', after.length, rows.length - 1);
+
+  // ...unless it is asked for explicitly, which the applicability review needs.
+  const withNA = app.getComplianceChart(marked, { includeNA: true });
+  check('includeNA brings it back', withNA.filter(r => r.key === target.key).length, 1);
+}
+
+// ── 11c. The PIT trading window (§2w) ───────────────────────
+// Schedule B cl. 4(2): closed from the end of every quarter until 48 hours
+// after the declaration of financial results. cl. 5: reopening no earlier than
+// 48 hours after the information becomes generally available.
+describe('PIT trading window');
+{
+  const win = (regs) => {
+    app.LG_REGS = Object.assign(
+      { directors: [], meetings: [], charges: [], allotments: [],
+        beneficial_interests: [], designated_persons: [], upsi_events: [],
+        upsi_access: [], pre_clearances: [] }, regs || {});
+    return app.pitWindow(LISTED);
+  };
+  const board = (held, results) => ({
+    id: 'w1', company_id: 'T-LISTED', kind: 'board', held_on: held,
+    approved_results: results !== false });
+
+  // Frozen at 29 Aug 2026, so the quarter in question ended 30 June.
+  check('the quarter end it works from', win({}).quarterEnd, '2026-06-30');
+
+  check('closed while no results meeting has been recorded since the quarter end',
+        win({}).state, 'closed');
+  check('and it cites the clause',
+        win({}).because[0].cite, 'Schedule B cl. 4(2)');
+
+  check('a non-results board meeting does not reopen it',
+        win({ meetings: [board('2026-08-05', false)] }).state, 'closed');
+
+  check('results approved 5 Aug reopened it on 7 Aug',
+        win({ meetings: [board('2026-08-05')] }).state, 'open');
+  check('and the reopening date is 48 hours after',
+        win({ meetings: [board('2026-08-05')] }).reopensOn, '2026-08-07');
+
+  check('results approved yesterday leave it closed',
+        win({ meetings: [board('2026-08-28')] }).state, 'closed');
+
+  // An open UPSI item the compliance officer has marked as closing it.
+  const withUpsi = (u) => win({
+    meetings: [board('2026-08-05')],
+    upsi_events: [Object.assign({ id: 'u1', company_id: 'T-LISTED',
+      particulars: 'Proposed acquisition' }, u)] });
+
+  check('unpublished UPSI marked as closing holds it shut',
+        withUpsi({ arose_on: '2026-08-20', window_closed: true }).state, 'closed');
+  check('cited to the clause that makes it a judgement',
+        withUpsi({ arose_on: '2026-08-20', window_closed: true }).because[0].cite,
+        'Schedule B cl. 4(1)');
+
+  // The 2025 proviso: UPSI not emanating from within the company need not close it.
+  check('UPSI not marked as closing leaves it open',
+        withUpsi({ arose_on: '2026-08-20', window_closed: false }).state, 'open');
+
+  check('published yesterday, still inside the 48 hours',
+        withUpsi({ published_on: '2026-08-28', window_closed: true }).state, 'closed');
+  check('and cites the reopening clause',
+        withUpsi({ published_on: '2026-08-28', window_closed: true }).because[0].cite,
+        'Schedule B cl. 5');
+  check('published long enough ago, it reopens',
+        withUpsi({ published_on: '2026-08-01', window_closed: true }).state, 'open');
+}
+
+setRegisters();
 
 // ── 12. Dashboard invariants ────────────────────────────────
 describe('dashboard invariants');
