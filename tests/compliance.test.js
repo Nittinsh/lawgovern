@@ -620,6 +620,162 @@ describe('board composition — sections 149, 177, 178');
      B.checks.filter(x => !x.evaluable && !x.note).length + ' without one');
 }
 
+// ── 11e. Entity class (§2z) ─────────────────────────────────
+describe('entity class');
+{
+  const CRr = 10000000;
+  const co = (t, cap, tur, extra) => Object.assign(
+    { id: 'C-' + t, name: t, type: t, fyend: '2026-03-31', capital: cap, turnover: tur,
+      cin: 'U12345MH2015PTC123456', chart: {} }, extra || {});
+
+  // s.2(85): "a company, other than a public company", within BOTH limits. The
+  // prescribed figures — Rs 4 crore and Rs 40 crore — are in Rule 2(1)(t), not
+  // in the Act text, and the code says so where it uses them.
+  ok('a private company inside both limits is small',
+     app.lgIsSmallCompany(co('private', 2 * CRr, 20 * CRr)), 'not small');
+  ok('at exactly both limits it is still small',
+     app.lgIsSmallCompany(co('private', 4 * CRr, 40 * CRr)), 'not small');
+  ok('a rupee over the capital limit and it is not',
+     !app.lgIsSmallCompany(co('private', 4 * CRr + 1, 20 * CRr)), 'still small');
+  ok('a rupee over the turnover limit and it is not',
+     !app.lgIsSmallCompany(co('private', 2 * CRr, 40 * CRr + 1)), 'still small');
+  // "other than a public company" — the size test never reaches a public one.
+  ok('a tiny public company is never small',
+     !app.lgIsSmallCompany(co('public', 100, 100)), 'treated as small');
+  ok('nor is a Section 8 company, however small',
+     !app.lgIsSmallCompany(co('sec8', 100, 100)), 'treated as small');
+  // A holding or subsidiary company is excluded by the proviso whatever its size.
+  ok('a holding company is excluded by the proviso',
+     !app.lgIsSmallCompany(co('private', 100, 100, { is_holding: true })), 'treated as small');
+  ok('and so is a subsidiary',
+     !app.lgIsSmallCompany(co('private', 100, 100, { is_subsidiary: true })), 'treated as small');
+
+  // s.96(1): "Every company other than a One Person Company shall ... hold ...
+  // an annual general meeting". An OPC was being told to hold one.
+  const opcRows = app.getComplianceChart(co('opc', CRr, 2 * CRr));
+  check('a One Person Company is given no AGM', opcRows.filter(app.lgRowIsAGM).length, 0);
+  check('every other class still gets one',
+        app.getComplianceChart(co('private', CRr, 2 * CRr)).filter(app.lgRowIsAGM).length, 1);
+
+  // An LLP is not a company under this Act. It was receiving "Board meetings —
+  // 0 of 4 held" against Sec 173(1), a section it has no Board for.
+  const llp = app.getComplianceChart(co('llp', CRr, 5 * CRr));
+  check('an LLP is on the LLP Act, not the Companies Act', app.lgEntityRegime(co('llp', 0, 0)), 'llp');
+  check('and receives no Companies Act obligation at all',
+        llp.filter(r => r.law === 'Companies Act 2013').length, 0);
+  check('specifically none under section 173', llp.filter(r => /173/.test(r.section)).length, 0);
+  ok('it does receive Form 11', llp.some(r => r.form === 'Form 11'), 'missing');
+  ok('and Form 8', llp.some(r => r.form === 'Form 8'), 'missing');
+  ok('every LLP row says the LLP Act is not in reference/',
+     llp.filter(r => r.law === 'LLP Act 2008').every(r => /not in reference\//.test(r.derivedNote || '')),
+     'a row claims a period without saying where it came from');
+
+  // A duty the class still owes, in a different form.
+  const smallNotes = app.getComplianceChart(co('private', 2 * CRr, 20 * CRr))
+    .filter(r => r.classNote);
+  ok('a small company gets class notes', smallNotes.length >= 3, smallNotes.length);
+  ok('one of them resolves MGT-7 vs MGT-7A',
+     smallNotes.some(r => /MGT-7A/.test(r.classNote)), 'not resolved');
+  check('a company that is not small gets none',
+        app.getComplianceChart(co('private', 10 * CRr, 100 * CRr)).filter(r => r.classNote).length, 0);
+  ok('the OPC board report note quotes s.134(4), which the Act itself settles',
+     app.getComplianceChart(co('opc', CRr, 2 * CRr))
+       .some(r => /134\(4\)/.test(r.classNote || '')), 'not cited');
+}
+
+// ── 11f. Borrowing, deposits and LLP fees (§2z) ─────────────
+describe('section 180 — borrowing powers');
+{
+  // "will exceed aggregate of its paid-up share capital, free reserves and
+  // securities premium, apart from temporary loans obtained from the company's
+  // bankers in the ordinary course of business".
+  const B = app.calc180Limit(100000000, 20000000, 10000000, 140000000, 30000000, 30000000);
+  check('the ceiling is capital plus free reserves plus premium', B.limit, 130000000);
+  check('temporary bank loans come out of what is counted', B.counted, 110000000);
+  check('and the proposed borrowing goes in', B.total, 140000000);
+  check('so it exceeds the ceiling', B.exceeds, true);
+  check('by the headroom, negated', B.headroom, -10000000);
+
+  // Failing to exclude temporary loans is the whole point of the Explanation.
+  check('without the temporary loans it would be inside',
+        app.calc180Limit(100000000, 20000000, 10000000, 110000000, 30000000, 30000000).exceeds, false);
+  check('a temporary figure larger than the borrowing cannot go negative',
+        app.calc180Limit(1000, 0, 0, 100, 500, 0).counted, 0);
+}
+
+describe('deposits — is it a deposit at all');
+{
+  const cap = [10000000, 5000000, 0];
+  // Rule 2(1)(c)(viii): a director's own money, on a written declaration.
+  check('a director without the declaration is only conditional',
+        app.calcDepositTest('director', true, false, cap[0], cap[1], cap[2], 1000000).verdict,
+        'conditional');
+  check('with it, not a deposit',
+        app.calcDepositTest('director', true, true, cap[0], cap[1], cap[2], 1000000).verdict,
+        'not_deposit');
+  // Rule 3(3): a private company, one hundred per cent of the aggregate.
+  check('a member within the limit is not a deposit',
+        app.calcDepositTest('member', true, false, cap[0], cap[1], cap[2], 14000000).verdict,
+        'not_deposit');
+  check('over the limit it becomes one',
+        app.calcDepositTest('member', true, false, cap[0], cap[1], cap[2], 16000000).verdict,
+        'deposit');
+  check('the limit is the aggregate, not a fraction of it',
+        app.calcDepositTest('member', true, false, cap[0], cap[1], cap[2], 1).limit, 15000000);
+  // The member exclusion belongs to private companies only.
+  check('a member of a company that is not private is a deposit',
+        app.calcDepositTest('member', false, false, cap[0], cap[1], cap[2], 1).verdict, 'deposit');
+  check('money from the public always is',
+        app.calcDepositTest('public', true, true, cap[0], cap[1], cap[2], 1).verdict, 'deposit');
+  ok('every answer names the rule it rests on',
+     ['director','member','relative','bank','company','public'].every(sr =>
+       !!app.calcDepositTest(sr, true, true, 1, 1, 1, 1).rule), 'one has no citation');
+}
+
+describe('LLP filing fee');
+{
+  const F = app.calcLlpFee('form11', '2026-05-30', '2026-07-01');
+  check('the delay is counted', F.days, 32);
+  check('but the fee is refused — the LLP Rules are not held', F.unpriced, true);
+  check('an on-time filing is not late', app.calcLlpFee('form8', '2026-10-30', '2026-10-01').late, false);
+  ok('the form carries its own period', /60 days/.test(F.form[2]), F.form[2]);
+}
+
+// ── 11g. Reference data holds together (§2z) ────────────────
+describe('reference data');
+{
+  check('NIC has 21 sections', app.NIC_SECTIONS.length, 21);
+  // Divisions run 01-99 with gaps, so the count is 88 and the screen says 88.
+  check('and 88 divisions, not 99', app.NIC_DIVISIONS.length, 88);
+  const secs = app.NIC_SECTIONS.map(x => x[0]);
+  ok('every division belongs to a section that exists',
+     app.NIC_DIVISIONS.every(d => secs.indexOf(d[1]) >= 0),
+     app.NIC_DIVISIONS.filter(d => secs.indexOf(d[1]) < 0).map(d => d[0]).join(','));
+  ok('no division code appears twice',
+     new Set(app.NIC_DIVISIONS.map(d => d[0])).size === 88, 'duplicates present');
+  ok('searching for what a business does finds the division',
+     app.nicMatch('software').some(d => d[0] === '62'), 'software did not reach 62');
+  ok('and an unrelated word finds nothing rather than everything',
+     app.nicMatch('zzzzq').length === 0, app.nicMatch('zzzzq').length);
+
+  // Every checklist item must carry a citation and declare whether the text
+  // behind it is held. An item that claims neither is the defect these lists
+  // exist to avoid.
+  const lists = { CHK_DIRREP: app.CHK_DIRREP, CHK_SS1: app.CHK_SS1, CHK_SS2: app.CHK_SS2,
+                  CHK_AUDIT: app.CHK_AUDIT, CHK_POSTINC: app.CHK_POSTINC };
+  Object.keys(lists).forEach(k => {
+    ok(k + ': every item cites a provision',
+       lists[k].every(i => !!i.c), lists[k].filter(i => !i.c).length + ' without one');
+    ok(k + ': every item declares whether its text is held',
+       lists[k].every(i => typeof i.held === 'boolean'),
+       lists[k].filter(i => typeof i.held !== 'boolean').length + ' undeclared');
+    ok(k + ': every unheld item explains what is missing',
+       lists[k].filter(i => !i.held).every(i => !!i.note),
+       'an unheld item gives no reason');
+  });
+  check('the responsibility statement has all five clauses of s.134(5)', app.CHK_DRS.length, 5);
+}
+
 // ── 12. Dashboard invariants ────────────────────────────────
 describe('dashboard invariants');
 {

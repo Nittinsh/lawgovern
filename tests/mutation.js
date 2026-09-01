@@ -138,7 +138,45 @@ const MUTATIONS = [
 
   { name: 'an untested composition condition reports as satisfied (§2y)',
     from: "    have:'not recorded', ok:false, evaluable:false,",
-    to:   "    have:'not recorded', ok:true, evaluable:true," }
+    to:   "    have:'not recorded', ok:true, evaluable:true," },
+
+  // ── entity class ────────────────────────────────────────────
+  // Two of these three were live in the shipped product. Both told a real
+  // client something confident and wrong about a section that does not reach it.
+
+  { name: 'an LLP starts receiving Companies Act obligations again (§2z)',
+    from: "  return (c && c.type === 'llp') ? 'llp' : 'companies_act';",
+    to:   "  return 'companies_act';" },
+
+  { name: 'a One Person Company is told to hold an AGM again (§2z — s.96(1))',
+    from: "  if(c.type === 'opc'){\n    out.agm = 'A One Person Company holds no annual general meeting",
+    to:   "  if(false){\n    out.agm = 'A One Person Company holds no annual general meeting" },
+
+  { name: 'the small-company size test reaches a public company (§2z — s.2(85))',
+    from: "  if(c.type !== 'private') return false;",
+    to:   "  if(c.type === 'llp') return false;" },
+
+  { name: 'the s.2(85) holding/subsidiary proviso stops applying (§2z)',
+    from: '  if(c.is_holding === true || c.is_subsidiary === true) return false;',
+    to:   '  if(false) return false;' },
+
+  // ── the newer calculators ───────────────────────────────────
+
+  { name: 's.180 stops excluding temporary bank loans (§2z — the Explanation)',
+    from: '  var counted = calcNum(alreadyBorrowed) - calcNum(temporary);',
+    to:   '  var counted = calcNum(alreadyBorrowed);' },
+
+  { name: 'the private-company deposit limit is halved (§2z — Rule 3(3) says 100%)',
+    from: '  var limit = cap;                   // Rule 3(3): one hundred per cent',
+    to:   '  var limit = cap / 2;' },
+
+  { name: "a director's money is excluded without the declaration (§2z)",
+    from: "    if(!declaration) r.verdict = 'conditional';",
+    to:   '    if(false) r.verdict = 0;' },
+
+  { name: 'the LLP fee is priced from rules that are not held (§2z)',
+    from: '  return {form:f, days: days > 0 ? days : 0, late: days > 0, unpriced:true};',
+    to:   '  return {form:f, days: days > 0 ? days : 0, late: days > 0, fee: days * 100};' }
 ];
 
 const src = fs.readFileSync(INDEX, 'utf8');

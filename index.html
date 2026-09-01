@@ -547,6 +547,32 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 .brd-none{font-size:12px;color:var(--ink-soft);font-style:italic;margin:0;}
 .brd-tbl{width:100%;border-collapse:collapse;font-size:12px;}
 .calc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px 18px;}
+.chk-row{display:flex;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line-soft);cursor:pointer;align-items:flex-start;transition:.12s;}
+.nic-count{font-size:12px;color:var(--ink-soft);margin-bottom:10px;font-weight:600;}
+.nic-sec{margin-bottom:18px;}
+.nic-sec-h{display:flex;align-items:center;gap:9px;font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;}
+.nic-sec-c{font-family:'IBM Plex Mono',monospace;background:var(--navy);color:#fff;width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;}
+.nic-row{display:flex;gap:12px;padding:8px 10px;border-radius:7px;align-items:baseline;}
+.nic-row:hover{background:var(--bg);}
+.nic-code{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:var(--blue);width:26px;flex-shrink:0;}
+.nic-title{font-size:12.5px;line-height:1.5;color:var(--ink);}
+.chk-row:last-child{border-bottom:none;}
+.chk-row:hover{background:var(--bg);}
+.chk-box{width:19px;height:19px;border:1.8px solid var(--line);border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;margin-top:1px;}
+.chk-row.on .chk-box{background:var(--ok);border-color:var(--ok);}
+.chk-row.on .chk-t{color:var(--ink-soft);}
+.chk-main{flex:1;min-width:0;}
+.chk-t{font-size:13px;line-height:1.55;color:var(--ink);}
+.chk-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:5px;}
+.chk-cite{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);}
+.chk-held{font-size:10.5px;font-weight:600;color:var(--ok);background:rgba(16,185,129,.1);padding:2px 7px;border-radius:99px;}
+.chk-unheld{font-size:10.5px;font-weight:600;color:var(--warn);background:rgba(245,158,11,.12);padding:2px 7px;border-radius:99px;}
+.chk-note{font-size:11.5px;line-height:1.6;color:var(--ink-soft);margin-top:6px;}
+.chk-sum{font-size:12.5px;color:var(--ink-mid);line-height:1.6;}
+.chk-reset{color:var(--blue);cursor:pointer;font-weight:600;margin-left:8px;}
+.chk-reset:hover{text-decoration:underline;}
+.chk-copy{float:right;font-size:11px;font-weight:600;color:var(--blue);cursor:pointer;padding:2px 9px;border:1px solid var(--line);border-radius:6px;}
+.chk-report{width:100%;min-height:340px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;line-height:1.65;padding:14px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);resize:vertical;margin-top:12px;}
 .calc-f{margin-bottom:12px;display:flex;flex-direction:column;}
 .calc-l{font-size:12px;font-weight:600;color:var(--ink-mid);margin-bottom:5px;line-height:1.4;}
 .calc-cite{display:block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:500;color:var(--ink-soft);margin-top:2px;}
@@ -1450,7 +1476,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v163">
+      <meta id="build-version" content="v164">
     </div>
   </div>
   <div class="cc-search">
@@ -1483,8 +1509,8 @@ input[type="text"], input[type="password"], textarea, select {
 </div>
 <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="closeMobileNav()"></div>
 <div class="appshell">
-<aside class="appside"><div class="navitem on" onclick="sw('home')" id="t-home"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span>Dashboard</span></div><div class="navgrp" id="ng-cmp"><div class="navhead" onclick="navToggle('cmp')"><span>Compliance</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What applies, what is due, what is evidenced</div><div class="navbody"><div class="navitem" onclick="sw('universe')" id="t-universe"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg><span>Compliance Universe</span></div><div class="navitem" onclick="sw('mywork')" id="t-mywork"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3 8-8M20 12v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h9"/></svg><span>My Work</span></div><div class="navitem" onclick="sw('cal')" id="t-cal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Calendar</span></div><div class="navitem" onclick="sw('applies')" id="t-applies"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke-linecap="round"/></svg><span>What Applies</span></div><div class="navitem" onclick="sw('exceptions')" id="t-exceptions"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3L12 3z"/><path d="M12 10v4" stroke-linecap="round"/></svg><span>Exceptions</span><span class="nav-badge" id="nav-exc-n" style="display:none">0</span></div><div class="navitem" onclick="sw('calc')" id="t-calc"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15v4M8 19h4" stroke-linecap="round"/></svg><span>Calculators</span></div></div></div><div class="navgrp" id="ng-evt"><div class="navhead" onclick="navToggle('evt')"><span>Events & change</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What happened, and what changed</div><div class="navbody"><div class="navitem" onclick="sw('impact')" id="t-impact"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9z" stroke-linejoin="round"/></svg><span>Event Impact</span></div><div class="navitem" onclick="sw('events')" id="t-events"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 8v5l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>Material Events</span></div><div class="navitem" onclick="sw('tracker')" id="t-tracker"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v3M12 18v3"/></svg><span>Regulatory Radar</span></div></div></div><div class="navgrp" id="ng-pit"><div class="navhead" onclick="navToggle('pit')"><span>Insider trading</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">Is the window open, and who knows what</div><div class="navbody"><div class="navitem" onclick="sw('pit')" id="t-pit"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3" stroke-linecap="round"/></svg><span>PIT Control Centre</span></div><div class="navitem" onclick="sw('dp')" id="t-dp"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0112 0M17 11h4M19 9v4" stroke-linecap="round"/></svg><span>Designated Persons</span></div><div class="navitem" onclick="sw('upsi')" id="t-upsi"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3z" stroke-linejoin="round"/><path d="M12 10v4M12 17h.01" stroke-linecap="round"/></svg><span>UPSI Register</span></div><div class="navitem" onclick="sw('sdd')" id="t-sdd"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><span>SDD &mdash; UPSI access</span></div><div class="navitem" onclick="sw('preclear')" id="t-preclear"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9" stroke-linecap="round"/></svg><span>Pre-clearance</span></div></div></div>
-<div class="navgrp" id="ng-reg"><div class="navhead" onclick="navToggle('reg')"><span>Registers</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What we know about the entity</div><div class="navbody"><div class="navitem" onclick="sw('entities')" id="t-entities"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h2m-2 4h2m-2 4h2m4-8h2m-2 4h2m-2 4h2"/></svg><span>Entities</span></div><div class="navitem" onclick="sw('directors')" id="t-directors"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-8 0v2"/><circle cx="12" cy="7" r="4"/></svg><span>Directors &amp; KMP</span></div><div class="navitem" onclick="sw('meetings')" id="t-meetings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Board &amp; Meetings</span></div><div class="navitem" onclick="sw('charges')" id="t-charges"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10V6z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Charges</span></div><div class="navitem" onclick="sw('allotments')" id="t-allotments"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M7 8h7a3 3 0 010 6H7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Allotments</span></div><div class="navitem" onclick="sw('beneficial')" id="t-beneficial"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20a6.5 6.5 0 0113 0" stroke-linecap="round"/><path d="M17.5 4.5l2 2 3-3" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Beneficial Interest</span></div><div class="navitem" onclick="sw('internal')" id="t-internal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg><span>Internal Compliance</span></div></div></div><div class="navgrp" id="ng-evd"><div class="navhead" onclick="navToggle('evd')"><span>Evidence</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">Can I prove it was done</div><div class="navbody"><div class="navitem" onclick="sw('filings')" id="t-filings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11l5 5v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M15 4v5h5M8 14h8M8 17h5"/></svg><span>Filings &amp; Records</span></div><div class="navitem" onclick="sw('documents')" id="t-documents"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Documents</span></div><div class="navitem" onclick="sw('approvals')" id="t-approvals"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Approvals</span><span class="nav-badge" id="nav-approvals-n" style="display:none">0</span></div></div></div><div class="navgrp" id="ng-rpt"><div class="navhead" onclick="navToggle('rpt')"><span>Reports</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What can I present</div><div class="navbody"><div class="navitem" onclick="sw('board')" id="t-board"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v13H4z" stroke-linejoin="round"/><path d="M9 21h6M12 17v4M8 12l2.5 2.5L16 9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Board Report</span></div><div class="navitem" onclick="sw('audit')" id="t-audit"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>Audit Trail</span></div></div></div><div class="navgrp closed" id="ng-drf"><div class="navhead" onclick="navToggle('drf')"><span>Drafting</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navbody"><div class="navitem" onclick="sw('res')" id="t-res"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg><span>Resolutions</span></div><div class="navitem" onclick="sw('docs')" id="t-docs"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 5h16M4 12h16M4 19h10"/></svg><span>Notices &amp; Minutes</span></div></div></div><div class="navgrp closed" id="ng-ref"><div class="navhead" onclick="navToggle('ref')"><span>Reference</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navbody"><div class="navitem" onclick="sw('ff')" id="t-ff"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><span>Forms &amp; Filings</span></div><div class="navitem" onclick="sw('chat')" id="t-chat"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3.2"/></svg><span>AI Compliance</span></div><div class="navitem" onclick="sw('penalty')" id="t-penalty"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 3h12M6 8h12M9 3c0 6 6 6 6 11a4 4 0 0 1-8 0"/></svg><span>Penalties</span></div><div class="navitem" onclick="sw('deeplaw')" id="t-deeplaw"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3l9 4v5c0 5-3.5 8-9 9-5.5-1-9-4-9-9V7l9-4z"/></svg><span>Deep Law</span></div></div></div><div class="navgrp closed" id="ng-adm"><div class="navhead" onclick="navToggle('adm')"><span>Administration</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navbody"><div class="navitem" onclick="sw('governance')" id="t-governance"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16M4 12h16M4 19h10" stroke-linecap="round"/><circle cx="18.5" cy="19" r="2.6"/><path d="M17.3 19l.9.9 1.9-1.9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Rule Governance</span></div><div class="navitem" onclick="sw('settings')" id="t-settings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Settings</span></div><div class="navitem" onclick="sw('admin')" id="t-admin" style="display:none"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.3l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2.2-1.3L14 2h-4l-.3 2.2a7 7 0 0 0-2.2 1.3l-2.3-1-2 3.4 2 1.5A7 7 0 0 0 5 12a7 7 0 0 0 .1 1.3l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2.2 1.3L10 22h4l.3-2.2a7 7 0 0 0 2.2-1.3l2.3 1 2-3.4-2-1.5z"/></svg><span>Administration</span></div></div></div>
+<aside class="appside"><div class="navitem on" onclick="sw('home')" id="t-home"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span>Dashboard</span></div><div class="navgrp" id="ng-cmp"><div class="navhead" onclick="navToggle('cmp')"><span>Compliance</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What applies, what is due, what is evidenced</div><div class="navbody"><div class="navitem" onclick="sw('universe')" id="t-universe"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg><span>Compliance Universe</span></div><div class="navitem" onclick="sw('mywork')" id="t-mywork"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3 8-8M20 12v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h9"/></svg><span>My Work</span></div><div class="navitem" onclick="sw('cal')" id="t-cal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Calendar</span></div><div class="navitem" onclick="sw('applies')" id="t-applies"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke-linecap="round"/></svg><span>What Applies</span></div><div class="navitem" onclick="sw('exceptions')" id="t-exceptions"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3L12 3z"/><path d="M12 10v4" stroke-linecap="round"/></svg><span>Exceptions</span><span class="nav-badge" id="nav-exc-n" style="display:none">0</span></div><div class="navitem" onclick="sw('calc')" id="t-calc"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15v4M8 19h4" stroke-linecap="round"/></svg><span>Calculators</span></div><div class="navitem" onclick="sw('checks')" id="t-checks"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12l1.5 1.5L14 10" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Checklists</span></div></div></div><div class="navgrp" id="ng-evt"><div class="navhead" onclick="navToggle('evt')"><span>Events & change</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What happened, and what changed</div><div class="navbody"><div class="navitem" onclick="sw('impact')" id="t-impact"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9z" stroke-linejoin="round"/></svg><span>Event Impact</span></div><div class="navitem" onclick="sw('events')" id="t-events"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 8v5l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>Material Events</span></div><div class="navitem" onclick="sw('tracker')" id="t-tracker"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v3M12 18v3"/></svg><span>Regulatory Radar</span></div></div></div><div class="navgrp" id="ng-pit"><div class="navhead" onclick="navToggle('pit')"><span>Insider trading</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">Is the window open, and who knows what</div><div class="navbody"><div class="navitem" onclick="sw('pit')" id="t-pit"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3" stroke-linecap="round"/></svg><span>PIT Control Centre</span></div><div class="navitem" onclick="sw('dp')" id="t-dp"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0112 0M17 11h4M19 9v4" stroke-linecap="round"/></svg><span>Designated Persons</span></div><div class="navitem" onclick="sw('upsi')" id="t-upsi"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3z" stroke-linejoin="round"/><path d="M12 10v4M12 17h.01" stroke-linecap="round"/></svg><span>UPSI Register</span></div><div class="navitem" onclick="sw('sdd')" id="t-sdd"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><span>SDD &mdash; UPSI access</span></div><div class="navitem" onclick="sw('preclear')" id="t-preclear"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9" stroke-linecap="round"/></svg><span>Pre-clearance</span></div></div></div>
+<div class="navgrp" id="ng-reg"><div class="navhead" onclick="navToggle('reg')"><span>Registers</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What we know about the entity</div><div class="navbody"><div class="navitem" onclick="sw('entities')" id="t-entities"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h2m-2 4h2m-2 4h2m4-8h2m-2 4h2m-2 4h2"/></svg><span>Entities</span></div><div class="navitem" onclick="sw('directors')" id="t-directors"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-8 0v2"/><circle cx="12" cy="7" r="4"/></svg><span>Directors &amp; KMP</span></div><div class="navitem" onclick="sw('meetings')" id="t-meetings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Board &amp; Meetings</span></div><div class="navitem" onclick="sw('charges')" id="t-charges"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10V6z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Charges</span></div><div class="navitem" onclick="sw('allotments')" id="t-allotments"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M7 8h7a3 3 0 010 6H7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Allotments</span></div><div class="navitem" onclick="sw('beneficial')" id="t-beneficial"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20a6.5 6.5 0 0113 0" stroke-linecap="round"/><path d="M17.5 4.5l2 2 3-3" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Beneficial Interest</span></div><div class="navitem" onclick="sw('internal')" id="t-internal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg><span>Internal Compliance</span></div></div></div><div class="navgrp" id="ng-evd"><div class="navhead" onclick="navToggle('evd')"><span>Evidence</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">Can I prove it was done</div><div class="navbody"><div class="navitem" onclick="sw('filings')" id="t-filings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11l5 5v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M15 4v5h5M8 14h8M8 17h5"/></svg><span>Filings &amp; Records</span></div><div class="navitem" onclick="sw('documents')" id="t-documents"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Documents</span></div><div class="navitem" onclick="sw('approvals')" id="t-approvals"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Approvals</span><span class="nav-badge" id="nav-approvals-n" style="display:none">0</span></div></div></div><div class="navgrp" id="ng-rpt"><div class="navhead" onclick="navToggle('rpt')"><span>Reports</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What can I present</div><div class="navbody"><div class="navitem" onclick="sw('board')" id="t-board"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v13H4z" stroke-linejoin="round"/><path d="M9 21h6M12 17v4M8 12l2.5 2.5L16 9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Board Report</span></div><div class="navitem" onclick="sw('audit')" id="t-audit"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>Audit Trail</span></div></div></div><div class="navgrp closed" id="ng-drf"><div class="navhead" onclick="navToggle('drf')"><span>Drafting</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navbody"><div class="navitem" onclick="sw('res')" id="t-res"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg><span>Resolutions</span></div><div class="navitem" onclick="sw('docs')" id="t-docs"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 5h16M4 12h16M4 19h10"/></svg><span>Notices &amp; Minutes</span></div></div></div><div class="navgrp closed" id="ng-ref"><div class="navhead" onclick="navToggle('ref')"><span>Reference</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navbody"><div class="navitem" onclick="sw('ff')" id="t-ff"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><span>Forms &amp; Filings</span></div><div class="navitem" onclick="sw('nic')" id="t-nic"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 13h8M8 16h5" stroke-linecap="round"/></svg><span>NIC Codes</span></div><div class="navitem" onclick="sw('chat')" id="t-chat"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3.2"/></svg><span>AI Compliance</span></div><div class="navitem" onclick="sw('penalty')" id="t-penalty"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 3h12M6 8h12M9 3c0 6 6 6 6 11a4 4 0 0 1-8 0"/></svg><span>Penalties</span></div><div class="navitem" onclick="sw('deeplaw')" id="t-deeplaw"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3l9 4v5c0 5-3.5 8-9 9-5.5-1-9-4-9-9V7l9-4z"/></svg><span>Deep Law</span></div></div></div><div class="navgrp closed" id="ng-adm"><div class="navhead" onclick="navToggle('adm')"><span>Administration</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navbody"><div class="navitem" onclick="sw('governance')" id="t-governance"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16M4 12h16M4 19h10" stroke-linecap="round"/><circle cx="18.5" cy="19" r="2.6"/><path d="M17.3 19l.9.9 1.9-1.9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Rule Governance</span></div><div class="navitem" onclick="sw('settings')" id="t-settings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Settings</span></div><div class="navitem" onclick="sw('admin')" id="t-admin" style="display:none"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.3l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2.2-1.3L14 2h-4l-.3 2.2a7 7 0 0 0-2.2 1.3l-2.3-1-2 3.4 2 1.5A7 7 0 0 0 5 12a7 7 0 0 0 .1 1.3l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2.2 1.3L10 22h4l.3-2.2a7 7 0 0 0 2.2-1.3l2.3 1 2-3.4-2-1.5z"/></svg><span>Administration</span></div></div></div>
 </aside>
 <div class="appmain">
 
@@ -1593,7 +1619,7 @@ input[type="text"], input[type="password"], textarea, select {
 <div class="panel" id="p-charges"><div class="cc-tool"><div id="reg-root-charges"></div></div></div>
 <div class="panel" id="p-allotments"><div class="cc-tool"><div id="reg-root-allotments"></div></div></div>
 <div class="panel" id="p-beneficial"><div class="cc-tool"><div id="reg-root-beneficial"></div></div></div>
-<div class="panel" id="p-calc"><div class="cc-tool"><div id="calc-root"></div></div></div><div class="panel" id="p-governance"><div class="cc-tool"><div id="gov-root"></div></div></div>
+<div class="panel" id="p-calc"><div class="cc-tool"><div id="calc-root"></div></div></div><div class="panel" id="p-checks"><div class="cc-tool"><div id="chk-root"></div></div></div><div class="panel" id="p-nic"><div class="cc-tool"><div id="nic-root"></div></div></div><div class="panel" id="p-governance"><div class="cc-tool"><div id="gov-root"></div></div></div>
 <div class="panel" id="p-board"><div class="cc-tool"><div id="brd-root"></div></div></div>
 <div class="panel" id="p-applies"><div class="cc-tool"><div id="app-root"></div></div></div>
 <div class="panel" id="p-impact"><div class="cc-tool"><div id="imp-root"></div></div></div>
@@ -2828,6 +2854,8 @@ function sw(id) {
   if (typeof navReveal === 'function') navReveal(id);
   if (id==='pit' && typeof renderPIT==='function') renderPIT();
   if (id==='calc' && typeof renderCalc==='function') renderCalc();
+  if (id==='checks' && typeof renderChecks==='function') renderChecks();
+  if (id==='nic' && typeof renderNIC==='function') renderNIC();
   if (id==='governance' && typeof renderGovernance==='function') renderGovernance();
   if (id==='board' && typeof renderBoard==='function') renderBoard();
   if (id==='applies' && typeof renderApplies==='function') renderApplies();
@@ -4861,6 +4889,10 @@ function lgAddMonths(iso, n){
 // ── derived obligations ──────────────────────────────────────────
 function regDerivedRows(c, ctx){
   var rows = [];
+  // Every obligation below is a Companies Act duty read off a register. None of
+  // them reaches an LLP, which is why one of them was reporting "Board meetings
+  // — 0 of 4 held" against Sec 173(1) for an entity that has no Board.
+  if(typeof lgEntityRegime === 'function' && lgEntityRegime(c) === 'llp') return rows;
   var dt = ctx.dt, plus = ctx.plus, y = ctx.y;
   var fyEnd = ctx.fyEnd, fyStart = ctx.fyStart;
 
@@ -5363,6 +5395,160 @@ function lgExcludedFor(c){
   return out;
 }
 
+// ═══════════════════════════════════════════════════
+// ENTITY CLASS — s.2(85), and which Act governs at all
+// ═══════════════════════════════════════════════════
+// Before this, "small company" was decided inside a single row's cadence check,
+// so none of the other consequences followed; and nothing asked whether the
+// Companies Act governed the entity at all, so an LLP was told to hold board
+// meetings under Sec 173(1). An LLP has no Board and no s.173.
+
+// s.2(85): a company, OTHER THAN A PUBLIC COMPANY, whose paid-up capital and
+// turnover are both under the prescribed figures, and which is not a holding or
+// subsidiary company, not registered under s.8, and not governed by a special Act.
+//
+// The Act states Rs 50 lakh / Rs 2 crore "or such higher amount as may be
+// prescribed", capped at Rs 10 crore / Rs 100 crore. The amounts ACTUALLY
+// prescribed — Rs 4 crore and Rs 40 crore — are in Rule 2(1)(t) of the Companies
+// (Specification of Definitions Details) Rules 2014, which is NOT in reference/.
+// So the figures below rest on the Rules, not on a text we hold, and the screen
+// says so. Same treatment as PAS-3 under Rule 12 (CLAUDE.md section 2n).
+var LG_SMALL_CAP = 40000000;      // Rs 4 crore
+var LG_SMALL_TURNOVER = 400000000; // Rs 40 crore
+
+function lgIsSmallCompany(c){
+  if(!c) return false;
+  // An OPC is not a "small company" as defined; it has its own exemptions, which
+  // happen to overlap. Conflating them would put s.2(85) reasons on an OPC row.
+  if(c.type !== 'private') return false;
+  if(c.is_holding === true || c.is_subsidiary === true) return false;
+  var cap = parseFloat(c.capital || 0), tur = parseFloat(c.turnover || 0);
+  return cap <= LG_SMALL_CAP && tur <= LG_SMALL_TURNOVER;
+}
+
+// Whether s.2(85) could be settled at all. Holding/subsidiary status is not a
+// column on companies, so for an entity that is one, this engine cannot know.
+function lgSmallCompanyUnknowns(c){
+  var out = [];
+  if(c && c.type === 'private' && c.is_holding == null && c.is_subsidiary == null)
+    out.push('Whether this company is a holding or subsidiary company is not recorded. ' +
+             'Either would take it out of s.2(85) however small its figures.');
+  return out;
+}
+
+// Which Act governs. An LLP is not a company under the Companies Act 2013 and
+// almost nothing in it reaches one.
+function lgEntityRegime(c){
+  return (c && c.type === 'llp') ? 'llp' : 'companies_act';
+}
+
+// ── the exclusions, each citing the provision it rests on ───────
+// Returns a map of key -> reason for rows this class does not owe. Applied in
+// getComplianceChart so every screen inherits it.
+// ── what the class changes about a duty that still applies ──────
+// Distinct from lgClassExclusions, which removes a duty entirely. These rows are
+// owed; the class changes their FORM or CONTENT. The corpus states both options
+// and picks neither, which is no help to whoever is filing.
+function lgClassNote(c, row){
+  if(!c || !row) return null;
+  var sec = String(row.section || ''), ob = String(row.obligation || '');
+  var isSmall = (typeof lgIsSmallCompany === 'function') && lgIsSmallCompany(c);
+  var isOPC = c.type === 'opc';
+  if(!isSmall && !isOPC) return null;
+  var who = isOPC ? 'A One Person Company' : 'A small company under s.2(85)';
+
+  // Annual return: MGT-7A rather than MGT-7.
+  if(/\bSec(?:tion)?\.?\s*92\b/i.test(sec) && /annual return/i.test(ob)){
+    return who + ' files <b>MGT-7A</b>, not MGT-7. The form is prescribed by Rule 11(1) of ' +
+      'the Companies (Management and Administration) Rules 2014, which is not in reference/. ' +
+      'The Act itself settles only the signing: the proviso to s.92(1) lets the company ' +
+      'secretary sign, or a director where there is none — a practising company secretary ' +
+      'is not required.';
+  }
+
+  // Board's report: abridged, and for an OPC the Act itself narrows it.
+  if(/\bSec(?:tion)?\.?\s*134\b/i.test(sec) && /board.s report/i.test(ob)){
+    if(isOPC){
+      return 'For a One Person Company the Act itself narrows this. s.134(4): the Board&rsquo;s ' +
+        'report "shall ... mean a report containing explanations or comments by the Board on ' +
+        'every qualification, reservation or adverse remark or disclaimer made by the auditor ' +
+        'in his report" — the s.134(3) list does not have to be reproduced.';
+    }
+    return who + ' may file an <b>abridged</b> Board&rsquo;s report. s.134(3A) empowers the ' +
+      'Central Government to prescribe one "for the purpose of compliance with this section by ' +
+      'One Person Company or small company"; its contents are in Rule 8A of the Companies ' +
+      '(Accounts) Rules 2014, which is not in reference/.';
+  }
+
+  // Board meeting cadence, stated in the Act.
+  if(/\b173\b/.test(sec) && /board meeting/i.test(ob)){
+    return who + ' is "deemed to have complied ... if at least one meeting of the Board of ' +
+      'Directors has been conducted in each half of a calendar year and the gap between the ' +
+      'two meetings is not less than ninety days" — s.173(5).' +
+      (isOPC ? ' Where an OPC has only one director, the proviso disapplies s.173 and s.174 ' +
+               'altogether.' : '');
+  }
+  return null;
+}
+
+function lgClassExclusions(c){
+  var out = {};
+  if(!c) return out;
+
+  if(lgEntityRegime(c) === 'llp'){
+    out.__regime = 'The Limited Liability Partnership Act 2008 governs this entity. ' +
+      'Obligations under the Companies Act 2013 do not apply to it.';
+    return out;
+  }
+
+  // s.96(1): "Every company other than a One Person Company shall in each year
+  // hold ... a general meeting as its annual general meeting".
+  if(c.type === 'opc'){
+    out.agm = 'A One Person Company holds no annual general meeting — s.96(1) applies to ' +
+      '"every company other than a One Person Company".';
+  }
+  return out;
+}
+
+// Does a row carry an obligation the class is excluded from? Matched on the
+// provision rather than on a key, because the generated rule sets and the
+// hardcoded rows use different keys for the same duty.
+function lgRowIsAGM(r){
+  var sec = String((r && r.section) || '');
+  var ob  = String((r && r.obligation) || '');
+  return /\bSec(?:tion)?\.?\s*96\b/i.test(sec) && /annual general meeting/i.test(ob);
+}
+
+// ── what an LLP actually owes ───────────────────────────────────
+// The LLP Act 2008 and the LLP Rules 2009 are NOT in reference/ — the only texts
+// held are the Companies Act, LODR, PIT and the depositories regulations. These
+// two filings and their dates therefore rest on the owner's own knowledge of the
+// Act, not on a text this project holds, and every row says so. That is a weaker
+// footing than the rest of the register and must not be hidden.
+function lgLlpRows(c, ctx){
+  var dt = ctx.dt, y = ctx.y;
+  var caveat = 'The LLP Act 2008 and the LLP Rules 2009 are not in reference/, so this ' +
+               'period has not been checked against a held text.';
+  return [
+    {key:'llp-form11', law:'LLP Act 2008', section:'Sec 35', form:'Form 11',
+     obligation:'Annual Return of the LLP',
+     owner:'Designated Partner', due: dt(y, 5, 30), risk:'critical',
+     penalty:'Rs 100 per day, no cap', applicable:true,
+     dueConfidence:'stated', derivedNote:'Within 60 days of the close of the financial year. ' + caveat},
+    {key:'llp-form8', law:'LLP Act 2008', section:'Sec 34(2), (3)', form:'Form 8',
+     obligation:'Statement of Account and Solvency',
+     owner:'Designated Partner', due: dt(y, 10, 30), risk:'critical',
+     penalty:'Rs 100 per day, no cap', applicable:true,
+     dueConfidence:'stated', derivedNote:'Within 30 days from the end of six months of the ' +
+       'financial year. ' + caveat},
+    {key:'llp-fla', law:'FEMA / RBI', section:'Master Dir', form:'FLA',
+     obligation:'Foreign Liabilities & Assets Return to RBI',
+     owner:'Designated Partner', due: dt(y, 7, 15), risk:'medium',
+     penalty:'FEMA compounding', applicable:true,
+     derivedNote:'An LLP with foreign direct investment files this as a company does.'}
+  ];
+}
+
 function getComplianceChart(c, opts){
   var y  = new Date().getFullYear();
 
@@ -5489,6 +5675,33 @@ function getComplianceChart(c, opts){
       rows = rows.concat(regDerivedRows(c, {dt:dt, plus:plus, y:y, fyEnd:_fyEnd, fyStart:_fyStart}));
     }
   }catch(e){ console.error('[registers]', e); }
+
+  // ── class exclusions, and the LLP's own set ──────────────────
+  // Applied here so every consumer inherits them. Each carries the provision it
+  // rests on; a silent filter would be the same defect as an invented date.
+  var _excl = (typeof lgClassExclusions === 'function') ? lgClassExclusions(c) : {};
+  if(_excl.__regime){
+    // Nothing in the Companies Act corpus reaches an LLP. Replace the lot rather
+    // than filtering row by row and hoping none was missed.
+    rows = (typeof lgLlpRows === 'function')
+      ? lgLlpRows(c, {dt:dt, plus:plus, y:y}) : [];
+  } else {
+    rows = rows.filter(function(r){
+      if(_excl.agm && typeof lgRowIsAGM === 'function' && lgRowIsAGM(r)){
+        r.__excludedReason = _excl.agm;
+        return false;
+      }
+      return true;
+    });
+    // A duty the class still owes, in a different form. Attached to the row so
+    // the detail view and the board report both carry it.
+    if(typeof lgClassNote === 'function'){
+      rows.forEach(function(r){
+        var n = lgClassNote(c, r);
+        if(n) r.classNote = n;
+      });
+    }
+  }
 
   // A user's "not applicable" overrides the engine, which cannot know whether
   // this company accepts deposits, has a subsidiary or holds foreign assets.
@@ -8585,7 +8798,10 @@ var CALC_TABS = [
   ['s186', 'Loan &amp; investment'],
   ['s185', 'Loan to a director'],
   ['s123', 'Dividend'],
+  ['s180', 'Borrowing powers'],
+  ['dep',  'Is it a deposit?'],
   ['fees', 'Late filing fee'],
+  ['llpfee','LLP filing fee'],
   ['board','Board composition']
 ];
 
@@ -8826,6 +9042,123 @@ function calcBoardCheck(company, directors){
           isPublic:isPublic, isListedPublic:isListedPublic, checks:out};
 }
 
+// ── Section 180(1)(c) — the Board's borrowing ceiling ───────────
+// "to borrow money, where the money to be borrowed, together with the money
+// already borrowed by the company will exceed aggregate of its paid-up share
+// capital, free reserves and securities premium, apart from temporary loans
+// obtained from the company's bankers in the ordinary course of business".
+//
+// Temporary loans are defined by the Explanation: repayable on demand or within
+// six months, such as short-term or cash-credit arrangements and the discounting
+// of bills — "but does not include loans raised for the purpose of financial
+// expenditure of a capital nature". So they come out of the numerator, and the
+// screen says what the Act means by them rather than leaving it to the reader.
+function calc180Limit(paidUp, freeReserves, secPremium, alreadyBorrowed, temporary, proposed){
+  var limit = calcNum(paidUp) + calcNum(freeReserves) + calcNum(secPremium);
+  var counted = calcNum(alreadyBorrowed) - calcNum(temporary);
+  if(counted < 0) counted = 0;
+  var total = counted + calcNum(proposed);
+  return {
+    limit: limit, counted: counted, temporary: calcNum(temporary),
+    proposed: calcNum(proposed), total: total,
+    headroom: limit - total, exceeds: total > limit
+  };
+}
+
+// ── Deposits — is this money a deposit at all ───────────────────
+// s.73(1) prohibits deposits from the public; s.73(2) allows them from members
+// on conditions. What is EXCLUDED from "deposit" is in Rule 2(1)(c) of the
+// Companies (Acceptance of Deposits) Rules 2014, and the limit on what a private
+// company may take from its members is in Rule 3(3). NEITHER is in reference/.
+//
+// So this narrows the question and names the rule; it does not pretend to
+// decide it. Each exclusion below is stated as the Rules put it, flagged as
+// resting on a text not held.
+var CALC_DEP_SOURCES = [
+  ['director',  'A director, out of their own funds'],
+  ['member',    'A member of a private company'],
+  ['relative',  'A relative of a director of a private company'],
+  ['bank',      'A bank or a public financial institution'],
+  ['company',   'Another company (an inter-corporate deposit)'],
+  ['public',    'The public, or anyone not in the list above']
+];
+function calcDepositTest(source, isPrivate, declaration, paidUp, freeReserves, secPremium, amount){
+  var cap = calcNum(paidUp) + calcNum(freeReserves) + calcNum(secPremium);
+  var limit = cap;                   // Rule 3(3): one hundred per cent
+  var amt = calcNum(amount);
+  var r = {source:source, limit:limit, amount:amt, exceeds:amt > limit, ruleHeld:false};
+
+  if(source === 'director'){
+    r.verdict = 'not_deposit';
+    r.why = 'Money received from a director is excluded from "deposit" where the director ' +
+      'furnishes a written declaration that it is not being given out of funds acquired by ' +
+      'borrowing or accepting loans or deposits from others.';
+    r.needs = declaration ? null : 'The written declaration has not been recorded. Without it ' +
+      'the exclusion does not operate and this is a deposit.';
+    if(!declaration) r.verdict = 'conditional';
+    r.rule = 'Rule 2(1)(c)(viii) of the Companies (Acceptance of Deposits) Rules 2014';
+  } else if(source === 'relative'){
+    r.verdict = isPrivate ? (declaration ? 'not_deposit' : 'conditional') : 'deposit';
+    r.why = isPrivate
+      ? 'A relative of a director of a PRIVATE company is within the same exclusion, on the ' +
+        'same written declaration.'
+      : 'The exclusion for a relative of a director is available only to a private company.';
+    if(isPrivate && !declaration) r.needs = 'The written declaration has not been recorded.';
+    r.rule = 'Rule 2(1)(c)(viii), as extended to private companies';
+  } else if(source === 'member'){
+    if(!isPrivate){
+      r.verdict = 'deposit';
+      r.why = 'Money from members of a company that is not private is a deposit, acceptable ' +
+        'only under s.73(2) — a members’ resolution, a circular filed with the Registrar ' +
+        'thirty days before issue, the deposit repayment reserve, and the certificate of no ' +
+        'default.';
+      r.rule = 's.73(2)(a) to (f)';
+    } else {
+      r.verdict = r.exceeds ? 'deposit' : 'not_deposit';
+      r.why = 'A private company may accept from its members monies not exceeding one hundred ' +
+        'per cent of the aggregate of paid-up share capital, free reserves and securities ' +
+        'premium. Beyond that it is a deposit.';
+      r.rule = 'Rule 3(3) of the Companies (Acceptance of Deposits) Rules 2014';
+    }
+  } else if(source === 'bank' || source === 'company'){
+    r.verdict = 'not_deposit';
+    r.why = source === 'bank'
+      ? 'Money received from a banking company or a public financial institution is excluded.'
+      : 'Money received from another company is excluded — an inter-corporate deposit is not a ' +
+        '"deposit" for this Chapter, though s.186 still governs the lender.';
+    r.rule = 'Rule 2(1)(c)';
+  } else {
+    r.verdict = 'deposit';
+    r.why = 'Money from the public is a deposit. s.73(1): "no company shall invite, accept or ' +
+      'renew deposits under this Act from the public except in a manner provided under this ' +
+      'Chapter", and that manner is open only to the eligible companies s.76 describes.';
+    r.rule = 's.73(1), s.76';
+  }
+  return r;
+}
+
+// ── LLP filing fees ─────────────────────────────────────────────
+// The slabs are in Annexure A to the LLP Rules 2009, which is NOT in reference/,
+// and neither is the LLP Act. This returns the shape of the answer and refuses
+// to state the amount, for the same reason s.403 refuses every form but two.
+var CALC_LLP_FORMS = [
+  ['form11', 'Form 11 — Annual Return', 'Within 60 days of the close of the financial year'],
+  ['form8',  'Form 8 — Statement of Account and Solvency',
+             'Within 30 days from the end of six months of the financial year'],
+  ['form3',  'Form 3 — LLP agreement or changes to it', 'Within 30 days of incorporation or change'],
+  ['form4',  'Form 4 — Change among partners or designated partners', 'Within 30 days of the change']
+];
+function calcLlpFee(formKey, dueOn, filedOn){
+  var f = null;
+  for(var i=0;i<CALC_LLP_FORMS.length;i++) if(CALC_LLP_FORMS[i][0]===formKey) f = CALC_LLP_FORMS[i];
+  if(!f) return {error:'Pick a form.'};
+  if(!dueOn || !filedOn) return {form:f, error:'Both dates are needed to count the delay.'};
+  var d1 = new Date(dueOn + 'T00:00:00'), d2 = new Date(filedOn + 'T00:00:00');
+  if(isNaN(d1) || isNaN(d2)) return {form:f, error:'Those dates do not read as dates.'};
+  var days = Math.round((d2 - d1) / 86400000);
+  return {form:f, days: days > 0 ? days : 0, late: days > 0, unpriced:true};
+}
+
 // ── the screen ──────────────────────────────────────────────────
 function calcSetMode(m){ calcRead(); CALC_MODE = m; renderCalc(); }
 
@@ -8999,6 +9332,49 @@ function calcForm(){
         'be declared. The third proviso forbids declaring out of reserves other than free '+
         'reserves. Declaring out of accumulated profits where the year is inadequate is '+
         'governed by rules not held here.');
+
+  case 's180':
+    return '<div class="calc-grid">'+
+      calcField('b_paidup','Paid-up share capital','s.180(1)(c)')+
+      calcField('b_freeres','Free reserves','s.180(1)(c)')+
+      calcField('b_secprem','Securities premium','s.180(1)(c)')+
+      calcField('b_already','Money already borrowed','')+
+      calcField('b_temp','Of that, temporary loans from the company&rsquo;s bankers',
+                's.180(1)(c) Explanation')+
+      calcField('b_proposed','Amount now proposed to be borrowed','')+
+      '</div>'+
+      calcNote('<b>&ldquo;Temporary loans&rdquo;</b> means loans repayable on demand or within '+
+        'six months &mdash; short-term or cash-credit arrangements, the discounting of bills, '+
+        'other short-term loans of a seasonal character &mdash; <b>but not</b> loans raised for '+
+        'capital expenditure. Only borrowings from the company&rsquo;s bankers in the ordinary '+
+        'course qualify. Enter only that part here.');
+
+  case 'dep':
+    return '<div class="calc-grid">'+
+      calcSelect('d_source','Who is the money coming from?', CALC_DEP_SOURCES, 's.73, Deposit Rules')+
+      calcSelect('d_decl','Has a written declaration been taken that the money is not itself borrowed?',
+                 [['no','No'],['yes','Yes']], 'Rule 2(1)(c)(viii)')+
+      calcField('d_paidup','Paid-up share capital','Rule 3(3)')+
+      calcField('d_freeres','Free reserves','Rule 3(3)')+
+      calcField('d_secprem','Securities premium','Rule 3(3)')+
+      calcField('d_amount','Amount received or proposed','')+
+      '</div>'+
+      calcNote('<b>The Deposit Rules are not in <span class="calc-mono">reference/</span>.</b> '+
+        'The Act prohibits deposits from the public (s.73(1)) and allows them from members on '+
+        'conditions (s.73(2)); <i>what is excluded from the word &ldquo;deposit&rdquo; at all</i> '+
+        'is in Rule 2(1)(c), and the private-company limit is in Rule 3(3). Both are named below '+
+        'rather than relied on silently.');
+
+  case 'llpfee':
+    return '<div class="calc-grid">'+
+      calcSelect('l_form','Form', CALC_LLP_FORMS.map(function(f){ return [f[0], f[1]]; }), 'LLP Act 2008')+
+      calcDate('l_due','Due date')+
+      calcDate('l_filed','Date filed, or today')+
+      '</div>'+
+      calcNote('<b>Neither the LLP Act 2008 nor the LLP Rules 2009 is in '+
+        '<span class="calc-mono">reference/</span>.</b> The fee slabs turn on the contribution '+
+        'of the LLP and sit in Annexure A to the Rules. This will count the delay and name what '+
+        'governs the fee; it will not state an amount it cannot cite.');
 
   case 'fees':
     return '<div class="calc-grid">'+
@@ -9185,6 +9561,72 @@ function calcOutput(){
       '</div></div></div>';
   }
 
+  case 's180': {
+    var B180 = calc180Limit(calcN('b_paidup'), calcN('b_freeres'), calcN('b_secprem'),
+                            calcN('b_already'), calcN('b_temp'), calcN('b_proposed'));
+    return '<div class="cc-card"><div class="cc-card-h">The Board&rsquo;s ceiling</div>'+
+      '<div class="cc-card-b">'+
+      calcResult('Paid-up capital + free reserves + securities premium', calcMoney(B180.limit),
+        'Beyond this the Board cannot borrow without the members.')+
+      '<div class="calc-base-line">Already borrowed, less '+calcMoney(B180.temporary)+
+        ' of temporary bank loans = '+calcMoney(B180.counted)+
+        '; plus '+calcMoney(B180.proposed)+' proposed = <b>'+calcMoney(B180.total)+'</b></div>'+
+      (B180.exceeds
+        ? '<div class="calc-warn"><b>Over the ceiling by '+calcMoney(-B180.headroom)+'.</b> '+
+          's.180(1) requires the consent of the company by <b>special resolution</b> before the '+
+          'Board exercises this power, and s.180(2) requires that resolution to <b>specify the '+
+          'total amount</b> up to which monies may be borrowed. A resolution without a figure '+
+          'does not authorise the borrowing.</div>'
+        : '<div class="calc-ok">Within the Board&rsquo;s own powers, with headroom of '+
+          calcMoney(B180.headroom)+'. No special resolution is required on this limb.</div>')+
+      '<div class="calc-note">s.180(5): a debt incurred beyond this limit is not valid against '+
+      'the company unless the lender proves it advanced the loan without knowing the limit had '+
+      'been exceeded. Note this is a different test from s.186, which caps <i>lending and '+
+      'investing</i>; a company can be inside one and outside the other.</div></div></div>';
+  }
+
+  case 'dep': {
+    var D = calcDepositTest(CALC_V.d_source || 'director',
+              !c || c.type === 'private', String(CALC_V.d_decl || 'no') === 'yes',
+              calcN('d_paidup'), calcN('d_freeres'), calcN('d_secprem'), calcN('d_amount'));
+    var tone = D.verdict === 'not_deposit' ? 'ok' : 'warn';
+    var head = D.verdict === 'not_deposit' ? 'Not a deposit'
+             : D.verdict === 'conditional' ? 'Not a deposit &mdash; but only on a condition not yet met'
+             : 'This is a deposit';
+    return '<div class="cc-card"><div class="cc-card-h">'+head+'</div><div class="cc-card-b">'+
+      '<div class="calc-'+tone+'">'+D.why+(D.needs ? ' <b>'+D.needs+'</b>' : '')+'</div>'+
+      (D.source === 'member' && (!c || c.type === 'private')
+        ? '<div class="calc-base-line">Limit: '+calcMoney(D.limit)+
+          ' &middot; received or proposed: '+calcMoney(D.amount)+
+          (D.exceeds ? ' &mdash; <b>over by '+calcMoney(D.amount - D.limit)+'</b>' : '')+'</div>'
+        : '')+
+      '<div class="calc-base-line">On <span class="calc-mono">'+D.rule+'</span></div>'+
+      '<div class="calc-warn"><b>The Deposit Rules are not held here.</b> The Act settles the '+
+      'prohibition and the s.73(2) conditions; the exclusions in Rule 2(1)(c) and the Rule 3(3) '+
+      'limit above are stated from the rule named, not from a text in '+
+      '<span class="calc-mono">reference/</span>. Confirm both before acting.</div>'+
+      '<div class="calc-note">Whatever the answer, <b>DPT-3 is filed by 30 June every year, '+
+      'including a nil return</b>, covering money received that is not a deposit as well as '+
+      'money that is. It is already in the register as an obligation.</div></div></div>';
+  }
+
+  case 'llpfee': {
+    var LF = calcLlpFee(CALC_V.l_form || 'form11', CALC_V.l_due, CALC_V.l_filed);
+    var body = LF.error
+      ? '<div class="cc-none">'+LF.error+'</div>'
+      : (LF.late
+          ? '<div class="calc-warn"><b>'+LF.days+' days late.</b></div>'
+          : '<div class="calc-ok">Filed on or before the due date.</div>');
+    return '<div class="cc-card"><div class="cc-card-h">'+
+      (LF.form ? LF.form[1] : 'LLP filing')+'</div><div class="cc-card-b">'+body+
+      (LF.form ? '<div class="calc-base-line">'+LF.form[2]+'</div>' : '')+
+      '<div class="calc-warn"><b>This cannot be priced here.</b> The LLP fee slabs turn on the '+
+      'contribution of the LLP and are set by Annexure A to the LLP Rules 2009 &mdash; neither '+
+      'the Rules nor the LLP Act 2008 is in <span class="calc-mono">reference/</span>. Every '+
+      'other number in this product cites a text this project holds, and this one cannot, so it '+
+      'is not stated.</div></div></div>';
+  }
+
   case 'fees': {
     var F = calc403Fee(CALC_V.feeform || 'mgt7', CALC_V.feedue, CALC_V.feefiled);
     if(F.error) return '<div class="cc-card"><div class="cc-card-b"><div class="cc-none">'+
@@ -9240,6 +9682,512 @@ function calcOutput(){
   }
   }
   return '';
+}
+
+// ═══════════════════════════════════════════════════
+// CHECKLISTS
+// ═══════════════════════════════════════════════════
+// held:true  — the item is in reference/companies-act-2013 and is quoted
+// held:false — the duty is real but its detail is in a Rule or an ICSI standard
+//              this project does not hold. Marked on screen, never blurred into
+//              the ones that are.
+
+var CHK_MODE = 'dirrep';
+var CHK_STATE = {};      // ticked items, per browser — a working note, not a record
+
+var CHK_TABS = [
+  ['dirrep', 'Directors&rsquo; Report'],
+  ['ss1',    'Board meeting'],
+  ['ss2',    'General meeting'],
+  ['audit',  'Statutory audit'],
+  ['postinc','Post-incorporation']
+];
+
+// ── s.134(3): what must be in the Board's report ────────────────
+var CHK_DIRREP = [
+  {c:'(a)', t:'The web address, if any, where the annual return under s.92(3) has been placed', held:true},
+  {c:'(b)', t:'Number of meetings of the Board', held:true},
+  {c:'(c)', t:'Directors&rsquo; Responsibility Statement — the five clauses of s.134(5)', held:true},
+  {c:'(ca)',t:'Frauds reported by the auditor under s.143(12), other than those reportable to the Central Government', held:true},
+  {c:'(d)', t:'A statement on the declaration given by independent directors under s.149(6)', held:true,
+   only:'listed'},
+  {c:'(e)', t:'Where s.178(1) applies — the policy on directors&rsquo; appointment and remuneration, '+
+              'including criteria for qualifications, positive attributes and independence', held:true,
+   only:'listed'},
+  {c:'(f)', t:'Explanations or comments by the Board on every qualification, reservation, adverse '+
+              'remark or disclaimer made by the auditor and by the PCS in the secretarial audit report', held:true},
+  {c:'(g)', t:'Particulars of loans, guarantees or investments under s.186', held:true},
+  {c:'(h)', t:'Particulars of contracts or arrangements with related parties under s.188(1), in the prescribed form (AOC-2)', held:true},
+  {c:'(i)', t:'The state of the company&rsquo;s affairs', held:true},
+  {c:'(j)', t:'Amounts, if any, proposed to be carried to any reserves', held:true},
+  {c:'(k)', t:'The amount, if any, recommended to be paid by way of dividend', held:true},
+  {c:'(l)', t:'Material changes and commitments affecting the financial position, occurring between '+
+              'the end of the financial year and the date of the report', held:true},
+  {c:'(m)', t:'Conservation of energy, technology absorption, foreign exchange earnings and outgo', held:true,
+   note:'"in such manner as may be prescribed" — the manner is in Rule 8(3) of the Companies (Accounts) Rules 2014, not held here.'},
+  {c:'(n)', t:'A statement on the development and implementation of a risk management policy, '+
+              'identifying elements of risk that may threaten the existence of the company', held:true},
+  {c:'(o)', t:'Details of the CSR policy developed and implemented, and initiatives taken during the year', held:true},
+  {c:'(p)', t:'For a listed company and every other public company with prescribed paid-up capital — '+
+              'the manner of formal annual evaluation of the Board, its Committees and individual directors', held:true,
+   only:'public'},
+  {c:'(q)', t:'Such other matters as may be prescribed', held:false,
+   note:'Rule 8 of the Companies (Accounts) Rules 2014 adds further matters. That Rule is not in reference/.'}
+];
+
+// s.134(5) — the Directors' Responsibility Statement, verbatim in substance.
+var CHK_DRS = [
+  ['(a)', 'the applicable accounting standards had been followed in preparing the annual accounts, '+
+          'with proper explanation relating to material departures'],
+  ['(b)', 'accounting policies were selected and applied consistently, and judgments and estimates '+
+          'made that are reasonable and prudent, so as to give a true and fair view'],
+  ['(c)', 'proper and sufficient care was taken for the maintenance of adequate accounting records '+
+          'for safeguarding the assets and for preventing and detecting fraud and other irregularities'],
+  ['(d)', 'the annual accounts were prepared on a going concern basis'],
+  ['(e)', 'for a listed company — internal financial controls were laid down and are adequate and '+
+          'were operating effectively']
+];
+
+// ── Board meeting: the Act, then the standard ───────────────────
+var CHK_SS1 = [
+  {c:'s.173(1)', t:'First Board meeting held within thirty days of incorporation', held:true},
+  {c:'s.173(1)', t:'At least four meetings in the year, with not more than one hundred and twenty '+
+                   'days between two consecutive meetings', held:true,
+   note:'s.173(5): an OPC, small or dormant company complies with one meeting in each half of the '+
+        'calendar year, the two at least ninety days apart.'},
+  {c:'s.173(3)', t:'Not less than seven days&rsquo; notice in writing to every director at the address '+
+                   'registered with the company, by hand, post or electronic means', held:true},
+  {c:'s.173(3) proviso', t:'Shorter notice only to transact urgent business, subject to the conditions '+
+                   'in the proviso', held:true},
+  {c:'s.174(1)', t:'Quorum — one-third of total strength or two directors, whichever is higher', held:true},
+  {c:'s.174(3)', t:'Where the number of interested directors leaves the meeting inquorate, the '+
+                   'remaining directors, being not less than two, are the quorum', held:true},
+  {c:'s.184(1)', t:'Disclosure of interest in Form MBP-1 at the first Board meeting of the financial year', held:true},
+  {c:'s.179(3)', t:'Powers exercisable only by resolution at a meeting, not by circulation', held:true},
+  {c:'s.118(1)', t:'Minutes prepared, signed and entered in the minute book within thirty days of '+
+                   'the conclusion of the meeting', held:true},
+  {c:'s.118(10)', t:'Secretarial Standard on Meetings of the Board of Directors (SS-1) observed', held:false,
+   note:'s.118(10) makes SS-1 mandatory: "Every company shall observe secretarial standards ... '+
+        'specified by the Institute of Company Secretaries of India". SS-1 itself is an ICSI '+
+        'document and is NOT in reference/, so its individual requirements &mdash; agenda and notes '+
+        'circulated with the notice, the leave of absence, the chairman&rsquo;s conduct of the meeting '+
+        '&mdash; cannot be quoted here.'}
+];
+
+var CHK_SS2 = [
+  {c:'s.96(1)', t:'AGM held within six months of the close of the financial year, and not more than '+
+                  'fifteen months after the last one', held:true,
+   note:'First AGM: within nine months of the close of the first financial year. An OPC holds none.'},
+  {c:'s.96(2)', t:'Called during business hours, between 9 a.m. and 6 p.m., on a day that is not a '+
+                  'National Holiday, at the registered office or within the same city, town or village', held:true},
+  {c:'s.101(1)', t:'Not less than clear twenty-one days&rsquo; notice, in writing or electronically', held:true},
+  {c:'s.101(1) proviso', t:'Shorter notice only with the consent of 95% of members entitled to vote '+
+                  '(AGM), or as the proviso provides for other meetings', held:true},
+  {c:'s.102', t:'Explanatory statement annexed for every item of special business', held:true},
+  {c:'s.103(1)', t:'Quorum — a private company two members present in person; a public company five, '+
+                  'fifteen or thirty by reference to whether members exceed one thousand or five thousand', held:true},
+  {c:'s.105', t:'The notice states that a member may appoint a proxy, and that the proxy need not be a member', held:true},
+  {c:'s.118(1)', t:'Minutes prepared, signed and entered within thirty days of the conclusion', held:true},
+  {c:'s.118(10)', t:'Secretarial Standard on General Meetings (SS-2) observed', held:false,
+   note:'Mandatory by s.118(10), same as SS-1. SS-2 is an ICSI document and is not in reference/.'}
+];
+
+// ── s.143(3): what the auditor's report must state ──────────────
+// The CS does not sign this, but reads it: s.134(3)(f) requires the Board to
+// explain every qualification in it, so knowing what it must cover is the CS's
+// business.
+var CHK_AUDIT = [
+  {c:'(a)', t:'Whether all information and explanations necessary for the audit were sought and '+
+              'obtained, and if not, the details and their effect on the financial statements', held:true},
+  {c:'(b)', t:'Whether proper books of account as required by law have been kept, and proper returns '+
+              'received from branches not visited', held:true},
+  {c:'(c)', t:'Whether a branch auditor&rsquo;s report under s.143(8) was received, and how it was dealt with', held:true},
+  {c:'(d)', t:'Whether the balance sheet and profit and loss account agree with the books of account and returns', held:true},
+  {c:'(e)', t:'Whether, in the auditor&rsquo;s opinion, the financial statements comply with the accounting standards', held:true},
+  {c:'(f)', t:'Observations or comments on financial transactions or matters having an adverse effect '+
+              'on the functioning of the company', held:true},
+  {c:'(g)', t:'Whether any director is disqualified from being appointed under s.164(2)', held:true},
+  {c:'(h)', t:'Any qualification, reservation or adverse remark on the maintenance of accounts', held:true},
+  {c:'(i)', t:'Whether the company has adequate internal financial controls with reference to financial '+
+              'statements, and their operating effectiveness', held:true},
+  {c:'(j)', t:'Such other matters as may be prescribed', held:false,
+   note:'Rule 11 of the Companies (Audit and Auditors) Rules 2014 and the Companies (Auditor&rsquo;s '+
+        'Report) Order add substantially to this. Neither is in reference/.'},
+  {c:'s.143(4)', t:'Where any of the above is answered in the negative or with a qualification, the '+
+              'report states the reasons', held:true},
+  {c:'s.143(12)', t:'Fraud reported to the Central Government or to the Board, by amount, within the '+
+              'prescribed time', held:false,
+   note:'The threshold and the time are in Rule 13, not held here.'}
+];
+
+// ── Post-incorporation ──────────────────────────────────────────
+var CHK_POSTINC = [
+  {c:'s.173(1)', t:'First meeting of the Board held within thirty days of incorporation', held:true},
+  {c:'s.10A', t:'Declaration of commencement of business in <b>INC-20A</b> within one hundred and '+
+                'eighty days of incorporation, confirming every subscriber has paid the value of the '+
+                'shares agreed to be taken', held:true,
+   note:'Until this is filed the company cannot commence business or exercise any borrowing powers.'},
+  {c:'s.12', t:'Registered office capable of receiving communications from the thirtieth day of '+
+               'incorporation; verification in <b>INC-22</b> within thirty days where not given on incorporation', held:true},
+  {c:'s.139(6)', t:'First auditor appointed by the Board within thirty days of registration; failing '+
+                   'that, by the members within ninety days at an extraordinary general meeting', held:true},
+  {c:'s.184(1)', t:'Disclosure of interest by every director in <b>MBP-1</b> at the first Board meeting', held:true},
+  {c:'s.164(2)', t:'Declaration of non-disqualification in <b>DIR-8</b> from every director', held:true},
+  {c:'s.118(1)', t:'Minute book opened, and minutes of the first meeting entered within thirty days', held:true},
+  {c:'s.88', t:'Registers of members, debenture-holders and other security holders opened and maintained', held:true},
+  {c:'s.128', t:'Books of account kept at the registered office from the date of incorporation', held:true},
+  {c:'s.96(1) proviso', t:'First AGM within nine months of the close of the first financial year', held:true},
+  {c:'—', t:'Statutory registers, common seal if adopted, letterhead, name board and PAN/TAN/GST as applicable', held:false,
+   note:'Housekeeping that follows from the above rather than from a single section.'}
+];
+
+function chkList(){
+  switch(CHK_MODE){
+    case 'dirrep':  return CHK_DIRREP;
+    case 'ss1':     return CHK_SS1;
+    case 'ss2':     return CHK_SS2;
+    case 'audit':   return CHK_AUDIT;
+    case 'postinc': return CHK_POSTINC;
+  }
+  return [];
+}
+function chkKey(i){ return CHK_MODE + ':' + i; }
+function chkToggle(i){
+  var k = chkKey(i);
+  CHK_STATE[k] = !CHK_STATE[k];
+  try{ localStorage.setItem('lg_chk', JSON.stringify(CHK_STATE)); }catch(e){}
+  renderChecks();
+}
+function chkSetMode(m){ CHK_MODE = m; renderChecks(); }
+function chkReset(){
+  var L = chkList();
+  for(var i=0;i<L.length;i++) delete CHK_STATE[chkKey(i)];
+  try{ localStorage.setItem('lg_chk', JSON.stringify(CHK_STATE)); }catch(e){}
+  renderChecks();
+}
+
+// Whether an item is shown at all depends on the company class, where the
+// section itself limits it. Nothing is hidden silently — the count says so.
+function chkApplies(item, c){
+  if(!item.only || !c) return true;
+  if(item.only === 'listed') return c.type === 'listed';
+  if(item.only === 'public') return c.type === 'listed' || c.type === 'public';
+  return true;
+}
+
+function chkEntity(){
+  if(typeof CLIENTS === 'undefined' || !CLIENTS.length) return null;
+  var sel = document.getElementById('chk-entity');
+  var id = sel ? sel.value : CLIENTS[0].id;
+  for(var i=0;i<CLIENTS.length;i++) if(String(CLIENTS[i].id) === String(id)) return CLIENTS[i];
+  return CLIENTS[0];
+}
+
+// ── the Directors' Report skeleton ──────────────────────────────
+// Headings and the statutory language only. Every figure is left as a blank for
+// the CS to complete, because a report with invented numbers in it is worse than
+// no report at all.
+function chkBuildDirReport(c){
+  var name = c ? c.name : '[Company name]';
+  var L = [];
+  L.push("BOARD'S REPORT");
+  L.push('');
+  L.push('To the Members of ' + name);
+  L.push('');
+  L.push('Your Directors present the [  ] Annual Report of the Company together with the Audited');
+  L.push('Financial Statements for the financial year ended [  ].');
+  L.push('');
+  CHK_DIRREP.forEach(function(it){
+    if(!chkApplies(it, c)) return;
+    L.push('── ' + it.c + ' ' + String(it.t).replace(/<[^>]+>/g, '') + ' — s.134(3)' + it.c);
+    L.push('[  ]');
+    L.push('');
+  });
+  L.push("DIRECTORS' RESPONSIBILITY STATEMENT — Section 134(5)");
+  L.push('');
+  L.push('Pursuant to section 134(5), your Directors state that —');
+  CHK_DRS.forEach(function(d){
+    L.push('  ' + d[0] + '  ' + d[1] + ';');
+  });
+  L.push('');
+  L.push('                                        For and on behalf of the Board of Directors');
+  L.push('');
+  L.push('Place: [  ]                             [  ]                    [  ]');
+  L.push('Date:  [  ]                             Director                Director');
+  L.push('                                        DIN: [  ]               DIN: [  ]');
+  return L.join('\n');
+}
+function chkCopyReport(){
+  var el = document.getElementById('chk-report');
+  if(!el) return;
+  el.select();
+  try{ document.execCommand('copy'); }catch(e){}
+  var b = document.getElementById('chk-copybtn');
+  if(b){ b.textContent = 'Copied'; setTimeout(function(){ b.textContent = 'Copy'; }, 1600); }
+}
+
+// ═══════════════════════════════════════════════════
+// NIC 2008 — division finder
+// ═══════════════════════════════════════════════════
+// Complete at SECTION and DIVISION level: 21 sections, 88 divisions, which is
+// the whole of NIC 2008 at those two levels. Divisions run 01-99 with gaps --
+// there is no 04, 34, 40, 44, 48, 54, 57, 67, 76, 83 or 89 -- so 88 is the count,
+// not 99. The five-digit sub-class SPICe+ asks for sits two levels below; the NIC
+// booklet is not in reference/, so those are not listed rather than guessed at.
+// Narrowing to the right division is most of the work and can be done exactly.
+
+var NIC_SECTIONS = [
+  ['A','Agriculture, forestry and fishing'],
+  ['B','Mining and quarrying'],
+  ['C','Manufacturing'],
+  ['D','Electricity, gas, steam and air conditioning supply'],
+  ['E','Water supply; sewerage, waste management and remediation'],
+  ['F','Construction'],
+  ['G','Wholesale and retail trade; repair of motor vehicles and motorcycles'],
+  ['H','Transportation and storage'],
+  ['I','Accommodation and food service activities'],
+  ['J','Information and communication'],
+  ['K','Financial and insurance activities'],
+  ['L','Real estate activities'],
+  ['M','Professional, scientific and technical activities'],
+  ['N','Administrative and support service activities'],
+  ['O','Public administration and defence; compulsory social security'],
+  ['P','Education'],
+  ['Q','Human health and social work activities'],
+  ['R','Arts, entertainment and recreation'],
+  ['S','Other service activities'],
+  ['T','Activities of households as employers'],
+  ['U','Activities of extraterritorial organisations and bodies']
+];
+
+// [division, section, title, search aliases]
+// The aliases exist because nobody describes their business in NIC's words. A
+// company secretary types "software" or "trading", not "computer programming,
+// consultancy and related activities".
+var NIC_DIVISIONS = [
+  ['01','A','Crop and animal production, hunting and related service activities','farming agriculture crop cattle dairy poultry'],
+  ['02','A','Forestry and logging','timber wood forest'],
+  ['03','A','Fishing and aquaculture','fish fishery prawn shrimp'],
+  ['05','B','Mining of coal and lignite','coal'],
+  ['06','B','Extraction of crude petroleum and natural gas','oil gas petroleum'],
+  ['07','B','Mining of metal ores','iron ore bauxite metal mining'],
+  ['08','B','Other mining and quarrying','stone sand quarry granite marble'],
+  ['09','B','Mining support service activities','drilling mining services'],
+  ['10','C','Manufacture of food products','food processing bakery dairy flour edible oil'],
+  ['11','C','Manufacture of beverages','beverage drinks water bottling liquor'],
+  ['12','C','Manufacture of tobacco products','tobacco cigarette'],
+  ['13','C','Manufacture of textiles','textile yarn fabric spinning weaving cotton'],
+  ['14','C','Manufacture of wearing apparel','garment apparel clothing readymade'],
+  ['15','C','Manufacture of leather and related products','leather footwear shoes'],
+  ['16','C','Manufacture of wood and products of wood and cork, except furniture','plywood wood timber'],
+  ['17','C','Manufacture of paper and paper products','paper packaging carton'],
+  ['18','C','Printing and reproduction of recorded media','printing press publishing print'],
+  ['19','C','Manufacture of coke and refined petroleum products','refinery petroleum coke'],
+  ['20','C','Manufacture of chemicals and chemical products','chemical fertiliser paint dye'],
+  ['21','C','Manufacture of pharmaceuticals, medicinal chemical and botanical products','pharma medicine drug formulation api'],
+  ['22','C','Manufacture of rubber and plastics products','plastic rubber tyre pipe'],
+  ['23','C','Manufacture of other non-metallic mineral products','cement glass ceramic tiles'],
+  ['24','C','Manufacture of basic metals','steel iron aluminium foundry'],
+  ['25','C','Manufacture of fabricated metal products, except machinery and equipment','fabrication metal structural'],
+  ['26','C','Manufacture of computer, electronic and optical products','electronics computer hardware semiconductor'],
+  ['27','C','Manufacture of electrical equipment','electrical cable motor transformer battery'],
+  ['28','C','Manufacture of machinery and equipment n.e.c.','machinery machine tools equipment'],
+  ['29','C','Manufacture of motor vehicles, trailers and semi-trailers','automobile car auto components vehicle'],
+  ['30','C','Manufacture of other transport equipment','ship railway aircraft cycle'],
+  ['31','C','Manufacture of furniture','furniture'],
+  ['32','C','Other manufacturing','jewellery toys sports goods medical devices'],
+  ['33','C','Repair and installation of machinery and equipment','repair installation maintenance machinery'],
+  ['35','D','Electricity, gas, steam and air conditioning supply','power electricity solar renewable generation'],
+  ['36','E','Water collection, treatment and supply','water supply'],
+  ['37','E','Sewerage','sewage'],
+  ['38','E','Waste collection, treatment and disposal activities; materials recovery','waste recycling scrap'],
+  ['39','E','Remediation activities and other waste management services','remediation environment'],
+  ['41','F','Construction of buildings','construction builder developer residential commercial'],
+  ['42','F','Civil engineering','infrastructure road bridge civil'],
+  ['43','F','Specialised construction activities','electrical plumbing interior contractor'],
+  ['45','G','Wholesale and retail trade and repair of motor vehicles and motorcycles','car dealer auto dealership'],
+  ['46','G','Wholesale trade, except of motor vehicles and motorcycles','wholesale trading distribution supplier import export'],
+  ['47','G','Retail trade, except of motor vehicles and motorcycles','retail shop store ecommerce'],
+  ['49','H','Land transport and transport via pipelines','transport trucking logistics road pipeline'],
+  ['50','H','Water transport','shipping marine'],
+  ['51','H','Air transport','airline aviation'],
+  ['52','H','Warehousing and support activities for transportation','warehouse logistics freight forwarding cold storage'],
+  ['53','H','Postal and courier activities','courier post delivery'],
+  ['55','I','Accommodation','hotel resort lodging hospitality'],
+  ['56','I','Food and beverage service activities','restaurant catering cafe food service cloud kitchen'],
+  ['58','J','Publishing activities','publishing books software publishing newspaper'],
+  ['59','J','Motion picture, video and television programme production, sound recording and music publishing','film media production music'],
+  ['60','J','Broadcasting and programming activities','tv radio broadcast'],
+  ['61','J','Telecommunications','telecom mobile internet service provider'],
+  ['62','J','Computer programming, consultancy and related activities','software it services saas app development technology programming'],
+  ['63','J','Information service activities','data processing hosting web portal bpo'],
+  ['64','K','Financial service activities, except insurance and pension funding','nbfc finance lending investment holding company'],
+  ['65','K','Insurance, reinsurance and pension funding, except compulsory social security','insurance'],
+  ['66','K','Activities auxiliary to financial service and insurance activities','broking insurance agent fintech payment'],
+  ['68','L','Real estate activities','real estate property leasing rental land'],
+  ['69','M','Legal and accounting activities','legal law accounting audit company secretary'],
+  ['70','M','Activities of head offices; management consultancy activities','consultancy management holding head office advisory'],
+  ['71','M','Architecture and engineering activities; technical testing and analysis','architecture engineering design testing'],
+  ['72','M','Scientific research and development','research development laboratory'],
+  ['73','M','Advertising and market research','advertising marketing branding media buying'],
+  ['74','M','Other professional, scientific and technical activities','design photography translation'],
+  ['75','M','Veterinary activities','veterinary'],
+  ['77','N','Rental and leasing activities','rental leasing equipment hire'],
+  ['78','N','Employment activities','recruitment staffing manpower hr'],
+  ['79','N','Travel agency, tour operator and other reservation service and related activities','travel tour tourism'],
+  ['80','N','Security and investigation activities','security guard'],
+  ['81','N','Services to buildings and landscape activities','facility management housekeeping cleaning'],
+  ['82','N','Office administrative, office support and other business support activities','bpo call centre outsourcing back office'],
+  ['84','O','Public administration and defence; compulsory social security','government'],
+  ['85','P','Education','education school college training coaching edtech'],
+  ['86','Q','Human health activities','hospital clinic healthcare diagnostic'],
+  ['87','Q','Residential care activities','nursing care home'],
+  ['88','Q','Social work activities without accommodation','social work ngo'],
+  ['90','R','Creative, arts and entertainment activities','arts entertainment events'],
+  ['91','R','Libraries, archives, museums and other cultural activities','library museum'],
+  ['92','R','Gambling and betting activities','gaming betting lottery'],
+  ['93','R','Sports activities and amusement and recreation activities','sports gym fitness amusement'],
+  ['94','S','Activities of membership organisations','association society trade union chamber'],
+  ['95','S','Repair of computers and personal and household goods','repair service'],
+  ['96','S','Other personal service activities','salon spa laundry personal services'],
+  ['97','T','Activities of households as employers of domestic personnel','domestic household'],
+  ['98','T','Undifferentiated goods- and services-producing activities of private households for own use','household own use'],
+  ['99','U','Activities of extraterritorial organisations and bodies','embassy international organisation']
+];
+
+var NIC_Q = '';
+function nicSearch(v){ NIC_Q = String(v || ''); renderNIC(); }
+function nicSectionName(code){
+  for(var i=0;i<NIC_SECTIONS.length;i++) if(NIC_SECTIONS[i][0] === code) return NIC_SECTIONS[i][1];
+  return code;
+}
+function nicMatch(q){
+  q = String(q || '').trim().toLowerCase();
+  if(!q) return NIC_DIVISIONS;
+  var terms = q.split(/\s+/);
+  return NIC_DIVISIONS.filter(function(d){
+    var hay = (d[0] + ' ' + d[1] + ' ' + d[2] + ' ' + d[3] + ' ' + nicSectionName(d[1])).toLowerCase();
+    return terms.every(function(t){ return hay.indexOf(t) >= 0; });
+  });
+}
+
+function renderNIC(){
+  var root = document.getElementById('nic-root');
+  if(!root) return;
+  var hits = nicMatch(NIC_Q);
+
+  var bySection = {};
+  hits.forEach(function(d){ (bySection[d[1]] = bySection[d[1]] || []).push(d); });
+
+  var body = NIC_SECTIONS.filter(function(sec){ return bySection[sec[0]]; }).map(function(sec){
+    return '<div class="nic-sec"><div class="nic-sec-h"><span class="nic-sec-c">'+sec[0]+
+      '</span>'+sec[1]+'</div>'+
+      bySection[sec[0]].map(function(d){
+        return '<div class="nic-row"><span class="nic-code">'+d[0]+'</span>'+
+          '<span class="nic-title">'+d[2]+'</span></div>';
+      }).join('')+'</div>';
+  }).join('');
+
+  root.innerHTML =
+    '<div class="cc-pagehead"><div><div class="cc-crumb">Reference &rsaquo; NIC Codes</div>'+
+    '<h1 class="cc-h1">NIC 2008</h1>'+
+    '<p class="cc-sub">All 21 sections and all 88 divisions. Search by what the business '+
+    'actually does.</p></div></div>'+
+    '<div class="cc-card cc-toolbar"><div class="cc-toolrow">'+
+    '<input id="nic-q" class="lg-field" type="text" placeholder="software, trading, hotel, '+
+    'pharma, construction&hellip;" value="'+entEsc(NIC_Q)+'" oninput="nicSearch(this.value)">'+
+    '</div></div>'+
+    '<div class="calc-note" style="margin:0 0 16px;"><b>This goes to division level, and stops '+
+    'there deliberately.</b> SPICe+ asks for a five-digit sub-class, two levels below this; the '+
+    'NIC booklet is not in <span class="calc-mono">reference/</span>, so listing five-digit '+
+    'codes here would mean inventing them &mdash; and someone would file on one. Narrow to the '+
+    'division below, then take those two digits to the NIC 2008 list on the MCA portal for the '+
+    'exact sub-class. (Divisions run 01&ndash;99 with gaps, so there are 88, not 99.)</div>'+
+    (hits.length
+      ? '<div class="nic-count">'+hits.length+' of '+NIC_DIVISIONS.length+' divisions</div>'+body
+      : '<div class="cc-card"><div class="cc-card-b"><div class="cc-none">Nothing matches '+
+        '&ldquo;'+entEsc(NIC_Q)+'&rdquo;. Try the activity rather than the industry &mdash; '+
+        '&ldquo;lending&rdquo; rather than &ldquo;NBFC&rdquo;, &ldquo;garment&rdquo; rather '+
+        'than a brand.</div></div></div>');
+}
+
+function renderChecks(){
+  var root = document.getElementById('chk-root');
+  if(!root) return;
+  try{
+    var saved = localStorage.getItem('lg_chk');
+    if(saved && !CHK_STATE.__loaded){ CHK_STATE = JSON.parse(saved) || {}; CHK_STATE.__loaded = true; }
+  }catch(e){ CHK_STATE.__loaded = true; }
+
+  var c = chkEntity();
+  var head = '<div class="cc-pagehead"><div>'+
+    '<div class="cc-crumb">Compliance &rsaquo; Checklists</div>'+
+    '<h1 class="cc-h1">Checklists</h1>'+
+    '<p class="cc-sub">Each item says whether it comes from the Act text held here, or from a '+
+    'Rule or standard that does not.</p></div></div>';
+
+  var tabs = '<div class="mw-tabs">'+CHK_TABS.map(function(t){
+    return '<div class="mw-tab'+(CHK_MODE===t[0]?' on':'')+'" onclick="chkSetMode('+
+      lgArg(t[0])+')">'+t[1]+'</div>';
+  }).join('')+'</div>';
+
+  var entSel = (typeof CLIENTS !== 'undefined' && CLIENTS.length)
+    ? '<div class="cc-card cc-toolbar"><div class="cc-toolrow">'+
+      '<div class="calc-f" style="margin:0;"><label class="calc-l">Entity</label>'+
+      '<select id="chk-entity" class="lg-field" onchange="renderChecks()">'+
+      CLIENTS.map(function(x){
+        return '<option value="'+entEsc(x.id)+'">'+entEsc(x.name)+'</option>';
+      }).join('')+'</select></div></div></div>'
+    : '';
+
+  var L = chkList();
+  var shown = [], hidden = 0;
+  L.forEach(function(it, i){
+    if(chkApplies(it, c)) shown.push({it:it, i:i}); else hidden++;
+  });
+  var done = shown.filter(function(x){ return CHK_STATE[chkKey(x.i)]; }).length;
+  var held = shown.filter(function(x){ return x.it.held; }).length;
+
+  var rows = shown.map(function(x){
+    var on = !!CHK_STATE[chkKey(x.i)];
+    return '<div class="chk-row'+(on?' on':'')+'" onclick="chkToggle('+x.i+')">'+
+      '<div class="chk-box">'+(on?'✓':'')+'</div>'+
+      '<div class="chk-main">'+
+        '<div class="chk-t">'+x.it.t+'</div>'+
+        '<div class="chk-meta"><span class="chk-cite">'+x.it.c+'</span>'+
+          (x.it.held
+            ? '<span class="chk-held">in the Act text held here</span>'
+            : '<span class="chk-unheld">rests on a text not held</span>')+
+        '</div>'+
+        (x.it.note ? '<div class="chk-note">'+x.it.note+'</div>' : '')+
+      '</div></div>';
+  }).join('');
+
+  var summary = '<div class="cc-card"><div class="cc-card-b">'+
+    '<div class="chk-sum"><b>'+done+' of '+shown.length+'</b> ticked &middot; '+
+    held+' of '+shown.length+' quote a provision in '+
+    '<span class="calc-mono">reference/</span>'+
+    (hidden ? ' &middot; '+hidden+' item'+(hidden===1?'':'s')+' not shown, being limited by the '+
+      'section to a class this entity is not in' : '')+
+    ' <span class="chk-reset" onclick="chkReset()">clear ticks</span></div></div></div>';
+
+  var extra = '';
+  if(CHK_MODE === 'dirrep'){
+    extra = '<div class="cc-card"><div class="cc-card-h">Skeleton report'+
+      ' <span id="chk-copybtn" class="chk-copy" onclick="chkCopyReport()">Copy</span></div>'+
+      '<div class="cc-card-b">'+
+      '<div class="calc-note">Headings in the order s.134(3) sets them, with the s.134(5) '+
+      'statement written out. <b>Every figure is left blank.</b> A Board&rsquo;s report with '+
+      'invented numbers in it is the one thing this product must never hand you to sign.</div>'+
+      '<textarea id="chk-report" class="chk-report" readonly>'+
+      entEsc(chkBuildDirReport(c))+'</textarea></div></div>';
+  }
+
+  root.innerHTML = head + tabs + entSel + summary +
+    '<div class="cc-card"><div class="cc-card-b">'+rows+'</div></div>' + extra +
+    '<div class="calc-foot">Ticks are kept in this browser only. They are a working note while '+
+    'you go through the list, not a record of compliance &mdash; what the register holds is the '+
+    'record. The Act text behind these citations is <b>as amended upto 01.04.2021</b>.</div>';
 }
 
 function renderCalc(){

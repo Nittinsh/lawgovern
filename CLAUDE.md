@@ -1177,6 +1177,96 @@ looks exactly like a right one**, which is the whole reason this suite exists.
 
 ---
 
+## 2z. ENTITY CLASS, AND THE REST OF THE TOOL LIST (v164)
+
+A coverage audit against a list of tools the owner wanted matched found eleven covered, four
+partly, nine not at all -- and, more importantly, **two live defects where the product asserted
+wrong law against a real entity**. Those are the same failure class as the 31 March dates in
+section 2k: a confident statement with nothing behind it.
+
+### The two defects
+
+**An LLP was told to hold four board meetings under Sec 173(1).** An LLP has no Board and no
+s.173. It was receiving exactly two obligations, one of which was wrong law and the other of which
+(FLA) was right by accident -- while **Form 11 and Form 8, the only two filings an LLP actually
+owes, were absent entirely**. The cause: `regDerivedRows` emitted Companies Act rows for every
+entity, and the generated CA corpus filtered LLPs out but the register-derived rows did not.
+
+**A One Person Company was told to hold an annual general meeting.** s.96(1) opens *"Every company
+**other than a One Person Company** shall in each year hold ... an annual general meeting"*. The
+hardcoded row had `applicable:!isOPC`, but that row is superseded by the generated corpus, which
+does not carry the exclusion. The guard was there and had stopped being reached.
+
+### One place, and every exclusion cites its provision
+`lgClassExclusions(c)` decides what a class does not owe; `lgClassNote(c, row)` decides what it owes
+**in a different form**. Both applied in `getComplianceChart` so every screen inherits them. A
+silent filter would have been the same defect wearing different clothes.
+
+- `lgIsSmallCompany` implements s.2(85) properly, including the provisos the size test alone
+  misses: **not a public company, not a holding or subsidiary company, not a s.8 company**. A
+  holding company is excluded *however small its figures*. The prescribed figures (Rs 4 crore /
+  Rs 40 crore) are in **Rule 2(1)(t), not in the Act text**, and the code says so where it uses them.
+- `lgEntityRegime` answers which Act governs at all, and `regDerivedRows` now returns immediately
+  for an LLP.
+- Class notes resolve what the corpus raises and leaves open. The register says *"Annual return -
+  MGT-7 / MGT-7A"* -- true for every company and therefore useless to whoever is filing. Now it
+  says which, and that s.92(1)'s proviso lets the CS or a director sign. For an OPC the Board's
+  report note quotes **s.134(4)**, where the Act itself narrows the report to comments on the
+  auditor's qualifications.
+
+### Three more calculators
+**s.180(1)(c)** is computed outright -- capital + free reserves + securities premium, less
+*"temporary loans obtained from the company's bankers in the ordinary course of business"*, which
+the Explanation defines and which the screen quotes. Forgetting to exclude them is the error the
+Explanation exists to prevent. Note it is a **different test from s.186**: one caps borrowing, the
+other lending, and a company can be inside one and outside the other.
+
+**Deposits** narrows the question and names the rule. The Act settles the prohibition (s.73(1)) and
+the s.73(2) conditions; *what is excluded from the word "deposit" at all* is Rule 2(1)(c) and the
+private-company limit is Rule 3(3), **neither in `reference/`** -- so both are named, not relied on
+silently.
+
+**LLP fees** refuses to state an amount. The slabs turn on contribution and sit in Annexure A to the
+LLP Rules 2009, which is not held. It counts the delay and says why it will not price it.
+
+### Checklists, and the mark that makes them worth having
+Panel `p-checks`: Directors' Report (s.134(3)(a)-(q) + the five clauses of s.134(5)), board meeting,
+general meeting, statutory audit (s.143(3)(a)-(j)), post-incorporation.
+
+**Every item is marked `held` or `rests on a text not held`.** The Secretarial Standards are
+mandatory by **s.118(10)** -- that is in the Act and is quoted -- but SS-1 and SS-2 are ICSI
+documents that are not in `reference/`, so their individual requirements cannot be. A checklist that
+mixes "the Act says this" with "I believe this" and marks neither is worse than no checklist,
+because the reader assumes the stronger. The suite asserts that every unheld item explains what is
+missing.
+
+The Directors' Report **generator emits headings and the statutory language with every figure left
+blank**. A Board's report with plausible invented numbers in it is the one thing this product must
+never hand a CS to sign.
+
+### NIC 2008 -- and the count that was wrong
+Complete at section and division level, which is the whole of NIC 2008 at those two levels. The
+five-digit sub-class SPICe+ wants is two levels below; the NIC booklet is not held, so those are not
+listed rather than invented.
+
+**My own test caught the claim before it shipped.** The screen said "all 99 divisions". Divisions run
+01-99 **with gaps** -- there is no 04, 34, 40, 44, 48, 54, 57, 67, 76, 83 or 89 -- so the count is
+**88**. The list was right; the sentence describing it was not, which is exactly the kind of
+unverified number this product is not allowed to state. The suite now counts the table.
+
+### Coverage
+Suite **151 -> 212 assertions**, mutations **24 -> 32 caught, 0 missed**. Both live defects have a
+mutation that puts them back.
+
+### Still not covered, and why
+- **Resume builders** -- excluded by the owner.
+- **Five-digit NIC sub-classes** -- would have to be invented.
+- **Full MCA fee slabs** beyond s.92 and s.137, and the LLP slabs -- in Rules not held.
+- **SS-1 / SS-2 clause-level checks** -- the ICSI standards are not in `reference/`. Adding those
+  two documents would make this the most complete meeting checklist in the product.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -1245,7 +1335,7 @@ looks exactly like a right one**, which is the whole reason this suite exists.
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (151 assertions, run against `index.html` itself), `node tests/mutation.js` (24 bugs reintroduced, all caught), and `python tools/rule_audit.py` (the release gate). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (212 assertions, run against `index.html` itself), `node tests/mutation.js` (32 bugs reintroduced, all caught), and `python tools/rule_audit.py` (the release gate). See `tests/README.md`.
 - **No AI model auto-updates to current law.** Staying current = fetch fresh sources (RSS via rss2json/allorigins for SEBI/MCA/IBBI/RBI/IncomeTax) + human curation + (optionally) paid web-search. Vetted human templates + AI drafting is the right model.
 - **Drafting quality:** resolution/notice prompts (`RES_SYS`, `DOC_SYS`) were tuned to a senior-CS standard (exact sub-section citations with read-with clauses, SEBI LODR cross-refs, full RESOLVED THAT/FURTHER THAT cascade, standard severally-authorised CS clause, Certified True Copy headers, Section 102 explanatory statements, MCA form+deadline line). There's an anti-reasoning guard telling the model to output ONLY the final document (some free models leaked their chain-of-thought). Keep these standards.
 - **Child/again:** all AI legal output must carry a "verify on MCA/SEBI portal before filing" caveat — the CS signs and carries professional responsibility.
@@ -1254,7 +1344,7 @@ looks exactly like a right one**, which is the whole reason this suite exists.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v163.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v164.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. Migrations through `db/016` are applied. **`db/017_applicability_review.sql` is new and has not been run** — until it is, confirming an applicability condition fails with a message naming the file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**
