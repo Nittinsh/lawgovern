@@ -546,6 +546,32 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 .brd-lead{font-size:12px;color:var(--ink-mid);line-height:1.65;margin:0 0 10px;}
 .brd-none{font-size:12px;color:var(--ink-soft);font-style:italic;margin:0;}
 .brd-tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.calc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px 18px;}
+.calc-f{margin-bottom:12px;display:flex;flex-direction:column;}
+.calc-l{font-size:12px;font-weight:600;color:var(--ink-mid);margin-bottom:5px;line-height:1.4;}
+.calc-cite{display:block;font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:500;color:var(--ink-soft);margin-top:2px;}
+.calc-in{width:100%;}
+.calc-h{font-size:12px;font-weight:700;color:var(--navy);margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line-soft);}
+.calc-h .calc-cite{display:inline;margin-left:8px;}
+.calc-note{font-size:12px;line-height:1.65;color:var(--ink-soft);background:var(--bg);border-radius:8px;padding:11px 13px;margin-top:14px;}
+.calc-tbl td:last-child,.calc-tbl th:last-child{text-align:right;}
+.calc-tbl tr.calc-base td{font-weight:700;color:var(--navy);background:var(--bg);}
+.calc-amt{font-family:'IBM Plex Mono',monospace;white-space:nowrap;}
+.calc-neg{color:var(--crit);}
+.calc-mono{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);}
+.calc-sub{font-size:11px;color:var(--ink-soft);margin-top:3px;line-height:1.5;}
+.calc-res{margin-top:16px;padding:14px 16px;border-radius:10px;background:var(--blue-wash);border:1px solid var(--line);}
+.calc-res-l{font-size:12px;font-weight:600;color:var(--ink-mid);}
+.calc-res-v{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:700;color:var(--navy);margin-top:4px;}
+.calc-res-s{font-size:11.5px;color:var(--ink-soft);margin-top:4px;}
+.calc-base-line{font-size:12.5px;color:var(--ink-mid);margin-bottom:12px;line-height:1.6;}
+.calc-warn{font-size:12.5px;line-height:1.65;color:var(--ink);background:rgba(239,68,68,.07);border-left:3px solid var(--crit);border-radius:0 8px 8px 0;padding:11px 14px;margin-bottom:12px;}
+.calc-ok{font-size:12.5px;line-height:1.65;color:var(--ink);background:rgba(16,185,129,.08);border-left:3px solid var(--ok);border-radius:0 8px 8px 0;padding:11px 14px;margin-bottom:12px;}
+.calc-yes{color:var(--ok);font-weight:700;font-size:11.5px;}
+.calc-no{color:var(--crit);font-weight:700;font-size:11.5px;}
+.calc-unk{color:var(--ink-soft);font-weight:600;font-size:11.5px;font-style:italic;}
+.calc-foot{font-size:11.5px;line-height:1.7;color:var(--ink-soft);margin-top:20px;padding-top:14px;border-top:1px solid var(--line-soft);}
+@media(max-width:640px){.calc-grid{grid-template-columns:1fr;}.calc-res-v{font-size:18px;}}
 .brd-tbl td,.brd-tbl th{padding:7px 10px;border-bottom:1px solid var(--line-soft);text-align:left;vertical-align:top;color:var(--ink-mid);}
 .brd-tbl th{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);border-bottom:1px solid var(--line);}
 .brd-tbl tr:last-child td{border-bottom:none;}
@@ -1424,7 +1450,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v162">
+      <meta id="build-version" content="v163">
     </div>
   </div>
   <div class="cc-search">
@@ -1457,7 +1483,7 @@ input[type="text"], input[type="password"], textarea, select {
 </div>
 <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="closeMobileNav()"></div>
 <div class="appshell">
-<aside class="appside"><div class="navitem on" onclick="sw('home')" id="t-home"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span>Dashboard</span></div><div class="navgrp" id="ng-cmp"><div class="navhead" onclick="navToggle('cmp')"><span>Compliance</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What applies, what is due, what is evidenced</div><div class="navbody"><div class="navitem" onclick="sw('universe')" id="t-universe"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg><span>Compliance Universe</span></div><div class="navitem" onclick="sw('mywork')" id="t-mywork"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3 8-8M20 12v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h9"/></svg><span>My Work</span></div><div class="navitem" onclick="sw('cal')" id="t-cal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Calendar</span></div><div class="navitem" onclick="sw('applies')" id="t-applies"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke-linecap="round"/></svg><span>What Applies</span></div><div class="navitem" onclick="sw('exceptions')" id="t-exceptions"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3L12 3z"/><path d="M12 10v4" stroke-linecap="round"/></svg><span>Exceptions</span><span class="nav-badge" id="nav-exc-n" style="display:none">0</span></div></div></div><div class="navgrp" id="ng-evt"><div class="navhead" onclick="navToggle('evt')"><span>Events & change</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What happened, and what changed</div><div class="navbody"><div class="navitem" onclick="sw('impact')" id="t-impact"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9z" stroke-linejoin="round"/></svg><span>Event Impact</span></div><div class="navitem" onclick="sw('events')" id="t-events"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 8v5l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>Material Events</span></div><div class="navitem" onclick="sw('tracker')" id="t-tracker"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v3M12 18v3"/></svg><span>Regulatory Radar</span></div></div></div><div class="navgrp" id="ng-pit"><div class="navhead" onclick="navToggle('pit')"><span>Insider trading</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">Is the window open, and who knows what</div><div class="navbody"><div class="navitem" onclick="sw('pit')" id="t-pit"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3" stroke-linecap="round"/></svg><span>PIT Control Centre</span></div><div class="navitem" onclick="sw('dp')" id="t-dp"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0112 0M17 11h4M19 9v4" stroke-linecap="round"/></svg><span>Designated Persons</span></div><div class="navitem" onclick="sw('upsi')" id="t-upsi"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3z" stroke-linejoin="round"/><path d="M12 10v4M12 17h.01" stroke-linecap="round"/></svg><span>UPSI Register</span></div><div class="navitem" onclick="sw('sdd')" id="t-sdd"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><span>SDD &mdash; UPSI access</span></div><div class="navitem" onclick="sw('preclear')" id="t-preclear"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9" stroke-linecap="round"/></svg><span>Pre-clearance</span></div></div></div>
+<aside class="appside"><div class="navitem on" onclick="sw('home')" id="t-home"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span>Dashboard</span></div><div class="navgrp" id="ng-cmp"><div class="navhead" onclick="navToggle('cmp')"><span>Compliance</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What applies, what is due, what is evidenced</div><div class="navbody"><div class="navitem" onclick="sw('universe')" id="t-universe"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg><span>Compliance Universe</span></div><div class="navitem" onclick="sw('mywork')" id="t-mywork"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3 8-8M20 12v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h9"/></svg><span>My Work</span></div><div class="navitem" onclick="sw('cal')" id="t-cal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Calendar</span></div><div class="navitem" onclick="sw('applies')" id="t-applies"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke-linecap="round"/></svg><span>What Applies</span></div><div class="navitem" onclick="sw('exceptions')" id="t-exceptions"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3L12 3z"/><path d="M12 10v4" stroke-linecap="round"/></svg><span>Exceptions</span><span class="nav-badge" id="nav-exc-n" style="display:none">0</span></div><div class="navitem" onclick="sw('calc')" id="t-calc"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15v4M8 19h4" stroke-linecap="round"/></svg><span>Calculators</span></div></div></div><div class="navgrp" id="ng-evt"><div class="navhead" onclick="navToggle('evt')"><span>Events & change</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What happened, and what changed</div><div class="navbody"><div class="navitem" onclick="sw('impact')" id="t-impact"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9z" stroke-linejoin="round"/></svg><span>Event Impact</span></div><div class="navitem" onclick="sw('events')" id="t-events"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 8v5l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>Material Events</span></div><div class="navitem" onclick="sw('tracker')" id="t-tracker"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v3M12 18v3"/></svg><span>Regulatory Radar</span></div></div></div><div class="navgrp" id="ng-pit"><div class="navhead" onclick="navToggle('pit')"><span>Insider trading</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">Is the window open, and who knows what</div><div class="navbody"><div class="navitem" onclick="sw('pit')" id="t-pit"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3" stroke-linecap="round"/></svg><span>PIT Control Centre</span></div><div class="navitem" onclick="sw('dp')" id="t-dp"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0112 0M17 11h4M19 9v4" stroke-linecap="round"/></svg><span>Designated Persons</span></div><div class="navitem" onclick="sw('upsi')" id="t-upsi"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3z" stroke-linejoin="round"/><path d="M12 10v4M12 17h.01" stroke-linecap="round"/></svg><span>UPSI Register</span></div><div class="navitem" onclick="sw('sdd')" id="t-sdd"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><span>SDD &mdash; UPSI access</span></div><div class="navitem" onclick="sw('preclear')" id="t-preclear"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9" stroke-linecap="round"/></svg><span>Pre-clearance</span></div></div></div>
 <div class="navgrp" id="ng-reg"><div class="navhead" onclick="navToggle('reg')"><span>Registers</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What we know about the entity</div><div class="navbody"><div class="navitem" onclick="sw('entities')" id="t-entities"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h2m-2 4h2m-2 4h2m4-8h2m-2 4h2m-2 4h2"/></svg><span>Entities</span></div><div class="navitem" onclick="sw('directors')" id="t-directors"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-8 0v2"/><circle cx="12" cy="7" r="4"/></svg><span>Directors &amp; KMP</span></div><div class="navitem" onclick="sw('meetings')" id="t-meetings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Board &amp; Meetings</span></div><div class="navitem" onclick="sw('charges')" id="t-charges"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10V6z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Charges</span></div><div class="navitem" onclick="sw('allotments')" id="t-allotments"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M7 8h7a3 3 0 010 6H7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Allotments</span></div><div class="navitem" onclick="sw('beneficial')" id="t-beneficial"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20a6.5 6.5 0 0113 0" stroke-linecap="round"/><path d="M17.5 4.5l2 2 3-3" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Beneficial Interest</span></div><div class="navitem" onclick="sw('internal')" id="t-internal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg><span>Internal Compliance</span></div></div></div><div class="navgrp" id="ng-evd"><div class="navhead" onclick="navToggle('evd')"><span>Evidence</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">Can I prove it was done</div><div class="navbody"><div class="navitem" onclick="sw('filings')" id="t-filings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11l5 5v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M15 4v5h5M8 14h8M8 17h5"/></svg><span>Filings &amp; Records</span></div><div class="navitem" onclick="sw('documents')" id="t-documents"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Documents</span></div><div class="navitem" onclick="sw('approvals')" id="t-approvals"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Approvals</span><span class="nav-badge" id="nav-approvals-n" style="display:none">0</span></div></div></div><div class="navgrp" id="ng-rpt"><div class="navhead" onclick="navToggle('rpt')"><span>Reports</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What can I present</div><div class="navbody"><div class="navitem" onclick="sw('board')" id="t-board"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v13H4z" stroke-linejoin="round"/><path d="M9 21h6M12 17v4M8 12l2.5 2.5L16 9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Board Report</span></div><div class="navitem" onclick="sw('audit')" id="t-audit"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>Audit Trail</span></div></div></div><div class="navgrp closed" id="ng-drf"><div class="navhead" onclick="navToggle('drf')"><span>Drafting</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navbody"><div class="navitem" onclick="sw('res')" id="t-res"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg><span>Resolutions</span></div><div class="navitem" onclick="sw('docs')" id="t-docs"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 5h16M4 12h16M4 19h10"/></svg><span>Notices &amp; Minutes</span></div></div></div><div class="navgrp closed" id="ng-ref"><div class="navhead" onclick="navToggle('ref')"><span>Reference</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navbody"><div class="navitem" onclick="sw('ff')" id="t-ff"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><span>Forms &amp; Filings</span></div><div class="navitem" onclick="sw('chat')" id="t-chat"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3.2"/></svg><span>AI Compliance</span></div><div class="navitem" onclick="sw('penalty')" id="t-penalty"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 3h12M6 8h12M9 3c0 6 6 6 6 11a4 4 0 0 1-8 0"/></svg><span>Penalties</span></div><div class="navitem" onclick="sw('deeplaw')" id="t-deeplaw"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3l9 4v5c0 5-3.5 8-9 9-5.5-1-9-4-9-9V7l9-4z"/></svg><span>Deep Law</span></div></div></div><div class="navgrp closed" id="ng-adm"><div class="navhead" onclick="navToggle('adm')"><span>Administration</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navbody"><div class="navitem" onclick="sw('governance')" id="t-governance"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16M4 12h16M4 19h10" stroke-linecap="round"/><circle cx="18.5" cy="19" r="2.6"/><path d="M17.3 19l.9.9 1.9-1.9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Rule Governance</span></div><div class="navitem" onclick="sw('settings')" id="t-settings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Settings</span></div><div class="navitem" onclick="sw('admin')" id="t-admin" style="display:none"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.3l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2.2-1.3L14 2h-4l-.3 2.2a7 7 0 0 0-2.2 1.3l-2.3-1-2 3.4 2 1.5A7 7 0 0 0 5 12a7 7 0 0 0 .1 1.3l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2.2 1.3L10 22h4l.3-2.2a7 7 0 0 0 2.2-1.3l2.3 1 2-3.4-2-1.5z"/></svg><span>Administration</span></div></div></div>
 </aside>
 <div class="appmain">
@@ -1567,7 +1593,7 @@ input[type="text"], input[type="password"], textarea, select {
 <div class="panel" id="p-charges"><div class="cc-tool"><div id="reg-root-charges"></div></div></div>
 <div class="panel" id="p-allotments"><div class="cc-tool"><div id="reg-root-allotments"></div></div></div>
 <div class="panel" id="p-beneficial"><div class="cc-tool"><div id="reg-root-beneficial"></div></div></div>
-<div class="panel" id="p-governance"><div class="cc-tool"><div id="gov-root"></div></div></div>
+<div class="panel" id="p-calc"><div class="cc-tool"><div id="calc-root"></div></div></div><div class="panel" id="p-governance"><div class="cc-tool"><div id="gov-root"></div></div></div>
 <div class="panel" id="p-board"><div class="cc-tool"><div id="brd-root"></div></div></div>
 <div class="panel" id="p-applies"><div class="cc-tool"><div id="app-root"></div></div></div>
 <div class="panel" id="p-impact"><div class="cc-tool"><div id="imp-root"></div></div></div>
@@ -2801,6 +2827,7 @@ function sw(id) {
   if (id==='documents' && typeof renderDocuments==='function') renderDocuments();
   if (typeof navReveal === 'function') navReveal(id);
   if (id==='pit' && typeof renderPIT==='function') renderPIT();
+  if (id==='calc' && typeof renderCalc==='function') renderCalc();
   if (id==='governance' && typeof renderGovernance==='function') renderGovernance();
   if (id==='board' && typeof renderBoard==='function') renderBoard();
   if (id==='applies' && typeof renderApplies==='function') renderApplies();
@@ -8531,6 +8558,728 @@ async function govClear(ruleId){
   }catch(e){}
   govClose();
   renderGovernance();
+}
+
+// ═══════════════════════════════════════════════════
+// STATUTORY CALCULATORS
+// ═══════════════════════════════════════════════════
+// The register answers "what is due". These answer "how much" — the questions a
+// CS is asked on the phone and currently works out in a spreadsheet.
+//
+// Every engine here is a PURE FUNCTION taking a plain object and returning the
+// working line by line, each line carrying the clause it comes from. Nothing
+// returns a bare number: a figure a client cannot trace is a figure the CS
+// cannot sign. The forms below are only a way of calling them.
+//
+// Grounded in reference/companies-act-2013 (amended upto 01.04.2021 — stale by
+// over five years, stated on the screen). Where a limb rests on Rules that are
+// NOT in reference/, the engine says so instead of inventing the number.
+
+var CALC_MODE = 's198';
+var CALC_V = {};   // typed values survive a tab switch
+
+var CALC_TABS = [
+  ['s198', 'Net profit'],
+  ['s197', 'Managerial remuneration'],
+  ['csr',  'CSR spend'],
+  ['s186', 'Loan &amp; investment'],
+  ['s185', 'Loan to a director'],
+  ['s123', 'Dividend'],
+  ['fees', 'Late filing fee'],
+  ['board','Board composition']
+];
+
+function calcNum(v){ var n = parseFloat(v); return isNaN(n) ? 0 : n; }
+function calcN(k){ return calcNum(CALC_V[k]); }
+
+// Rupees in, rupees and crore out. The app stores rupees because that is how
+// the statute states its thresholds (see the units note in CLAUDE.md); people
+// read crore, so both are shown rather than one being guessed at.
+function calcMoney(n){
+  if(n === null || n === undefined || isNaN(n)) return '—';
+  var neg = n < 0, a = Math.abs(n);
+  var main = '₹' + Math.round(a).toLocaleString('en-IN');
+  if(a >= 10000000) main += ' (' + (a/10000000).toLocaleString('en-IN',
+    {maximumFractionDigits:2}) + ' cr)';
+  else if(a >= 100000) main += ' (' + (a/100000).toLocaleString('en-IN',
+    {maximumFractionDigits:2}) + ' lakh)';
+  return (neg ? '(' : '') + main + (neg ? ')' : '');
+}
+
+// ── Section 198 — calculation of profits ────────────────────────
+// s.198(1): credit shall be given for the sums in (2) and not for those in (3);
+// the sums in (4) shall be deducted and those in (5) shall not.
+//
+// So the working starts at the profit before tax the books already show and
+// adjusts it in exactly those four directions. Each line names its clause.
+function calc198Compute(v){
+  var L = [], t = 0;
+  function line(label, cite, amt, sign){
+    if(!amt) return;
+    var d = sign * amt; t += d;
+    L.push({label:label, cite:cite, amt:d});
+  }
+  var pbt = calcNum(v.pbt);
+  t = pbt;
+  L.push({label:'Profit before tax, as per the statement of profit and loss',
+          cite:'starting point', amt:pbt, base:true});
+
+  // (5) — these shall NOT be deducted, so anything charged in the books
+  // comes back.
+  line('Income-tax and any other tax on income charged in the accounts',
+       's.198(5)(a)', calcNum(v.a5a), 1);
+  line('Compensation, damages or payments made voluntarily',
+       's.198(5)(b)', calcNum(v.a5b), 1);
+  line('Loss of a capital nature charged in the accounts',
+       's.198(5)(c)', calcNum(v.a5c), 1);
+  line('Change in carrying amount on fair-value measurement, charged',
+       's.198(5)(d)', calcNum(v.a5d), 1);
+
+  // (2) — credit shall be given for these.
+  line('Bounties and subsidies received from Government, not already credited',
+       's.198(2)', calcNum(v.a2), 1);
+
+  // (3) — credit shall NOT be given, so anything credited comes out.
+  line('Premium on shares or debentures issued or sold',
+       's.198(3)(a)', calcNum(v.l3a), -1);
+  line('Profits on sale of forfeited shares',
+       's.198(3)(b)', calcNum(v.l3b), -1);
+  line('Profits of a capital nature, including on sale of an undertaking',
+       's.198(3)(c)', calcNum(v.l3c), -1);
+  line('Profits on sale of immovable property or capital fixed assets',
+       's.198(3)(d)', calcNum(v.l3d), -1);
+  line('Change in carrying amount recognised in reserves on fair valuation',
+       's.198(3)(e)', calcNum(v.l3e), -1);
+  line('Unrealised gains, notional gains or revaluation of assets',
+       's.198(3)(f)', calcNum(v.l3f), -1);
+
+  // (4) — these shall be deducted, to the extent the books have not.
+  line('Depreciation to the extent specified in s.123, over the amount charged',
+       's.198(4)(k)', calcNum(v.l4k), -1);
+  line('Excess of expenditure over income of earlier years, not yet deducted',
+       's.198(4)(l)', calcNum(v.l4l), -1);
+
+  return {lines:L, total:t};
+}
+
+// ── Section 197 — the ceilings ──────────────────────────────────
+// s.197(1) applies to a PUBLIC company. It also says the limit is worked out on
+// the s.198 figure "except that the remuneration of the directors shall not be
+// deducted from the gross profits" — so remuneration already charged is added
+// back before the percentages are taken. Missing that understates every ceiling.
+function calc197Limits(net198, dirRem, hasMdWtd, isPublic){
+  var base = calcNum(net198) + calcNum(dirRem);
+  var pct = function(p){ return base * p / 100; };
+  return {
+    applies: isPublic !== false,
+    base: base,
+    addedBack: calcNum(dirRem),
+    rows: [
+      {label:'Total managerial remuneration — all directors and the manager',
+       cite:'s.197(1)', pct:11, amt:pct(11),
+       note:'The general meeting may authorise more, subject to Schedule V.'},
+      {label:'Any one managing director, whole-time director or manager',
+       cite:'s.197(1), second proviso (i)', pct:5, amt:pct(5),
+       note:'Exceeding this needs a special resolution.'},
+      {label:'All such directors and the manager taken together, if more than one',
+       cite:'s.197(1), second proviso (i)', pct:10, amt:pct(10), note:''},
+      {label:'Directors who are neither managing nor whole-time',
+       cite:'s.197(1), second proviso (ii)' + (hasMdWtd ? '(A)' : '(B)'),
+       pct: hasMdWtd ? 1 : 3, amt: pct(hasMdWtd ? 1 : 3),
+       note: hasMdWtd ? 'One per cent, because there is a managing or whole-time director or manager.'
+                      : 'Three per cent, there being no managing or whole-time director or manager.'}
+    ]
+  };
+}
+
+// ── Section 135 — what has to be spent ──────────────────────────
+// The Explanation to s.135 is explicit: "net profit" here "shall be calculated
+// in accordance with the provisions of section 198", so this takes the same
+// figure the calculator above produces, for each of the three preceding years.
+function calcCSRSpend(p1, p2, p3, yearsAvailable){
+  var vals = [calcNum(p1), calcNum(p2), calcNum(p3)];
+  var n = (yearsAvailable && yearsAvailable < 3) ? yearsAvailable : 3;
+  var used = vals.slice(0, n);
+  var sum = used.reduce(function(a,b){ return a + b; }, 0);
+  var avg = n ? sum / n : 0;
+  // s.135(5) sets a floor of two per cent; a company may spend more.
+  var spend = avg > 0 ? avg * 2 / 100 : 0;
+  return {
+    years: n, average: avg, spend: spend,
+    // s.135(9): where the amount does not exceed fifty lakh rupees, the CSR
+    // Committee is not required and the Board discharges its functions.
+    committeeRequired: spend > 5000000,
+    negative: avg <= 0
+  };
+}
+
+// ── Section 186 — the ceiling on loans and investments ──────────
+// s.186(2): "exceeding sixty per cent. of its paid-up share capital, free
+// reserves and securities premium account or one hundred per cent. of its free
+// reserves and securities premium account, whichever is more."
+function calc186Limit(paidUp, freeReserves, secPremium, already, proposed){
+  var a = (calcNum(paidUp) + calcNum(freeReserves) + calcNum(secPremium)) * 0.60;
+  var b = (calcNum(freeReserves) + calcNum(secPremium)) * 1.00;
+  var limit = Math.max(a, b);
+  var total = calcNum(already) + calcNum(proposed);
+  return {
+    sixty: a, hundred: b, limit: limit, which: a >= b ? 'sixty' : 'hundred',
+    already: calcNum(already), proposed: calcNum(proposed), total: total,
+    headroom: limit - total,
+    exceeds: total > limit
+  };
+}
+
+// ── Section 403 — what a late filing costs ──────────────────────
+// The first proviso to s.403(1) fixes the additional fee for s.92 and s.137
+// filings at not less than one hundred rupees per day. Every other form's
+// multiplier lives in the Companies (Registration Offices and Fees) Rules,
+// which are NOT in reference/ — so this refuses to price them rather than
+// guessing. Same treatment as PAS-3 under Rule 12.
+var CALC_FEE_FORMS = [
+  ['mgt7', 'MGT-7 / MGT-7A — annual return', 92,  true],
+  ['aoc4', 'AOC-4 — financial statements',  137, true],
+  ['other','Any other form',                 0,  false]
+];
+function calc403Fee(formKey, dueOn, filedOn){
+  var f = null;
+  for(var i=0;i<CALC_FEE_FORMS.length;i++) if(CALC_FEE_FORMS[i][0]===formKey) f = CALC_FEE_FORMS[i];
+  if(!f) return {error:'Pick a form.'};
+  if(!dueOn || !filedOn) return {error:'Both dates are needed.'};
+  var d1 = new Date(dueOn + 'T00:00:00'), d2 = new Date(filedOn + 'T00:00:00');
+  if(isNaN(d1) || isNaN(d2)) return {error:'Those dates do not read as dates.'};
+  var days = Math.round((d2 - d1) / 86400000);
+  if(days <= 0) return {form:f, days:0, late:false};
+  if(!f[3]) return {form:f, days:days, late:true, unpriced:true};
+  return {form:f, days:days, late:true, perDay:100, fee:days * 100, section:f[2]};
+}
+
+// ── Sections 149, 177, 178 — is the board lawfully composed ─────
+// This one runs against the directors register rather than a form, so it
+// answers for a real company. What the register does not record — residency,
+// and who actually sits on which committee — is reported as unevaluable, not
+// as a pass. An untested condition is not a satisfied one.
+function calcBoardCheck(company, directors){
+  var inOffice = (directors || []).filter(function(d){ return !d.cessation_on; });
+  var n = inOffice.length;
+  var type = (company && company.type) || 'private';
+  var isPublic = type === 'public' || type === 'listed';
+  var isListedPublic = type === 'listed';
+
+  var indep = inOffice.filter(function(d){ return d.designation === 'independent'; }).length;
+  var women = inOffice.filter(function(d){ return d.is_woman === true; }).length;
+  var exec  = inOffice.filter(function(d){
+    return d.designation === 'managing_director' || d.designation === 'whole_time' ||
+           d.designation === 'manager'; }).length;
+
+  var min = type === 'opc' ? 1 : (isPublic ? 3 : 2);
+  var out = [];
+
+  out.push({cite:'s.149(1)(a)',
+    test:'Minimum number of directors — ' + min +
+         (type === 'opc' ? ' for a One Person Company'
+                         : isPublic ? ' for a public company' : ' for a private company'),
+    have:n + ' in office', ok: n >= min, evaluable:true});
+
+  out.push({cite:'s.149(1)(b)', test:'Maximum of fifteen directors',
+    have:n + ' in office', ok: n <= 15, evaluable:true,
+    note: n > 15 ? 'More than fifteen is permitted, but only by special resolution.' : ''});
+
+  if(isListedPublic){
+    // "at least one-third of the total number of directors ... any fraction
+    // contained in such one-third number shall be rounded off as one."
+    var need = Math.ceil(n / 3);
+    out.push({cite:'s.149(4)',
+      test:'At least one-third independent directors — ' + need + ' of ' + n,
+      have:indep + ' independent', ok: indep >= need, evaluable:true,
+      note:'The Explanation rounds any fraction in the one-third up to one.'});
+  }
+
+  out.push({cite:'s.149(1), second proviso',
+    test:'A woman director, for the prescribed class of companies',
+    have: women + ' recorded', ok: women >= 1, evaluable:false,
+    note:'Which companies are covered is prescribed by Rule 3 of the Companies ' +
+         '(Appointment and Qualification of Directors) Rules 2014, which is not in ' +
+         'reference/. Whether this company is in that class has not been decided here.'});
+
+  out.push({cite:'s.149(3)',
+    test:'At least one director resident in India for 182 days or more',
+    have:'not recorded', ok:false, evaluable:false,
+    note:'The directors register does not hold residency, so this cannot be tested.'});
+
+  if(isListedPublic){
+    out.push({cite:'s.177(2)',
+      test:'Audit Committee — three directors, independent directors in a majority',
+      have: indep + ' independent directors available',
+      ok: indep >= 2 && n >= 3, evaluable:false,
+      note:'Committee membership is not recorded, so this reports only whether a ' +
+           'compliant committee could be formed from the board as it stands.'});
+    out.push({cite:'s.178(1)',
+      test:'Nomination and Remuneration Committee — three or more non-executive ' +
+           'directors, not less than one-half independent',
+      have: (n - exec) + ' non-executive, of whom ' + indep + ' independent',
+      ok: (n - exec) >= 3 && indep >= Math.ceil(3/2), evaluable:false,
+      note:'Same limit — the register does not record who sits on the committee.'});
+  }
+
+  return {count:n, independent:indep, women:women, executive:exec,
+          isPublic:isPublic, isListedPublic:isListedPublic, checks:out};
+}
+
+// ── the screen ──────────────────────────────────────────────────
+function calcSetMode(m){ calcRead(); CALC_MODE = m; renderCalc(); }
+
+// Harvest every field into CALC_V so a tab switch does not lose typing.
+function calcRead(){
+  var f = document.querySelectorAll('[data-calc]');
+  for(var i=0;i<f.length;i++) CALC_V[f[i].getAttribute('data-calc')] = f[i].value;
+}
+function calcLive(){
+  calcRead();
+  var out = document.getElementById('calc-out');
+  if(out) out.innerHTML = calcOutput();
+}
+function calcEntity(){
+  if(typeof CLIENTS === 'undefined' || !CLIENTS.length) return null;
+  var sel = document.getElementById('calc-entity');
+  var id = sel ? sel.value : CLIENTS[0].id;
+  for(var i=0;i<CLIENTS.length;i++) if(String(CLIENTS[i].id) === String(id)) return CLIENTS[i];
+  return CLIENTS[0];
+}
+// Switching entity clears the typed figures. They belong to the company they
+// were entered for, and silently carrying one company's profit into another's
+// working is the worst thing this screen could do.
+function calcEntityChange(){ CALC_V = {}; renderCalc(); }
+
+function calcField(k, label, cite, ph){
+  return '<div class="calc-f">'+
+    '<label class="calc-l" for="calc-'+k+'">'+label+
+      (cite ? '<span class="calc-cite">'+cite+'</span>' : '')+'</label>'+
+    '<input id="calc-'+k+'" class="lg-field calc-in" data-calc="'+k+'" type="number" '+
+      'step="any" oninput="calcLive()" value="'+entEsc(CALC_V[k] == null ? '' : CALC_V[k])+'" '+
+      'placeholder="'+entEsc(ph || '0')+'">'+
+    '</div>';
+}
+function calcSelect(k, label, opts, cite){
+  return '<div class="calc-f">'+
+    '<label class="calc-l" for="calc-'+k+'">'+label+
+      (cite ? '<span class="calc-cite">'+cite+'</span>' : '')+'</label>'+
+    '<select id="calc-'+k+'" class="lg-field calc-in" data-calc="'+k+'" onchange="calcLive()">'+
+      opts.map(function(o){
+        return '<option value="'+entEsc(o[0])+'"'+
+          (String(CALC_V[k]) === String(o[0]) ? ' selected' : '')+'>'+o[1]+'</option>';
+      }).join('')+'</select></div>';
+}
+function calcDate(k, label, cite){
+  return '<div class="calc-f">'+
+    '<label class="calc-l" for="calc-'+k+'">'+label+
+      (cite ? '<span class="calc-cite">'+cite+'</span>' : '')+'</label>'+
+    // Both events on purpose. A date picked from the calendar fires change; a
+    // date typed by hand fires input and only fires change on blur — and every
+    // other field on this screen updates as you type, so a date that sits stale
+    // until you click away reads as broken.
+    '<input id="calc-'+k+'" class="lg-field calc-in" data-calc="'+k+'" type="date" '+
+      'oninput="calcLive()" onchange="calcLive()" value="'+entEsc(CALC_V[k] || '')+'"></div>';
+}
+function calcNote(html){ return '<div class="calc-note">'+html+'</div>'; }
+function calcResult(label, value, sub){
+  return '<div class="calc-res"><div class="calc-res-l">'+label+'</div>'+
+    '<div class="calc-res-v">'+value+'</div>'+
+    (sub ? '<div class="calc-res-s">'+sub+'</div>' : '')+'</div>';
+}
+
+// ── each calculator: its inputs, then its working ───────────────
+function calcForm(){
+  var c = calcEntity();
+  switch(CALC_MODE){
+  case 's198':
+    return '<div class="calc-grid">'+
+      calcField('pbt','Profit before tax, per the statement of profit and loss','starting point')+
+      '</div>'+
+      '<div class="calc-h">Add back — shall <b>not</b> be deducted <span class="calc-cite">s.198(5)</span></div>'+
+      '<div class="calc-grid">'+
+      calcField('a5a','Income-tax and other tax on income charged','(a)')+
+      calcField('a5b','Compensation or damages paid voluntarily','(b)')+
+      calcField('a5c','Loss of a capital nature charged','(c)')+
+      calcField('a5d','Fair-value change in carrying amount charged','(d)')+
+      '</div>'+
+      '<div class="calc-h">Add — credit shall be given <span class="calc-cite">s.198(2)</span></div>'+
+      '<div class="calc-grid">'+
+      calcField('a2','Bounties and subsidies from Government, not already credited','s.198(2)')+
+      '</div>'+
+      '<div class="calc-h">Deduct — credit shall <b>not</b> be given <span class="calc-cite">s.198(3)</span></div>'+
+      '<div class="calc-grid">'+
+      calcField('l3a','Premium on shares or debentures issued or sold','(a)')+
+      calcField('l3b','Profits on sale of forfeited shares','(b)')+
+      calcField('l3c','Profits of a capital nature','(c)')+
+      calcField('l3d','Profits on sale of immovable property or fixed assets','(d)')+
+      calcField('l3e','Fair-value change recognised in reserves','(e)')+
+      calcField('l3f','Unrealised gains, notional gains, revaluation','(f)')+
+      '</div>'+
+      '<div class="calc-h">Deduct — to the extent the accounts have not <span class="calc-cite">s.198(4)</span></div>'+
+      '<div class="calc-grid">'+
+      calcField('l4k','Depreciation under s.123 above the amount charged','(k)')+
+      calcField('l4l','Excess of expenditure over income of earlier years','(l)')+
+      '</div>'+
+      calcNote('The proviso to s.198(3)(d) allows credit for the excess of sale price '+
+        'over written-down value, capped at the difference between original cost and '+
+        'written-down value. Enter the profit <b>net of</b> that permitted portion.');
+
+  case 's197':
+    return '<div class="calc-grid">'+
+      calcField('n198','Net profit computed under section 198','from the tab before this')+
+      calcField('dirrem','Directors&rsquo; remuneration charged in the accounts','s.197(1)')+
+      calcSelect('hasmd','Is there a managing or whole-time director, or a manager?',
+        [['yes','Yes'],['no','No']], 's.197(1) proviso (ii)')+
+      '</div>'+
+      calcNote('s.197(1) takes the s.198 figure <b>&ldquo;except that the remuneration of the '+
+        'directors shall not be deducted from the gross profits&rdquo;</b>, so remuneration '+
+        'already charged is added back before the percentages are applied. Leaving it out '+
+        'understates every ceiling below.');
+
+  case 'csr':
+    return '<div class="calc-grid">'+
+      calcField('csr1','Net profit — immediately preceding financial year','s.198 basis')+
+      calcField('csr2','Net profit — second preceding financial year','s.198 basis')+
+      calcField('csr3','Net profit — third preceding financial year','s.198 basis')+
+      calcSelect('csry','Financial years completed since incorporation',
+        [['3','Three or more'],['2','Two'],['1','One']], 's.135(5)')+
+      '</div>'+
+      calcNote('The Explanation to s.135 is express: net profit here '+
+        '<b>&ldquo;shall be calculated in accordance with the provisions of section '+
+        '198&rdquo;</b> — so use the figure from the first tab for each year, not the '+
+        'profit shown in the accounts.');
+
+  case 's186':
+    return '<div class="calc-grid">'+
+      calcField('paidup','Paid-up share capital', c ? 'held for this entity' : '')+
+      calcField('freeres','Free reserves','s.186(2)')+
+      calcField('secprem','Securities premium account','s.186(2)')+
+      calcField('already','Loans, guarantees, securities and investments already made','s.186(3)')+
+      calcField('proposed','Amount now proposed','s.186(3)')+
+      '</div>'+
+      calcNote('The limit does not apply to a loan, guarantee or security given to a '+
+        'wholly owned subsidiary or a joint venture, or to a holding company acquiring '+
+        'securities of its wholly owned subsidiary — first proviso to s.186(3). Those are '+
+        'still disclosed under s.186(4).');
+
+  case 's185':
+    return '<div class="calc-grid">'+
+      calcSelect('who','Who is the loan, guarantee or security for?',
+        [['director','A director of the company or of its holding company'],
+         ['relative','A partner or relative of such a director'],
+         ['firm','A firm in which such a director or relative is a partner'],
+         ['interested','A person in whom a director is interested — s.185(2) Explanation'],
+         ['wos','A wholly owned subsidiary'],
+         ['other','Someone outside all of these']], 's.185(1)')+
+      calcSelect('route','Does one of the s.185(3) exceptions apply?',
+        [['none','No'],
+         ['mdwtd','(a) To an MD or WTD, under conditions of service open to all employees, '+
+                  'or a scheme approved by special resolution'],
+         ['ordinary','(b) The company lends in the ordinary course of business, at a rate '+
+                     'not below the yield on the closest-tenor Government security'],
+         ['holdwos','(c) A holding company lending to its wholly owned subsidiary'],
+         ['holdguar','(d) A holding company guaranteeing a bank loan to its subsidiary']],
+        's.185(3)')+
+      '</div>'+
+      calcNote('s.185(4) makes a contravention punishable with a fine on the company of '+
+        '₹5 lakh to ₹25 lakh, and on every officer in default with imprisonment up to six '+
+        'months or the same fine. This is a prohibition, not a limit.');
+
+  case 's123':
+    return '<div class="calc-grid">'+
+      calcField('curprof','Profit for the year, after depreciation under Schedule II','s.123(1)(a), (2)')+
+      calcField('accprof','Undistributed profits of earlier years carried forward','s.123(1)(a)')+
+      calcField('carryloss','Previous losses carried over, and depreciation not provided','s.123(1), fourth proviso')+
+      calcField('transres','Amount proposed to be transferred to reserves','s.123(1), first proviso')+
+      calcField('divprop','Dividend proposed','')+
+      '</div>'+
+      calcNote('The first proviso to s.123(1) excludes unrealised gains, notional gains and '+
+        'revaluation, and any fair-value change, from the profits out of which dividend may '+
+        'be declared. The third proviso forbids declaring out of reserves other than free '+
+        'reserves. Declaring out of accumulated profits where the year is inadequate is '+
+        'governed by rules not held here.');
+
+  case 'fees':
+    return '<div class="calc-grid">'+
+      calcSelect('feeform','Form', CALC_FEE_FORMS.map(function(f){ return [f[0], f[1]]; }), 's.403')+
+      calcDate('feedue','Due date under the section')+
+      calcDate('feefiled','Date actually filed, or today')+
+      '</div>'+
+      calcNote('Only s.92 and s.137 filings are priced here. The first proviso to s.403(1) '+
+        'fixes their additional fee at <b>not less than one hundred rupees per day</b>. '+
+        'Every other form&rsquo;s multiplier lives in the Companies (Registration Offices '+
+        'and Fees) Rules, which are not in <span class="calc-mono">reference/</span> — so '+
+        'this refuses to price them rather than guessing.');
+
+  case 'board':
+    return c ? '' : '';
+  }
+  return '';
+}
+
+function calcOutput(){
+  var c = calcEntity();
+  switch(CALC_MODE){
+
+  case 's198': {
+    var r = calc198Compute(CALC_V);
+    var rows = r.lines.map(function(l){
+      return '<tr'+(l.base ? ' class="calc-base"' : '')+'><td>'+l.label+'</td>'+
+        '<td class="calc-mono">'+l.cite+'</td>'+
+        '<td class="calc-amt'+(l.amt < 0 ? ' calc-neg' : '')+'">'+calcMoney(l.amt)+'</td></tr>';
+    }).join('');
+    return '<div class="cc-card"><div class="cc-card-h">The working</div><div class="cc-card-b">'+
+      '<table class="brd-tbl calc-tbl"><thead><tr><th>Line</th><th>Clause</th>'+
+      '<th style="text-align:right">Amount</th></tr></thead><tbody>'+rows+'</tbody></table>'+
+      calcResult('Net profit under section 198', calcMoney(r.total),
+        'This is the figure sections 197 and 135 both run on.')+
+      '</div></div>';
+  }
+
+  case 's197': {
+    var isPub = !c || c.type === 'public' || c.type === 'listed';
+    var L = calc197Limits(calcN('n198'), calcN('dirrem'),
+                          String(CALC_V.hasmd || 'yes') === 'yes', isPub);
+    var warn = (c && !isPub)
+      ? '<div class="calc-warn"><b>'+entEsc(c.name)+' is not a public company.</b> '+
+        's.197(1) limits the remuneration payable <b>by a public company</b>. These ceilings '+
+        'do not bind it. The figures below are shown for reference only.</div>' : '';
+    var rows = L.rows.map(function(x){
+      return '<tr><td>'+x.label+(x.note ? '<div class="calc-sub">'+x.note+'</div>' : '')+'</td>'+
+        '<td class="calc-mono">'+x.cite+'</td><td class="calc-amt">'+x.pct+'%</td>'+
+        '<td class="calc-amt">'+calcMoney(x.amt)+'</td></tr>';
+    }).join('');
+    return warn + '<div class="cc-card"><div class="cc-card-h">The ceilings</div>'+
+      '<div class="cc-card-b">'+
+      '<div class="calc-base-line">Base: net profit under s.198 of '+
+        calcMoney(calcN('n198'))+', plus directors&rsquo; remuneration of '+
+        calcMoney(L.addedBack)+' added back per s.197(1) = <b>'+calcMoney(L.base)+'</b></div>'+
+      '<table class="brd-tbl calc-tbl"><thead><tr><th>Ceiling</th><th>Clause</th>'+
+      '<th style="text-align:right">Rate</th><th style="text-align:right">Amount</th></tr></thead>'+
+      '<tbody>'+rows+'</tbody></table>'+
+      '<div class="calc-note">Where profits are absent or inadequate, s.197(3) sends you to '+
+      'Schedule V, whose Part II Section II slabs turn on effective capital rather than on '+
+      'profit. Those are not computed here.</div></div></div>';
+  }
+
+  case 'csr': {
+    var R = calcCSRSpend(calcN('csr1'), calcN('csr2'), calcN('csr3'),
+                         parseInt(CALC_V.csry || '3', 10));
+    if(R.negative) return '<div class="cc-card"><div class="cc-card-b"><div class="cc-none">'+
+      'The average of those years is not positive, so s.135(5) produces no minimum spend. '+
+      'Applicability under s.135(1) is a separate test and is decided on the entity record.'+
+      '</div></div></div>';
+    return '<div class="cc-card"><div class="cc-card-h">Minimum spend</div><div class="cc-card-b">'+
+      '<div class="calc-base-line">Average net profit of the '+R.years+
+        ' immediately preceding financial year'+(R.years===1?'':'s')+': <b>'+
+        calcMoney(R.average)+'</b></div>'+
+      calcResult('At least two per cent — s.135(5)', calcMoney(R.spend),
+        'A floor, not a cap. The company may spend more.')+
+      '<div class="calc-note"><b>'+(R.committeeRequired
+        ? 'A CSR Committee is required.'
+        : 'No CSR Committee is required.')+'</b> s.135(9) dispenses with the Committee where '+
+        'the amount to be spent does not exceed fifty lakh rupees, the Board discharging its '+
+        'functions instead. Here the amount is '+calcMoney(R.spend)+'.</div>'+
+      '<div class="calc-note">Unspent amounts follow s.135(6) — an ongoing project moves to an '+
+      'Unspent CSR Account within thirty days of the year end and must be spent within three '+
+      'financial years; anything else goes to a Schedule VII Fund within six months. '+
+      's.135(7) penalises default at twice the shortfall or one crore rupees, whichever is less.'+
+      '</div></div></div>';
+  }
+
+  case 's186': {
+    var M = calc186Limit(calcN('paidup'), calcN('freeres'), calcN('secprem'),
+                         calcN('already'), calcN('proposed'));
+    return '<div class="cc-card"><div class="cc-card-h">The limit</div><div class="cc-card-b">'+
+      '<table class="brd-tbl calc-tbl"><tbody>'+
+      '<tr'+(M.which==='sixty'?' class="calc-base"':'')+'><td>Sixty per cent of paid-up capital, '+
+        'free reserves and securities premium</td><td class="calc-mono">s.186(2)</td>'+
+        '<td class="calc-amt">'+calcMoney(M.sixty)+'</td></tr>'+
+      '<tr'+(M.which==='hundred'?' class="calc-base"':'')+'><td>One hundred per cent of free '+
+        'reserves and securities premium</td><td class="calc-mono">s.186(2)</td>'+
+        '<td class="calc-amt">'+calcMoney(M.hundred)+'</td></tr>'+
+      '</tbody></table>'+
+      calcResult('The limit — whichever is more', calcMoney(M.limit))+
+      '<div class="calc-base-line">Already made '+calcMoney(M.already)+
+        ' + proposed '+calcMoney(M.proposed)+' = <b>'+calcMoney(M.total)+'</b></div>'+
+      (M.exceeds
+        ? '<div class="calc-warn"><b>Over the limit by '+calcMoney(-M.headroom)+'.</b> '+
+          's.186(3) requires prior authorisation by <b>special resolution</b> in general '+
+          'meeting before the loan is made, the guarantee given or the security provided.</div>'
+        : '<div class="calc-ok">Within the limit, with headroom of '+calcMoney(M.headroom)+
+          '. s.186(5) still requires a Board resolution passed with the consent of '+
+          '<b>all directors present</b>, and prior approval of any public financial '+
+          'institution whose term loan is subsisting.</div>')+
+      '</div></div>';
+  }
+
+  case 's185': {
+    var who = CALC_V.who || 'director', route = CALC_V.route || 'none';
+    var verdict, tone, cite;
+    if(who === 'other' || who === 'wos'){
+      verdict = 's.185 does not bite. Section 186 and its limits still do — use the tab before this.';
+      tone = 'ok'; cite = 's.185(1), s.185(3)(c)';
+    } else if(route !== 'none'){
+      verdict = 'Permitted. s.185(3) takes this out of both sub-section (1) and sub-section (2).' +
+        (route === 'ordinary'
+          ? ' Record the rate charged and the Government security yield it was set against — '+
+            'that is what the exception turns on.'
+          : (route === 'holdwos' || route === 'holdguar')
+            ? ' The proviso requires the loan to be used by the subsidiary for its principal '+
+              'business activities.'
+            : '');
+      tone = 'ok'; cite = 's.185(3)';
+    } else if(who === 'interested'){
+      verdict = 'Permitted only on conditions. s.185(2) requires a <b>special resolution</b>, '+
+        'with the explanatory statement disclosing full particulars of the loan, guarantee or '+
+        'security and the purpose it will be put to; and the borrowing company must use the '+
+        'loan for its <b>principal business activities</b>.';
+      tone = 'warn'; cite = 's.185(2)(a), (b)';
+    } else {
+      verdict = '<b>Prohibited.</b> s.185(1) forbids the company, directly or indirectly, from '+
+        'advancing this loan — including a loan represented by a book debt — or giving any '+
+        'guarantee or security in connection with it. No resolution cures it.';
+      tone = 'warn'; cite = 's.185(1)';
+    }
+    return '<div class="cc-card"><div class="cc-card-h">The answer</div><div class="cc-card-b">'+
+      '<div class="calc-'+tone+'">'+verdict+'</div>'+
+      '<div class="calc-base-line">On <span class="calc-mono">'+cite+'</span></div>'+
+      '<div class="calc-note">s.185(2) reaches a private company in which such a director is a '+
+      'director or member, a body corporate where such directors control at least twenty-five '+
+      'per cent of the voting power, and a body corporate whose Board is accustomed to act on '+
+      'their directions.</div></div></div>';
+  }
+
+  case 's123': {
+    var avail = calcN('curprof') + calcN('accprof') - calcN('carryloss') - calcN('transres');
+    var prop = calcN('divprop');
+    return '<div class="cc-card"><div class="cc-card-h">Is there a lawful source</div>'+
+      '<div class="cc-card-b">'+
+      '<table class="brd-tbl calc-tbl"><tbody>'+
+      '<tr><td>Profit for the year, after Schedule II depreciation</td>'+
+        '<td class="calc-mono">s.123(1)(a), (2)</td><td class="calc-amt">'+
+        calcMoney(calcN('curprof'))+'</td></tr>'+
+      '<tr><td>Undistributed profits of earlier years</td><td class="calc-mono">s.123(1)(a)</td>'+
+        '<td class="calc-amt">'+calcMoney(calcN('accprof'))+'</td></tr>'+
+      '<tr><td>Less: previous losses and depreciation not provided</td>'+
+        '<td class="calc-mono">s.123(1), fourth proviso</td>'+
+        '<td class="calc-amt calc-neg">'+calcMoney(-calcN('carryloss'))+'</td></tr>'+
+      '<tr><td>Less: transfer to reserves</td><td class="calc-mono">s.123(1), first proviso</td>'+
+        '<td class="calc-amt calc-neg">'+calcMoney(-calcN('transres'))+'</td></tr>'+
+      '</tbody></table>'+
+      calcResult('Available for distribution', calcMoney(avail))+
+      (prop > 0
+        ? (prop > avail
+            ? '<div class="calc-warn"><b>The proposed dividend of '+calcMoney(prop)+
+              ' exceeds that by '+calcMoney(prop - avail)+'.</b> s.123(1) permits declaration '+
+              'only out of the sources it lists, and the third proviso forbids declaring out '+
+              'of reserves other than free reserves.</div>'
+            : '<div class="calc-ok">The proposed dividend of '+calcMoney(prop)+
+              ' is within the amount available, leaving '+calcMoney(avail - prop)+'.</div>')
+        : '')+
+      '<div class="calc-note">This tests the <b>source</b> only. Declaration and payment carry '+
+      'their own duties — deposit in a separate account within five days under s.123(4), '+
+      'payment within thirty days under s.127, and transfer of the unpaid amount to the Unpaid '+
+      'Dividend Account under s.124. Those appear in the register as obligations, not here.'+
+      '</div></div></div>';
+  }
+
+  case 'fees': {
+    var F = calc403Fee(CALC_V.feeform || 'mgt7', CALC_V.feedue, CALC_V.feefiled);
+    if(F.error) return '<div class="cc-card"><div class="cc-card-b"><div class="cc-none">'+
+      F.error+'</div></div></div>';
+    if(!F.late) return '<div class="cc-card"><div class="cc-card-b"><div class="calc-ok">'+
+      'Filed on or before the due date. No additional fee arises under s.403.</div></div></div>';
+    if(F.unpriced) return '<div class="cc-card"><div class="cc-card-h">'+F.days+
+      ' days late</div><div class="cc-card-b"><div class="calc-warn">'+
+      '<b>This form cannot be priced here.</b> s.403(1) says the fee is &ldquo;such fee as may '+
+      'be prescribed&rdquo;, and the slabs for forms other than those under s.92 and s.137 are '+
+      'in the Companies (Registration Offices and Fees) Rules, which are not in '+
+      '<span class="calc-mono">reference/</span>. Naming a number we cannot cite would be worse '+
+      'than saying so.</div></div></div>';
+    return '<div class="cc-card"><div class="cc-card-h">'+F.days+' days late</div>'+
+      '<div class="cc-card-b">'+
+      calcResult('Additional fee', calcMoney(F.fee),
+        F.days+' days &times; ₹100 per day')+
+      '<div class="calc-note">The first proviso to s.403(1) fixes the additional fee for a '+
+      'filing under <b>section '+F.section+'</b> at <b>not less than one hundred rupees per '+
+      'day</b>, and allows different amounts for different classes of company. This is the '+
+      'floor the Act itself states; confirm the amount on MCA21 before paying. s.403(2) keeps '+
+      'the penalty for the default itself alive on top of the fee.</div></div></div>';
+  }
+
+  case 'board': {
+    if(!c) return '<div class="cc-card"><div class="cc-card-b"><div class="cc-empty">'+
+      '<div class="cc-empty-icon">◇</div><h3>No entity selected</h3>'+
+      '<p>This one reads the directors register rather than a form.</p></div></div></div>';
+    var dirs = [];
+    try{ dirs = regRowsFor('directors', c.id) || []; }catch(e){}
+    if(!dirs.length) return '<div class="cc-card"><div class="cc-card-b"><div class="cc-none">'+
+      'No directors are recorded for '+entEsc(c.name)+'. Composition cannot be tested against '+
+      'an empty register — an empty register is not a compliant board.</div></div></div>';
+    var B = calcBoardCheck(c, dirs);
+    var rows = B.checks.map(function(x){
+      var mark = !x.evaluable ? '<span class="calc-unk">not tested</span>'
+               : x.ok ? '<span class="calc-yes">meets</span>'
+                      : '<span class="calc-no">short</span>';
+      return '<tr><td>'+x.test+(x.note ? '<div class="calc-sub">'+x.note+'</div>' : '')+'</td>'+
+        '<td class="calc-mono">'+x.cite+'</td><td>'+x.have+'</td><td>'+mark+'</td></tr>';
+    }).join('');
+    return '<div class="cc-card"><div class="cc-card-h">'+entEsc(c.name)+
+      ' — '+B.count+' directors in office</div><div class="cc-card-b">'+
+      '<div class="calc-base-line">'+B.independent+' independent &middot; '+B.executive+
+        ' executive &middot; '+B.women+' woman '+(B.women===1?'director':'directors')+'</div>'+
+      '<table class="brd-tbl calc-tbl"><thead><tr><th>Condition</th><th>Provision</th>'+
+      '<th>On the register</th><th>Result</th></tr></thead><tbody>'+rows+'</tbody></table>'+
+      '<div class="calc-note"><b>&ldquo;Not tested&rdquo; is not a pass.</b> The register does '+
+      'not record residency, nor which directors sit on which committee, so those conditions '+
+      'are reported as unevaluable rather than assumed satisfied. Committee rows say only '+
+      'whether a compliant committee could be formed from the board as it stands.</div>'+
+      '</div></div>';
+  }
+  }
+  return '';
+}
+
+function renderCalc(){
+  var root = document.getElementById('calc-root');
+  if(!root) return;
+
+  var head = '<div class="cc-pagehead"><div>'+
+    '<div class="cc-crumb">Compliance &rsaquo; Calculators</div>'+
+    '<h1 class="cc-h1">Calculators</h1>'+
+    '<p class="cc-sub">The statutory arithmetic, worked line by line, each line citing the '+
+    'clause it comes from.</p></div></div>';
+
+  var entSel = (typeof CLIENTS !== 'undefined' && CLIENTS.length)
+    ? '<select id="calc-entity" class="lg-field" onchange="calcEntityChange()">'+
+      CLIENTS.map(function(x){
+        return '<option value="'+entEsc(x.id)+'">'+entEsc(x.name)+'</option>';
+      }).join('')+'</select>'
+    : '';
+
+  var tabs = '<div class="mw-tabs">'+CALC_TABS.map(function(t){
+    return '<div class="mw-tab'+(CALC_MODE===t[0]?' on':'')+'" onclick="calcSetMode('+
+      lgArg(t[0])+')">'+t[1]+'</div>';
+  }).join('')+'</div>';
+
+  var form = calcForm();
+
+  root.innerHTML = head + tabs +
+    (entSel ? '<div class="cc-card cc-toolbar"><div class="cc-toolrow">'+
+      '<div class="calc-f" style="margin:0;"><label class="calc-l">Entity</label>'+entSel+
+      '</div></div></div>' : '') +
+    (form ? '<div class="cc-card"><div class="cc-card-b">'+form+'</div></div>' : '') +
+    '<div id="calc-out">'+calcOutput()+'</div>' +
+    '<div class="calc-foot">Every figure above is computed here from what you entered and the '+
+    'section named beside it — nothing is retrieved from MCA21 or any other source. The '+
+    'Companies Act text these citations were taken from is <b>as amended upto 01.04.2021</b>, '+
+    'over five years old; check any rate or threshold against a current compilation before '+
+    'relying on it. Amounts are in rupees.</div>';
+
+  var sel = document.getElementById('calc-entity');
+  if(sel && CALC_V.__ent) sel.value = CALC_V.__ent;
 }
 
 function renderGovernance(){

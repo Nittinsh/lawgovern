@@ -126,8 +126,9 @@ Until step 2 runs, `entSave()` fails with a "column does not exist" error and sa
   we hold. Worth adding the Rules PDF to `reference/`.
 - **The Companies Act PDF is "as amended upto 01.04.2021" — over five years stale.** Any threshold
   or timeline verified from it must be re-checked against a current compilation before relying on it.
-- The CSR *spend* calculation (2% of average net profit over three preceding FYs) is not modelled
-  at all — only applicability is.
+- ~~The CSR *spend* calculation (2% of average net profit over three preceding FYs) is not modelled
+  at all — only applicability is.~~ **Built in v163**, see section 2y. The Explanation to s.135 fixes
+  the basis as s.198, so the net-profit calculator feeds it directly.
 
 ---
 
@@ -1085,6 +1086,97 @@ across cl. 4(1), cl. 4(2) and cl. 5, plus three mutations.
 
 ---
 
+## 2y. STATUTORY CALCULATORS (v163)
+
+Panel `p-calc` -> `renderCalc()`. Nav: Compliance > Calculators.
+
+**The gap this fills.** The app could say *what* is due and *whether* it was evidenced, and could
+not compute a single statutory number. Applicability, deadlines, evidence, registers all answer
+"what" and "when". None of them answers **"how much"**, which is most of what a CS is actually
+asked on the phone.
+
+Eight calculators, one panel, tabs -- deliberately not eight nav destinations. The owner's
+not-wanted list names "too many dashboards", and section 2u had just cut thirty destinations into
+nine groups; adding eight more would have undone it.
+
+### Every engine is a pure function, and that is the point
+`calc198Compute` / `calc197Limits` / `calcCSRSpend` / `calc186Limit` / `calc403Fee` /
+`calcBoardCheck` take a plain object and return **the working line by line**, each line carrying
+the clause it comes from. Nothing returns a bare number: a figure a client cannot trace is a figure
+the CS cannot sign. The forms are only a way of calling them -- which is also why the suite can
+exercise all six directly. **A calculation reachable only through a form is a calculation nobody
+can test.**
+
+### What each rests on, verbatim from `reference/`
+| tab | provision | the words it turns on |
+|---|---|---|
+| Net profit | s.198(1)-(5) | credit for (2), none for (3); (4) deducted, (5) not |
+| Managerial remuneration | s.197(1) | 11% / 5% / 10% / 1% / 3%, and the public-company limit |
+| CSR spend | s.135(5), (9) | "at least two per cent of the average net profits ... three immediately preceding financial years" |
+| Loan & investment | s.186(2) | "sixty per cent ... or one hundred per cent ... **whichever is more**" |
+| Loan to a director | s.185(1)-(3) | the prohibition, the s.185(2) route, the four s.185(3) exceptions |
+| Dividend | s.123(1) + provisos | the sources test only |
+| Late filing fee | s.403(1), first proviso | "not less than one hundred rupees per day" |
+| Board composition | s.149(1), (3), (4), 177(2), 178(1) | minimums, the fifteen cap, the one-third rule |
+
+### The three decisions worth keeping
+
+**1. s.197 adds directors' remuneration back, and forgetting it understates every ceiling.**
+s.197(1) computes on the s.198 figure *"except that the remuneration of the directors shall not be
+deducted from the gross profits"*. So remuneration already charged in the accounts is added back
+before the percentages are taken. This is the commonest error in the calculation and it fails
+**quietly** -- it produces a lower, entirely plausible ceiling.
+
+**2. CSR closes a gap section 2c recorded as unmodelled.** That section says the CSR *spend*
+calculation "is not modelled at all -- only applicability is". The Explanation to s.135 settles the
+basis: net profit here *"shall be calculated in accordance with the provisions of section 198"* --
+so the first tab feeds the third directly. s.135(9)'s fifty-lakh Committee threshold is
+**inclusive** ("does not exceed"), so exactly fifty lakh needs **no** Committee; the suite asserts
+that boundary from both sides.
+
+**3. s.403 refuses to price most forms.** The Act says the fee is *"such fee as may be prescribed"*.
+Only the first proviso names a figure, and only for s.92 and s.137 filings -- Rs 100/day. Every
+other form's slabs are in the Companies (Registration Offices and Fees) Rules, **not in
+`reference/`**. So the screen says it cannot price them. Naming a number we cannot cite would be
+worse than the gap: a CS would file on it. Same treatment as PAS-3 under Rule 12 (section 2n).
+
+### Board composition runs on the register, and says what it cannot test
+`calcBoardCheck` reads the directors register rather than a form, so it answers for a real company.
+s.149(4)'s Explanation rounds any fraction in the one-third **up**, so seven directors need three
+independent, not two -- asserted from both sides.
+
+What the register does not hold is reported as **`not tested`, never as a pass**: residency under
+s.149(3), and committee membership for s.177(2)/178(1). The committee rows say only whether a
+compliant committee *could* be formed from the board as it stands. Same rule as the evidence engine
+-- **the absence of a check is not a pass.** Every untested row carries its reason, and the suite
+asserts that too.
+
+### The bug the browser found that Node could not
+Every field updates as you type, except a date. The date inputs listened on `change` alone, which
+for a hand-typed date does not fire until blur -- so the answer sat stale while the user looked at
+it, which reads as broken. Now `oninput` **and** `onchange`: a picked date fires one, a typed date
+fires the other. **Node could not have caught this; only driving the real form did.**
+
+### Coverage
+**52 new assertions** (suite 99 -> 151) and **10 new mutations** (14 -> 24 caught, 0 missed). The
+mutations reverse a sign or move a boundary rather than breaking the code, because that is how this
+class of bug actually arrives: `Math.max` -> `Math.min` on s.186, `>` -> `>=` on the CSR threshold,
+`ceil` -> `floor` on the one-third, a s.198(5) add-back turned into a deduction. **A wrong figure
+looks exactly like a right one**, which is the whole reason this suite exists.
+
+### Not built, and why
+- **Resume builders** -- not a compliance product's job.
+- **A statutory-audit checklist** -- the auditor's workpaper, not the CS's.
+- **NIC code finder** -- needs the NIC-2008 corpus, which is not held. A partial list would be a
+  dummy item.
+- **Schedule V Part II slabs** (remuneration where profits are inadequate) -- they turn on
+  *effective capital*, a different computation with its own definition. Named on screen as not
+  computed.
+- **Annual compliance calendars per company class** -- `getComplianceChart` already does this per
+  entity from its actual figures, which beats a generic list by class.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -1153,7 +1245,7 @@ across cl. 4(1), cl. 4(2) and cl. 5, plus three mutations.
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/compliance.test.js` (78 assertions, runs against `index.html` itself). `node tests/mutation.js` proves the suite can still fail by reintroducing 8 bugs that actually shipped here. See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (151 assertions, run against `index.html` itself), `node tests/mutation.js` (24 bugs reintroduced, all caught), and `python tools/rule_audit.py` (the release gate). See `tests/README.md`.
 - **No AI model auto-updates to current law.** Staying current = fetch fresh sources (RSS via rss2json/allorigins for SEBI/MCA/IBBI/RBI/IncomeTax) + human curation + (optionally) paid web-search. Vetted human templates + AI drafting is the right model.
 - **Drafting quality:** resolution/notice prompts (`RES_SYS`, `DOC_SYS`) were tuned to a senior-CS standard (exact sub-section citations with read-with clauses, SEBI LODR cross-refs, full RESOLVED THAT/FURTHER THAT cascade, standard severally-authorised CS clause, Certified True Copy headers, Section 102 explanatory statements, MCA form+deadline line). There's an anti-reasoning guard telling the model to output ONLY the final document (some free models leaked their chain-of-thought). Keep these standards.
 - **Child/again:** all AI legal output must carry a "verify on MCA/SEBI portal before filing" caveat — the CS signs and carries professional responsibility.
@@ -1162,7 +1254,7 @@ across cl. 4(1), cl. 4(2) and cl. 5, plus three mutations.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v162.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v163.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. Migrations through `db/016` are applied. **`db/017_applicability_review.sql` is new and has not been run** — until it is, confirming an applicability condition fails with a message naming the file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

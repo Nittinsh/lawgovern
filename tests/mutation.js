@@ -94,7 +94,51 @@ const MUTATIONS = [
 
   { name: 'any board meeting reopens the window, not only a results one (§2w)',
     from: '      return m.approved_results === true && m.held_on && String(m.held_on) >= qEnd;',
-    to:   '      return m.held_on && String(m.held_on) >= qEnd;' }
+    to:   '      return m.held_on && String(m.held_on) >= qEnd;' },
+
+  // ── the statutory calculators ───────────────────────────────
+  // A wrong figure looks exactly like a right one, which is why each of these
+  // reverses a direction or moves a boundary rather than breaking the code.
+
+  { name: 'a s.198(5) tax add-back is deducted instead (§2y — sign reversed)',
+    from: "       's.198(5)(a)', calcNum(v.a5a), 1);",
+    to:   "       's.198(5)(a)', calcNum(v.a5a), -1);" },
+
+  { name: 'a s.198(3) credit is added rather than removed (§2y)',
+    from: "       's.198(3)(a)', calcNum(v.l3a), -1);",
+    to:   "       's.198(3)(a)', calcNum(v.l3a), 1);" },
+
+  { name: "s.197 stops adding directors' remuneration back (§2y — every ceiling understated)",
+    from: '  var base = calcNum(net198) + calcNum(dirRem);',
+    to:   '  var base = calcNum(net198);' },
+
+  { name: 's.197 binds a private company too (§2y — a ceiling that does not exist)',
+    from: '    applies: isPublic !== false,',
+    to:   '    applies: true,' },
+
+  { name: 'the CSR committee threshold turns inclusive (§2y — s.135(9) says "does not exceed")',
+    from: '    committeeRequired: spend > 5000000,',
+    to:   '    committeeRequired: spend >= 5000000,' },
+
+  { name: 's.186 takes the smaller limb, not "whichever is more" (§2y)',
+    from: '  var limit = Math.max(a, b);',
+    to:   '  var limit = Math.min(a, b);' },
+
+  { name: 's.403 prices a form whose fee rules are not held (§2y)',
+    from: '  if(!f[3]) return {form:f, days:days, late:true, unpriced:true};',
+    to:   '  if(false) return {form:f, days:days, late:true, unpriced:true};' },
+
+  { name: 's.149(4) rounds the one-third down (§2y — the Explanation rounds up)',
+    from: '    var need = Math.ceil(n / 3);',
+    to:   '    var need = Math.floor(n / 3);' },
+
+  { name: 'a ceased director is still counted on the board (§2y)',
+    from: '  var inOffice = (directors || []).filter(function(d){ return !d.cessation_on; });',
+    to:   '  var inOffice = (directors || []);' },
+
+  { name: 'an untested composition condition reports as satisfied (§2y)',
+    from: "    have:'not recorded', ok:false, evaluable:false,",
+    to:   "    have:'not recorded', ok:true, evaluable:true," }
 ];
 
 const src = fs.readFileSync(INDEX, 'utf8');

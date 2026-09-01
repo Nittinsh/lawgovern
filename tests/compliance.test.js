@@ -453,6 +453,173 @@ describe('PIT trading window');
 
 setRegisters();
 
+// ── 11d. Statutory calculators ──────────────────────────────
+// Every figure here traces to a section in reference/companies-act-2013.
+const CR = 10000000;
+
+describe('section 198 — calculation of profits');
+{
+  // s.198(1): credit for (2), none for (3); (4) deducted, (5) not deducted.
+  const r = app.calc198Compute({
+    pbt: 10 * CR,     // profit before tax per the books
+    a5a: 2 * CR,      // income-tax charged — s.198(5)(a), added back
+    l3c: 1 * CR,      // capital profits credited — s.198(3)(c), removed
+    l4l: 0.5 * CR     // earlier years' excess of expenditure — s.198(4)(l)
+  });
+  check('net profit under s.198', r.total, 10.5 * CR);
+  check('the working shows every line that moved', r.lines.length, 4);
+  check('the first line is the starting point', r.lines[0].base, true);
+
+  // Direction matters more than magnitude: a (5) item that subtracts, or a (3)
+  // item that adds, produces a plausible number that is wrong.
+  check('a s.198(5) item is ADDED back',
+        app.calc198Compute({ pbt: 100, a5a: 50 }).total, 150);
+  check('a s.198(3) credit is REMOVED',
+        app.calc198Compute({ pbt: 100, l3a: 50 }).total, 50);
+  check('a s.198(4) deduction is SUBTRACTED',
+        app.calc198Compute({ pbt: 100, l4k: 50 }).total, 50);
+  check('a s.198(2) subsidy is ADDED', app.calc198Compute({ pbt: 100, a2: 50 }).total, 150);
+  check('an empty working returns the profit unchanged',
+        app.calc198Compute({ pbt: 100 }).total, 100);
+}
+
+describe('section 197 — managerial remuneration');
+{
+  // s.197(1) computes on the s.198 figure "except that the remuneration of the
+  // directors shall not be deducted from the gross profits".
+  const L = app.calc197Limits(10 * CR, 2 * CR, true, true);
+  check('remuneration charged is added back to the base', L.base, 12 * CR);
+  check('overall ceiling is eleven per cent', L.rows[0].amt, 1.32 * CR);
+  check('one managing or whole-time director — five per cent', L.rows[1].amt, 0.6 * CR);
+  check('more than one, taken together — ten per cent', L.rows[2].amt, 1.2 * CR);
+
+  // The fourth row switches rate on whether an MD/WTD/manager exists.
+  check('non-executives get one per cent where there is an MD or WTD',
+        L.rows[3].pct, 1);
+  check('and three per cent where there is not',
+        app.calc197Limits(10 * CR, 0, false, true).rows[3].pct, 3);
+  check('the citation follows the rate',
+        app.calc197Limits(1, 0, false, true).rows[3].cite,
+        's.197(1), second proviso (ii)(B)');
+
+  // s.197(1) binds a PUBLIC company. Applying it to a private one would be a
+  // ceiling that does not exist.
+  check('it does not bind a private company',
+        app.calc197Limits(10 * CR, 0, true, false).applies, false);
+  check('it binds a public one', app.calc197Limits(10 * CR, 0, true, true).applies, true);
+}
+
+describe('section 135 — CSR spend');
+{
+  // The Explanation to s.135: net profit "shall be calculated in accordance
+  // with the provisions of section 198".
+  const C = app.calcCSRSpend(10 * CR, 8 * CR, 6 * CR, 3);
+  check('average of the three preceding years', C.average, 8 * CR);
+  check('two per cent of that average', C.spend, 0.16 * CR);
+
+  // s.135(9): no Committee where the amount "does not exceed fifty lakh
+  // rupees" — so exactly fifty lakh is on the no-Committee side.
+  check('a spend of exactly fifty lakh needs no CSR Committee',
+        app.calcCSRSpend(25 * CR, 25 * CR, 25 * CR, 3).committeeRequired, false);
+  check('and the spend at that point is fifty lakh',
+        app.calcCSRSpend(25 * CR, 25 * CR, 25 * CR, 3).spend, 5000000);
+  check('a rupee more does need one',
+        app.calcCSRSpend(25 * CR, 25 * CR, 25.0001 * CR, 3).committeeRequired, true);
+
+  // The 2019 insertion: a company that has not completed three years averages
+  // over the years it has.
+  check('fewer than three years averages over those it has',
+        app.calcCSRSpend(30 * CR, 0, 0, 1).average, 30 * CR);
+  check('a loss-making average produces no minimum spend',
+        app.calcCSRSpend(-5 * CR, -5 * CR, -5 * CR, 3).negative, true);
+}
+
+describe('section 186 — loan and investment limit');
+{
+  // "sixty per cent. of its paid-up share capital, free reserves and securities
+  // premium account or one hundred per cent. of its free reserves and
+  // securities premium account, whichever is more."
+  const M = app.calc186Limit(10 * CR, 2 * CR, 1 * CR, 5 * CR, 4 * CR);
+  check('sixty per cent limb', M.sixty, 7.8 * CR);
+  check('one hundred per cent limb', M.hundred, 3 * CR);
+  check('the limit is the larger', M.limit, 7.8 * CR);
+  check('and it says which limb won', M.which, 'sixty');
+  check('nine crore against a 7.8 crore limit exceeds it', M.exceeds, true);
+  check('headroom is negative by the excess', M.headroom, -1.2 * CR);
+
+  // Both limbs must be able to win, or "whichever is more" is not implemented.
+  const M2 = app.calc186Limit(1 * CR, 20 * CR, 0, 0, 0);
+  check('free reserves can carry the hundred per cent limb', M2.which, 'hundred');
+  check('and the limit follows it', M2.limit, 20 * CR);
+}
+
+describe('section 403 — additional fee for late filing');
+{
+  check('a filing made before the due date attracts none',
+        app.calc403Fee('mgt7', '2026-10-30', '2026-10-20').late, false);
+  const F = app.calc403Fee('mgt7', '2026-10-30', '2026-11-29');
+  check('days late are counted from the due date', F.days, 30);
+  check('at one hundred rupees a day — first proviso to s.403(1)', F.fee, 3000);
+  check('and the section it is filed under is named', F.section, 92);
+  check('AOC-4 is priced under section 137',
+        app.calc403Fee('aoc4', '2026-10-30', '2026-11-29').section, 137);
+
+  // The Fees Rules are not in reference/, so no other form may be priced.
+  const O = app.calc403Fee('other', '2026-10-30', '2026-11-29');
+  check('any other form is refused rather than guessed at', O.unpriced, true);
+  check('but it still says how late it is', O.days, 30);
+  check('missing dates are refused', !!app.calc403Fee('mgt7', '', '').error, true);
+}
+
+describe('board composition — sections 149, 177, 178');
+{
+  const dirs = (n, designation, extra) => Array.from({ length: n }, (_, i) =>
+    Object.assign({ id: designation + i, name: designation + i, designation }, extra || {}));
+  const listed  = { id: 'B-L', name: 'L', type: 'listed' };
+  const priv    = { id: 'B-P', name: 'P', type: 'private' };
+  const pub     = { id: 'B-U', name: 'U', type: 'public' };
+  const cite = (B, c) => B.checks.filter(x => x.cite === c)[0];
+
+  // s.149(1)(a): three public, two private, one OPC.
+  check('a private company needs two directors',
+        cite(app.calcBoardCheck(priv, dirs(2, 'director')), 's.149(1)(a)').ok, true);
+  check('a public company needs three',
+        cite(app.calcBoardCheck(pub, dirs(2, 'director')), 's.149(1)(a)').ok, false);
+  check('an OPC needs one',
+        cite(app.calcBoardCheck({ id: 'B-O', name: 'O', type: 'opc' }, dirs(1, 'director')),
+             's.149(1)(a)').ok, true);
+  check('s.149(1)(b) caps the board at fifteen',
+        cite(app.calcBoardCheck(priv, dirs(16, 'director')), 's.149(1)(b)').ok, false);
+
+  // s.149(4) Explanation: "any fraction contained in such one-third number
+  // shall be rounded off as one". Seven directors therefore need three.
+  check('six directors need two independent',
+        cite(app.calcBoardCheck(listed, dirs(4, 'director').concat(dirs(2, 'independent'))),
+             's.149(4)').ok, true);
+  check('seven need three — the fraction rounds up',
+        cite(app.calcBoardCheck(listed, dirs(5, 'director').concat(dirs(2, 'independent'))),
+             's.149(4)').ok, false);
+  check('and seven with three meets it',
+        cite(app.calcBoardCheck(listed, dirs(4, 'director').concat(dirs(3, 'independent'))),
+             's.149(4)').ok, true);
+  check('the one-third test is not applied to an unlisted company',
+        cite(app.calcBoardCheck(priv, dirs(9, 'director')), 's.149(4)'), undefined);
+
+  // A director who has ceased is not on the board.
+  const withGone = dirs(2, 'director').concat(dirs(1, 'director', { cessation_on: '2026-01-01' }));
+  check('a ceased director is not counted', app.calcBoardCheck(priv, withGone).count, 2);
+
+  // What the register cannot answer must not read as a pass.
+  const B = app.calcBoardCheck(listed, dirs(6, 'independent'));
+  check('residency is reported as untested, not satisfied',
+        cite(B, 's.149(3)').evaluable, false);
+  check('committee rows are untested too — membership is not recorded',
+        cite(B, 's.177(2)').evaluable, false);
+  ok('every untested row carries its reason',
+     B.checks.filter(x => !x.evaluable).every(x => !!x.note),
+     B.checks.filter(x => !x.evaluable && !x.note).length + ' without one');
+}
+
 // ── 12. Dashboard invariants ────────────────────────────────
 describe('dashboard invariants');
 {
