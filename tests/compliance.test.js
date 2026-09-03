@@ -776,6 +776,89 @@ describe('reference data');
   check('the responsibility statement has all five clauses of s.134(5)', app.CHK_DRS.length, 5);
 }
 
+// ── 11h. Roles and organisation scope (§3a) ─────────────────
+describe('roles');
+{
+  const asRole = (r, fn) => {
+    const prev = app.CURRENT_ROLE;
+    app.CURRENT_ROLE = r;
+    try { return fn(); } finally { app.CURRENT_ROLE = prev; }
+  };
+
+  // A viewer reads and never writes. Everyone else writes data.
+  check('an owner may write',   asRole('owner',  () => app.lgCanWrite()), true);
+  check('an admin may write',   asRole('admin',  () => app.lgCanWrite()), true);
+  check('a member may write',   asRole('member', () => app.lgCanWrite()), true);
+  check('a viewer may not',     asRole('viewer', () => app.lgCanWrite()), false);
+
+  // Only owner and admin manage people.
+  check('an owner manages people',  asRole('owner',  () => app.lgCanAdmin()), true);
+  check('an admin manages people',  asRole('admin',  () => app.lgCanAdmin()), true);
+  check('a member does not',        asRole('member', () => app.lgCanAdmin()), false);
+  check('a viewer does not',        asRole('viewer', () => app.lgCanAdmin()), false);
+
+  // Before db/025 runs there is no role at all, and the app must keep working
+  // exactly as it did — every policy still carries its legacy single-user limb.
+  check('no role behaves as a writer, not as a viewer',
+        asRole(null, () => app.lgCanWrite()), true);
+
+  ok('every role has a label', ['owner','admin','member','viewer']
+     .every(r => app.lgRoleLabel(r) !== r), 'one is unlabelled');
+  check('and an unknown role does not crash the label', app.lgRoleLabel('nonsense'), 'nonsense');
+}
+
+describe('a viewer cannot be a checker');
+{
+  const st = { evidence: { recordedBy: 'someone@else.com' }, checkState: 'unchecked' };
+  const asRole = (r, fn) => {
+    const prev = app.CURRENT_ROLE, prevU = app.CURRENT_USER;
+    app.CURRENT_ROLE = r;
+    app.CURRENT_USER = { id: 'u1', email: 'me@firm.com' };
+    try { return fn(); } finally { app.CURRENT_ROLE = prev; app.CURRENT_USER = prevU; }
+  };
+  // Confirming a filing records that a check was carried out. Someone who
+  // cannot change a record must not be able to certify one.
+  check('a viewer is refused', asRole('viewer', () => app.lgCanCheck(st).can), false);
+  ok('and told why in terms they can act on',
+     /viewer/i.test(asRole('viewer', () => app.lgCanCheck(st).why)),
+     asRole('viewer', () => app.lgCanCheck(st).why));
+  check('a member may check', asRole('member', () => app.lgCanCheck(st).can), true);
+
+  // The maker-checker rule itself still stands on top of the role.
+  const mine = { evidence: { recordedBy: 'me@firm.com' }, checkState: 'unchecked' };
+  check('and may still not check their own entry',
+        asRole('member', () => app.lgCanCheck(mine).can), false);
+  check('nor may an owner check their own',
+        asRole('owner', () => app.lgCanCheck(mine).can), false);
+}
+
+describe('organisation scope');
+{
+  const withOrg = (id, fn) => {
+    const prev = app.CURRENT_ORG;
+    app.CURRENT_ORG = id;
+    try { return fn(); } finally { app.CURRENT_ORG = prev; }
+  };
+  const rows = [
+    { id: 1, org_id: 'A' }, { id: 2, org_id: 'B' },
+    { id: 3, org_id: 'A' }, { id: 4, org_id: null }
+  ];
+  // Someone in two practices can read both. The screen shows one at a time.
+  check('rows from another organisation are dropped',
+        withOrg('A', () => app.lgScopeToOrg(rows).map(r => r.id).join(',')), '1,3,4');
+  check('and switching changes what is kept',
+        withOrg('B', () => app.lgScopeToOrg(rows).map(r => r.id).join(',')), '2,4');
+
+  // A row with no org is kept deliberately: on a database where db/025 has not
+  // run, every row has a null org, and dropping them would empty the screen.
+  check('a row with no organisation is never dropped',
+        withOrg('A', () => app.lgScopeToOrg([{ id: 9, org_id: null }]).length), 1);
+  check('and where nothing carries an org, everything is kept',
+        withOrg('A', () => app.lgScopeToOrg([{ id: 1 }, { id: 2 }]).length), 2);
+  check('with no organisation selected, nothing is filtered',
+        withOrg(null, () => app.lgScopeToOrg(rows).length), 4);
+}
+
 // ── 12. Dashboard invariants ────────────────────────────────
 describe('dashboard invariants');
 {

@@ -1267,6 +1267,61 @@ mutation that puts them back.
 
 ---
 
+## 3a. ORGANISATIONS — the change that makes it sellable (v165) — db/025 NOT YET RUN
+
+Every table was scoped `user_id = auth.uid()`, with no org, team or firm anywhere. Two consequences:
+
+1. **Two people in one practice could not see the same company**, so it could not be sold to
+   anyone not working alone.
+2. **Maker-checker could never complete.** `db/005` enforces `checker <> maker` in the database,
+   but if only a row's creator can see it, no second person can ever confirm anything. The
+   strongest control in the product was structurally unreachable. It was not a bug in the feature
+   — the feature was correct and the visibility model made it impossible.
+
+### The safety rule for db/025
+Every policy reads **`( membership test ) OR ( user_id = auth.uid() )`**. The legacy limb is
+deliberate: if the backfill misses a row, or a company ends up with a null `org_id`, the owner
+still sees their own data exactly as before. **A migration that can lock the only user out of a
+live compliance database is not worth any amount of tidiness.** Drop that limb later, in its own
+migration, once every row is confirmed to carry an org.
+
+The suite asserts this both ways: with no role at all `lgCanWrite()` returns **true**, and
+`lgScopeToOrg` keeps rows with no `org_id` — because on a database where db/025 has not run,
+every row has a null org and filtering them would empty the screen.
+
+### One anchor, not seventeen
+Only `companies` and `rule_verifications` carry `org_id`. Every register row already has
+`company_id`, so its access derives from the company through `lg_see_company()` /
+`lg_write_company()` rather than being duplicated across seventeen tables and kept in step by hand.
+
+`SECURITY DEFINER` on the helpers is not optional: a policy on `org_members` that queries
+`org_members` recurses forever.
+
+### Roles
+`owner` / `admin` / `member` / `viewer`. A viewer reads and never writes — and therefore
+**cannot be a checker**, by construction rather than by a separate rule. Confirming a filing
+records that a check was carried out; somebody who cannot change a record should not be able to
+certify one. `lgGuardWrite()` sits at the top of `entSave`, `regSave`, `lgRecordSave`, `govSave`,
+`entDelete` and `regDelete` — RLS refuses these anyway, so the guard exists to turn a red database
+error into a sentence naming the role and where to change it.
+
+### Invitations are by email
+The person may not have an account yet. `org_invites` holds the pending row; `lg_claim_invites()`
+runs on sign-in and matches on the signed-in email, so an invitation cannot be claimed by anyone
+else. It is **separate from** the existing admin-approval gate: approval decides whether someone
+gets in at all, membership decides what they see once they are.
+
+### Switching reloads
+Deliberately. Every cached register, chart and rendered screen belongs to the practice that was
+open; re-rendering would leave one organisation's data on screen while the header named another.
+
+### Coverage
+**233 assertions** (was 212), **37 mutations caught, 0 missed** (was 32). Five of the new
+mutations are access control — the 30 August assessment asked for that coverage and there was
+none to write until there were roles.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -1335,7 +1390,7 @@ mutation that puts them back.
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (212 assertions, run against `index.html` itself), `node tests/mutation.js` (32 bugs reintroduced, all caught), and `python tools/rule_audit.py` (the release gate). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (233 assertions, run against `index.html` itself), `node tests/mutation.js` (37 bugs reintroduced, all caught), and `python tools/rule_audit.py` (the release gate). See `tests/README.md`.
 - **No AI model auto-updates to current law.** Staying current = fetch fresh sources (RSS via rss2json/allorigins for SEBI/MCA/IBBI/RBI/IncomeTax) + human curation + (optionally) paid web-search. Vetted human templates + AI drafting is the right model.
 - **Drafting quality:** resolution/notice prompts (`RES_SYS`, `DOC_SYS`) were tuned to a senior-CS standard (exact sub-section citations with read-with clauses, SEBI LODR cross-refs, full RESOLVED THAT/FURTHER THAT cascade, standard severally-authorised CS clause, Certified True Copy headers, Section 102 explanatory statements, MCA form+deadline line). There's an anti-reasoning guard telling the model to output ONLY the final document (some free models leaked their chain-of-thought). Keep these standards.
 - **Child/again:** all AI legal output must carry a "verify on MCA/SEBI portal before filing" caveat — the CS signs and carries professional responsibility.
@@ -1344,7 +1399,7 @@ mutation that puts them back.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v164.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v165.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. Migrations through `db/016` are applied. **`db/017_applicability_review.sql` is new and has not been run** — until it is, confirming an applicability condition fails with a message naming the file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

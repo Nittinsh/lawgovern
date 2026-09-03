@@ -176,7 +176,32 @@ const MUTATIONS = [
 
   { name: 'the LLP fee is priced from rules that are not held (§2z)',
     from: '  return {form:f, days: days > 0 ? days : 0, late: days > 0, unpriced:true};',
-    to:   '  return {form:f, days: days > 0 ? days : 0, late: days > 0, fee: days * 100};' }
+    to:   '  return {form:f, days: days > 0 ? days : 0, late: days > 0, fee: days * 100};' },
+
+  // ── access control ──────────────────────────────────────────
+  // The 30 August assessment asked for mutation coverage on auth. There was
+  // none to write until there were roles. A mistake here is not a wrong figure
+  // on a screen — it is somebody certifying something they should not.
+
+  { name: 'a viewer gains write access (§3a)',
+    from: "function lgCanWrite(){ return CURRENT_ROLE !== 'viewer'; }",
+    to:   'function lgCanWrite(){ return true; }' },
+
+  { name: 'a member can manage people (§3a)',
+    from: "function lgCanAdmin(){ return CURRENT_ROLE === 'owner' || CURRENT_ROLE === 'admin'; }",
+    to:   "function lgCanAdmin(){ return CURRENT_ROLE !== 'viewer'; }" },
+
+  { name: 'a viewer may confirm a filing (§3a — certifying without being able to write)',
+    from: "  if(typeof lgCanWrite === 'function' && !lgCanWrite())",
+    to:   '  if(false)' },
+
+  { name: 'another organisation\'s companies leak onto the screen (§3a)',
+    from: '    return !r.org_id || String(r.org_id) === String(CURRENT_ORG);',
+    to:   '    return true;' },
+
+  { name: 'a row with no organisation is dropped, emptying a pre-migration database (§3a)',
+    from: '    return !r.org_id || String(r.org_id) === String(CURRENT_ORG);',
+    to:   '    return String(r.org_id) === String(CURRENT_ORG);' }
 ];
 
 const src = fs.readFileSync(INDEX, 'utf8');

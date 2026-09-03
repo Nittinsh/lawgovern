@@ -2,7 +2,7 @@
 
 ```bash
 node tests/smoke.test.js        # structural integrity — fastest, run first
-node tests/compliance.test.js   # 212 assertions — run before every deploy
+node tests/compliance.test.js   # 233 assertions — run before every deploy
 node tests/mutation.js          # proves the suite can actually fail
 python tools/rule_audit.py      # release gate: rules vs the held regulation texts
 ```

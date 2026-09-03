@@ -549,6 +549,16 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 .calc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px 18px;}
 .chk-row{display:flex;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line-soft);cursor:pointer;align-items:flex-start;transition:.12s;}
 .nic-count{font-size:12px;color:var(--ink-soft);margin-bottom:10px;font-weight:600;}
+.lg-org-slot{display:flex;align-items:center;}
+.lg-org-one{display:flex;flex-direction:column;font-size:12.5px;font-weight:700;color:var(--navy);line-height:1.3;}
+.lg-org-role{font-size:10.5px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;}
+.lg-org-sel{font-size:12.5px;font-weight:600;color:var(--navy);border:1px solid var(--line);border-radius:8px;padding:6px 9px;background:#fff;max-width:190px;}
+.team-org{display:flex;align-items:center;gap:12px;font-size:15px;color:var(--navy);flex-wrap:wrap;}
+.team-rolechip{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--blue);background:var(--blue-wash);padding:3px 9px;border-radius:99px;}
+.team-role{font-size:12px;padding:5px 8px;max-width:150px;}
+.team-x{font-size:11.5px;font-weight:600;color:var(--crit);cursor:pointer;}
+.team-x:hover{text-decoration:underline;}
+@media(max-width:640px){.lg-org-slot{display:none;}}
 .nic-sec{margin-bottom:18px;}
 .nic-sec-h{display:flex;align-items:center;gap:9px;font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;}
 .nic-sec-c{font-family:'IBM Plex Mono',monospace;background:var(--navy);color:#fff;width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;}
@@ -1293,7 +1303,13 @@ function enterApp(){
   if(typeof renderCommandCenter === 'function') renderCommandCenter();
   // Load cloud data, then re-render dashboard with real numbers
   if(typeof loadCloudClients === 'function'){
-    Promise.resolve(loadCloudClients())
+    // Membership decides what the queries below return, so it is loaded first.
+    // A failure here must not stop the app: until db/025 runs there are no
+    // organisations, and every policy still carries its legacy single-user limb.
+    Promise.resolve((typeof lgLoadOrgs === 'function') ? lgLoadOrgs() : null)
+      .catch(function(){})
+      .then(function(){ if(typeof lgOrgHeader === 'function') lgOrgHeader(); })
+      .then(function(){ return loadCloudClients(); })
       .then(function(){ return (typeof lgLoadRegisters === 'function') ? lgLoadRegisters() : null; })
       .then(function(){
       if(typeof renderCommandCenter === 'function') renderCommandCenter();
@@ -1476,7 +1492,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v164">
+      <meta id="build-version" content="v165">
     </div>
   </div>
   <div class="cc-search">
@@ -1487,6 +1503,7 @@ input[type="text"], input[type="password"], textarea, select {
     <div id="gs-results" class="gs-results" style="display:none;"></div>
   </div>
   <div class="appheader-right">
+    <div id="lg-org-slot" class="lg-org-slot"></div>
     <div class="hdr-ent" id="hdr-ent" onclick="sw('entities')" title="Manage entities">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>
       <div><div class="hdr-ent-n" id="hdr-ent-name">No entity</div>
@@ -1510,7 +1527,7 @@ input[type="text"], input[type="password"], textarea, select {
 <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="closeMobileNav()"></div>
 <div class="appshell">
 <aside class="appside"><div class="navitem on" onclick="sw('home')" id="t-home"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span>Dashboard</span></div><div class="navgrp" id="ng-cmp"><div class="navhead" onclick="navToggle('cmp')"><span>Compliance</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What applies, what is due, what is evidenced</div><div class="navbody"><div class="navitem" onclick="sw('universe')" id="t-universe"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg><span>Compliance Universe</span></div><div class="navitem" onclick="sw('mywork')" id="t-mywork"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3 8-8M20 12v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h9"/></svg><span>My Work</span></div><div class="navitem" onclick="sw('cal')" id="t-cal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Calendar</span></div><div class="navitem" onclick="sw('applies')" id="t-applies"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke-linecap="round"/></svg><span>What Applies</span></div><div class="navitem" onclick="sw('exceptions')" id="t-exceptions"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3L12 3z"/><path d="M12 10v4" stroke-linecap="round"/></svg><span>Exceptions</span><span class="nav-badge" id="nav-exc-n" style="display:none">0</span></div><div class="navitem" onclick="sw('calc')" id="t-calc"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15v4M8 19h4" stroke-linecap="round"/></svg><span>Calculators</span></div><div class="navitem" onclick="sw('checks')" id="t-checks"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12l1.5 1.5L14 10" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Checklists</span></div></div></div><div class="navgrp" id="ng-evt"><div class="navhead" onclick="navToggle('evt')"><span>Events & change</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What happened, and what changed</div><div class="navbody"><div class="navitem" onclick="sw('impact')" id="t-impact"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9z" stroke-linejoin="round"/></svg><span>Event Impact</span></div><div class="navitem" onclick="sw('events')" id="t-events"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 8v5l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>Material Events</span></div><div class="navitem" onclick="sw('tracker')" id="t-tracker"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v3M12 18v3"/></svg><span>Regulatory Radar</span></div></div></div><div class="navgrp" id="ng-pit"><div class="navhead" onclick="navToggle('pit')"><span>Insider trading</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">Is the window open, and who knows what</div><div class="navbody"><div class="navitem" onclick="sw('pit')" id="t-pit"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3" stroke-linecap="round"/></svg><span>PIT Control Centre</span></div><div class="navitem" onclick="sw('dp')" id="t-dp"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0112 0M17 11h4M19 9v4" stroke-linecap="round"/></svg><span>Designated Persons</span></div><div class="navitem" onclick="sw('upsi')" id="t-upsi"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3z" stroke-linejoin="round"/><path d="M12 10v4M12 17h.01" stroke-linecap="round"/></svg><span>UPSI Register</span></div><div class="navitem" onclick="sw('sdd')" id="t-sdd"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><span>SDD &mdash; UPSI access</span></div><div class="navitem" onclick="sw('preclear')" id="t-preclear"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9" stroke-linecap="round"/></svg><span>Pre-clearance</span></div></div></div>
-<div class="navgrp" id="ng-reg"><div class="navhead" onclick="navToggle('reg')"><span>Registers</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What we know about the entity</div><div class="navbody"><div class="navitem" onclick="sw('entities')" id="t-entities"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h2m-2 4h2m-2 4h2m4-8h2m-2 4h2m-2 4h2"/></svg><span>Entities</span></div><div class="navitem" onclick="sw('directors')" id="t-directors"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-8 0v2"/><circle cx="12" cy="7" r="4"/></svg><span>Directors &amp; KMP</span></div><div class="navitem" onclick="sw('meetings')" id="t-meetings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Board &amp; Meetings</span></div><div class="navitem" onclick="sw('charges')" id="t-charges"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10V6z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Charges</span></div><div class="navitem" onclick="sw('allotments')" id="t-allotments"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M7 8h7a3 3 0 010 6H7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Allotments</span></div><div class="navitem" onclick="sw('beneficial')" id="t-beneficial"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20a6.5 6.5 0 0113 0" stroke-linecap="round"/><path d="M17.5 4.5l2 2 3-3" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Beneficial Interest</span></div><div class="navitem" onclick="sw('internal')" id="t-internal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg><span>Internal Compliance</span></div></div></div><div class="navgrp" id="ng-evd"><div class="navhead" onclick="navToggle('evd')"><span>Evidence</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">Can I prove it was done</div><div class="navbody"><div class="navitem" onclick="sw('filings')" id="t-filings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11l5 5v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M15 4v5h5M8 14h8M8 17h5"/></svg><span>Filings &amp; Records</span></div><div class="navitem" onclick="sw('documents')" id="t-documents"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Documents</span></div><div class="navitem" onclick="sw('approvals')" id="t-approvals"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Approvals</span><span class="nav-badge" id="nav-approvals-n" style="display:none">0</span></div></div></div><div class="navgrp" id="ng-rpt"><div class="navhead" onclick="navToggle('rpt')"><span>Reports</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What can I present</div><div class="navbody"><div class="navitem" onclick="sw('board')" id="t-board"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v13H4z" stroke-linejoin="round"/><path d="M9 21h6M12 17v4M8 12l2.5 2.5L16 9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Board Report</span></div><div class="navitem" onclick="sw('audit')" id="t-audit"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>Audit Trail</span></div></div></div><div class="navgrp closed" id="ng-drf"><div class="navhead" onclick="navToggle('drf')"><span>Drafting</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navbody"><div class="navitem" onclick="sw('res')" id="t-res"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg><span>Resolutions</span></div><div class="navitem" onclick="sw('docs')" id="t-docs"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 5h16M4 12h16M4 19h10"/></svg><span>Notices &amp; Minutes</span></div></div></div><div class="navgrp closed" id="ng-ref"><div class="navhead" onclick="navToggle('ref')"><span>Reference</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navbody"><div class="navitem" onclick="sw('ff')" id="t-ff"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><span>Forms &amp; Filings</span></div><div class="navitem" onclick="sw('nic')" id="t-nic"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 13h8M8 16h5" stroke-linecap="round"/></svg><span>NIC Codes</span></div><div class="navitem" onclick="sw('chat')" id="t-chat"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3.2"/></svg><span>AI Compliance</span></div><div class="navitem" onclick="sw('penalty')" id="t-penalty"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 3h12M6 8h12M9 3c0 6 6 6 6 11a4 4 0 0 1-8 0"/></svg><span>Penalties</span></div><div class="navitem" onclick="sw('deeplaw')" id="t-deeplaw"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3l9 4v5c0 5-3.5 8-9 9-5.5-1-9-4-9-9V7l9-4z"/></svg><span>Deep Law</span></div></div></div><div class="navgrp closed" id="ng-adm"><div class="navhead" onclick="navToggle('adm')"><span>Administration</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navbody"><div class="navitem" onclick="sw('governance')" id="t-governance"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16M4 12h16M4 19h10" stroke-linecap="round"/><circle cx="18.5" cy="19" r="2.6"/><path d="M17.3 19l.9.9 1.9-1.9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Rule Governance</span></div><div class="navitem" onclick="sw('settings')" id="t-settings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Settings</span></div><div class="navitem" onclick="sw('admin')" id="t-admin" style="display:none"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.3l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2.2-1.3L14 2h-4l-.3 2.2a7 7 0 0 0-2.2 1.3l-2.3-1-2 3.4 2 1.5A7 7 0 0 0 5 12a7 7 0 0 0 .1 1.3l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2.2 1.3L10 22h4l.3-2.2a7 7 0 0 0 2.2-1.3l2.3 1 2-3.4-2-1.5z"/></svg><span>Administration</span></div></div></div>
+<div class="navgrp" id="ng-reg"><div class="navhead" onclick="navToggle('reg')"><span>Registers</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What we know about the entity</div><div class="navbody"><div class="navitem" onclick="sw('entities')" id="t-entities"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h2m-2 4h2m-2 4h2m4-8h2m-2 4h2m-2 4h2"/></svg><span>Entities</span></div><div class="navitem" onclick="sw('directors')" id="t-directors"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-8 0v2"/><circle cx="12" cy="7" r="4"/></svg><span>Directors &amp; KMP</span></div><div class="navitem" onclick="sw('meetings')" id="t-meetings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Board &amp; Meetings</span></div><div class="navitem" onclick="sw('charges')" id="t-charges"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10V6z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Charges</span></div><div class="navitem" onclick="sw('allotments')" id="t-allotments"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M7 8h7a3 3 0 010 6H7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Allotments</span></div><div class="navitem" onclick="sw('beneficial')" id="t-beneficial"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20a6.5 6.5 0 0113 0" stroke-linecap="round"/><path d="M17.5 4.5l2 2 3-3" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Beneficial Interest</span></div><div class="navitem" onclick="sw('internal')" id="t-internal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg><span>Internal Compliance</span></div></div></div><div class="navgrp" id="ng-evd"><div class="navhead" onclick="navToggle('evd')"><span>Evidence</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">Can I prove it was done</div><div class="navbody"><div class="navitem" onclick="sw('filings')" id="t-filings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11l5 5v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M15 4v5h5M8 14h8M8 17h5"/></svg><span>Filings &amp; Records</span></div><div class="navitem" onclick="sw('documents')" id="t-documents"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Documents</span></div><div class="navitem" onclick="sw('approvals')" id="t-approvals"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Approvals</span><span class="nav-badge" id="nav-approvals-n" style="display:none">0</span></div></div></div><div class="navgrp" id="ng-rpt"><div class="navhead" onclick="navToggle('rpt')"><span>Reports</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What can I present</div><div class="navbody"><div class="navitem" onclick="sw('board')" id="t-board"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v13H4z" stroke-linejoin="round"/><path d="M9 21h6M12 17v4M8 12l2.5 2.5L16 9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Board Report</span></div><div class="navitem" onclick="sw('audit')" id="t-audit"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>Audit Trail</span></div></div></div><div class="navgrp closed" id="ng-drf"><div class="navhead" onclick="navToggle('drf')"><span>Drafting</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navbody"><div class="navitem" onclick="sw('res')" id="t-res"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg><span>Resolutions</span></div><div class="navitem" onclick="sw('docs')" id="t-docs"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 5h16M4 12h16M4 19h10"/></svg><span>Notices &amp; Minutes</span></div></div></div><div class="navgrp closed" id="ng-ref"><div class="navhead" onclick="navToggle('ref')"><span>Reference</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navbody"><div class="navitem" onclick="sw('ff')" id="t-ff"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><span>Forms &amp; Filings</span></div><div class="navitem" onclick="sw('nic')" id="t-nic"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 13h8M8 16h5" stroke-linecap="round"/></svg><span>NIC Codes</span></div><div class="navitem" onclick="sw('chat')" id="t-chat"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3.2"/></svg><span>AI Compliance</span></div><div class="navitem" onclick="sw('penalty')" id="t-penalty"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 3h12M6 8h12M9 3c0 6 6 6 6 11a4 4 0 0 1-8 0"/></svg><span>Penalties</span></div><div class="navitem" onclick="sw('deeplaw')" id="t-deeplaw"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3l9 4v5c0 5-3.5 8-9 9-5.5-1-9-4-9-9V7l9-4z"/></svg><span>Deep Law</span></div></div></div><div class="navgrp closed" id="ng-adm"><div class="navhead" onclick="navToggle('adm')"><span>Administration</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navbody"><div class="navitem" onclick="sw('governance')" id="t-governance"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16M4 12h16M4 19h10" stroke-linecap="round"/><circle cx="18.5" cy="19" r="2.6"/><path d="M17.3 19l.9.9 1.9-1.9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Rule Governance</span></div><div class="navitem" onclick="sw('team')" id="t-team"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke-linecap="round"/></svg><span>Team</span></div><div class="navitem" onclick="sw('settings')" id="t-settings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Settings</span></div><div class="navitem" onclick="sw('admin')" id="t-admin" style="display:none"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.3l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2.2-1.3L14 2h-4l-.3 2.2a7 7 0 0 0-2.2 1.3l-2.3-1-2 3.4 2 1.5A7 7 0 0 0 5 12a7 7 0 0 0 .1 1.3l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2.2 1.3L10 22h4l.3-2.2a7 7 0 0 0 2.2-1.3l2.3 1 2-3.4-2-1.5z"/></svg><span>Administration</span></div></div></div>
 </aside>
 <div class="appmain">
 
@@ -1619,7 +1636,7 @@ input[type="text"], input[type="password"], textarea, select {
 <div class="panel" id="p-charges"><div class="cc-tool"><div id="reg-root-charges"></div></div></div>
 <div class="panel" id="p-allotments"><div class="cc-tool"><div id="reg-root-allotments"></div></div></div>
 <div class="panel" id="p-beneficial"><div class="cc-tool"><div id="reg-root-beneficial"></div></div></div>
-<div class="panel" id="p-calc"><div class="cc-tool"><div id="calc-root"></div></div></div><div class="panel" id="p-checks"><div class="cc-tool"><div id="chk-root"></div></div></div><div class="panel" id="p-nic"><div class="cc-tool"><div id="nic-root"></div></div></div><div class="panel" id="p-governance"><div class="cc-tool"><div id="gov-root"></div></div></div>
+<div class="panel" id="p-calc"><div class="cc-tool"><div id="calc-root"></div></div></div><div class="panel" id="p-checks"><div class="cc-tool"><div id="chk-root"></div></div></div><div class="panel" id="p-nic"><div class="cc-tool"><div id="nic-root"></div></div></div><div class="panel" id="p-team"><div class="cc-tool"><div id="team-root"></div></div></div><div class="panel" id="p-governance"><div class="cc-tool"><div id="gov-root"></div></div></div>
 <div class="panel" id="p-board"><div class="cc-tool"><div id="brd-root"></div></div></div>
 <div class="panel" id="p-applies"><div class="cc-tool"><div id="app-root"></div></div></div>
 <div class="panel" id="p-impact"><div class="cc-tool"><div id="imp-root"></div></div></div>
@@ -2856,6 +2873,7 @@ function sw(id) {
   if (id==='calc' && typeof renderCalc==='function') renderCalc();
   if (id==='checks' && typeof renderChecks==='function') renderChecks();
   if (id==='nic' && typeof renderNIC==='function') renderNIC();
+  if (id==='team' && typeof renderTeam==='function') renderTeam();
   if (id==='governance' && typeof renderGovernance==='function') renderGovernance();
   if (id==='board' && typeof renderBoard==='function') renderBoard();
   if (id==='applies' && typeof renderApplies==='function') renderApplies();
@@ -6401,6 +6419,9 @@ async function loadCloudClients(){
   if(!supaClient || !CURRENT_USER){ CLIENTS=[]; return; }
   try{
     var res = await supaClient.from('companies').select('*').order('created_at',{ascending:true});
+    // RLS returns every organisation this person belongs to. The screen shows
+    // one at a time, so anything belonging to another is dropped here.
+    if(res && res.data && typeof lgScopeToOrg === 'function') res.data = lgScopeToOrg(res.data);
     if(res.error) throw res.error;
     // Load compliance status for all companies
     var statusRes = await supaClient.from('compliance_status').select('*');
@@ -8115,6 +8136,7 @@ function regErr(msg){
 }
 
 async function regSave(key, id){
+  if(typeof lgGuardWrite === 'function' && !lgGuardWrite('change a register')) return;
   var cfg = LG_REG[key];
   var rec = {};
   for(var i=0;i<cfg.cols.length;i++){
@@ -8172,6 +8194,7 @@ async function regSave(key, id){
 }
 
 async function regDelete(key, id){
+  if(typeof lgGuardWrite === 'function' && !lgGuardWrite('delete a register entry')) return;
   if(!confirm('Delete this record? This cannot be undone.')) return;
   try{
     var r = await supaClient.from(LG_REG[key].table).delete().eq('id', id);
@@ -8722,6 +8745,7 @@ function govErr(msg){
 }
 
 async function govSave(ruleId){
+  if(typeof lgGuardWrite === 'function' && !lgGuardWrite('sign off a rule')) return;
   var rules = lgAllRules(), rule = null;
   for(var i=0;i<rules.length;i++) if(rules[i].id === ruleId) rule = rules[i];
 
@@ -10188,6 +10212,328 @@ function renderChecks(){
     '<div class="calc-foot">Ticks are kept in this browser only. They are a working note while '+
     'you go through the list, not a record of compliance &mdash; what the register holds is the '+
     'record. The Act text behind these citations is <b>as amended upto 01.04.2021</b>.</div>';
+}
+
+// ═══════════════════════════════════════════════════
+// ORGANISATIONS
+// ═══════════════════════════════════════════════════
+// Everything used to be scoped to one user account, which meant two people in a
+// practice could not see the same company — and meant MAKER-CHECKER could never
+// complete, because the second person could not see the row they were meant to
+// confirm. db/025 moves access onto membership of an organisation. This is the
+// app's side of that: which organisation am I in, what may I do, and who else
+// is here.
+
+var CURRENT_ORGS = [];      // [{id, name, role}]
+var CURRENT_ORG  = null;    // the one being viewed
+var CURRENT_ROLE = null;    // role in that one
+
+var LG_ROLES = [
+  ['owner',  'Owner',  'Everything, including removing the practice.'],
+  ['admin',  'Admin',  'Manages people, and all data.'],
+  ['member', 'Member', 'Reads and writes data. Cannot manage people.'],
+  ['viewer', 'Viewer', 'Reads only. Cannot record or confirm a filing.']
+];
+function lgRoleLabel(r){
+  for(var i=0;i<LG_ROLES.length;i++) if(LG_ROLES[i][0] === r) return LG_ROLES[i][1];
+  return r || '—';
+}
+
+// A viewer never writes. This mirrors lg_can_write() in db/025 — the database
+// refuses it either way; this only stops the user reaching for it.
+function lgCanWrite(){ return CURRENT_ROLE !== 'viewer'; }
+function lgCanAdmin(){ return CURRENT_ROLE === 'owner' || CURRENT_ROLE === 'admin'; }
+
+// Called at the top of every save path. Returns true when the action may go on.
+function lgGuardWrite(what){
+  if(lgCanWrite()) return true;
+  alert('You are a viewer in ' + ((lgCurrentOrg()||{}).name || 'this practice') +
+        ', so you cannot ' + (what || 'change this') + '.\n\n' +
+        'Ask an owner or an admin to change your role on the Team screen.');
+  return false;
+}
+function lgCurrentOrg(){
+  for(var i=0;i<CURRENT_ORGS.length;i++)
+    if(String(CURRENT_ORGS[i].id) === String(CURRENT_ORG)) return CURRENT_ORGS[i];
+  return CURRENT_ORGS[0] || null;
+}
+
+// The organisation sits in the header beside the account, because "which
+// practice am I looking at" changes what every number on the screen means.
+function lgOrgHeader(){
+  var slot = document.getElementById('lg-org-slot');
+  if(!slot) return;
+  if(!CURRENT_ORG || !CURRENT_ORGS.length){ slot.innerHTML = ''; return; }
+  if(CURRENT_ORGS.length === 1){
+    var o = lgCurrentOrg() || {};
+    slot.innerHTML = '<span class="lg-org-one">'+entEsc(o.name||'')+
+      '<span class="lg-org-role">'+lgRoleLabel(CURRENT_ROLE)+'</span></span>';
+    return;
+  }
+  slot.innerHTML = '<select class="lg-org-sel" onchange="lgSwitchOrg(this.value)">'+
+    CURRENT_ORGS.map(function(o){
+      return '<option value="'+entEsc(o.id)+'"'+
+        (String(o.id)===String(CURRENT_ORG)?' selected':'')+'>'+entEsc(o.name)+'</option>';
+    }).join('')+'</select>';
+}
+
+async function lgLoadOrgs(){
+  CURRENT_ORGS = []; CURRENT_ORG = null; CURRENT_ROLE = null;
+  if(!supaClient || !CURRENT_USER) return;
+
+  // An invitation is by email and may predate the account, so claim before
+  // reading membership.
+  try{ await supaClient.rpc('lg_claim_invites'); }catch(e){}
+
+  var r;
+  try{
+    r = await supaClient.from('org_members')
+          .select('org_id, role, organisations(id, name)')
+          .eq('user_id', CURRENT_USER.id);
+  }catch(e){ r = {error:e}; }
+
+  // Until db/025 runs there is no organisations table. The app keeps working
+  // exactly as it did — the legacy limb in every policy is still there.
+  if(!r || r.error || !r.data){
+    CURRENT_ORGS = []; CURRENT_ORG = null; CURRENT_ROLE = null;
+    return;
+  }
+  CURRENT_ORGS = r.data.map(function(m){
+    return {id: m.org_id, role: m.role,
+            name: (m.organisations && m.organisations.name) || 'Practice'};
+  }).sort(function(a,b){ return String(a.name).localeCompare(String(b.name)); });
+
+  var saved = null;
+  try{ saved = localStorage.getItem('lg_org'); }catch(e){}
+  var pick = null;
+  for(var i=0;i<CURRENT_ORGS.length;i++)
+    if(String(CURRENT_ORGS[i].id) === String(saved)) pick = CURRENT_ORGS[i];
+  if(!pick) pick = CURRENT_ORGS[0] || null;
+  if(pick){ CURRENT_ORG = pick.id; CURRENT_ROLE = pick.role; }
+}
+
+function lgSwitchOrg(id){
+  for(var i=0;i<CURRENT_ORGS.length;i++){
+    if(String(CURRENT_ORGS[i].id) === String(id)){
+      CURRENT_ORG = CURRENT_ORGS[i].id;
+      CURRENT_ROLE = CURRENT_ORGS[i].role;
+      try{ localStorage.setItem('lg_org', String(CURRENT_ORG)); }catch(e){}
+      // Everything on screen belongs to the other organisation. Reload rather
+      // than re-render, so nothing from the previous one survives in a cache.
+      location.reload();
+      return;
+    }
+  }
+}
+
+// Belt and braces with RLS: a user in two organisations can read both, so the
+// register is filtered to the one being viewed. Rows with no org yet (a
+// database where db/025 has not run) are kept, or the screen would go empty.
+function lgScopeToOrg(rows){
+  if(!CURRENT_ORG || !rows || !rows.length) return rows;
+  var anyOrg = rows.some(function(r){ return r && r.org_id; });
+  if(!anyOrg) return rows;
+  return rows.filter(function(r){
+    return !r.org_id || String(r.org_id) === String(CURRENT_ORG);
+  });
+}
+
+// ── the team screen ─────────────────────────────────────────────
+var TEAM_MEMBERS = null, TEAM_INVITES = null, TEAM_BUSY = false;
+
+async function teamLoad(){
+  TEAM_MEMBERS = []; TEAM_INVITES = [];
+  if(!supaClient || !CURRENT_ORG) return;
+  try{
+    var m = await supaClient.from('org_members')
+      .select('user_id, role, joined_at').eq('org_id', CURRENT_ORG);
+    TEAM_MEMBERS = (m && m.data) || [];
+  }catch(e){}
+  try{
+    var i = await supaClient.from('org_invites')
+      .select('id, email, role, created_at, accepted_at').eq('org_id', CURRENT_ORG);
+    TEAM_INVITES = ((i && i.data) || []).filter(function(x){ return !x.accepted_at; });
+  }catch(e){}
+}
+
+async function teamInvite(){
+  if(!lgCanAdmin()){ alert('Only an owner or an admin can invite someone.'); return; }
+  var email = (document.getElementById('team-email')||{}).value || '';
+  var role  = (document.getElementById('team-role')||{}).value || 'member';
+  email = String(email).trim().toLowerCase();
+  if(!email || email.indexOf('@') < 0){ alert('Enter the email address they will sign in with.'); return; }
+  if(CURRENT_USER && email === String(CURRENT_USER.email||'').toLowerCase()){
+    alert('That is your own address — you are already in this practice.'); return; }
+  TEAM_BUSY = true; renderTeam();
+  try{
+    var r = await supaClient.from('org_invites').insert({
+      org_id: CURRENT_ORG, email: email, role: role,
+      invited_by: CURRENT_USER ? CURRENT_USER.id : null
+    }).select();
+    if(r.error) throw r.error;
+    var el = document.getElementById('team-email'); if(el) el.value = '';
+  }catch(e){
+    alert(teamErr(e, 'Could not create that invitation.'));
+  }
+  TEAM_BUSY = false;
+  await teamLoad(); renderTeam();
+}
+
+function teamErr(e, fallback){
+  var m = String((e && (e.message || e.hint)) || '');
+  if(/does not exist|relation .* does not exist/i.test(m))
+    return 'The organisations tables are not there yet. Run db/025_organisations.sql ' +
+           'in the Supabase SQL editor, then reload.';
+  if(/duplicate key/i.test(m)) return 'That address has already been invited.';
+  if(/row-level security|policy/i.test(m))
+    return 'The database refused that. You may not have the role it requires.';
+  return m || fallback;
+}
+
+async function teamSetRole(userId, role){
+  if(!lgCanAdmin()){ alert('Only an owner or an admin can change a role.'); return; }
+  if(CURRENT_USER && String(userId) === String(CURRENT_USER.id) && role !== 'owner'){
+    if(!confirm('This lowers your OWN role. If you are the only owner you may not be ' +
+                'able to change it back. Continue?')) return;
+  }
+  try{
+    var r = await supaClient.from('org_members').update({role:role})
+              .eq('org_id', CURRENT_ORG).eq('user_id', userId).select();
+    if(r.error) throw r.error;
+  }catch(e){ alert(teamErr(e, 'Could not change that role.')); }
+  await lgLoadOrgs(); await teamLoad(); renderTeam();
+}
+
+async function teamRemove(userId){
+  if(!lgCanAdmin()){ alert('Only an owner or an admin can remove someone.'); return; }
+  var owners = (TEAM_MEMBERS||[]).filter(function(m){ return m.role === 'owner'; });
+  var target = (TEAM_MEMBERS||[]).filter(function(m){ return String(m.user_id) === String(userId); })[0];
+  if(target && target.role === 'owner' && owners.length <= 1){
+    alert('That is the only owner. Make someone else an owner first, or the practice ' +
+          'would be left with nobody who can manage it.');
+    return;
+  }
+  if(!confirm('Remove this person from the practice? They lose access to every company ' +
+              'in it. Nothing they recorded is deleted.')) return;
+  try{
+    var r = await supaClient.from('org_members').delete()
+              .eq('org_id', CURRENT_ORG).eq('user_id', userId);
+    if(r.error) throw r.error;
+  }catch(e){ alert(teamErr(e, 'Could not remove them.')); }
+  await teamLoad(); renderTeam();
+}
+
+async function teamCancelInvite(id){
+  try{
+    var r = await supaClient.from('org_invites').delete().eq('id', id);
+    if(r.error) throw r.error;
+  }catch(e){ alert(teamErr(e, 'Could not cancel that invitation.')); }
+  await teamLoad(); renderTeam();
+}
+
+function renderTeam(){
+  var root = document.getElementById('team-root');
+  if(!root) return;
+
+  var head = '<div class="cc-pagehead"><div>'+
+    '<div class="cc-crumb">Administration &rsaquo; Team</div>'+
+    '<h1 class="cc-h1">Team</h1>'+
+    '<p class="cc-sub">Who can see this practice&rsquo;s companies, and what each of them '+
+    'may do.</p></div></div>';
+
+  if(TEAM_MEMBERS === null){
+    root.innerHTML = head + '<div class="cc-card"><div class="cc-card-b">'+
+      '<div class="cc-none">Loading&hellip;</div></div></div>';
+    teamLoad().then(renderTeam);
+    return;
+  }
+
+  if(!CURRENT_ORG){
+    root.innerHTML = head + '<div class="cc-card"><div class="cc-card-b">'+
+      '<div class="calc-warn"><b>No practice is set up yet.</b> Run '+
+      '<span class="calc-mono">db/025_organisations.sql</span> in the Supabase SQL editor. '+
+      'It creates one for every existing account, moves that account&rsquo;s companies into '+
+      'it, and makes you its owner. Nothing is deleted, and your own access does not change '+
+      '&mdash; every policy keeps the old single-user rule alongside the new one.</div>'+
+      '</div></div>';
+    return;
+  }
+
+  var org = lgCurrentOrg() || {};
+  var mine = CURRENT_USER ? String(CURRENT_USER.id) : '';
+
+  var rows = (TEAM_MEMBERS||[]).map(function(m){
+    var isMe = String(m.user_id) === mine;
+    var sel = lgCanAdmin()
+      ? '<select class="lg-field team-role" onchange="teamSetRole('+lgArg(m.user_id)+',this.value)">'+
+        LG_ROLES.map(function(r){
+          return '<option value="'+r[0]+'"'+(m.role===r[0]?' selected':'')+'>'+r[1]+'</option>';
+        }).join('')+'</select>'
+      : '<span class="team-rolechip">'+lgRoleLabel(m.role)+'</span>';
+    return '<tr><td>'+(isMe ? '<b>You</b>' : '<span class="calc-mono">'+
+        entEsc(String(m.user_id).slice(0,8))+'&hellip;</span>')+
+      '<div class="calc-sub">joined '+(m.joined_at ? ccFmtDate(String(m.joined_at).slice(0,10)) : '—')+
+      '</div></td>'+
+      '<td>'+sel+'</td>'+
+      '<td>'+(lgCanAdmin()
+        ? '<span class="team-x" onclick="teamRemove('+lgArg(m.user_id)+')">Remove</span>'
+        : '')+'</td></tr>';
+  }).join('');
+
+  var invites = (TEAM_INVITES||[]).length
+    ? '<div class="cc-card"><div class="cc-card-h">Invited, not yet joined</div>'+
+      '<div class="cc-card-b"><table class="brd-tbl calc-tbl"><tbody>'+
+      TEAM_INVITES.map(function(i){
+        return '<tr><td>'+entEsc(i.email)+'</td><td>'+lgRoleLabel(i.role)+'</td>'+
+          '<td>'+(lgCanAdmin()
+            ? '<span class="team-x" onclick="teamCancelInvite('+lgArg(i.id)+')">Cancel</span>'
+            : '')+'</td></tr>';
+      }).join('')+'</tbody></table>'+
+      '<div class="calc-note">They join the moment they sign in with that address. Until '+
+      'then they can see nothing.</div></div></div>'
+    : '';
+
+  var inviteBox = lgCanAdmin()
+    ? '<div class="cc-card"><div class="cc-card-h">Invite someone</div><div class="cc-card-b">'+
+      '<div class="calc-grid">'+
+      '<div class="calc-f"><label class="calc-l" for="team-email">Email address</label>'+
+      '<input id="team-email" class="lg-field" type="email" placeholder="name@firm.com"></div>'+
+      '<div class="calc-f"><label class="calc-l" for="team-role">Role</label>'+
+      '<select id="team-role" class="lg-field">'+
+      LG_ROLES.filter(function(r){ return r[0] !== 'owner'; }).map(function(r){
+        return '<option value="'+r[0]+'"'+(r[0]==='member'?' selected':'')+'>'+r[1]+
+          ' — '+r[2]+'</option>';
+      }).join('')+'</select></div></div>'+
+      '<div class="cc-btn-primary" onclick="teamInvite()" style="display:inline-block;">'+
+      (TEAM_BUSY ? 'Working&hellip;' : 'Send invitation')+'</div>'+
+      '<div class="calc-note">The person must still be approved by the administrator when '+
+      'they sign up &mdash; this decides what they see once they are in, not whether they '+
+      'get in.</div></div></div>'
+    : '<div class="cc-card"><div class="cc-card-b"><div class="cc-none">Only an owner or an '+
+      'admin can invite people or change roles. You are a '+lgRoleLabel(CURRENT_ROLE)+'.'+
+      '</div></div></div>';
+
+  root.innerHTML = head +
+    '<div class="cc-card"><div class="cc-card-b">'+
+      '<div class="team-org"><b>'+entEsc(org.name||'Practice')+'</b>'+
+      '<span class="team-rolechip">You are '+lgRoleLabel(CURRENT_ROLE)+'</span></div>'+
+      (CURRENT_ORGS.length > 1
+        ? '<div class="calc-base-line">You belong to '+CURRENT_ORGS.length+' practices. '+
+          'Switch with the selector in the header &mdash; the screen reloads, because '+
+          'nothing from one may be shown while looking at the other.</div>' : '')+
+    '</div></div>'+
+    '<div class="cc-card"><div class="cc-card-h">People ('+(TEAM_MEMBERS||[]).length+')</div>'+
+    '<div class="cc-card-b"><table class="brd-tbl calc-tbl"><thead><tr><th>Person</th>'+
+    '<th>Role</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div></div>'+
+    invites + inviteBox +
+    '<div class="cc-card"><div class="cc-card-h">What this changed</div><div class="cc-card-b">'+
+    '<div class="calc-ok"><b>Maker-checker works now.</b> Recording a filing and confirming it '+
+    'are separate acts by different people, and the database enforces that the checker is not '+
+    'the maker. Until everyone was in the same practice, no second person could see the row to '+
+    'confirm it &mdash; the control existed and could never complete.</div>'+
+    '<div class="calc-note">A <b>viewer</b> cannot be a checker, by construction: confirming a '+
+    'filing is a write, and a viewer makes none. Someone who cannot change anything should not '+
+    'be able to certify it either.</div></div></div>';
 }
 
 function renderCalc(){
@@ -14656,6 +15002,7 @@ function lgRecordOpen(entityId, key){
 function lgRecordClose(){ var m=document.getElementById('lg-rec-modal'); if(m) m.remove(); }
 
 async function lgRecordSave(entityId, key){
+  if(typeof lgGuardWrite === 'function' && !lgGuardWrite('record a filing')) return;
   var g=function(id){ var e=document.getElementById(id); return e?e.value.trim():''; };
   var existingEv = null;
   if(typeof CLIENTS!=='undefined')
@@ -15393,6 +15740,12 @@ function lgFileLabel(pathStr){
 // ── the checker action ───────────────────────────────────────────
 function lgCanCheck(st){
   if(!st || !st.evidence) return {can:false, why:'There is nothing recorded to check.'};
+  // Confirming a filing is a write, so a viewer cannot do it. That is the right
+  // answer rather than an incidental one: somebody who cannot change a record
+  // should not be able to certify it either.
+  if(typeof lgCanWrite === 'function' && !lgCanWrite())
+    return {can:false, why:'You are a viewer in this practice. Confirming a filing records ' +
+            'that you carried out a check, so it needs at least member access.'};
   if(st.checkState === 'verified') return {can:false, why:'Already confirmed.'};
   var me = (CURRENT_USER&&CURRENT_USER.email)||'';
   var maker = st.evidence.recordedBy || '';
@@ -16953,6 +17306,7 @@ function entErr(msg){
 }
 
 async function entSave(){
+  if(typeof lgGuardWrite === 'function' && !lgGuardWrite('add or change a company')) return;
   var v = function(id){ var el=document.getElementById(id); return el ? el.value.trim() : ''; };
   var name = v('ent-name');
   if(!name){ entErr('Company name is required.'); return; }
@@ -16974,6 +17328,10 @@ async function entSave(){
       res = await supaClient.from('companies').update(payload).eq('id', ENT_EDITING).select();
     } else {
       payload.user_id = CURRENT_USER.id;
+      // db/025 has a trigger that fills this in when it arrives null, but a
+      // row reaching the table unanchored is invisible to everyone but its
+      // creator, so it is set here as well.
+      if(typeof CURRENT_ORG !== 'undefined' && CURRENT_ORG) payload.org_id = CURRENT_ORG;
       res = await supaClient.from('companies').insert(payload).select();
     }
     if(res.error) throw res.error;
@@ -16992,6 +17350,7 @@ async function entSave(){
 }
 
 async function entDelete(id){
+  if(typeof lgGuardWrite === 'function' && !lgGuardWrite('delete a company')) return;
   var nm = '';
   if(typeof CLIENTS!=='undefined')
     for(var i=0;i<CLIENTS.length;i++) if(String(CLIENTS[i].id)===String(id)) nm = CLIENTS[i].name;
