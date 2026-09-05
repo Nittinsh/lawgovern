@@ -583,7 +583,7 @@ compute the deadline from a row the user entered. Verified live: results board m
 board meeting on 10 Jul correctly ignored; **Q2-Q4 stay undated** because no results meeting is
 recorded for them.
 
-### db/018_meeting_outcomes.sql — NOT YET RUN
+### db/018_meeting_outcomes.sql — APPLIED (confirmed by `node tests/backend.test.js`)
 Adds `meetings.approved_results boolean`. The register recorded *that* a board meeting happened, not
 *what it transacted*, so the engine could not tell the results meeting from any other. Attaching the
 deadline to every board meeting would have invented deadlines for meetings that never considered
@@ -618,7 +618,7 @@ Verified: meeting 20 May -> due 19 Jun, signed 10 Jun -> evidence on record; mee
 
 ---
 
-## 2m. CHARGES REGISTER (v148) — db/019 NOT YET RUN
+## 2m. CHARGES REGISTER (v148) — db/019 — APPLIED (confirmed by `node tests/backend.test.js`)
 
 Sections 77-87 were the largest group of undated obligations, and not because the deadline was
 unknown. Verbatim from `reference/`:
@@ -655,7 +655,7 @@ Verified: 2023 charge unfiled -> still past due; 2019 charge filed -> dropped of
 
 ---
 
-## 2n. ALLOTMENTS REGISTER (v150) — db/020 NOT YET RUN
+## 2n. ALLOTMENTS REGISTER (v150) — db/020 — APPLIED (confirmed by `node tests/backend.test.js`)
 
 Same pattern as charges: three duties run from the date securities are allotted, and nothing
 recorded that an allotment had happened. `db/020_allotments_register.sql` adds `allotments`
@@ -686,7 +686,7 @@ Months are added by calendar and clamped to the last day of the target month —
 
 ---
 
-## 2o. BENEFICIAL INTEREST — sections 89 and 90 (v151) — db/021 NOT YET RUN
+## 2o. BENEFICIAL INTEREST — sections 89 and 90 (v151) — db/021 — APPLIED (confirmed by `node tests/backend.test.js`)
 
 `db/021_beneficial_interests.sql` adds `beneficial_interests`. Panel `p-beneficial`, nav
 "Beneficial Interest". Register key is `beneficial`, table is `beneficial_interests`.
@@ -751,7 +751,7 @@ against the real DOM** — the first cut targeted `.sidebar`, which does not exi
 
 ---
 
-## 2q. ADT-1 FROM THE MEETING (v155) — db/022 NOT YET RUN
+## 2q. ADT-1 FROM THE MEETING (v155) — db/022 — APPLIED (confirmed by `node tests/backend.test.js`)
 
 **No auditor register was needed for this.** The third proviso to s.139(1) gives the period and the
 anchor in one sentence, verbatim from `reference/`:
@@ -825,7 +825,7 @@ in the DOM found **no handler naming a function that no longer exists**.
 
 ---
 
-## 2s. RULE VERSION GOVERNANCE (v157, assessment P0) — db/023 NOT YET RUN
+## 2s. RULE VERSION GOVERNANCE (v157, assessment P0) — db/023 — APPLIED (confirmed by `node tests/backend.test.js`)
 
 Panel `p-governance` -> `renderGovernance()`. Nav: Administration > Rule Governance.
 
@@ -986,7 +986,7 @@ citation check is not a professional's sign-off and the screen must not let one 
 
 ---
 
-## 2w. PIT CONTROL CENTRE (v161) — db/024 NOT YET RUN
+## 2w. PIT CONTROL CENTRE (v161) — db/024 — APPLIED (confirmed by `node tests/backend.test.js`)
 
 Panel `p-pit` -> `renderPIT()`, plus four registers on the generic engine:
 `dp` / `upsi` / `sdd` / `preclear`. Nav group **Insider trading**.
@@ -1267,7 +1267,7 @@ mutation that puts them back.
 
 ---
 
-## 3a. ORGANISATIONS — the change that makes it sellable (v165) — db/025 NOT YET RUN
+## 3a. ORGANISATIONS — the change that makes it sellable (v165) — db/025 — APPLIED (confirmed by `node tests/backend.test.js`)
 
 Every table was scoped `user_id = auth.uid()`, with no org, team or firm anywhere. Two consequences:
 
@@ -1319,6 +1319,77 @@ open; re-rendering would leave one organisation's data on screen while the heade
 **233 assertions** (was 212), **37 mutations caught, 0 missed** (was 32). Five of the new
 mutations are access control — the 30 August assessment asked for that coverage and there was
 none to write until there were roles.
+
+---
+
+## 3b. BACKEND CONFORMANCE (v166)
+
+`node tests/backend.test.js` — **94 checks against the live Supabase project.**
+
+Every other test in this repository runs the shipped JavaScript under Node with a browser shim.
+**Not one of them touched Supabase.** That left tables, columns, row-level security, storage and
+functions checked only by whether the app happened to work when somebody clicked something — and
+db/025 had just rewritten every policy in the database.
+
+### What it answers
+| group | checks |
+|---|---|
+| Tables the app talks to exist | 21 |
+| Every column the app reads exists | 21 tables, 180+ columns |
+| Which migrations are applied, by witness column | 12 |
+| RLS: an anonymous read returns nothing | 21 |
+| RLS: an anonymous write is refused **by policy** | 7 |
+| Storage: the evidence bucket is neither public nor listable | 2 |
+| Database functions exist and refuse an anonymous caller | 7 |
+| Edge Functions refuse an unauthenticated call | 4 |
+
+### The schema is derived from the app, not typed out beside it
+`registersFromApp()` reads `LG_REG` out of `index.html`, so adding a field to a register adds it to
+this check automatically. A hand-maintained copy of the schema would drift, and a drift check that
+drifts is worse than none.
+
+### It is safe to run against production
+No writes. Schema and RLS checks are `SELECT ... limit=0`. The write probes use payloads whose
+foreign keys cannot resolve, so **a broken policy and a working one both end with nothing
+inserted**. A test that would corrupt the database if it found a bug is not one anybody should run.
+
+### It found three of its own bugs before it found anything else
+The same pattern as the smoke test (§2x) and the rule audit (§2v).
+
+1. **The write probe sent one payload to every table.** PostgREST rejected it with 400 *"could not
+   find the column"* before RLS was ever consulted — six confident failures that tested nothing but
+   my own payload. Per-table payloads now.
+2. **A refusal by constraint was being counted as a refusal by policy.** They are not the same: one
+   means RLS stopped it, the other means RLS let it through and a foreign key caught it. Now
+   distinguished, and the second fails.
+3. **The RPC probe sent `{}` to a two-argument function.** PostgREST matches on signature, so it
+   returned *"could not find the function"* — indistinguishable from the function not existing. It
+   reported `admin_set_approval` as **missing**, and it is not: with its real arguments it answers
+   `P0001 Not authorized`, which is the function running and correctly refusing. **A probe that
+   cannot tell a missing function from a mistyped call is checking itself, not the backend.**
+
+### It found the documentation wrong
+Eight sections of this file said `db/0NN NOT YET RUN`. **All eight were applied.** That is the class
+of claim this project is not allowed to make — stated once, never re-checked, untestable by the
+reader. Migration status is now identified by a column only that migration creates, which is a fact
+rather than a note.
+
+### One warning, correctly a warning
+`mca-directors` is not deployed. The app already handles the 404 by naming the deploy command, and
+the feature degrades to "add directors by hand". A stated limitation with a working path is not a
+defect.
+
+### What it deliberately cannot answer
+Everything runs as an **anonymous** caller, which proves the doors are shut. It cannot prove the
+right people get through:
+- does a member of one practice see its companies
+- does a member of **another** practice not see them
+- is a viewer refused a write the database should refuse
+- did db/025 backfill every company with an `org_id`
+
+All four need a signed-in session, and signing in means handling a password. **These stay manual.**
+The two-account maker-checker walkthrough is how they get covered, and until somebody does it, the
+multi-tenant isolation this product now sells on is asserted rather than demonstrated.
 
 ---
 
@@ -1390,7 +1461,7 @@ none to write until there were roles.
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (233 assertions, run against `index.html` itself), `node tests/mutation.js` (37 bugs reintroduced, all caught), and `python tools/rule_audit.py` (the release gate). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (233 assertions, run against `index.html` itself), `node tests/mutation.js` (37 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **No AI model auto-updates to current law.** Staying current = fetch fresh sources (RSS via rss2json/allorigins for SEBI/MCA/IBBI/RBI/IncomeTax) + human curation + (optionally) paid web-search. Vetted human templates + AI drafting is the right model.
 - **Drafting quality:** resolution/notice prompts (`RES_SYS`, `DOC_SYS`) were tuned to a senior-CS standard (exact sub-section citations with read-with clauses, SEBI LODR cross-refs, full RESOLVED THAT/FURTHER THAT cascade, standard severally-authorised CS clause, Certified True Copy headers, Section 102 explanatory statements, MCA form+deadline line). There's an anti-reasoning guard telling the model to output ONLY the final document (some free models leaked their chain-of-thought). Keep these standards.
 - **Child/again:** all AI legal output must carry a "verify on MCA/SEBI portal before filing" caveat — the CS signs and carries professional responsibility.
@@ -1399,8 +1470,8 @@ none to write until there were roles.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v165.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
-progress. Migrations through `db/016` are applied. **`db/017_applicability_review.sql` is new and has not been run** — until it is, confirming an applicability condition fails with a message naming the file. `db/013` is the drop script, deliberately left commented out.
+**Header is at v166.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**
 - [x] 11. Event -> Compliance Impact Engine (section 2f)
