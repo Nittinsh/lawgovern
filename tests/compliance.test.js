@@ -964,7 +964,7 @@ describe('companion deadlines');
 
   // The count guards the silent failure: a mistyped key produces a row that is
   // undated, which is indistinguishable from one that was never mapped.
-  ok('a listed entity resolves the full companion set', comp.length === 23, comp.length);
+  ok('a listed entity resolves the full companion set', comp.length === 19, comp.length);
   ok('every one of them carries a date', comp.every(r => !!r.due),
      comp.filter(r => !r.due).length + ' without one');
   ok('and names the filing it follows',
@@ -995,16 +995,19 @@ describe('companion deadlines');
   check('MGT-8 follows MGT-7', at('Section 92(2)').due, dueOf(LISTED, 'Section 92'));
 
   // A quarterly companion follows ITS OWN quarter, not the year.
-  const cg = L.filter(r => String(r.section).indexOf('Reg 27(2)(ba)') === 0 && r.due)
-              .map(r => r.due).sort();
-  check('the CG-report companion has four quarterly dates', cg.length, 4);
-  // Counting them is not enough. Falling back to the first results row gives
-  // four rows all carrying the Q1 date — same count, same first value. What the
-  // bug destroys is that they are four DIFFERENT dates, one per quarter.
-  check('they are four distinct dates, not the same one four times',
-        new Set(cg).size, 4);
-  check('and each matches its own quarter’s results submission',
-        cg.join(','), '2026-08-14,2026-11-14,2027-02-14,2027-05-15');
+  // Reg 23(9) is half-yearly and published "on the date of publication of
+  // standalone results", so each occurrence must follow ITS OWN period.
+  // (Reg 27(2)(ba) used to be tested here and is no longer a companion at all —
+  // §3e: it follows the CG report, which has no date of its own.)
+  const rpt = L.filter(r => String(r.section).indexOf('Reg 23(9)') === 0 && r.due)
+               .map(r => r.due).sort();
+  check('the related-party companion has two half-yearly dates', rpt.length, 2);
+  // Counting is not enough. Falling back to the first results row gives both
+  // occurrences the Q1 date — same count, same first value. What the bug
+  // destroys is that they are two DIFFERENT dates, one per half.
+  check('they are two distinct dates, not the same one twice', new Set(rpt).size, 2);
+  check('and each matches its own period’s results submission',
+        rpt.join(','), '2026-11-14,2027-05-15');
   // "With the annual results" means the year end, not the first quarter found.
   check('Reg 33(3)(e) follows the YEAR-END results', at('Reg 33(3)(e)').due, '2027-05-15');
 
@@ -1058,6 +1061,62 @@ describe('companion deadlines');
        r => !!r.companionOf.section && !!r.companionOf.label),
      everyRow.filter(r => r.companionOf &&
        (!r.companionOf.section || !r.companionOf.label)).length + ' name nothing');
+}
+
+// ── 11k. "As specified by SEBI", read against the text (§3e) ─
+// The held LODR compilation is amended to 14 July 2026, so the claim that these
+// have no period could be checked rather than assumed. Two of them HAD a period
+// and it was deleted; one has a period the corpus predates.
+describe('SEBI-specified timelines');
+{
+  const L = rowsFor(LISTED);
+  const one = (sec) => L.filter(r => String(r.section).indexOf(sec) === 0)[0] || {};
+
+  // Reg 91C(1)(ii), substituted w.e.f. 8 Sep 2025: 60 days from the FY end.
+  // The corpus still carries the pre-amendment "timelines specified by SEBI".
+  check('Reg 91C is dated 60 days from the financial year end',
+        one('Reg 91C').due, '2026-05-30');
+  ok('and says where that period comes from',
+     /8 September 2025/.test(one('Reg 91C').duePatchedFrom || ''),
+     one('Reg 91C').duePatchedFrom);
+
+  // Reg 27(2)(ba) follows the CG report, which has no date. Anchoring it to the
+  // financial results invented one.
+  check('Reg 27(2)(ba) is not dated from the results', one('Reg 27(2)(ba)').due, null);
+  ok('and explains that its own anchor has no date',
+     /no date of its own/.test(app.lgNoDeadlineWhy(one('Reg 27(2)(ba)')) || ''),
+     'no explanation');
+
+  // The two whose period was removed by amendment. This is the useful part: a
+  // CS working from memory still reaches for twenty-one days.
+  ['Reg 13(3)', 'Reg 27(2)(a)'].forEach(sec => {
+    const r = one(sec);
+    check(sec + ' has no date', r.due, null);
+    const why = app.lgNoDeadlineWhy(r) || '';
+    ok(sec + ' says the period was removed', /removed/i.test(why), why.slice(0, 60));
+    ok(sec + ' names the amendment that removed it',
+       /31 December 2024/.test(why), why.slice(0, 60));
+    ok(sec + ' still records what the period used to be',
+       /twenty-one days/i.test(why), why.slice(0, 60));
+  });
+
+  // Every explanation must attach to a row that genuinely has no date.
+  const explained = L.filter(r => app.lgNoDeadlineWhy(r));
+  ok('explanations appear only on undated rows', explained.every(r => !r.due),
+     explained.filter(r => r.due).length + ' dated rows carry one');
+  ok('a good number of undated rows now explain themselves', explained.length >= 25,
+     explained.length);
+  // A dated row must never carry one — that would contradict its own date.
+  ok('no dated row claims to have no deadline',
+     L.filter(r => r.due).every(r => !app.lgNoDeadlineWhy(r)), 'one does');
+  // Sweeping the real rows is not enough: none of the mapped keys happens to be
+  // dated, so removing the `row.due` guard changes nothing they can see. The
+  // contract is tested directly instead — a mapped key WITH a date must still
+  // get no explanation.
+  check('a mapped key that has a date gets no explanation',
+        app.lgNoDeadlineWhy({ key: 'LODR-REG-13-3', due: '2026-01-01' }), null);
+  ok('while the same key without one still does',
+     !!app.lgNoDeadlineWhy({ key: 'LODR-REG-13-3', due: null }), 'lost its explanation');
 }
 
 // ── 12. Dashboard invariants ────────────────────────────────

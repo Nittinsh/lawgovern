@@ -248,6 +248,16 @@ const MUTATIONS = [
     from: '        if(row.periodEnd && String(A.results[i].periodEnd) === String(row.periodEnd)) same = A.results[i];',
     to:   '        same = null;' },
 
+  // ── the SEBI-specified group (§3e) ──────────────────────────
+
+  { name: 'Reg 91C loses the period the 2025 amendment gave it (§3e)',
+    from: "  'LODR-REG-91C-91E': {",
+    to:   "  'LODR-REG-91C-DISABLED': {" },
+
+  { name: 'an explanation is offered for a row that already has a date (§3e)',
+    from: '  if(!row || row.due) return null;',
+    to:   '  if(!row) return null;' },
+
   { name: '"with the annual results" picks the first quarter it finds (§3d)',
     from: "      if(yr){ due = yr.due; src = yr; label = 'the year-end Reg 33(3)(a) results submission'; }",
     to:   "      if(A.results[0]){ due = A.results[0].due; src = A.results[0]; label = 'results'; }" },

@@ -1522,6 +1522,64 @@ Of the 96 rules with no offset:
 
 ---
 
+## 3e. "AS SPECIFIED BY SEBI", READ AGAINST THE TEXT (v169)
+
+§3d parked a group of obligations as *"SEBI specifies the timeline by circular, and we do not hold
+the circular"*. The held LODR compilation is **amended to 14 July 2026**, so that could be checked
+rather than assumed. Three outcomes, and the middle one is the point of the exercise.
+
+### 1. A bug §3d introduced, found by reading the regulation
+**Reg 27(2)(ba)** — cyber-security incidents — is disclosed *"along with the report mentioned in
+clause (a) of sub-regulation (2)"*. **Clause (a) has no date.** §3d read the rule's note "along with
+the quarterly CG report", found the CG report undated, and anchored it to the **financial results**
+instead. That gives a disclosure a date its own anchor does not have. Removed; four rows lost a
+date they should never have had.
+
+### 2. The periods were AMENDED AWAY — and saying so is the deliverable
+Both of these required **twenty-one days from the quarter end** until the **Third Amendment 2024
+substituted them with effect from 31 December 2024**:
+
+| | now reads |
+|---|---|
+| **Reg 13(3)** | statement of grievance redressal *"in such form and **within the timelines as may be specified by the Board**"* |
+| **Reg 27(2)(a)** | corporate governance report *"in the format and **within the timelines, as may be specified by the Board** from time to time"* |
+
+So the owner's spreadsheet was right and the app was right to leave them undated. **But a Company
+Secretary working from memory still reaches for twenty-one days**, and a blank cell does not correct
+them. `LG_NO_DEADLINE_WHY` now states which amendment removed the period and what it used to be.
+
+**Read the footnotes.** Both periods appear in this compilation as quoted text — inside a footnote
+recording the wording *prior to* substitution. Taking either at face value would have reinstated a
+period deleted eighteen months ago, sourced to the current text.
+
+### 3. One is recoverable, and the corpus predates it
+**Reg 91C(1)** was **substituted with effect from 8 September 2025** and now states real periods:
+- **(ii) non-financial** — "within a period of 60 days from the end of the financial year"
+- **(i) financial** — "by October 31st of each year or before the due date of filing of income tax
+  return ..., **whichever is later**"
+
+The rule data still carries the pre-amendment *"within the timelines specified by SEBI"*. The
+60-day limb goes into `LG_DUE_PATCH` — the mechanism §2k already has, rather than a second one
+beside it. The financial limb is **not** dated: "whichever is later" needs the income-tax return
+due date, which comes from an Act not held, so the row says that instead of asserting 31 October.
+
+### `LG_NO_DEADLINE_WHY` — a blank is not an explanation
+"Deadline not established" reads identically for a continuous duty, an annual applicability test,
+and a period deleted from the regulation. **Those are different facts.** Thirty rows on a listed
+entity now say which, in the Why panel, and the suite asserts an explanation can only ever attach to
+a row that genuinely has no date.
+
+### The mutation that needed the contract tested directly
+"An explanation is offered for a row that already has a date" passed against the bug, because none
+of the mapped keys happens to be dated — sweeping the real rows could not see it. The assertion now
+calls `lgNoDeadlineWhy` with a **constructed** row: a mapped key *with* a date must get nothing, the
+same key *without* one must still get its explanation. **When the data cannot exercise a guard, test
+the guard's contract rather than the data.**
+
+Suite **271 → 288**, mutations **44 → 46 caught, 0 missed**.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -1590,7 +1648,7 @@ Of the 96 rules with no offset:
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (271 assertions, run against `index.html` itself), `node tests/mutation.js` (44 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (288 assertions, run against `index.html` itself), `node tests/mutation.js` (46 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **No AI model auto-updates to current law.** Staying current = fetch fresh sources (RSS via rss2json/allorigins for SEBI/MCA/IBBI/RBI/IncomeTax) + human curation + (optionally) paid web-search. Vetted human templates + AI drafting is the right model.
 - **Drafting quality:** resolution/notice prompts (`RES_SYS`, `DOC_SYS`) were tuned to a senior-CS standard (exact sub-section citations with read-with clauses, SEBI LODR cross-refs, full RESOLVED THAT/FURTHER THAT cascade, standard severally-authorised CS clause, Certified True Copy headers, Section 102 explanatory statements, MCA form+deadline line). There's an anti-reasoning guard telling the model to output ONLY the final document (some free models leaked their chain-of-thought). Keep these standards.
 - **Child/again:** all AI legal output must carry a "verify on MCA/SEBI portal before filing" caveat — the CS signs and carries professional responsibility.
@@ -1599,7 +1657,7 @@ Of the 96 rules with no offset:
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v168.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v169.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

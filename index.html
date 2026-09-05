@@ -1496,7 +1496,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v168">
+      <meta id="build-version" content="v169">
     </div>
   </div>
   <div class="cc-search">
@@ -4749,7 +4749,19 @@ var LG_DUE_PATCH = {
     from:'Within 60 days from the end of each financial year'},
   'LODR-REG-44-5': {
     due:{type:'fy_end_month_offset', months:5},
-    from:'Within 5 months of FY close (i.e. by 31 August for a 31 March FY end)'}
+    from:'Within 5 months of FY close (i.e. by 31 August for a 31 March FY end)'},
+  // Reg 91C(1) was SUBSTITUTED with effect from 8 September 2025 and now states
+  // real periods; the corpus still carries the pre-amendment "within the
+  // timelines specified by SEBI". The 60-day limb is taken because it is the
+  // first thing owed and the only one computable here — the financial limb is
+  // "by October 31st ... or before the due date of filing of income tax return
+  // ..., WHICHEVER IS LATER", and the income-tax due date is not held.
+  'LODR-REG-91C-91E': {
+    due:{type:'fy_end_offset', days:60},
+    from:'Reg 91C(1)(ii), substituted w.e.f. 8 September 2025 — "within a period of 60 days '+
+         'from the end of the financial year". The financial disclosures under Reg 91C(1)(i) '+
+         'are due by 31 October or the income-tax return due date, whichever is later; that '+
+         'comparison needs a date this app does not hold.'}
 };
 
 // Applied before the date is computed, so lgHasDeadline sees a real offset and
@@ -5623,12 +5635,18 @@ var LG_COMPANION = {
   'LODR-REG-52-4':      {a:'results', w:'"Along with financial results".'},
   'LODR-REG-52-7-7A':   {a:'results', w:'"Along with quarterly financial results".'},
   'LODR-REG-54-2-3':    {a:'results', w:'Disclosed in the quarterly results.'},
-  'LODR-REG-27-2-BA':   {a:'results', w:'"Along with the quarterly CG report", which follows the results.'},
+  // Reg 27(2)(ba) is deliberately NOT here. It is disclosed "along with the
+  // report mentioned in clause (a) of sub-regulation (2)" — and clause (a) has
+  // no date of its own since the Third Amendment 2024 removed the twenty-one
+  // days. Anchoring it to the financial results instead gave a disclosure a
+  // date its own anchor does not have.
   'LODR-REG-23-9':      {a:'results', w:'"On the date of publication of standalone results".'},
   'LODR-REG-33-3-E':    {a:'annualResults', w:'"With the annual results" — the year-end submission, not a quarter.'},
   'LODR-REG-33-3-A-PROVISO': {a:'results', w:'"Along with annual results".'},
 
   // ── the AOC-4 and MGT-7 families ────────────────────────────
+  // (Reg 91C is not a companion — it has its own stated period, applied by
+  // LG_DUE_PATCH below.)
   // The Companies Act ids carry the source spreadsheet's row number. Guessing
   // them without it left six companions unresolved and looking exactly like
   // ones that were never mapped — which is why the suite now counts them.
@@ -5642,6 +5660,56 @@ var LG_COMPANION = {
 
 // Keys in the generated corpus carry occurrence suffixes (-Q1, -H2). Strip them
 // so one entry above covers every occurrence of that obligation.
+// ═══════════════════════════════════════════════════
+// WHY THERE IS NO DEADLINE
+// ═══════════════════════════════════════════════════
+// "Deadline not established" is true and unhelpful, and it reads the same for a
+// continuous obligation, an annual applicability test, and a period that was
+// deleted from the regulation eighteen months ago. Those are different facts.
+//
+// The third is the one that matters. Reg 13(3) and Reg 27(2)(a) each required
+// twenty-one days from the quarter end until the Third Amendment 2024
+// substituted them with effect from 31 December 2024. A Company Secretary
+// working from memory will still reach for twenty-one days. Naming the
+// amendment that removed it is worth more than a blank.
+//
+// Checked against reference/sebi-lodr-2015 (amended up to 14 July 2026).
+var LG_NO_DEADLINE_WHY = {
+  'LODR-REG-13-3': 'The twenty-one day period was <b>removed</b>. Reg 13(3) as substituted by the ' +
+    'Third Amendment 2024, with effect from <b>31 December 2024</b>, now reads: the statement is ' +
+    'filed "in such form and <b>within the timelines as may be specified by the Board</b>". Until ' +
+    'that specification is held here, no date can be computed. The period before the amendment ' +
+    'was twenty-one days from the end of each quarter.',
+  'LODR-REG-27-2-A': 'The twenty-one day period was <b>removed</b>. Reg 27(2)(a) as substituted by ' +
+    'the Third Amendment 2024, with effect from <b>31 December 2024</b>, now requires the report ' +
+    '"in the format and <b>within the timelines, as may be specified by the Board</b> from time to ' +
+    'time". The period before the amendment was twenty-one days from the end of each quarter.',
+  'LODR-REG-27-2-BA': 'Disclosed "along with the report mentioned in clause (a)" — and that report ' +
+    'has no date of its own since the Third Amendment 2024. This follows whatever date SEBI ' +
+    'specifies for the corporate governance report.',
+  'LODR-REG-14': 'Reg 14 requires fees to be paid "in the manner specified by the Board or the ' +
+    'recognised stock exchange(s)". The regulation fixes no date; the exchange does.',
+  'LODR-REG-32-1': 'Reg 32(1) states the statement is submitted "on a quarterly basis" and sets no ' +
+    'submission date. In practice it accompanies the quarterly results under a SEBI circular, ' +
+    'which is not in <span class="calc-mono">reference/</span>.',
+  'LODR-REG-13-4': 'Reg 13(4) requires the statement to be placed before the board "on a quarterly ' +
+    'basis". That is a cadence, not a filing date — it is met by a board meeting each quarter.',
+  'LODR-REG-17-3': 'Reg 17(3) requires the board to review compliance reports "periodically". The ' +
+    'regulation sets no interval; quarterly is practice, not text.',
+  'LODR-REG-23-2': 'Reg 23(2) requires audit committee approval <b>prior to the transaction</b>. ' +
+    'There is no date because the deadline is an event, not a day — it is met before the related ' +
+    'party transaction happens.',
+  'LODR-REG-10-1A': 'Reg 10 requires filings on the Board’s electronic platform in the manner ' +
+    'it specifies. The obligation is about the channel, not a date.'
+};
+
+// A row with no deadline, explained. Falls back to the state's own note.
+function lgNoDeadlineWhy(row){
+  if(!row || row.due) return null;
+  var k = (typeof lgCompanionKey === 'function') ? lgCompanionKey(row.key) : String(row.key || '');
+  return LG_NO_DEADLINE_WHY[k] || null;
+}
+
 function lgCompanionKey(key){
   return String(key || '').replace(/-(Q[1-4]|H[12]|M\d{1,2})$/i, '');
 }
@@ -15244,6 +15312,14 @@ function lgWhy(entityId, key){
       '<div class="lg-kv"><span>Calculated due date</span><b class="mono">'+entEsc(row.due||'—')+'</b></div>'+
       // A companion takes another filing's date. Say which, and quote the
       // wording that ties them, or the reader has a date with no derivation.
+      // A blank reads the same for a continuous duty, an annual review, and a
+      // period that was deleted from the regulation. Those are different facts,
+      // and the last one is the one a CS will otherwise get wrong from memory.
+      ((!row.due && typeof lgNoDeadlineWhy === 'function' && lgNoDeadlineWhy(row))
+        ? '<div style="font-size:12px;line-height:1.65;color:var(--ink-mid);background:var(--bg);'+
+          'border-radius:8px;padding:10px 12px;margin:6px 0 10px;">'+
+          '<b>Why there is no date.</b> '+lgNoDeadlineWhy(row)+'</div>'
+        : '')+
       (row.companionOf
         ? '<div class="lg-kv"><span>Taken from</span><b>'+entEsc(row.companionOf.label)+
           ' <span style="font-weight:400;color:var(--ink-soft);">('+
