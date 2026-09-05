@@ -953,6 +953,113 @@ describe('access check');
   };
 }
 
+// ── 11j. Deadlines expressed by reference (§3d) ─────────────
+// "With the annual report", "at the AGM", "along with financial results" — a
+// period stated by naming another filing. §2k called these "no period at all";
+// they are a period this register already computes, unresolved.
+describe('companion deadlines');
+{
+  const L = rowsFor(LISTED);
+  const comp = L.filter(r => r.companionOf);
+
+  // The count guards the silent failure: a mistyped key produces a row that is
+  // undated, which is indistinguishable from one that was never mapped.
+  ok('a listed entity resolves the full companion set', comp.length === 23, comp.length);
+  ok('every one of them carries a date', comp.every(r => !!r.due),
+     comp.filter(r => !r.due).length + ' without one');
+  ok('and names the filing it follows',
+     comp.every(r => r.companionOf.section && r.companionOf.label),
+     'one does not say what it follows');
+  ok('and quotes the wording that ties it there',
+     comp.every(r => !!r.companionOf.why), 'one has no wording');
+  check('they are marked as dated by reference, not by an offset',
+        comp.every(r => r.dueConfidence === 'companion'), true);
+
+  const at = (sec) => (L.filter(r => String(r.section).indexOf(sec) === 0 && r.companionOf)[0] || {});
+  const agm = dueOf(LISTED, 'Section 96');
+  check('the AGM anchor is where it was', agm, '2026-09-30');
+
+  // At the AGM.
+  check('Reg 20(3) falls on the AGM', at('Reg 20(3)').due, agm);
+  check('Reg 44(6) falls on the AGM', at('Reg 44(6)').due, agm);
+  // NOT a companion: Reg 34(1)(b) runs 48 hours from the AGM actually held, so
+  // it stays undated until the meetings register holds one. Anchoring it to the
+  // statutory last date would report a deadline weeks after the real one.
+  check('Reg 34(1)(b) is not resolved by reference', at('Reg 34(1)(b)').due, undefined);
+  // The annual report goes with the notice — s.101(1)'s clear 21 days.
+  check('Reg 34(2) follows the annual report', at('Reg 34(2)').due, '2026-09-09');
+  check('so does the Board’s Report', at('Section 134').due, '2026-09-09');
+
+  // The AOC-4 and MGT-7 families take their parent's date exactly.
+  check('XBRL follows AOC-4', at('Section 137; XBRL').due, dueOf(LISTED, 'Section 137; Accounts Rules'));
+  check('MGT-8 follows MGT-7', at('Section 92(2)').due, dueOf(LISTED, 'Section 92'));
+
+  // A quarterly companion follows ITS OWN quarter, not the year.
+  const cg = L.filter(r => String(r.section).indexOf('Reg 27(2)(ba)') === 0 && r.due)
+              .map(r => r.due).sort();
+  check('the CG-report companion has four quarterly dates', cg.length, 4);
+  // Counting them is not enough. Falling back to the first results row gives
+  // four rows all carrying the Q1 date — same count, same first value. What the
+  // bug destroys is that they are four DIFFERENT dates, one per quarter.
+  check('they are four distinct dates, not the same one four times',
+        new Set(cg).size, 4);
+  check('and each matches its own quarter’s results submission',
+        cg.join(','), '2026-08-14,2026-11-14,2027-02-14,2027-05-15');
+  // "With the annual results" means the year end, not the first quarter found.
+  check('Reg 33(3)(e) follows the YEAR-END results', at('Reg 33(3)(e)').due, '2027-05-15');
+
+  // A different year end must move every companion with it.
+  const DEC_LISTED = Object.assign({}, LISTED, { id: 'T-DECL', fyend: '2026-12-31' });
+  const dl = rowsFor(DEC_LISTED);
+  const dAgm = (dl.filter(r => String(r.section).indexOf('Section 96') === 0)[0] || {}).due;
+  const dR20 = (dl.filter(r => String(r.section).indexOf('Reg 20(3)') === 0)[0] || {}).due;
+  // The absolute date is not the point and an earlier draft of this assertion
+  // guessed it wrong: on 29 Aug 2026 a December company's outstanding AGM is
+  // FY2025's, due 30 June 2026 and overdue. What must hold is that the
+  // companion tracks whatever the AGM is.
+  ok('a December year end produces a different AGM date',
+     dAgm && dAgm !== '2026-09-30', dAgm);
+  check('and the companion moves with it', dR20, dAgm);
+
+  // A companion with no anchor stays undated. That is §2k's whole discipline:
+  // no anchor, no date, rather than a plausible invented one.
+  //
+  // A One Person Company is the case that exercises it — s.96(1) excludes it
+  // from holding an AGM, so every AGM-anchored companion has nothing to take a
+  // date from. On a listed entity every anchor is present, so the guard never
+  // fires and nothing was testing it.
+  const OPC = { id: 'T-OPC', name: 'Test OPC', type: 'opc', fyend: '2026-03-31',
+                capital: 1000000, turnover: 2000000,
+                cin: 'U12345MH2015OPC123456', chart: {} };
+  const opcRows = rowsFor(OPC);
+  check('an OPC has no AGM to anchor to', opcRows.filter(app.lgRowIsAGM).length, 0);
+  const opcBoardReport = opcRows.filter(
+    r => String(r.section).indexOf('Section 134') === 0)[0] || {};
+  check('so its Board’s Report companion stays undated', opcBoardReport.due, null);
+  ok('and no OPC row is dated by reference to an AGM it never holds',
+     opcRows.filter(r => r.companionOf &&
+                    /AGM|annual report/i.test(r.companionOf.label)).length === 0,
+     opcRows.filter(r => r.companionOf).map(r => r.section).join(', '));
+
+  const PVT = rowsFor(PRIVATE);
+  ok('a private company resolves only the companions it actually has',
+     PVT.filter(r => r.companionOf).length === 6,
+     PVT.filter(r => r.companionOf).length);
+  // The guard that stops an unanchored companion is `if(!due || !src) return`.
+  // Removing it does NOT produce a wrong date — `due` is still null — it
+  // produces a row CLAIMING to follow another filing while naming none. That is
+  // the defect: the screen would say "same date as ..." with a blank after it.
+  const everyRow = PVT.concat(L).concat(opcRows);
+  ok('no row claims a companion without a date',
+     everyRow.filter(r => r.companionOf).every(r => !!r.due),
+     everyRow.filter(r => r.companionOf && !r.due).length + ' claim one with no date');
+  ok('and none claims one without naming what it follows',
+     everyRow.filter(r => r.companionOf).every(
+       r => !!r.companionOf.section && !!r.companionOf.label),
+     everyRow.filter(r => r.companionOf &&
+       (!r.companionOf.section || !r.companionOf.label)).length + ' name nothing');
+}
+
 // ── 12. Dashboard invariants ────────────────────────────────
 describe('dashboard invariants');
 {

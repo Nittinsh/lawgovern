@@ -1496,7 +1496,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v167">
+      <meta id="build-version" content="v168">
     </div>
   </div>
   <div class="cc-search">
@@ -5571,6 +5571,168 @@ function lgLlpRows(c, ctx){
   ];
 }
 
+// ═══════════════════════════════════════════════════
+// COMPANION DEADLINES — dated by reference
+// ═══════════════════════════════════════════════════
+// Section 2k concluded that 87 obligations "state no period at all". That was
+// true of their wording and wrong as a conclusion: a large group states its
+// period BY REFERENCE to another filing — "with the annual report", "at the
+// AGM", "along with financial results". Those references were never resolved.
+//
+// Nothing here invents an offset. Each row takes the date of an obligation
+// already on the chart and records which one. If the anchor moves, every
+// companion moves with it.
+//
+// ANCHORS, each a filing this register already dates:
+//   agm          Section 96 (or Reg 44(5) for a listed entity)
+//   annualReport the AGM less 21 clear days — the annual report goes out WITH
+//                the notice (Reg 36(1)), and s.101(1) requires "not less than
+//                clear twenty-one days" notice. So the report is out by then.
+//   agmPlus2     48 hours after the AGM
+//   results      the Reg 33(3)(a) submission for the SAME period end
+//   aoc4         Section 137
+//   mgt7         Section 92
+var LG_COMPANION = {
+  // ── with the annual report ──────────────────────────────────
+  'LODR-REG-34-2':      {a:'annualReport', w:'"With the annual report" — the report itself.'},
+  'LODR-REG-32-4':      {a:'annualReport', w:'"With the annual report".'},
+  'LODR-REG-24A-1-A':   {a:'annualReport', w:'"Annexed to the annual report".'},
+  'LODR-REG-62M-1':     {a:'annualReport', w:'"Annexed to the annual report".'},
+  'LODR-REG-53':        {a:'annualReport', w:'"With the annual report".'},
+  'LODR-REG-56-1-A':    {a:'annualReport', w:'Forwarded to the debenture trustee when the annual report is issued.'},
+  'LODR-REG-36-1':      {a:'annualReport', w:'Sent with the AGM notice — Reg 36(1).'},
+  'LODR-REG-58-1':      {a:'annualReport', w:'Sent with the notice of the general meeting.'},
+  'LODR-REG-46-2-S':    {a:'annualReport', w:'"At least 21 days prior to the AGM", which is the same point in the calendar.'},
+  'LODR-REG-34-1-A':    {a:'annualReport', w:'Submitted on or before dispatch to shareholders begins.'},
+
+  // ── at the AGM ──────────────────────────────────────────────
+  'LODR-REG-20-3':      {a:'agm', w:'"At every AGM".'},
+  'LODR-REG-44-6':      {a:'agm', w:'"At the AGM" — the webcast is of that meeting.'},
+  'LODR-REG-24A-1-B':   {a:'agm', w:'The appointment is made at the AGM.'},
+  'LODR-REG-36-3':      {a:'agm', w:'Carried in the AGM or EGM notice.'},
+  // Reg 34(1)(b) is deliberately NOT here. "Not later than 48 hours after the
+  // AGM" runs from the meeting ACTUALLY HELD, which §2l takes from the meetings
+  // register. Anchoring it to the statutory last date for holding an AGM would
+  // report 2 October when the meeting was held on 5 September and the deadline
+  // passed on the 7th. "At the AGM" is bounded by the statutory date; "48 hours
+  // after it" is not bounded by it at all.
+
+  // ── along with the financial results ────────────────────────
+  // Matched to the Reg 33(3)(a) submission for the SAME period, so a quarterly
+  // companion follows its own quarter rather than the year.
+  'LODR-REG-52-4':      {a:'results', w:'"Along with financial results".'},
+  'LODR-REG-52-7-7A':   {a:'results', w:'"Along with quarterly financial results".'},
+  'LODR-REG-54-2-3':    {a:'results', w:'Disclosed in the quarterly results.'},
+  'LODR-REG-27-2-BA':   {a:'results', w:'"Along with the quarterly CG report", which follows the results.'},
+  'LODR-REG-23-9':      {a:'results', w:'"On the date of publication of standalone results".'},
+  'LODR-REG-33-3-E':    {a:'annualResults', w:'"With the annual results" — the year-end submission, not a quarter.'},
+  'LODR-REG-33-3-A-PROVISO': {a:'results', w:'"Along with annual results".'},
+
+  // ── the AOC-4 and MGT-7 families ────────────────────────────
+  // The Companies Act ids carry the source spreadsheet's row number. Guessing
+  // them without it left six companions unresolved and looking exactly like
+  // ones that were never mapped — which is why the suite now counts them.
+  'CA-SECTION-137-XBRL-RULES-10': {a:'aoc4', w:'"With annual financial statement filing timeline" — the same filing.'},
+  'CA-SECTION-129-3-ACCOUNTS-RULES-11': {a:'aoc4', w:'Consolidated statements go with the annual financial statement cycle.'},
+  'CA-COMPANIES-ACCOUNTS-RULES-AS-AMENDED-EFFE-12': {a:'aoc4', w:'"Along with relevant AOC-4 family filing".'},
+  'CA-SECTION-135-COMPANIES-ACCOUNTS-RULES-19': {a:'aoc4', w:'CSR-2 is filed with the AOC-4 family form.'},
+  'CA-SECTION-92-2-RULE-11-2-14': {a:'mgt7', w:'"Certification as part of annual return process" — MGT-8 is annexed to MGT-7.'},
+  'CA-SECTION-134-ACCOUNTS-RULES-36': {a:'annualReport', w:'The Board\'s Report forms part of the annual report sent with the notice.'}
+};
+
+// Keys in the generated corpus carry occurrence suffixes (-Q1, -H2). Strip them
+// so one entry above covers every occurrence of that obligation.
+function lgCompanionKey(key){
+  return String(key || '').replace(/-(Q[1-4]|H[12]|M\d{1,2})$/i, '');
+}
+
+// Find the obligations this register already dates, to anchor against.
+function lgFindAnchors(rows){
+  var a = {agm:null, aoc4:null, mgt7:null, results:[]};
+  rows.forEach(function(r){
+    if(!r.due) return;
+    var sec = String(r.section || '');
+    if(!a.agm  && /^Section 96\b/.test(sec)) a.agm = r;
+    if(!a.aoc4 && /^Section 137\b/.test(sec)) a.aoc4 = r;
+    if(!a.mgt7 && /^Section 92$/.test(sec))  a.mgt7 = r;
+    if(/^Reg 33\(3\)\(a\)/.test(sec)) a.results.push(r);
+  });
+  return a;
+}
+
+// The annual report reaches shareholders with the AGM notice, and s.101(1)
+// requires "not less than clear twenty-one days" of it. So it is out by then.
+function lgMinusDays(iso, n){
+  if(!iso) return null;
+  var p = String(iso).split('-').map(Number);
+  var d = new Date(p[0], p[1] - 1, p[2]);
+  d.setDate(d.getDate() - n);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') +
+         '-' + String(d.getDate()).padStart(2, '0');
+}
+
+function lgResolveCompanions(rows, fyMonth, fyDay){
+  var A = lgFindAnchors(rows);
+  var resolved = 0, failed = 0;
+  rows.forEach(function(row){
+   try{
+    if(row.due) return;                                   // already dated
+    var spec = LG_COMPANION[lgCompanionKey(row.key)];
+    if(!spec) return;
+
+    var src = null, due = null, label = '';
+    if(spec.a === 'agm' && A.agm){ due = A.agm.due; src = A.agm; label = 'the AGM'; }
+    else if(spec.a === 'annualReport' && A.agm){
+      due = lgMinusDays(A.agm.due, 21); src = A.agm;
+      label = 'the annual report, which goes out with the AGM notice'; }
+    else if(spec.a === 'aoc4' && A.aoc4){ due = A.aoc4.due; src = A.aoc4; label = 'AOC-4'; }
+    else if(spec.a === 'mgt7' && A.mgt7){ due = A.mgt7.due; src = A.mgt7; label = 'MGT-7'; }
+    else if(spec.a === 'annualResults' && A.results.length){
+      // "With the annual results" means the year-end submission. Matching the
+      // first results row found put this three quarters early.
+      var yr = null;
+      for(var k=0;k<A.results.length;k++){
+        var pe = String(A.results[k].periodEnd || '');
+        if(fyMonth && pe.slice(5) === (String(fyMonth).padStart(2,'0') + '-' +
+                                       String(fyDay).padStart(2,'0'))) yr = A.results[k];
+      }
+      if(yr){ due = yr.due; src = yr; label = 'the year-end Reg 33(3)(a) results submission'; }
+    }
+    else if(spec.a === 'results' && A.results.length){
+      // Match the results submission for the SAME period, so a quarterly
+      // companion follows its own quarter rather than the year end.
+      var same = null;
+      for(var i=0;i<A.results.length;i++)
+        if(row.periodEnd && String(A.results[i].periodEnd) === String(row.periodEnd)) same = A.results[i];
+      src = same || A.results[0];
+      due = src.due;
+      label = 'the Reg 33(3)(a) results submission' +
+              (same ? ' for the same period' : ' (nearest available period)');
+    }
+
+    // No anchor for this entity means no date. A companion without its anchor
+    // is precisely the invented date section 2k removed.
+    if(!due || !src) return;
+
+    row.due = due;
+    row.dueConfidence = 'companion';
+    row.companionOf = {section: src.section, obligation: src.obligation,
+                       label: label, why: spec.w};
+    resolved++;
+   }catch(e){
+     // One row that cannot be resolved must cost one row. Before this, a throw
+     // here aborted the loop and every companion after it was skipped without
+     // a word — the same shape as updateMode() aborting enterApp() in §2.
+     failed++;
+     console.error('[companion]', row && row.key, e);
+   }
+  });
+  LG_COMPANION_STATS = {resolved: resolved, failed: failed};
+  return rows;
+}
+// Exposed so a partial run is visible rather than silent.
+var LG_COMPANION_STATS = {resolved: 0, failed: 0};
+
 function getComplianceChart(c, opts){
   var y  = new Date().getFullYear();
 
@@ -5724,6 +5886,17 @@ function getComplianceChart(c, opts){
       });
     }
   }
+
+  // ── deadlines expressed by reference to another filing ──────
+  // AFTER the class exclusions, not before. Resolving first dated a One Person
+  // Company's Board's Report to 21 days before an AGM — an AGM s.96(1) excludes
+  // it from holding, which the exclusion then removed from the chart, leaving
+  // the companion carrying a date derived from a row that is not there. An
+  // anchor has to still be an obligation of this company at the moment it is
+  // used as one.
+  try{
+    if(typeof lgResolveCompanions === 'function') rows = lgResolveCompanions(rows, fyMonth, fyDay);
+  }catch(e){ console.error('[companion]', e); }
 
   // A user's "not applicable" overrides the engine, which cannot know whether
   // this company accepts deposits, has a subsidiary or holds foreign assets.
@@ -15069,6 +15242,16 @@ function lgWhy(entityId, key){
 
       '<div class="lg-h">Due date</div>'+
       '<div class="lg-kv"><span>Calculated due date</span><b class="mono">'+entEsc(row.due||'—')+'</b></div>'+
+      // A companion takes another filing's date. Say which, and quote the
+      // wording that ties them, or the reader has a date with no derivation.
+      (row.companionOf
+        ? '<div class="lg-kv"><span>Taken from</span><b>'+entEsc(row.companionOf.label)+
+          ' <span style="font-weight:400;color:var(--ink-soft);">('+
+          entEsc(row.companionOf.section)+')</span></b></div>'+
+          '<div style="font-size:12px;line-height:1.6;color:var(--ink-soft);margin:6px 0 10px;">'+
+          entEsc(row.companionOf.why)+' This obligation states its period by naming another '+
+          'filing rather than an offset, so it moves whenever that filing moves.</div>'
+        : '')+
       '<div class="lg-kv"><span>Days</span><b>'+(st.days===null?'—':(st.days<0?(-st.days)+' days past due':st.days+' days remaining'))+'</b></div>'+
       '<div class="lg-kv"><span>Financial year end</span><b class="mono">'+entEsc(c.fyend||'assumed 31 March')+'</b></div>'+
 

@@ -222,7 +222,39 @@ const MUTATIONS = [
 
   { name: 'the cross-tenant probe reports a leak as clean (§3c)',
     from: "        seen.length === 0 ? 'pass' : 'fail',",
-    to:   "        'pass'," }
+    to:   "        'pass'," },
+
+  // ── companion deadlines (§3d) ───────────────────────────────
+  // A companion takes another filing's date. Getting the anchor wrong produces
+  // a date that looks entirely reasonable and is months out — the same failure
+  // as the 31 March dates, arriving by a different road.
+
+  // NOT a mutation: "a companion with no anchor gets a date anyway" cannot be
+  // caught, and the reason is worth keeping. Removing `if(!due || !src) return`
+  // makes the next line read src.section on a null, which throws; the row then
+  // ends with no date and no companion — exactly what the guard produces. Two
+  // mechanisms, one visible result, so no assertion can separate them. Same
+  // shape as the doubly-guarded LODR exclusion in §2x.
+  //
+  // The exception did expose a real fragility, now fixed: it aborted the whole
+  // loop, silently skipping every companion after it. Each row is resolved
+  // inside its own guard, and LG_COMPANION_STATS records failures.
+
+  { name: 'the annual report stops being 21 days before the AGM (§3d)',
+    from: "      due = lgMinusDays(A.agm.due, 21); src = A.agm;",
+    to:   "      due = A.agm.due; src = A.agm;" },
+
+  { name: 'a quarterly companion follows the year instead of its own quarter (§3d)',
+    from: '        if(row.periodEnd && String(A.results[i].periodEnd) === String(row.periodEnd)) same = A.results[i];',
+    to:   '        same = null;' },
+
+  { name: '"with the annual results" picks the first quarter it finds (§3d)',
+    from: "      if(yr){ due = yr.due; src = yr; label = 'the year-end Reg 33(3)(a) results submission'; }",
+    to:   "      if(A.results[0]){ due = A.results[0].due; src = A.results[0]; label = 'results'; }" },
+
+  // NOT a mutation any more: the agmPlus2 branch was removed. Reg 34(1)(b) runs
+  // from the AGM actually held, which §2l takes from the meetings register, so
+  // it is not a companion at all. The suite asserts it stays undated instead.
 ];
 
 const src = fs.readFileSync(INDEX, 'utf8');

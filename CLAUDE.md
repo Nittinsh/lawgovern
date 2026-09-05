@@ -1448,6 +1448,80 @@ prefer single-line anchors, and normalise line endings on both sides before matc
 
 ---
 
+## 3d. DEADLINES EXPRESSED BY REFERENCE (v168)
+
+`LG_COMPANION` / `lgResolveCompanions`.
+
+Section 2k left 87 obligations undated and concluded they "state no period at all". That was true
+of their wording and **wrong as a conclusion**. Read again, a large group states its period
+precisely — by naming another filing:
+
+> "With the annual report" · "At the AGM" · "Along with financial results"
+> "Along with relevant AOC-4 family filing" · "Certification as part of the annual return process"
+
+Those are not vague. Each names a filing **this register already dates**. The deadline was never
+missing; it was expressed by reference and nothing resolved the reference.
+
+**Result: a listed entity goes 29 → 52 dated rows; every other class 8 → 14.** 23 obligations on a
+listed company, 5–6 on the others.
+
+### No offset is invented
+Each companion takes the date of an obligation already on the chart and records which one and the
+wording that ties them. If the anchor moves — a different year end, an AGM held late — every
+companion moves with it, which a hand-entered offset would get wrong. The Why panel shows
+**"Taken from AOC-4 (Section 137)"** with the quoted wording.
+
+Anchors: `agm` (s.96) · `annualReport` (the AGM less 21 clear days, because Reg 36(1) sends the
+report with the notice and s.101(1) requires "not less than clear twenty-one days") · `results`
+(the Reg 33(3)(a) submission **for the same period**) · `annualResults` (the year-end one) ·
+`aoc4` · `mgt7`.
+
+### Three things the suite caught, all of them mine
+
+**1. Reg 34(1)(b) must NOT be a companion.** "Not later than 48 hours after the AGM" runs from the
+meeting **actually held**, which §2l takes from the meetings register. Anchoring it to the statutory
+last date would report 2 October when the AGM was held on 5 September and the deadline passed on
+the 7th. **An assertion written in §2l failed the moment this was added** — three sections and many
+commits later. That is the distinction: *"at the AGM"* is bounded by the statutory date; *"48 hours
+after it"* is not bounded by it at all. The `agmPlus2` branch was removed rather than left dead.
+
+**2. Companions must resolve AFTER the class exclusions, not before.** Resolving first dated a One
+Person Company's Board's Report to 21 days before an AGM that **s.96(1) excludes it from holding** —
+the exclusion then removed the AGM row, leaving a companion carrying a date derived from a row that
+is not on the chart. An anchor must still be an obligation *of this company* at the moment it is
+used as one.
+
+**3. Six companions silently failed to resolve.** The Companies Act ids carry the source
+spreadsheet's row number (`CA-SECTION-137-XBRL-RULES-10`) and I had guessed them without it. A
+companion that finds no anchor is **indistinguishable from one that was never mapped** — both just
+stay undated, and nothing says which. The suite now counts them.
+
+### One mutation retired, and the fragility it exposed
+"A companion with no anchor gets a date anyway" cannot be caught. Removing `if(!due || !src) return`
+makes the next line read `src.section` on a null, which throws; the row ends with no date and no
+companion — **exactly what the guard produces**. Two mechanisms, one visible result. Recorded as a
+note, same as the doubly-guarded LODR exclusion in §2x.
+
+But the exception exposed something real: it **aborted the whole loop**, silently skipping every
+companion after the failing row. The same shape as `updateMode()` aborting `enterApp()` in §2. Each
+row is now resolved inside its own guard, and `LG_COMPANION_STATS` records failures so a partial run
+is visible rather than silent.
+
+### What is still undated, and why — this is now the honest remainder
+Of the 96 rules with no offset:
+- **~23 resolved here** by reference.
+- **~9 are event-anchored** to a register (§2l, §2m, §2n, §2o) and correctly undated until the event
+  is recorded.
+- **The rest divide into three kinds that are not deadlines at all**, and should stop being counted
+  as missing ones:
+  - **Continuous** — "Ongoing", "Continuous", "Prior to the transaction". `STANDING` is correct.
+  - **Applicability tests** — "Test thresholds each FY", "Reassess before relying on any exemption".
+    These are reviews, not filings.
+  - **Specified by SEBI** — Reg 13(3), 27(2)(a), 14, 91C/91E say the form and timeline are as SEBI
+    specifies, and **we do not hold the circular**. Correctly undated with a reason.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -1516,7 +1590,7 @@ prefer single-line anchors, and normalise line endings on both sides before matc
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (246 assertions, run against `index.html` itself), `node tests/mutation.js` (41 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (271 assertions, run against `index.html` itself), `node tests/mutation.js` (44 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **No AI model auto-updates to current law.** Staying current = fetch fresh sources (RSS via rss2json/allorigins for SEBI/MCA/IBBI/RBI/IncomeTax) + human curation + (optionally) paid web-search. Vetted human templates + AI drafting is the right model.
 - **Drafting quality:** resolution/notice prompts (`RES_SYS`, `DOC_SYS`) were tuned to a senior-CS standard (exact sub-section citations with read-with clauses, SEBI LODR cross-refs, full RESOLVED THAT/FURTHER THAT cascade, standard severally-authorised CS clause, Certified True Copy headers, Section 102 explanatory statements, MCA form+deadline line). There's an anti-reasoning guard telling the model to output ONLY the final document (some free models leaked their chain-of-thought). Keep these standards.
 - **Child/again:** all AI legal output must carry a "verify on MCA/SEBI portal before filing" caveat — the CS signs and carries professional responsibility.
@@ -1525,7 +1599,7 @@ prefer single-line anchors, and normalise line endings on both sides before matc
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v167.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v168.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**
