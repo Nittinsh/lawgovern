@@ -1496,7 +1496,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v169">
+      <meta id="build-version" content="v170">
     </div>
   </div>
   <div class="cc-search">
@@ -4756,6 +4756,40 @@ var LG_DUE_PATCH = {
   // first thing owed and the only one computable here — the financial limb is
   // "by October 31st ... or before the due date of filing of income tax return
   // ..., WHICHEVER IS LATER", and the income-tax due date is not held.
+  // ── Integrated Filing, Master Circular 30 January 2026 ──────
+  // Reg 10(1A) introduced Integrated Filing for filings from the quarter ending
+  // 31 December 2024. The Third Amendment 2024 took the twenty-one days out of
+  // Reg 13(3) and Reg 27(2)(a) BECAUSE the period moved here — it became thirty
+  // days, in a different instrument, under a filing that did not exist before.
+  'LODR-REG-13-3': {
+    due:{days:30},
+    from:'SEBI Master Circular for LODR compliance, 30 January 2026, Integrated Filing table — Integrated Filing (Governance), '+
+         '"within 30 days from the end of the quarter". Reg 13(3) itself says only "within the '+
+         'timelines as may be specified by the Board" since the Third Amendment 2024 (w.e.f. '+
+         '31 December 2024); this is that specification. The period was twenty-one days before.'},
+  'LODR-REG-27-2-A': {
+    due:{days:30},
+    from:'SEBI Master Circular for LODR compliance, 30 January 2026, Integrated Filing table — Integrated Filing (Governance), '+
+         '"within 30 days from the end of the quarter". Reg 27(2)(a) itself says only "within '+
+         'the timelines, as may be specified by the Board from time to time" since the Third '+
+         'Amendment 2024. The period was twenty-one days before.'},
+  // Reg 27(2)(ba) is disclosed "along with the report mentioned in clause (a)",
+  // so it follows the same Integrated Filing (Governance) date.
+  'LODR-REG-27-2-BA': {
+    due:{days:30},
+    from:'SEBI Master Circular for LODR compliance, 30 January 2026, Integrated Filing table — disclosed "along with the report '+
+         'mentioned in clause (a) of sub-regulation (2)", which is Integrated Filing '+
+         '(Governance), due within 30 days from the end of the quarter.'},
+  // Integrated Filing (Financial) is 45 days, and 60 from the last quarter and
+  // the financial year. Only the 45 is applied: the register has no separate
+  // last-quarter occurrence for this rule, so a single offset is the honest one
+  // and the note carries the variation.
+  'LODR-REG-32-1': {
+    due:{days:45},
+    from:'SEBI Master Circular for LODR compliance, 30 January 2026, Integrated Filing table — Integrated Filing (Financial), '+
+         '"within 45 days from the end of the quarter, other than the last quarter, and 60 days '+
+         'from the end of the last quarter and the financial year". The 45-day period is applied; '+
+         'for the last quarter the circular allows 60.'},
   'LODR-REG-91C-91E': {
     due:{type:'fy_end_offset', days:60},
     from:'Reg 91C(1)(ii), substituted w.e.f. 8 September 2025 — "within a period of 60 days '+
@@ -5675,23 +5709,12 @@ var LG_COMPANION = {
 //
 // Checked against reference/sebi-lodr-2015 (amended up to 14 July 2026).
 var LG_NO_DEADLINE_WHY = {
-  'LODR-REG-13-3': 'The twenty-one day period was <b>removed</b>. Reg 13(3) as substituted by the ' +
-    'Third Amendment 2024, with effect from <b>31 December 2024</b>, now reads: the statement is ' +
-    'filed "in such form and <b>within the timelines as may be specified by the Board</b>". Until ' +
-    'that specification is held here, no date can be computed. The period before the amendment ' +
-    'was twenty-one days from the end of each quarter.',
-  'LODR-REG-27-2-A': 'The twenty-one day period was <b>removed</b>. Reg 27(2)(a) as substituted by ' +
-    'the Third Amendment 2024, with effect from <b>31 December 2024</b>, now requires the report ' +
-    '"in the format and <b>within the timelines, as may be specified by the Board</b> from time to ' +
-    'time". The period before the amendment was twenty-one days from the end of each quarter.',
-  'LODR-REG-27-2-BA': 'Disclosed "along with the report mentioned in clause (a)" — and that report ' +
-    'has no date of its own since the Third Amendment 2024. This follows whatever date SEBI ' +
-    'specifies for the corporate governance report.',
+  // Reg 13(3), 27(2)(a), 27(2)(ba) and 32(1) are no longer here: the Master
+  // Circular of 30 January 2026 supplies the period the regulations delegate,
+  // and they are dated through LG_DUE_PATCH. What §3e recorded as "the period
+  // was removed" was half the story — it moved.
   'LODR-REG-14': 'Reg 14 requires fees to be paid "in the manner specified by the Board or the ' +
     'recognised stock exchange(s)". The regulation fixes no date; the exchange does.',
-  'LODR-REG-32-1': 'Reg 32(1) states the statement is submitted "on a quarterly basis" and sets no ' +
-    'submission date. In practice it accompanies the quarterly results under a SEBI circular, ' +
-    'which is not in <span class="calc-mono">reference/</span>.',
   'LODR-REG-13-4': 'Reg 13(4) requires the statement to be placed before the board "on a quarterly ' +
     'basis". That is a cadence, not a filing date — it is met by a board meeting each quarter.',
   'LODR-REG-17-3': 'Reg 17(3) requires the board to review compliance reports "periodically". The ' +
@@ -5699,8 +5722,11 @@ var LG_NO_DEADLINE_WHY = {
   'LODR-REG-23-2': 'Reg 23(2) requires audit committee approval <b>prior to the transaction</b>. ' +
     'There is no date because the deadline is an event, not a day — it is met before the related ' +
     'party transaction happens.',
-  'LODR-REG-10-1A': 'Reg 10 requires filings on the Board’s electronic platform in the manner ' +
-    'it specifies. The obligation is about the channel, not a date.'
+  'LODR-REG-10-1A': 'Reg 10(1A) is the enabling provision for <b>Integrated Filing</b>, introduced ' +
+    'by the Master Circular of 30 January 2026 for filings from the quarter ending 31 December ' +
+    '2024. It fixes no date of its own — it is the channel. The filings it carries are dated: ' +
+    'Governance within 30 days of the quarter end, Financial within 45 days (60 for the last ' +
+    'quarter and the financial year).'
 };
 
 // A row with no deadline, explained. Falls back to the state's own note.

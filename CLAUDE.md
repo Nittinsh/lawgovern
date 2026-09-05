@@ -1580,6 +1580,59 @@ Suite **271 → 288**, mutations **44 → 46 caught, 0 missed**.
 
 ---
 
+## 3f. THE MASTER CIRCULAR — where the period went (v170)
+
+§3e concluded that Reg 13(3) and Reg 27(2)(a) have no date because the Third Amendment 2024
+replaced their twenty-one days with *"as may be specified by the Board"*. Right as far as it went,
+and **one step short**. The Board has specified.
+
+SEBI's **Master Circular for LODR compliance, 30 January 2026** — now in
+`reference/sebi-lodr-master-circular/` — introduces **Integrated Filing** under Reg 10(1A) for
+filings "for the quarter ending 31st December 2024 and thereafter", and sets the periods in a table:
+
+| filing | regulations | period |
+|---|---|---|
+| **Integrated Filing (Governance)** | 13(3), 27(2)(a) | **within 30 days** of the quarter end |
+| **Integrated Filing (Financial)** | 23(9), 30 r/w V-B, 32(1), 33(3) | **within 45 days**, and 60 from the last quarter and the financial year |
+
+**The twenty-one days did not disappear. It became thirty, in a different instrument, under a filing
+that did not exist before.** A blank cell said nothing about that, and a CS reading "as specified by
+the Board" had nowhere to go.
+
+**Listed entity: 49 → 65 dated rows.** Reg 13(3), 27(2)(a), 27(2)(ba) each gain four quarterly dates
+at 30 days; Reg 32(1) four at 45.
+
+### The lesson worth carrying: a delegating regulation is a pointer, not a dead end
+LODR increasingly delegates. Read only the regulation and these look undatable. **When a provision
+says "as specified by the Board", the circular is where the number went** — go and find it.
+
+### Getting the document
+The page is an index; the PDF is behind a JS-rendered viewer. Its URL is in an `iframe` `src`, found
+by reading the page in the browser pane, not by fetching it. 291 pages, 4.3 MB.
+
+**A hand-rolled extractor was tried first and must not be repeated.** It produced 26K chars of
+fragments from 291 pages: only **12 of the 42 embedded fonts carry a ToUnicode map**, and **62 object
+streams are compressed** beyond a regex's reach. A partial extraction here is worse than none —
+searching it for a period and not finding one proves nothing. `pip install pypdf` gave 611K chars of
+clean text in one line. Recorded in `reference/README.md`.
+
+### Reading it needs the same care as the regulation
+The one competing figure in the circular — *"within fifteen days of end of the quarter"* — is
+**Reg 69(1), the IDR holding pattern**, and unrelated. Taking the first number that matched a search
+would have put fifteen days on the corporate governance report. Same class of trap as the §3e
+footnotes: the text contains periods that are real, current, and about something else.
+
+### Coverage
+Suite **288 → 299**, mutations **46 → 49 caught, 0 missed**. The mutations swap the Governance and
+Financial periods, because 30 and 45 are both entirely plausible and being a fortnight wrong in
+either direction is the hardest kind of error to see.
+
+Three assertions written in §2k and §3e had to be repointed — they used Reg 13(3) and Reg 27(2)(ba)
+as examples of *undated* rules, and both are dated now. **The examples moved; the properties they
+test did not.** Reg 17(3) ("periodically", no interval fixed) is the undated example now.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -1648,7 +1701,7 @@ Suite **271 → 288**, mutations **44 → 46 caught, 0 missed**.
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (288 assertions, run against `index.html` itself), `node tests/mutation.js` (46 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (299 assertions, run against `index.html` itself), `node tests/mutation.js` (49 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **No AI model auto-updates to current law.** Staying current = fetch fresh sources (RSS via rss2json/allorigins for SEBI/MCA/IBBI/RBI/IncomeTax) + human curation + (optionally) paid web-search. Vetted human templates + AI drafting is the right model.
 - **Drafting quality:** resolution/notice prompts (`RES_SYS`, `DOC_SYS`) were tuned to a senior-CS standard (exact sub-section citations with read-with clauses, SEBI LODR cross-refs, full RESOLVED THAT/FURTHER THAT cascade, standard severally-authorised CS clause, Certified True Copy headers, Section 102 explanatory statements, MCA form+deadline line). There's an anti-reasoning guard telling the model to output ONLY the final document (some free models leaked their chain-of-thought). Keep these standards.
 - **Child/again:** all AI legal output must carry a "verify on MCA/SEBI portal before filing" caveat — the CS signs and carries professional responsibility.
@@ -1657,7 +1710,7 @@ Suite **271 → 288**, mutations **44 → 46 caught, 0 missed**.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v169.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v170.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

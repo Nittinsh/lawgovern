@@ -90,8 +90,11 @@ describe('period end is not a deadline');
   const derivedWithDate = dated.filter(r => r.dueConfidence === 'derived');
   check('no dated row still reports itself as derived', derivedWithDate.length, 0);
 
-  // Quarterly occurrences survive losing their invented dates.
-  const q = rows.filter(r => /Reg 13\(3\)/.test(String(r.section)));
+  // Quarterly occurrences survive losing their invented dates. Reg 17(3) is the
+  // example because it is genuinely undated — the regulation says the board
+  // reviews compliance reports "periodically" and fixes no interval. (Reg 13(3)
+  // stood here until §3f, when the Master Circular supplied its period.)
+  const q = rows.filter(r => /Reg 17\(3\)/.test(String(r.section)));
   check('a quarterly rule keeps four occurrences', q.length, 4);
   check('and none of them carries a deadline', q.filter(r => r.due).length, 0);
   check('but each keeps its real period end',
@@ -1080,31 +1083,51 @@ describe('SEBI-specified timelines');
      /8 September 2025/.test(one('Reg 91C').duePatchedFrom || ''),
      one('Reg 91C').duePatchedFrom);
 
-  // Reg 27(2)(ba) follows the CG report, which has no date. Anchoring it to the
-  // financial results invented one.
-  check('Reg 27(2)(ba) is not dated from the results', one('Reg 27(2)(ba)').due, null);
-  ok('and explains that its own anchor has no date',
-     /no date of its own/.test(app.lgNoDeadlineWhy(one('Reg 27(2)(ba)')) || ''),
-     'no explanation');
+  // Reg 27(2)(ba) follows the CG report, so it takes the GOVERNANCE period of
+  // 30 days — not the 45-day Financial one, and not the results date §3d
+  // briefly gave it. Both wrong answers are plausible dates, which is why this
+  // asserts which one.
+  check('Reg 27(2)(ba) takes the 30-day Governance period, not 45',
+        one('Reg 27(2)(ba)').due, '2026-07-30');
+  ok('and cites the clause it follows',
+     /clause \(a\)/.test(one('Reg 27(2)(ba)').duePatchedFrom || ''),
+     one('Reg 27(2)(ba)').duePatchedFrom);
+  ok('it is not resolved as a companion of the results',
+     !one('Reg 27(2)(ba)').companionOf, 'still a companion');
 
-  // The two whose period was removed by amendment. This is the useful part: a
-  // CS working from memory still reaches for twenty-one days.
-  ['Reg 13(3)', 'Reg 27(2)(a)'].forEach(sec => {
-    const r = one(sec);
-    check(sec + ' has no date', r.due, null);
-    const why = app.lgNoDeadlineWhy(r) || '';
-    ok(sec + ' says the period was removed', /removed/i.test(why), why.slice(0, 60));
-    ok(sec + ' names the amendment that removed it',
-       /31 December 2024/.test(why), why.slice(0, 60));
-    ok(sec + ' still records what the period used to be',
-       /twenty-one days/i.test(why), why.slice(0, 60));
+  // §3f: the period did not disappear when the Third Amendment 2024 took it out
+  // of the regulation — it MOVED to the Master Circular's Integrated Filing.
+  // Governance filings within 30 days of the quarter end.
+  const q = (sec) => L.filter(r => String(r.section).indexOf(sec) === 0 && r.due)
+                      .map(r => r.due).sort();
+  ['Reg 13(3)', 'Reg 27(2)(a)', 'Reg 27(2)(ba)'].forEach(sec => {
+    check(sec + ' is dated for all four quarters', q(sec).length, 4);
+    check(sec + ' — 30 days from each quarter end',
+          q(sec).join(','), '2026-07-30,2026-10-30,2027-01-30,2027-04-30');
+    const src = (L.filter(r => String(r.section).indexOf(sec) === 0)[0] || {}).duePatchedFrom || '';
+    ok(sec + ' cites the Master Circular', /Master Circular/.test(src), src.slice(0, 50));
+    ok(sec + ' names the date of that circular', /30 January 2026/.test(src), src.slice(0, 50));
+  });
+  // Integrated Filing (Financial) is 45 days, not 30. Getting these two the same
+  // way round is the whole point of the table.
+  check('Reg 32(1) takes the Financial period, 45 days',
+        q('Reg 32(1)').join(','), '2026-08-14,2026-11-14,2027-02-14,2027-05-15');
+  ok('and its note records the 60 days allowed for the last quarter',
+     /60 days/.test((L.filter(r => String(r.section).indexOf('Reg 32(1)') === 0)[0] || {})
+       .duePatchedFrom || ''), 'not recorded');
+  // Once a period is supplied, the row must stop explaining why it has none.
+  ['Reg 13(3)', 'Reg 27(2)(a)', 'Reg 32(1)'].forEach(sec => {
+    ok(sec + ' no longer claims to have no deadline',
+       !app.lgNoDeadlineWhy(one(sec)), 'still explains an absent date');
   });
 
   // Every explanation must attach to a row that genuinely has no date.
   const explained = L.filter(r => app.lgNoDeadlineWhy(r));
   ok('explanations appear only on undated rows', explained.every(r => !r.due),
      explained.filter(r => r.due).length + ' dated rows carry one');
-  ok('a good number of undated rows now explain themselves', explained.length >= 25,
+  // Fewer than before §3f, and that is the improvement: sixteen of these rows
+  // stopped needing an explanation because the Master Circular gave them a date.
+  ok('the rows that remain undated still explain themselves', explained.length >= 12,
      explained.length);
   // A dated row must never carry one — that would contradict its own date.
   ok('no dated row claims to have no deadline',
@@ -1113,10 +1136,14 @@ describe('SEBI-specified timelines');
   // dated, so removing the `row.due` guard changes nothing they can see. The
   // contract is tested directly instead — a mapped key WITH a date must still
   // get no explanation.
+  // Reg 23(2) is a genuine "prior to the transaction" duty and stays mapped;
+  // Reg 13(3) was removed from the map when the circular gave it a date.
   check('a mapped key that has a date gets no explanation',
-        app.lgNoDeadlineWhy({ key: 'LODR-REG-13-3', due: '2026-01-01' }), null);
+        app.lgNoDeadlineWhy({ key: 'LODR-REG-23-2', due: '2026-01-01' }), null);
   ok('while the same key without one still does',
-     !!app.lgNoDeadlineWhy({ key: 'LODR-REG-13-3', due: null }), 'lost its explanation');
+     !!app.lgNoDeadlineWhy({ key: 'LODR-REG-23-2', due: null }), 'lost its explanation');
+  ok('and a key the circular has now dated is no longer mapped at all',
+     !app.lgNoDeadlineWhy({ key: 'LODR-REG-13-3', due: null }), 'still mapped');
 }
 
 // ── 12. Dashboard invariants ────────────────────────────────

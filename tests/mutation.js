@@ -250,6 +250,23 @@ const MUTATIONS = [
 
   // ── the SEBI-specified group (§3e) ──────────────────────────
 
+  // ── Integrated Filing (§3f) ─────────────────────────────────
+  // Governance is 30 days from the quarter end, Financial is 45. Swapping them
+  // gives every affected row a completely plausible date that is a fortnight
+  // wrong in one direction or the other — the hardest kind of error to notice.
+
+  { name: 'Governance filings take the 45-day Financial period (§3f)',
+    from: "  'LODR-REG-13-3': {\n    due:{days:30},",
+    to:   "  'LODR-REG-13-3': {\n    due:{days:45}," },
+
+  { name: 'the deviation statement takes the 30-day Governance period (§3f)',
+    from: "  'LODR-REG-32-1': {\n    due:{days:45},",
+    to:   "  'LODR-REG-32-1': {\n    due:{days:30}," },
+
+  { name: 'the cyber-security disclosure stops following clause (a) (§3f)',
+    from: "  'LODR-REG-27-2-BA': {\n    due:{days:30},",
+    to:   "  'LODR-REG-27-2-BA': {\n    due:{days:45}," },
+
   { name: 'Reg 91C loses the period the 2025 amendment gave it (§3e)',
     from: "  'LODR-REG-91C-91E': {",
     to:   "  'LODR-REG-91C-DISABLED': {" },
