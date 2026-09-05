@@ -201,7 +201,28 @@ const MUTATIONS = [
 
   { name: 'a row with no organisation is dropped, emptying a pre-migration database (§3a)',
     from: '    return !r.org_id || String(r.org_id) === String(CURRENT_ORG);',
-    to:   '    return String(r.org_id) === String(CURRENT_ORG);' }
+    to:   '    return String(r.org_id) === String(CURRENT_ORG);' },
+
+  // ── the access check (§3c) ──────────────────────────────────
+  // This is the tenant-isolation proof a customer runs on their own data. If it
+  // can be made to report a pass while the isolation is broken it is worse than
+  // not shipping it, because somebody would rely on it.
+
+  { name: 'the access check stops noticing an unanchored company (§3c)',
+    from: '    var unanchored = rows.filter(function(r){ return !r.org_id; });',
+    to:   '    var unanchored = [];' },
+
+  { name: 'the access check stops noticing a foreign row (§3c)',
+    from: '      var foreign = rows.filter(function(r){ return r.org_id && !mine[String(r.org_id)]; });',
+    to:   '      var foreign = [];' },
+
+  { name: 'a constraint refusal counts as a policy refusal for a viewer (§3c)',
+    from: "    var byPolicy = /row-level security|violates row-level/i.test(msg);",
+    to:   "    var byPolicy = /violates/i.test(msg);" },
+
+  { name: 'the cross-tenant probe reports a leak as clean (§3c)',
+    from: "        seen.length === 0 ? 'pass' : 'fail',",
+    to:   "        'pass'," }
 ];
 
 const src = fs.readFileSync(INDEX, 'utf8');

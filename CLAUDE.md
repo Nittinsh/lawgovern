@@ -1393,6 +1393,61 @@ multi-tenant isolation this product now sells on is asserted rather than demonst
 
 ---
 
+## 3c. ACCESS CHECK — the half that needs a session (v167)
+
+**Administration → Team → Run access check.** `lgAccessCheck(probeId)`.
+
+`tests/backend.test.js` runs anonymously, which proves the doors are shut and cannot prove the
+right people get through. The four things it names as untestable all need a signed-in session, and
+a session needs a password the tooling here must never hold. So the check runs **inside the app**,
+where the session already exists.
+
+It is not a developer tool. **Any customer can run it against their own tenant** and see that
+another practice's data is unreachable — which is the claim this product is now sold on and, until
+this, was only asserted.
+
+### Nine checks
+Signed in · member of a practice · companies readable · **every company carries an org_id** (the
+backfill question `backend.test.js` names and cannot reach) · nothing visible from a practice you
+are not in · register rows belong to a company you can see · **the database agrees with the UI
+about your role** · maker-checker has something to check · **cross-tenant probe**.
+
+### The write probe, and the distinction that makes it a test
+One insert, whose foreign key cannot resolve. **Nothing is written on either path** — that is what
+makes it safe to ship to customers.
+
+What it reads is *which layer refused*:
+- a **viewer** must be stopped by the **policy**. Stopped by the **constraint** instead means the
+  policy let the write through and a foreign key happened to catch it — so that case **fails**.
+- anyone else must reach the constraint. Refused by the policy means their role is not working.
+
+Those two errors look equally like "it didn't work". Treating them as the same would let a broken
+policy report a pass, which is the one thing this check must not do.
+
+### The cross-tenant probe needs two accounts
+It is the only one that does. The screen prints your own first company id for the other account to
+paste into *its* probe. If the second account can read it, isolation does not hold.
+`docs/two-account-walkthrough.md` is the script, including the trap that both accounts sharing a
+practice makes that row fail *correctly* — the second account has to be removed from the practice
+first for the test to mean anything.
+
+### The checker is tested even though the walkthrough is not
+**12 assertions and 4 mutations.** The database is stubbed and every verdict the check can reach is
+driven from a controlled answer: unanchored companies, a foreign row, an orphan register row, a
+viewer refused by policy vs by constraint, a member wrongly refused, the probe both ways, and no
+organisation at all. **A check nobody has watched fail is a check nobody should trust** — and this
+one is a tenant-isolation proof a customer will rely on, so it earns the coverage twice over.
+
+Suite **233 → 246**, mutations **37 → 41 caught, 0 missed**.
+
+### Line endings cost four attempts today
+Twice a shell heredoc turned `\n` inside a JavaScript string into a real newline, breaking the
+file — CLAUDE.md §6's recurring failure. Then a patch script written with CRLF would not match a
+target file written with LF, in the opposite direction. **Write patch scripts with the Write tool,
+prefer single-line anchors, and normalise line endings on both sides before matching.**
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -1461,7 +1516,7 @@ multi-tenant isolation this product now sells on is asserted rather than demonst
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (233 assertions, run against `index.html` itself), `node tests/mutation.js` (37 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (246 assertions, run against `index.html` itself), `node tests/mutation.js` (41 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **No AI model auto-updates to current law.** Staying current = fetch fresh sources (RSS via rss2json/allorigins for SEBI/MCA/IBBI/RBI/IncomeTax) + human curation + (optionally) paid web-search. Vetted human templates + AI drafting is the right model.
 - **Drafting quality:** resolution/notice prompts (`RES_SYS`, `DOC_SYS`) were tuned to a senior-CS standard (exact sub-section citations with read-with clauses, SEBI LODR cross-refs, full RESOLVED THAT/FURTHER THAT cascade, standard severally-authorised CS clause, Certified True Copy headers, Section 102 explanatory statements, MCA form+deadline line). There's an anti-reasoning guard telling the model to output ONLY the final document (some free models leaked their chain-of-thought). Keep these standards.
 - **Child/again:** all AI legal output must carry a "verify on MCA/SEBI portal before filing" caveat — the CS signs and carries professional responsibility.
@@ -1470,7 +1525,7 @@ multi-tenant isolation this product now sells on is asserted rather than demonst
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v166.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v167.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

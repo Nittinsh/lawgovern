@@ -554,6 +554,10 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 .lg-org-role{font-size:10.5px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;}
 .lg-org-sel{font-size:12.5px;font-weight:600;color:var(--navy);border:1px solid var(--line);border-radius:8px;padding:6px 9px;background:#fff;max-width:190px;}
 .team-org{display:flex;align-items:center;gap:12px;font-size:15px;color:var(--navy);flex-wrap:wrap;}
+.acc-pass{font-size:10.5px;font-weight:700;color:var(--ok);background:rgba(16,185,129,.1);padding:2px 8px;border-radius:99px;text-transform:uppercase;letter-spacing:.04em;}
+.acc-fail{font-size:10.5px;font-weight:700;color:var(--crit);background:rgba(239,68,68,.1);padding:2px 8px;border-radius:99px;text-transform:uppercase;letter-spacing:.04em;}
+.acc-warn{font-size:10.5px;font-weight:700;color:var(--warn);background:rgba(245,158,11,.12);padding:2px 8px;border-radius:99px;text-transform:uppercase;letter-spacing:.04em;}
+.acc-id{background:var(--bg);padding:3px 8px;border-radius:5px;user-select:all;font-size:11px;}
 .team-rolechip{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--blue);background:var(--blue-wash);padding:3px 9px;border-radius:99px;}
 .team-role{font-size:12px;padding:5px 8px;max-width:150px;}
 .team-x{font-size:11.5px;font-weight:600;color:var(--crit);cursor:pointer;}
@@ -1492,7 +1496,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v166">
+      <meta id="build-version" content="v167">
     </div>
   </div>
   <div class="cc-search">
@@ -10431,6 +10435,173 @@ async function teamCancelInvite(id){
   await teamLoad(); renderTeam();
 }
 
+// ═══════════════════════════════════════════════════
+// ACCESS CHECK — runs as the signed-in user
+// ═══════════════════════════════════════════════════
+// tests/backend.test.js runs anonymously: it proves nothing gets in. It cannot
+// prove the right people get through, because that needs a session, and a
+// session needs a password that the test tooling must never hold.
+//
+// So it runs here instead, where the session already exists. Read-only, except
+// one insert probe whose foreign key cannot resolve — so whether the policy
+// refuses it or lets it through, nothing is written either way.
+//
+// GAP_PROBE below is the cross-tenant test, and it is the only one that needs
+// two accounts: one person reads their own company id off this screen, the
+// other pastes it in. If the second account can see it, the isolation this
+// product is sold on does not hold.
+
+var ACC_RESULT = null, ACC_BUSY = false;
+
+function accRow(name, state, detail){
+  return {name:name, state:state, detail:detail || ''};
+}
+
+async function lgAccessCheck(probeId){
+  var out = [], GHOST = '00000000-0000-0000-0000-000000000000';
+  if(!supaClient || !CURRENT_USER){
+    return [accRow('Signed in', 'fail', 'No session. Sign in first.')];
+  }
+  out.push(accRow('Signed in', 'pass', CURRENT_USER.email || CURRENT_USER.id));
+
+  // ── 1. am I in a practice, and as what ────────────────────────
+  if(!CURRENT_ORG){
+    out.push(accRow('Member of a practice', 'fail',
+      'You are in no organisation. Either db/025 has not run, or the backfill ' +
+      'missed your account. Everything below is running on the legacy ' +
+      'single-user rule.'));
+  } else {
+    out.push(accRow('Member of a practice', 'pass',
+      (lgCurrentOrg()||{}).name + ' — ' + lgRoleLabel(CURRENT_ROLE)));
+  }
+
+  // ── 2. did the backfill anchor every company ──────────────────
+  // This is the question tests/backend.test.js names and cannot answer.
+  var comp = null;
+  try{
+    comp = await supaClient.from('companies').select('id,name,org_id,user_id');
+  }catch(e){ comp = {error:e}; }
+  if(!comp || comp.error){
+    out.push(accRow('Read your companies', 'fail',
+      (comp && comp.error && comp.error.message) || 'query failed'));
+  } else {
+    var rows = comp.data || [];
+    var unanchored = rows.filter(function(r){ return !r.org_id; });
+    out.push(accRow('Read your companies', 'pass', rows.length + ' visible'));
+    out.push(accRow('Every company carries an organisation',
+      unanchored.length === 0 ? 'pass' : 'fail',
+      unanchored.length === 0
+        ? 'all ' + rows.length + ' anchored'
+        : unanchored.length + ' of ' + rows.length + ' have no org_id — they are ' +
+          'visible only to you and cannot be shared: ' +
+          unanchored.slice(0,3).map(function(r){ return r.name; }).join(', ')));
+
+    // ── 3. is anything visible that belongs to another practice ─
+    if(CURRENT_ORG){
+      var mine = {};
+      CURRENT_ORGS.forEach(function(o){ mine[String(o.id)] = true; });
+      var foreign = rows.filter(function(r){ return r.org_id && !mine[String(r.org_id)]; });
+      out.push(accRow('Nothing visible from a practice you are not in',
+        foreign.length === 0 ? 'pass' : 'fail',
+        foreign.length === 0 ? 'clean'
+          : foreign.length + ' row(s) leaked from another organisation'));
+    }
+  }
+
+  // ── 4. registers follow the company ───────────────────────────
+  try{
+    var d = await supaClient.from('directors').select('id,company_id').limit(50);
+    if(d.error) throw d.error;
+    var ids = {};
+    ((comp && comp.data) || []).forEach(function(r){ ids[String(r.id)] = true; });
+    var orphan = (d.data||[]).filter(function(r){ return r.company_id && !ids[String(r.company_id)]; });
+    out.push(accRow('Register rows belong to a company you can see',
+      orphan.length === 0 ? 'pass' : 'fail',
+      orphan.length === 0 ? (d.data||[]).length + ' director rows checked'
+        : orphan.length + ' row(s) reference a company you cannot see'));
+  }catch(e){
+    out.push(accRow('Register rows belong to a company you can see', 'warn',
+      String(e.message||e).slice(0,80)));
+  }
+
+  // ── 5. does the database agree with the UI about your role ────
+  // An insert whose foreign key cannot resolve. A viewer should be stopped by
+  // the POLICY; anyone else should get past the policy and be stopped by the
+  // CONSTRAINT. Those are different errors, which is what makes this a test.
+  // Nothing is written on either path.
+  try{
+    var probe = await supaClient.from('companies')
+      .insert({name:'__access_check__', user_id: GHOST, org_id: GHOST}).select();
+    var msg = String((probe.error && probe.error.message) || '');
+    var byPolicy = /row-level security|violates row-level/i.test(msg);
+    var byConstraint = /foreign key|violates foreign/i.test(msg);
+    if(lgCanWrite()){
+      out.push(accRow('The database agrees you may write',
+        byConstraint || !probe.error ? 'pass' : (byPolicy ? 'fail' : 'warn'),
+        byConstraint ? 'reached the constraint, so the policy allowed it'
+          : byPolicy ? 'the policy refused a write your role should allow'
+          : msg.slice(0,80) || 'no error — check nothing was inserted'));
+    } else {
+      out.push(accRow('The database refuses a viewer write',
+        byPolicy ? 'pass' : 'fail',
+        byPolicy ? 'refused by policy, as it should be'
+          : 'NOT refused by policy: ' + (msg.slice(0,80) || 'the insert was allowed')));
+    }
+  }catch(e){
+    out.push(accRow('Write permission matches your role', 'warn', String(e.message||e).slice(0,80)));
+  }
+
+  // ── 6. is maker-checker actually reachable ────────────────────
+  try{
+    var cs = await supaClient.from('compliance_status')
+      .select('id,recorded_by,check_state').not('recorded_by','is',null).limit(50);
+    var recs = (cs && cs.data) || [];
+    var me = String((CURRENT_USER && CURRENT_USER.email) || '').toLowerCase();
+    var byOthers = recs.filter(function(r){
+      return String(r.recorded_by||'').toLowerCase() !== me && r.check_state !== 'verified';
+    });
+    out.push(accRow('Maker-checker has something to check',
+      recs.length === 0 ? 'warn' : (byOthers.length ? 'pass' : 'warn'),
+      recs.length === 0 ? 'no filings recorded yet — record one to test this'
+        : byOthers.length ? byOthers.length + ' recorded by someone else, awaiting confirmation'
+        : 'every recorded filing is your own; a second person must record one'));
+  }catch(e){
+    out.push(accRow('Maker-checker has something to check', 'warn', String(e.message||e).slice(0,80)));
+  }
+
+  // ── 7. the cross-tenant probe ─────────────────────────────────
+  // The only check that needs two accounts. Paste the other account's company
+  // id; seeing it means the isolation does not hold.
+  if(probeId){
+    try{
+      var p = await supaClient.from('companies').select('id,name').eq('id', probeId);
+      var seen = (p && p.data) || [];
+      out.push(accRow('Cross-tenant: that company is NOT visible to you',
+        seen.length === 0 ? 'pass' : 'fail',
+        seen.length === 0 ? 'returned nothing, which is correct'
+          : 'LEAKED: you can read "' + (seen[0].name||'') + '" from another practice'));
+    }catch(e){
+      out.push(accRow('Cross-tenant probe', 'warn', String(e.message||e).slice(0,80)));
+    }
+  }
+
+  return out;
+}
+
+async function accRun(){
+  ACC_BUSY = true; renderTeam();
+  var probe = (document.getElementById('acc-probe')||{}).value || '';
+  try{ ACC_RESULT = await lgAccessCheck(probe.trim()); }
+  catch(e){ ACC_RESULT = [accRow('Access check', 'fail', String(e.message||e))]; }
+  ACC_BUSY = false; renderTeam();
+}
+
+// The id another account pastes into its own probe.
+function accSampleId(){
+  if(typeof CLIENTS === 'undefined' || !CLIENTS.length) return null;
+  return CLIENTS[0].id;
+}
+
 function renderTeam(){
   var root = document.getElementById('team-root');
   if(!root) return;
@@ -10513,6 +10684,46 @@ function renderTeam(){
       'admin can invite people or change roles. You are a '+lgRoleLabel(CURRENT_ROLE)+'.'+
       '</div></div></div>';
 
+  // ── the access check ────────────────────────────────────────
+  var accRows = ACC_RESULT ? ACC_RESULT.map(function(r){
+    var chip = r.state === 'pass' ? '<span class="acc-pass">pass</span>'
+             : r.state === 'fail' ? '<span class="acc-fail">FAIL</span>'
+             : '<span class="acc-warn">check</span>';
+    return '<tr><td>'+r.name+'</td><td>'+chip+'</td>'+
+      '<td class="calc-sub" style="padding-top:7px;">'+entEsc(r.detail)+'</td></tr>';
+  }).join('') : '';
+  var failed = ACC_RESULT ? ACC_RESULT.filter(function(r){ return r.state==='fail'; }).length : 0;
+  var sample = accSampleId();
+
+  var accBox = '<div class="cc-card"><div class="cc-card-h">Access check</div>'+
+    '<div class="cc-card-b">'+
+    '<div class="calc-note">Runs as <b>you</b>, against the live database. Read-only, apart from '+
+    'one insert whose foreign key cannot resolve &mdash; so whether the policy refuses it or lets '+
+    'it through, nothing is written. This is the half of the backend suite that needs a signed-in '+
+    'session, which is why it lives here rather than in <span class="calc-mono">tests/</span>.'+
+    '</div>'+
+    '<div class="calc-f" style="margin-top:14px;">'+
+    '<label class="calc-l" for="acc-probe">Cross-tenant probe &mdash; optional'+
+    '<span class="calc-cite">Paste a company id from ANOTHER account. You should not be able to '+
+    'see it.</span></label>'+
+    '<input id="acc-probe" class="lg-field" type="text" placeholder="paste a company id from the '+
+    'other account" value=""></div>'+
+    (sample ? '<div class="calc-base-line">Your own first company id, for the other account to '+
+      'paste into <i>their</i> probe: <span class="calc-mono acc-id">'+entEsc(sample)+
+      '</span></div>' : '')+
+    '<div class="cc-btn-primary" onclick="accRun()" style="display:inline-block;">'+
+    (ACC_BUSY ? 'Running&hellip;' : 'Run access check')+'</div>'+
+    (ACC_RESULT
+      ? '<table class="brd-tbl calc-tbl" style="margin-top:16px;"><tbody>'+accRows+'</tbody></table>'+
+        (failed
+          ? '<div class="calc-warn"><b>'+failed+' check'+(failed===1?'':'s')+' failed.</b> '+
+            'Anything marked FAIL above is a real gap in isolation or in the migration &mdash; '+
+            'not a cosmetic issue.</div>'
+          : '<div class="calc-ok">Every check passed for this account. The cross-tenant row only '+
+            'means something if you pasted an id from a different account.</div>')
+      : '')+
+    '</div></div>';
+
   root.innerHTML = head +
     '<div class="cc-card"><div class="cc-card-b">'+
       '<div class="team-org"><b>'+entEsc(org.name||'Practice')+'</b>'+
@@ -10525,7 +10736,7 @@ function renderTeam(){
     '<div class="cc-card"><div class="cc-card-h">People ('+(TEAM_MEMBERS||[]).length+')</div>'+
     '<div class="cc-card-b"><table class="brd-tbl calc-tbl"><thead><tr><th>Person</th>'+
     '<th>Role</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div></div>'+
-    invites + inviteBox +
+    invites + inviteBox + accBox +
     '<div class="cc-card"><div class="cc-card-h">What this changed</div><div class="cc-card-b">'+
     '<div class="calc-ok"><b>Maker-checker works now.</b> Recording a filing and confirming it '+
     'are separate acts by different people, and the database enforces that the checker is not '+

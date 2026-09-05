@@ -859,6 +859,100 @@ describe('organisation scope');
         withOrg(null, () => app.lgScopeToOrg(rows).length), 4);
 }
 
+// ── 11i. The access check itself (§3c) ──────────────────────
+// lgAccessCheck runs against a live session, which the suite has none of. So
+// the DATABASE is stubbed and the CHECK is what gets tested — every verdict it
+// can reach, driven from a controlled answer. A check nobody has watched fail
+// is a check nobody should trust.
+let ACCESS_CHECKS = null;
+describe('access check');
+{
+  const stub = (cfg) => {
+    const chain = (rows) => {
+      const o = { select: () => o, eq: (c, v) => chain((rows||[]).filter(r => String(r[c]) === String(v))),
+                  limit: () => o, not: () => o,
+                  then: (res) => res({ data: rows || [], error: null }) };
+      return o;
+    };
+    app.supaClient = {
+      from(t){
+        return { select: () => chain(cfg[t] || []),
+                 insert: () => ({ select: () => ({
+                   then: r => r({ data: null, error: cfg.__insertErr || null }) }) }) };
+      }
+    };
+  };
+  const FK  = { message: 'insert violates foreign key constraint "companies_org_id_fkey"' };
+  const RLS = { message: 'new row violates row-level security policy for table "companies"' };
+  const run = async (cfg, role, probe) => {
+    app.CURRENT_USER = { id: 'u-me', email: 'me@firm.com' };
+    app.CURRENT_ORGS = [{ id: 'org-A', name: 'A', role: role }];
+    app.CURRENT_ORG = 'org-A'; app.CURRENT_ROLE = role;
+    stub(cfg);
+    return await app.lgAccessCheck(probe);
+  };
+  const of = (rows, prefix) => (rows.filter(r => r.name.indexOf(prefix) === 0)[0] || {}).state;
+
+  const healthy = { companies: [{ id:'c1', name:'A', org_id:'org-A' }],
+                    directors: [{ id:'d1', company_id:'c1' }],
+                    compliance_status: [], __insertErr: FK };
+
+  // This file is CommonJS, so there is no top-level await. The block is defined
+  // here beside its fixtures and invoked by the runner at the foot of the file,
+  // which then reports. Anything else would report before these had finished.
+  ACCESS_CHECKS = async () => {
+    let r = await run(healthy, 'owner');
+    check('a healthy tenant passes the org check', of(r, 'Member of a practice'), 'pass');
+    check('and the anchoring check', of(r, 'Every company carries'), 'pass');
+    check('and sees nothing foreign', of(r, 'Nothing visible from'), 'pass');
+
+    // The backfill question tests/backend.test.js cannot reach.
+    r = await run(Object.assign({}, healthy, {
+      companies: [{ id:'c1', org_id:'org-A' }, { id:'c2', name:'B', org_id:null }] }), 'owner');
+    check('a company with no org_id fails', of(r, 'Every company carries'), 'fail');
+
+    // Cross-tenant leakage.
+    r = await run(Object.assign({}, healthy, {
+      companies: [{ id:'c1', org_id:'org-A' }, { id:'cX', name:'Other', org_id:'org-ZZZ' }] }), 'owner');
+    check('a row from another practice fails', of(r, 'Nothing visible from'), 'fail');
+
+    // A register row hanging off a company the user cannot see.
+    r = await run(Object.assign({}, healthy, {
+      directors: [{ id:'d1', company_id:'c1' }, { id:'d2', company_id:'c-GONE' }] }), 'owner');
+    check('an orphan register row fails', of(r, 'Register rows belong'), 'fail');
+
+    // The subtle one. A viewer's write stopped by a CONSTRAINT is not a pass:
+    // it means the policy let it through and a foreign key happened to catch
+    // it. Only a refusal by the policy is a refusal.
+    r = await run(Object.assign({}, healthy, { __insertErr: RLS }), 'viewer');
+    check('a viewer refused by policy passes', of(r, 'The database refuses a viewer'), 'pass');
+    r = await run(Object.assign({}, healthy, { __insertErr: FK }), 'viewer');
+    check('a viewer stopped only by a constraint FAILS',
+          of(r, 'The database refuses a viewer'), 'fail');
+
+    // A member must not be refused by the policy.
+    r = await run(Object.assign({}, healthy, { __insertErr: RLS }), 'member');
+    check('a member refused by policy fails', of(r, 'The database agrees you may write'), 'fail');
+    r = await run(Object.assign({}, healthy, { __insertErr: FK }), 'member');
+    check('a member reaching the constraint passes',
+          of(r, 'The database agrees you may write'), 'pass');
+
+    // The cross-tenant probe, both ways.
+    r = await run(healthy, 'owner', 'c-OTHER');
+    check('a probe id that is not visible passes', of(r, 'Cross-tenant'), 'pass');
+    r = await run(Object.assign({}, healthy, {
+      companies: [{ id:'c1', org_id:'org-A' }, { id:'c-OTHER', name:'Rival', org_id:'org-A' }] }),
+      'owner', 'c-OTHER');
+    check('a probe id that IS visible fails', of(r, 'Cross-tenant'), 'fail');
+
+    // Before db/025 there is no org, and that must be reported, not passed over.
+    app.CURRENT_ORG = null; app.CURRENT_ORGS = []; app.CURRENT_ROLE = null;
+    stub(healthy);
+    r = await app.lgAccessCheck();
+    check('no organisation at all is reported', of(r, 'Member of a practice'), 'fail');
+  };
+}
+
 // ── 12. Dashboard invariants ────────────────────────────────
 describe('dashboard invariants');
 {
@@ -881,4 +975,11 @@ describe('dashboard invariants');
         Object.values(byLaw).reduce((a, b) => a + b, 0), s.totalObligations);
 }
 
-process.exit(report());
+// The access-check assertions are async — they drive a stubbed database through
+// a promise. Everything above is synchronous, so the report has to wait for
+// them or it would print before they had run.
+(async function(){
+  try{ if(ACCESS_CHECKS) await ACCESS_CHECKS(); }
+  catch(e){ console.log('access check block threw: ' + (e && e.message)); process.exit(1); }
+  process.exit(report());
+})();
