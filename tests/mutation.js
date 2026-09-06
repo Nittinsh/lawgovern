@@ -250,6 +250,22 @@ const MUTATIONS = [
 
   // ── the SEBI-specified group (§3e) ──────────────────────────
 
+  // ── the export (§3h) ────────────────────────────────────────
+  // An export that drops a table silently is worse than none: it looks like a
+  // backup. Both mutations make the drop invisible rather than breaking it.
+
+  { name: 'a table that fails to read is skipped instead of recorded (§3h)',
+    from: "      out.errors[spec.t] = String((e && e.message) || e);",
+    to:   "      out.errors[spec.t] = undefined;" },
+
+  { name: 'a failed table is counted as zero rows rather than unknown (§3h)',
+    from: "      out.counts[spec.t] = null;",
+    to:   "      out.counts[spec.t] = 0;" },
+
+  { name: 'the export stops saying what it leaves out (§3h)',
+    from: "      notIncluded: [",
+    to:   "      notIncluded: [].concat([" },
+
   // ── Integrated Filing (§3f) ─────────────────────────────────
   // Governance is 30 days from the quarter end, Financial is 45. Swapping them
   // gives every affected row a completely plausible date that is a fortnight

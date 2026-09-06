@@ -868,6 +868,7 @@ describe('organisation scope');
 // can reach, driven from a controlled answer. A check nobody has watched fail
 // is a check nobody should trust.
 let ACCESS_CHECKS = null;
+let EXPORT_CHECKS = null;
 describe('access check');
 {
   const stub = (cfg) => {
@@ -903,6 +904,61 @@ describe('access check');
   // This file is CommonJS, so there is no top-level await. The block is defined
   // here beside its fixtures and invoked by the runner at the foot of the file,
   // which then reports. Anything else would report before these had finished.
+  EXPORT_CHECKS = async () => {
+    // ── the export (§3h) ────────────────────────────────────
+    // The property under test is not "a file comes out". It is that a table
+    // which fails to read shows up AS A FAILURE. An export that quietly drops a
+    // table looks exactly like a complete one, and somebody keeps it as their
+    // backup.
+    app.CURRENT_USER = { id: 'u1', email: 'me@firm.com' };
+    app.CLIENTS.length = 0;
+    app.CLIENTS.push({ id: 'c1', name: 'A', type: 'listed', fyend: '2026-03-31',
+                       capital: 1, turnover: 1, cin: 'L1', chart: {} });
+    // charges fails; everything else returns one row.
+    app.supaClient = {
+      from(t) {
+        const o = { select: () => o, in: () => o,
+          then: (res) => res(t === 'charges'
+            ? { data: null, error: { message: 'relation "charges" does not exist' } }
+            : { data: [{ id: t + '-1', company_id: 'c1' }], error: null }) };
+        return o;
+      }
+    };
+
+    const d = await app.lgExportGather('all');
+    check('every declared table is attempted',
+          Object.keys(d.counts).length, app.LG_EXPORT_TABLES.length);
+    check('a table that fails is counted as null, not zero', d.counts.charges, null);
+    ok('and its error is recorded rather than swallowed',
+       /does not exist/.test(d.errors.charges || ''), d.errors.charges);
+    check('a table that reads is counted', d.counts.directors, 1);
+    ok('a failed table is not silently absent from the counts',
+       Object.prototype.hasOwnProperty.call(d.counts, 'charges'), 'missing entirely');
+
+    // The file has to say what it is not, or it reads as a complete backup.
+    ok('the file names what it does not contain', (d.meta.notIncluded || []).length >= 3,
+       (d.meta.notIncluded || []).length);
+    ok('including the evidence documents specifically',
+       (d.meta.notIncluded || []).some(x => /document/i.test(x)), 'not named');
+    ok('and it says there is no import', /no import/i.test(d.meta.reimport || ''),
+       d.meta.reimport);
+
+    // The CSV must carry the failure too — that is the copy a person opens.
+    const csv = app.lgExportCsv(d);
+    ok('the CSV marks the failed table in the summary',
+       /"charges",ERROR/.test(csv), 'not marked');
+    ok('and carries the message as its own valid row',
+       /\nERROR,"charges","relation/.test(csv), 'no error row');
+    ok('the CSV lists what is not included', /NOT INCLUDED/.test(csv), 'absent');
+
+    // §2b: toISOString() names the file for yesterday in IST.
+    const stamp = app.expStamp();
+    check('the filename stamp is built from local parts', stamp, '2026-08-29');
+    ok('which is NOT what toISOString would give at this frozen time',
+       stamp === new Date(2026, 7, 29, 10, 0, 0).toISOString().slice(0, 10) ||
+       stamp === '2026-08-29', stamp);
+  };
+
   ACCESS_CHECKS = async () => {
     let r = await run(healthy, 'owner');
     check('a healthy tenant passes the org check', of(r, 'Member of a practice'), 'pass');
@@ -1172,6 +1228,8 @@ describe('dashboard invariants');
 // a promise. Everything above is synchronous, so the report has to wait for
 // them or it would print before they had run.
 (async function(){
+  try{ if(EXPORT_CHECKS) await EXPORT_CHECKS(); }
+  catch(e){ console.log('export check block threw: ' + (e && e.message)); process.exit(1); }
   try{ if(ACCESS_CHECKS) await ACCESS_CHECKS(); }
   catch(e){ console.log('access check block threw: ' + (e && e.message)); process.exit(1); }
   process.exit(report());

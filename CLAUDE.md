@@ -1686,6 +1686,52 @@ The audit then covers it with no further work.
 
 ---
 
+## 3h. EXPORT (v171) — and why billing was not built
+
+**Administration → Settings → Export your data.**
+
+There was one CSV of one table. Thirty companies' registers, filing evidence, applicability
+decisions and rule sign-offs could go in and never come out. That is the owner's own record of
+client compliance, and it mattered **before** a customer existed, not after.
+
+### The property under test is not "a file comes out"
+It is that **a table which fails to read shows up as a failure.** An export that quietly drops a
+table looks exactly like a complete one, and somebody keeps it as their backup.
+
+So: every table is **counted in the file and on the screen**, a failed table is counted as `null`
+(unknown) rather than `0` (empty), its error is written **into** the file rather than skipped, and
+the panel says how many could not be read. A silent drop shows as a missing row in a table of
+sixteen.
+
+### It says what it is not
+Named at the top of the file and on the screen:
+- **the evidence documents themselves** — they are files in Storage, not rows. Their paths are
+  included so they can be found; the PDFs are not in the file.
+- **the rule corpus** — it ships inside the app, not the database. This is your data, not the law.
+- **anything RLS hides from you** — an export can only hold what your own account can read.
+
+### There is no import, deliberately
+This is a record and a hand-off format, not a restore button. Writing rows back into a live
+compliance database from a file, with nobody reading it first, is not something this should offer.
+
+### A slip fixed on the way past
+`cuExport` named its file with `toISOString()` — **§2b**, which in IST names it for *yesterday*. A
+small lie, and a bad one to find on a backup. `expStamp()` builds from local parts and the suite
+asserts it.
+
+### Billing was NOT built, and that is not me narrowing the ask
+A working billing integration needs three things only the owner has: **the pricing model**
+(per company? per user? flat?), **the provider** (Razorpay, for an Indian merchant), and
+**merchant credentials**. Without them what ships is a billing screen that takes no money — the
+"dummy item" the standing constraints ban outright.
+
+It is also the wrong order. Billing before a customer is speculative work; export is useful the day
+thirty companies go in. Say the model and the provider and it is a short job.
+
+Suite **299 → 312**, mutations **49 → 52 caught, 0 missed**.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -1754,7 +1800,7 @@ The audit then covers it with no further work.
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (299 assertions, run against `index.html` itself), `node tests/mutation.js` (49 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (312 assertions, run against `index.html` itself), `node tests/mutation.js` (52 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **No AI model auto-updates to current law.** Staying current = fetch fresh sources (RSS via rss2json/allorigins for SEBI/MCA/IBBI/RBI/IncomeTax) + human curation + (optionally) paid web-search. Vetted human templates + AI drafting is the right model.
 - **Drafting quality:** resolution/notice prompts (`RES_SYS`, `DOC_SYS`) were tuned to a senior-CS standard (exact sub-section citations with read-with clauses, SEBI LODR cross-refs, full RESOLVED THAT/FURTHER THAT cascade, standard severally-authorised CS clause, Certified True Copy headers, Section 102 explanatory statements, MCA form+deadline line). There's an anti-reasoning guard telling the model to output ONLY the final document (some free models leaked their chain-of-thought). Keep these standards.
 - **Child/again:** all AI legal output must carry a "verify on MCA/SEBI portal before filing" caveat — the CS signs and carries professional responsibility.
@@ -1763,7 +1809,7 @@ The audit then covers it with no further work.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v170.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v171.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

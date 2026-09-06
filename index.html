@@ -1496,7 +1496,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v170">
+      <meta id="build-version" content="v171">
     </div>
   </div>
   <div class="cc-search">
@@ -13091,6 +13091,182 @@ function setGet(k, dflt){
 }
 function setPut(k, v){ try{ localStorage.setItem(k, v); }catch(e){} }
 
+// ═══════════════════════════════════════════════════
+// EXPORT — the data, back out
+// ═══════════════════════════════════════════════════
+// One CSV of one table was the whole of it. Thirty companies' registers, filing
+// evidence, applicability decisions and rule sign-offs could go in and never
+// come out. That is the owner's own record of client compliance.
+//
+// The rule this follows: an export that quietly omits a table is WORSE than no
+// export, because it looks like a backup. Every table is counted in the file
+// and on the screen; a table that fails to read is recorded as an error rather
+// than skipped; and what is deliberately absent is named at the top of the file.
+
+// Every table the app owns. Registers are scoped by company; the rest are not.
+var LG_EXPORT_TABLES = [
+  {t:'companies',             by:'id'},
+  {t:'compliance_status',     by:'company_id'},
+  {t:'directors',             by:'company_id'},
+  {t:'meetings',              by:'company_id'},
+  {t:'charges',               by:'company_id'},
+  {t:'allotments',            by:'company_id'},
+  {t:'beneficial_interests',  by:'company_id'},
+  {t:'designated_persons',    by:'company_id'},
+  {t:'upsi_events',           by:'company_id'},
+  {t:'upsi_access',           by:'company_id'},
+  {t:'pre_clearances',        by:'company_id'},
+  {t:'material_events',       by:'company_id'},
+  {t:'internal_compliances',  by:null},
+  {t:'internal_compliance_log', by:null},
+  {t:'rule_verifications',    by:null},
+  {t:'compliance_audit',      by:null}
+];
+
+var EXP_BUSY = false, EXP_RESULT = null;
+
+// Dates from local parts. toISOString() shifts back a day in IST — §2b — and a
+// file named for yesterday is a small lie in a backup.
+function expStamp(){
+  var d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' +
+         String(d.getDate()).padStart(2,'0');
+}
+
+function expScopeIds(scope){
+  if(typeof CLIENTS === 'undefined' || !CLIENTS.length) return [];
+  if(scope === 'all') return CLIENTS.map(function(c){ return c.id; });
+  return CLIENTS.filter(function(c){ return String(c.id) === String(scope); })
+                .map(function(c){ return c.id; });
+}
+
+async function lgExportGather(scope){
+  var ids = expScopeIds(scope);
+  var out = {
+    meta: {
+      exportedAt: new Date().toString(),
+      exportedBy: (CURRENT_USER && CURRENT_USER.email) || 'unknown',
+      organisation: (typeof lgCurrentOrg === 'function' && (lgCurrentOrg()||{}).name) || null,
+      appVersion: (document.getElementById('build-version')||{}).content || null,
+      scope: scope === 'all' ? 'every company you can see' : 'one company',
+      companyCount: ids.length,
+      // Named here so nobody reads this file as a complete backup.
+      notIncluded: [
+        'The evidence DOCUMENTS themselves. They are files in Supabase Storage, ' +
+        'not rows. Their paths appear in compliance_status.evidence_file so they ' +
+        'can be located, but the PDFs are not in this file.',
+        'The rule corpus (327 obligations). It ships inside the app, not in your ' +
+        'database — this file holds your data, not the law.',
+        'Anything row-level security hides from you. An export can only contain ' +
+        'what your own account can read.'
+      ],
+      reimport: 'There is no import. This is a record and a hand-off format, not ' +
+                'a restore button — writing rows back into a live compliance ' +
+                'database is not something to do from a file without a person ' +
+                'reading it first.'
+    },
+    counts: {},
+    errors: {},
+    tables: {}
+  };
+
+  if(!supaClient){
+    out.errors.__client = 'Not connected to the database.';
+    return out;
+  }
+
+  for(var i=0;i<LG_EXPORT_TABLES.length;i++){
+    var spec = LG_EXPORT_TABLES[i];
+    try{
+      var q = supaClient.from(spec.t).select('*');
+      if(spec.by && ids.length) q = q.in(spec.by, ids);
+      var r = await q;
+      if(r.error) throw r.error;
+      out.tables[spec.t] = r.data || [];
+      out.counts[spec.t] = (r.data || []).length;
+    }catch(e){
+      // Recorded, never skipped. A missing key in a backup must be visible.
+      out.errors[spec.t] = String((e && e.message) || e);
+      out.counts[spec.t] = null;
+    }
+  }
+  return out;
+}
+
+function expDownload(name, text, mime){
+  try{
+    var blob = new Blob([text], {type: (mime||'application/json') + ';charset=utf-8'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+    return true;
+  }catch(e){ alert('Could not start the download: ' + (e && e.message)); return false; }
+}
+
+async function lgExportRun(fmt){
+  var sel = document.getElementById('exp-scope');
+  var scope = sel ? sel.value : 'all';
+  EXP_BUSY = true; EXP_RESULT = null; renderSettings();
+  var data = null;
+  try{ data = await lgExportGather(scope); }
+  catch(e){ alert('Export failed: ' + (e && e.message)); EXP_BUSY = false; renderSettings(); return; }
+
+  var stamp = expStamp();
+  var label = scope === 'all' ? 'all-entities' : 'entity';
+  if(fmt === 'json'){
+    expDownload('lawgovern-export-' + label + '-' + stamp + '.json',
+                JSON.stringify(data, null, 1), 'application/json');
+  } else {
+    expDownload('lawgovern-export-' + label + '-' + stamp + '.csv',
+                lgExportCsv(data), 'text/csv');
+  }
+  EXP_RESULT = data;
+  EXP_BUSY = false;
+  renderSettings();
+}
+
+// One flat CSV across every table, so it opens in a spreadsheet. The JSON keeps
+// the structure; this keeps it readable.
+function lgExportCsv(data){
+  var esc = function(v){
+    if(v === null || v === undefined) return '';
+    var s = (typeof v === 'object') ? JSON.stringify(v) : String(v);
+    return '"' + s.replace(/"/g, '""') + '"';
+  };
+  var lines = [];
+  lines.push('LawGovern export,' + esc(data.meta.exportedAt) + ',' + esc(data.meta.exportedBy));
+  lines.push('');
+  lines.push('table,rows');
+  Object.keys(data.counts).forEach(function(t){
+    lines.push(esc(t) + ',' + (data.counts[t] === null ? 'ERROR' : data.counts[t]));
+  });
+  // A proper three-column row. The first version put the word ERROR outside the
+  // quotes, which is not valid CSV and would land in a spreadsheet as one
+  // mangled cell — in the row that matters most.
+  if(Object.keys(data.errors).length){
+    lines.push('');
+    lines.push('errors,table,message');
+    Object.keys(data.errors).forEach(function(t){
+      lines.push('ERROR,' + esc(t) + ',' + esc(data.errors[t]));
+    });
+  }
+  lines.push('');
+  Object.keys(data.tables).forEach(function(t){
+    var rows = data.tables[t] || [];
+    lines.push('## ' + t + ' (' + rows.length + ' rows)');
+    if(!rows.length){ lines.push('(none)'); lines.push(''); return; }
+    var cols = Object.keys(rows[0]);
+    lines.push(cols.map(esc).join(','));
+    rows.forEach(function(r){ lines.push(cols.map(function(c){ return esc(r[c]); }).join(',')); });
+    lines.push('');
+  });
+  lines.push('NOT INCLUDED');
+  (data.meta.notIncluded || []).forEach(function(n){ lines.push(esc(n)); });
+  return lines.join('\n');
+}
+
 function renderSettings(){
   var root = document.getElementById('set-root');
   if(!root) return;
@@ -13115,6 +13291,54 @@ function renderSettings(){
           'Turning this off means a single person can both record and rely on an entry.')+
         toggle('lg_hide_na', setGet('lg_hide_na','0')==='1', 'Hide obligations that do not apply',
           'Keeps the register to what is actually applicable to each entity.')+
+      '</div>'+
+    '</div>'+
+
+    // ── export ──────────────────────────────────────────────
+    '<div class="cc-card" style="max-width:720px;">'+
+      '<div class="cc-card-h"><h3>Export your data</h3></div>'+
+      '<div class="cc-card-b">'+
+        '<div class="set-n" style="margin-bottom:12px;">Everything this account can read: '+
+        'entities, every register, filing evidence, applicability decisions and rule sign-offs. '+
+        '<b>JSON</b> keeps the structure; <b>CSV</b> opens in a spreadsheet.</div>'+
+        '<div class="calc-f"><label class="calc-l" for="exp-scope">What to export</label>'+
+        '<select id="exp-scope" class="lg-field">'+
+          '<option value="all">Every entity you can see</option>'+
+          ((typeof CLIENTS !== 'undefined' ? CLIENTS : []).map(function(c){
+            return '<option value="'+entEsc(c.id)+'">'+entEsc(c.name)+'</option>';
+          }).join(''))+
+        '</select></div>'+
+        '<div class="cc-btn-primary" onclick="lgExportRun(' + lgArg('json') + ')" '+
+        'style="display:inline-block;margin-right:8px;">'+
+        (EXP_BUSY ? 'Working&hellip;' : 'Download JSON')+'</div>'+
+        '<div class="cc-btn-primary" onclick="lgExportRun(' + lgArg('csv') + ')" '+
+        'style="display:inline-block;">Download CSV</div>'+
+        (EXP_RESULT
+          ? '<table class="brd-tbl calc-tbl" style="margin-top:14px;"><thead><tr>'+
+            '<th>Table</th><th style="text-align:right">Rows</th></tr></thead><tbody>'+
+            Object.keys(EXP_RESULT.counts).map(function(t){
+              var n = EXP_RESULT.counts[t];
+              return '<tr><td class="calc-mono">'+entEsc(t)+'</td><td class="calc-amt">'+
+                (n === null
+                  ? '<span class="acc-fail">error</span>'
+                  : n)+'</td></tr>';
+            }).join('')+'</tbody></table>'+
+            (Object.keys(EXP_RESULT.errors).length
+              ? '<div class="calc-warn"><b>'+Object.keys(EXP_RESULT.errors).length+
+                ' table(s) could not be read</b> and are recorded as errors inside the file '+
+                'rather than left out of it: '+
+                entEsc(Object.keys(EXP_RESULT.errors).join(', '))+'</div>'
+              : '<div class="calc-ok">Every table read. The counts above are what the file '+
+                'contains &mdash; a table that silently vanished would show as a zero here.</div>')
+          : '')+
+        '<div class="calc-note"><b>What this does not contain.</b> The evidence '+
+        '<b>documents</b> themselves &mdash; they are files in storage, not rows; their paths '+
+        'are included so they can be found, but the PDFs are not. The rule corpus, which ships '+
+        'inside the app rather than your database. And anything row-level security hides from '+
+        'you: an export can only hold what your own account can read.</div>'+
+        '<div class="calc-note"><b>There is no import.</b> This is a record and a hand-off '+
+        'format, not a restore button. Writing rows back into a live compliance database from a '+
+        'file, without a person reading it first, is not something this should offer.</div>'+
       '</div>'+
     '</div>'+
 
@@ -14150,7 +14374,9 @@ function cuExport(){
   });
   var a=document.createElement('a');
   a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
-  a.download='compliance_universe_'+new Date().toISOString().substring(0,10)+'.csv';
+  // Local parts, not toISOString — §2b: in IST that names the file for
+  // yesterday, which is a small lie to find in a backup.
+  a.download='compliance_universe_'+expStamp()+'.csv';
   a.click();
 }
 
