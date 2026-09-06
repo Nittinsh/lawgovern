@@ -34,13 +34,26 @@ DETAIL = '--detail' in sys.argv
 SOURCES = {
     'SEBI LODR 2015': ('reference/sebi-lodr-2015/lodr.txt', 'Amended up to July 14, 2026'),
     'SEBI PIT Regulations 2015': ('reference/sebi-pit-2015/sebi pit.txt', 'Amended upto March 12, 2025'),
+    # STALE by over five years. Everything checked against it is reported
+    # separately and never blocks — see CA_STALE below.
+    'Companies Act 2013': ('reference/companies-act-2013/'
+                           'Companies Act 2013 as amended upto 01.04.2021_.txt',
+                           'As amended upto 01.04.2021 — STALE'),
 }
 
 CORPORA = [
     ('rules/lodr_periodic.json', 'rules', 'SEBI LODR 2015'),
     ('rules/lodr_events.json',   'events', 'SEBI LODR 2015'),
     ('rules/pit_master.json',    'rules', 'SEBI PIT Regulations 2015'),
+    ('rules/ca_master.json',     'rules', 'Companies Act 2013'),
 ]
+
+# The Act text predates every amendment since April 2021, so a section it does
+# not contain may be a wrong citation OR a provision added after that date.
+# This audit cannot tell those apart, so Companies Act results are reported and
+# never block. Failing every release over a five-year-old PDF would only teach
+# everyone to skip the gate.
+CA_STALE = 'Companies Act 2013'
 
 
 def load_text(path):
@@ -72,6 +85,37 @@ def cited_regs(s):
     out = []
     for m in re.finditer(r'\bReg(?:ulation)?s?\.?\s*(\d{1,3}[A-Z]{0,2})(?![A-Za-z0-9])', s, re.I):
         out.append(m.group(1).upper())
+    return out
+
+
+def sections_present(text):
+    """Section numbers that appear as a numbered provision in the Act."""
+    found = set()
+    # "198. Calculation of profits." — the heading form. Also the amended form
+    # "3[185. Loans to directors", where a footnote marker precedes the number,
+    # which is how s.185 first read as absent from a text that contains it in
+    # full.
+    for m in re.finditer(r'(?:^|\s|\[)(\d{1,3}[A-Z]{0,2})\s*\.\s*[A-Z]', text):
+        found.add(m.group(1).upper())
+    for m in re.finditer(r'\bsections?\s+(\d{1,3}[A-Z]{0,2})\b', text, re.I):
+        found.add(m.group(1).upper())
+    return found
+
+
+def cited_sections(s):
+    """The section numbers a rule's citation names.
+
+    The corpus writes these several ways — "Section 92", "Sections 12, 15",
+    "Sec 173(1)", "Sections 77-87". A range is expanded to its endpoints only:
+    asserting that every number between them is a real section would invent
+    citations the rule never made.
+    """
+    s = str(s or '')
+    out = []
+    for m in re.finditer(r'\bSec(?:tion)?s?\.?\s*([\d\s,\-]+[A-Z]{0,2})', s, re.I):
+        blob = m.group(1)
+        for n in re.finditer(r'(\d{1,3}[A-Z]{0,2})', blob):
+            out.append(n.group(1).upper())
     return out
 
 
@@ -127,7 +171,8 @@ for law, (path, asof) in SOURCES.items():
         print('%-28s COULD NOT READ: %s' % (law, e))
 
 print()
-present = {law: regs_present(t) for law, t in texts.items()}
+present = {law: (sections_present(t) if law == CA_STALE else regs_present(t))
+           for law, t in texts.items()}
 for law, s in present.items():
     print('%-28s %d numbered provisions located in the text' % (law, len(s)))
 print()
@@ -143,7 +188,7 @@ for path, key, law in CORPORA:
     for r in data.get(key, []):
         rid = r.get('id')
         cite = r.get('regulation') or ''
-        regs = cited_regs(cite)
+        regs = cited_sections(cite) if law == CA_STALE else cited_regs(cite)
         counts['checked'] += 1
 
         if not regs:
@@ -153,9 +198,18 @@ for path, key, law in CORPORA:
 
         missing = [g for g in regs if g not in present[law]]
         if missing:
-            counts['citation not found'] += 1
-            findings['cites a provision not found in the current text'].append(
-                (rid, cite, 'missing: ' + ', '.join(missing)))
+            if law == CA_STALE:
+                # Two possible causes and this cannot separate them: a wrong
+                # citation, or a provision inserted after April 2021. Reported,
+                # never blocking — see CA_STALE.
+                counts['not in the 2021 Act text'] += 1
+                findings['Companies Act — not in the 01.04.2021 text '
+                         '(wrong citation, or newer than the text)'].append(
+                    (rid, cite, 'missing: ' + ', '.join(missing)))
+            else:
+                counts['citation not found'] += 1
+                findings['cites a provision not found in the current text'].append(
+                    (rid, cite, 'missing: ' + ', '.join(missing)))
             continue
         counts['citation found'] += 1
 
@@ -185,7 +239,8 @@ for path, key, law in CORPORA:
                     sorted(want), regs[0], sorted(have))))
 
 print('─' * 70)
-for k in ['checked', 'citation found', 'citation not found', 'no citation',
+for k in ['checked', 'citation found', 'citation not found', 'not in the 2021 Act text',
+          'no citation',
           'schedule-derived (period lives in the Schedule)', 'period mismatch']:
     print('  %-24s %d' % (k, counts[k]))
 print('─' * 70)
@@ -197,6 +252,14 @@ for group, rows in findings.items():
         print('   %-38s %-26s %s' % (str(rid)[:37], str(cite)[:25], note[:70]))
     if not DETAIL and len(rows) > 12:
         print('   ... %d more (run with --detail)' % (len(rows) - 12))
+
+if counts['not in the 2021 Act text']:
+    print()
+    print('The Companies Act text here is amended only to 01.04.2021. A section it does')
+    print('not contain may be a wrong citation OR a provision added since — this cannot')
+    print('tell them apart, so those %d are reported and never block. They are the'
+          % counts['not in the 2021 Act text'])
+    print('worklist for the day a current Act reaches reference/.')
 
 print('\nEvery line above is a question for the CS, not a finding. A citation the')
 print('parser cannot locate may be a heading this extraction mangled; a period')

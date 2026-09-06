@@ -1633,6 +1633,59 @@ test did not.** Reg 17(3) ("periodically", no interval fixed) is the undated exa
 
 ---
 
+## 3g. THE COMPANIES ACT ENTERS THE AUDIT (v170)
+
+`python tools/rule_audit.py` checked **273 SEBI citations and zero Companies Act ones**. Fifty-four
+rules, every calculator and every checklist rest on that Act, and nothing had ever verified that the
+sections they cite exist.
+
+**Now 327 rules checked, 299 citations resolved, none unresolved.** The Act text yields **497
+numbered provisions**, and every section the corpus cites is in it.
+
+### An Act is not a regulation, and the parser has to know
+`sections_present` / `cited_sections` sit beside the regulation pair. Two differences that matter:
+- The corpus writes citations several ways — `Section 92`, `Sections 12, 15`, `Sec 173(1)`,
+  `Sections 77-87`. A **range is expanded to its endpoints only**: asserting that every number
+  between them is a real section would invent citations the rule never made.
+- An amended heading carries its footnote marker *before* the number — `3[185. Loans to directors`.
+  Requiring the number at a line start would have read s.185 as absent from a text that contains it
+  in full. Same trap as Reg 91C in §2v, mirrored.
+
+### Companies Act misses do not block, and that is deliberate
+The held Act is amended only to **01.04.2021**. A section it does not contain has **two possible
+causes and this audit cannot separate them**: a wrong citation, or a provision inserted since. So
+they get their own counter and never fail the gate.
+
+Blocking on them would fail every release over a five-year-old PDF, and the first thing anyone would
+do is stop running the gate — the same reasoning that keeps "schedule-derived" non-blocking (§2x).
+
+What it produces instead is what was missing: **a specific, per-rule list of what the 2021 text
+cannot confirm.** "The Act is stale" was a caveat nobody could act on. A list of section numbers is
+a worklist for the day a current Act reaches `reference/`. Today that list is **empty** — every
+cited section resolves.
+
+### The ten with no citation are correct
+`Companies (Accounts) Rules`, `PAS Rules 9A/9B`, `Rule 12A`, `Governance control`. They cite
+**Rules, not sections**, and a Rule is not in the Act. None of those Rules is in `reference/` —
+already recorded in §2c and §2n.
+
+### Getting a current Act — four routes, all closed
+- **India Code (old domain)** — migrated; every bitstream URL returns the Angular app shell.
+- **India Code (new domain)** — DSpace 9.1 REST API answers, but handle `123456789/2114` is a 404
+  after the migration and the search index surfaces only circulars and notifications, not the Act.
+- **MCA in the browser pane** — navigation denied.
+- **MCA via fetch** — HTTP 403.
+
+**Not guessed at.** The candidate PDFs include the original 2013 gazette, and downloading that would
+replace a 2021 text with a 2013 one — making every citation *worse*. The whole value depends on the
+replacement being newer, so an unverified download is not a partial win, it is a regression.
+
+**This needs one action that is not mine:** a consolidated Companies Act with amendments
+incorporated, saved into `reference/companies-act-2013/`, extracted with `pypdf` as §3f records.
+The audit then covers it with no further work.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -1701,7 +1754,7 @@ test did not.** Reg 17(3) ("periodically", no interval fixed) is the undated exa
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (299 assertions, run against `index.html` itself), `node tests/mutation.js` (49 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (299 assertions, run against `index.html` itself), `node tests/mutation.js` (49 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **No AI model auto-updates to current law.** Staying current = fetch fresh sources (RSS via rss2json/allorigins for SEBI/MCA/IBBI/RBI/IncomeTax) + human curation + (optionally) paid web-search. Vetted human templates + AI drafting is the right model.
 - **Drafting quality:** resolution/notice prompts (`RES_SYS`, `DOC_SYS`) were tuned to a senior-CS standard (exact sub-section citations with read-with clauses, SEBI LODR cross-refs, full RESOLVED THAT/FURTHER THAT cascade, standard severally-authorised CS clause, Certified True Copy headers, Section 102 explanatory statements, MCA form+deadline line). There's an anti-reasoning guard telling the model to output ONLY the final document (some free models leaked their chain-of-thought). Keep these standards.
 - **Child/again:** all AI legal output must carry a "verify on MCA/SEBI portal before filing" caveat — the CS signs and carries professional responsibility.
