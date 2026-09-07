@@ -556,22 +556,192 @@ describe('section 186 — loan and investment limit');
   check('and the limit follows it', M2.limit, 20 * CR);
 }
 
-describe('section 403 — additional fee for late filing');
+describe('section 403 — the fee, and the penalty beside it');
 {
   check('a filing made before the due date attracts none',
         app.calc403Fee('mgt7', '2026-10-30', '2026-10-20').late, false);
   const F = app.calc403Fee('mgt7', '2026-10-30', '2026-11-29');
   check('days late are counted from the due date', F.days, 30);
-  check('at one hundred rupees a day — first proviso to s.403(1)', F.fee, 3000);
-  check('and the section it is filed under is named', F.section, 92);
+  check('at one hundred rupees a day — first proviso to s.403(1)', F.fee.amount, 3000);
+  check('and the section it is filed under is named', F.fee.section, '92');
   check('AOC-4 is priced under section 137',
-        app.calc403Fee('aoc4', '2026-10-30', '2026-11-29').section, 137);
-
-  // The Fees Rules are not in reference/, so no other form may be priced.
-  const O = app.calc403Fee('other', '2026-10-30', '2026-11-29');
-  check('any other form is refused rather than guessed at', O.unpriced, true);
-  check('but it still says how late it is', O.days, 30);
+        app.calc403Fee('aoc4', '2026-10-30', '2026-11-29').fee.section, '137');
   check('missing dates are refused', !!app.calc403Fee('mgt7', '', '').error, true);
+  check('an unknown form is refused', !!app.calc403Fee('zzz', '2026-10-30', '2026-11-29').error, true);
+
+  // ── the FEE is refused for other forms; the PENALTY is not ──
+  // This is the whole change. The Fees Rules are not in reference/, so the fee
+  // still cannot be priced for any form but s.92 and s.137 — but the penalty is
+  // in the Act, and refusing THAT as well was the defect. Both halves are
+  // asserted, because asserting only the first is what let it stand.
+  const O = app.calc403Fee('other', '2026-10-30', '2026-11-29');
+  check('the additional fee is refused for any other form', O.feeUnpriced, true);
+  check('and no fee figure is invented', O.fee, undefined);
+  check('but the penalty IS computed', O.pen.co.amount, 10000 + 29 * 1000);
+  check('and it still says how late it is', O.days, 30);
+
+  // ── the maximum, which is the thing that was missing ──
+  const LONG = app.calc403Fee('mgt7', '2016-11-29', '2027-11-01');
+  check('the company penalty stops at two lakh — s.92(5)', LONG.pen.co.amount, 200000);
+  check('and reports that it was capped', LONG.pen.co.capped, true);
+  check('the officer penalty stops at fifty thousand', LONG.pen.off.amount, 50000);
+  check('the uncapped figure is kept, so the working can show what was cut',
+        LONG.pen.co.uncapped, 10000 + (LONG.days - 1) * 100);
+  check('the fee has NO maximum and keeps running past it',
+        LONG.fee.amount, LONG.days * 100);
+  check('the day the cap bit is named', LONG.pen.coCapDate, '2022-02-12');
+  check('a penalty short of its cap does not claim one', F.pen.co.capped, false);
+  check('and names no cap date', F.pen.coCapDate, undefined);
+
+  // ── "each day" vs "each day after the first" ──
+  // Both counts live inside s.137(3): the company pays for every day, the MD
+  // and CFO for each day after the first. One day of penalty separates them,
+  // and a uniform implementation gets one of the two legs wrong every time.
+  const A1 = app.calc403Fee('aoc4', '2026-10-30', '2026-10-31');   // one day late
+  check('s.137(3), company — the first day already carries a day of penalty',
+        A1.pen.co.amount, 10100);
+  check('s.137(3), officers — the first day carries none',
+        A1.pen.off.amount, 10000);
+  check('s.92(5) counts both legs after the first',
+        app.calc403Fee('mgt7', '2026-10-30', '2026-10-31').pen.co.amount, 10000);
+  check('and the leg records which count it used', A1.pen.co.dayFrom, 'each-day');
+  check('while its own officer leg records the other', A1.pen.off.dayFrom, 'after-first');
+
+  // ── the three shapes the Act actually uses ──
+  const CH = app.calc403Fee('chg', '2026-10-30', '2026-11-29');
+  check('s.86(1) is a fixed amount, not a daily one', CH.pen.co.kind, 'flat');
+  check('five lakh on the company from the first day', CH.pen.co.amount, 500000);
+  check('and it does not grow with the delay',
+        app.calc403Fee('chg', '2016-10-30', '2026-11-29').pen.co.amount, 500000);
+  check('a flat penalty claims no maximum', CH.pen.co.cap, undefined);
+
+  const AD = app.calc403Fee('adt1', '2026-10-30', '2026-11-29');
+  check('s.147(1) is a FINE, fixed by a court, not a penalty', AD.pen.kind, 'fine');
+  check('so it is stated as a range', AD.pen.co.min, 25000);
+  check('and its ceiling is the top of that range', AD.pen.co.max, 500000);
+  check('a fine has no computed amount, because there is not one to compute',
+        AD.pen.co.amount, undefined);
+
+  // ── every form in the table answers something ──
+  // The user's complaint was that choosing anything but two forms produced
+  // nothing. Every entry must now yield either a fee or a penalty.
+  let silent = [];
+  app.CALC_FEE_FORMS.forEach(f => {
+    const R = app.calc403Fee(f.key, '2026-10-30', '2026-11-29');
+    if (!R.fee && !R.pen) silent.push(f.key);
+  });
+  check('no form on the list answers with nothing', silent.join(','), '');
+  check('and only s.92 and s.137 filings carry a fee',
+        app.CALC_FEE_FORMS.filter(f => f.fee).map(f => f.key).join(','), 'mgt7,aoc4');
+
+  // Every penalty quotes the provision it comes from. A figure a client cannot
+  // trace is a figure the CS cannot sign — and these are figures a CS repeats
+  // to a director.
+  let unquoted = [];
+  app.CALC_FEE_FORMS.forEach(f => {
+    if (f.pen && (!f.pen.words || f.pen.words.length < 80)) unquoted.push(f.key);
+    if (f.pen && !f.pen.cite) unquoted.push(f.key + ':cite');
+  });
+  check('every penalty quotes its own provision', unquoted.join(','), '');
+
+  // s.450 is a residual and must say so, or it will be read as the answer for a
+  // form whose own section states a different one.
+  check('s.450 is flagged as a residual', app.calc403Form('other').pen.residual, true);
+  check('and the forms with their own penalty are not',
+        !!app.calc403Form('mgt7').pen.residual, false);
+}
+
+describe('section 403 — the due date comes from the register');
+{
+  // A hand-typed due date is a date with nothing behind it — the §2k defect
+  // arriving through the keyboard. The register already computes these.
+  const c = { id: 'FEE-1', name: 'Fee Test Pvt Ltd', type: 'private',
+              fyend: '2026-03-31', capital: 5e7, turnover: 2e8,
+              cin: 'U12345MH2015PTC000001' };
+
+  const m7 = app.calc403DueOptions(c, 'mgt7');
+  check('MGT-7 takes its due date from the register', m7.length, 1);
+  check('and it is the date the register shows', m7[0].due, '2026-11-29');
+  check('the section it came from travels with it', m7[0].section, 'Section 92');
+  check('so does the period it reports on', m7[0].periodEnd, '2026-03-31');
+
+  const a4 = app.calc403DueOptions(c, 'aoc4');
+  check('AOC-4 finds its own date', a4[0].due, '2026-10-30');
+  check('and the three s.137 rows sharing that date collapse to one', a4.length, 1);
+
+  // s.92(2) is the MGT-8 certification, not the annual return. Dating MGT-7
+  // from it would be right by accident today and wrong the moment the two
+  // diverge.
+  // Tested through the MATCHER, not through the output. The MGT-8
+  // certification falls due on the same day as the annual return, so a matcher
+  // widened onto s.92(2) produces output identical to the correct one — the
+  // mutation check found that blind spot, and it is the §3e lesson again: when
+  // the data cannot exercise a guard, test the guard's contract.
+  const hitsFor = (s) => app.CALC_FEE_FORMS.filter(f => f.match && f.match.test(s))
+                            .map(f => f.key).join(',');
+  check('s.92(2) is the MGT-8 certification, not the annual return',
+        hitsFor('Section 92(2); Rule 11(2)'), '');
+  check('and no MGT-7 option is offered under it',
+        m7.filter(o => /92\(2\)/.test(o.section)).length, 0);
+  check('nothing else of MGT-7s is hiding behind that date', m7[0].shared.length, 0);
+  // AOC-4 is the case where rows really do share one: the accounts row and the
+  // XBRL row both cite s.137 and fall due together. They collapse to a single
+  // option and the count is KEPT, so a row swallowed by the dedupe cannot go
+  // unnoticed the way the s.92(2) mutation did.
+  check('the two s.137 rows collapse to one option', a4.length, 1);
+  check('and the one it absorbed is counted', a4[0].shared.length, 1);
+  check('the consolidated row cites s.129(3) and is not absorbed into it',
+        hitsFor('Section 129(3); Accounts Rules'), '');
+
+  // An event-driven obligation is correctly undated until the event is
+  // recorded (§2m, §2n), so the calculator must find nothing rather than
+  // supply something.
+  check('an event-driven form offers no date until the event is recorded',
+        app.calc403DueOptions(c, 'chg').length, 0);
+  check('and the form with no section at all offers none',
+        app.calc403DueOptions(c, 'other').length, 0);
+  check('no company, no options', app.calc403DueOptions(null, 'mgt7').length, 0);
+
+  // §3j: a date computed from a year end nobody entered must carry the warning
+  // through to this screen too. It is the same date and the same assumption.
+  const noFy = Object.assign({}, c, { fyend: null });
+  check('an assumed year end is flagged on the due date offered here',
+        app.calc403DueOptions(noFy, 'mgt7')[0].fyAssumed, true);
+  check('and is not flagged when the year end is recorded',
+        !!m7[0].fyAssumed, false);
+
+  // The matchers decide which register rows belong to which form, and a
+  // mismatch would price one filing against another's deadline. Checked
+  // against the section strings the register actually emits.
+  const hits = hitsFor;
+  check('Section 92 is MGT-7 alone', hits('Section 92'), 'mgt7');
+  check('Section 137; XBRL Rules is AOC-4', hits('Section 137; XBRL Rules'), 'aoc4');
+  check('Section 129(3) is neither', hits('Section 129(3); Accounts Rules'), '');
+  check('Section 128 is not mistaken for section 12',
+        hits('Section 128; Accounts Rules'), '');
+  check('Sections 123-125 is not mistaken for section 12',
+        hits('Sections 123-125; IEPF Rules'), '');
+  check('Sections 12, 15 is INC-22', hits('Sections 12, 15'), 'inc22');
+  check('the register-derived Sec 82(1) reaches the charge forms',
+        hits('Sec 82(1)'), 'chg');
+  check('Sections 168, 170 is DIR-12', hits('Sections 168, 170 and rules'), 'dir12');
+  check('Section 96 belongs to no form on this screen', hits('Section 96'), '');
+
+  // No section string may resolve to two forms. A due date offered under two
+  // different penalties is a fork the screen has no way to show.
+  let ambiguous = [];
+  ['Section 92', 'Section 92(2); Rule 11(2)', 'Section 137; Accounts Rules',
+   'Section 137; XBRL Rules', 'Section 129(3); Accounts Rules',
+   'Section 117 and applicable exemptions', 'Sections 168, 170 and rules',
+   'Sections 39, 42; PAS Rules', 'Sections 77-87', 'Section 82', 'Sec 77(1)',
+   'Sec 82(1)', 'Section 89', 'Section 90; SBO Rules', 'Sections 12, 15',
+   'Section 405; Specified Companies Order as amended', 'Section 128; Accounts Rules',
+   'Sections 123-125; IEPF Rules', 'Section 139', 'Sec 139(1), third proviso',
+   'Section 96', 'Section 121', 'Section 134; Accounts Rules', 'Sec 118(1)',
+   'Sec 173(1)', 'Section 135; CSR Rules'].forEach(s => {
+    if (hits(s).split(',').filter(Boolean).length > 1) ambiguous.push(s);
+  });
+  check('no register section resolves to two forms', ambiguous.join(' | '), '');
 }
 
 describe('board composition — sections 149, 177, 178');

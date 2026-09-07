@@ -1943,6 +1943,96 @@ Suite **330 → 350**, mutations **56 → 61 caught, 0 missed**.
 
 ---
 
+## 3m. THE FEE WAS NOT THE LIABILITY (v175)
+
+Three criticisms of the late-filing calculator, from the owner, and all three
+are the same defect: **it computed one liability out of two.**
+
+> "why there is only two forms and in any other form there is nothing in this due
+> date should be automatically be there and in penalty part understand the law
+> act rules carefully somewhere it has also written subject to max amount"
+
+The card was headed **"Additional fee"**, the working was `days x 100`, and the
+tab was called "Late filing fee". A CS would have read that figure to a director
+and been believed.
+
+| | provision | the words | maximum |
+|---|---|---|---|
+| **FEE** | s.403(1), first proviso | "not less than one hundred rupees per day" &mdash; **s.92 and s.137 only** | **none stated** |
+| **PENALTY** | s.92(5), s.137(3), s.117(2)&hellip; | "ten thousand rupees and&hellip; a further penalty of one hundred rupees" | **stated, and it is what the owner spotted** |
+
+**s.403(2) settles it in terms.** The company and its officers are liable for the
+penalty *"without prejudice to the liability for the payment of fee and additional
+fee"*. The Act itself insists they are two liabilities; the screen had folded them
+into one. On MGT-7 filed 78 days late that is Rs 7,800 shown against Rs 7,800 of
+fee **plus Rs 17,700 on the company plus Rs 17,700 on every officer in default**.
+
+### The other two criticisms fall out of the same fix
+- **"only two forms"** &mdash; because only two forms have a *fee* the Act states.
+  Twelve now have a *penalty* it states, so twelve answer. The fee still refuses
+  to guess: the slabs are in the Companies (Registration Offices and Fees) Rules,
+  which are not in `reference/`.
+- **"the due date should automatically be there"** &mdash; the register already
+  computed it. `calc403DueOptions` reads it back, matched on the **section**,
+  which is what the register displays and therefore what the reader can check.
+
+### The one-day trap, inside one sub-section
+**s.137(3) uses both counts.** The company pays a further penalty *"for each day
+**during which** such failure continues"*; the MD and CFO pay *"for each day
+**after the first**"*. A uniform implementation is wrong by a day's penalty on
+one of the two legs, every time. Each leg carries the count its own provision
+states, and 108 days late reads Rs 20,800 against Rs 20,700 on screen.
+
+### Three shapes, because the Act uses three
+Flattening them into one "amount" column would report a court's discretion and an
+arithmetic result as if they were the same claim.
+- **continuing penalty** &mdash; base + daily rate, capped. The common case.
+- **flat** &mdash; s.86(1), charges: Rs 5 lakh on the company and Rs 50,000 on
+  every officer, **the same on day one as on day three hundred**, and no maximum
+  because it does not accrue. It is also the largest figure on the screen.
+- **fine** &mdash; s.147(1), ADT-1: *punishable with fine* of Rs 25,000 to Rs 5
+  lakh, imposed by a court. **No amount inside that range is calculable from a
+  number of days**, so the range is shown and a figure is not.
+
+`s.450` is offered for anything else and **says it is a residual** &mdash; it
+applies only where the Act fixes no penalty elsewhere, and read as the answer it
+would price a form whose own section says something different.
+
+### What the mutation check found that the assertions could not
+**"MGT-7 also matches s.92(2)"** was MISSED. s.92(2) is the *MGT-8 certification*,
+not the annual return &mdash; and it falls due **on the same day**, so the option
+list deduplicated the wrongly-matched row away and the broken build produced
+output identical to the correct one. The guard worked; nothing could see it work.
+
+Two changes, and both are the general lesson:
+1. **Test the guard's contract, not the data** (the §3e rule again) &mdash; the
+   matcher is now asserted directly against the section strings the register
+   emits, including the ones it must reject.
+2. **A dedupe must count what it swallows.** Rows sharing a due date still
+   collapse to one option, but the option says `+1 more on this date`. A silent
+   dedupe is how a wrong row hides inside a right one.
+
+### Coverage
+Suite **350 -> 406**, mutations **52 -> 73 caught, 0 missed, 0 skipped**. One
+older mutation retired: *"s.403 prices a form whose fee rules are not held"*
+tested `f[3]` on the old array shape and is superseded by a mutation that gives
+the residual form a fee outright.
+
+Four existing assertions were repointed (`F.fee` is an object now, beside `F.pen`);
+one changed its **meaning** and that is the deliverable &mdash; *"any other form is
+refused rather than guessed at"* used to assert nothing came back at all.
+Refusing the **fee** is still right; refusing the **penalty** was the bug. It
+asserts both halves now, because asserting only the first is what let it stand.
+
+### Stated on screen, not assumed
+Every penalty quotes its own provision verbatim (the suite refuses one that does
+not), the due date says whether it came from the register or from the keyboard,
+a date resting on an assumed year end carries the §3j warning through to this
+screen, and the Act in `reference/` is **amended only to 01.04.2021** &mdash; said
+on the card, not only in this file.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -2011,7 +2101,7 @@ Suite **330 → 350**, mutations **56 → 61 caught, 0 missed**.
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (350 assertions, run against `index.html` itself), `node tests/mutation.js` (61 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (406 assertions, run against `index.html` itself), `node tests/mutation.js` (73 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **No AI model auto-updates to current law.** Staying current = fetch fresh sources (RSS via rss2json/allorigins for SEBI/MCA/IBBI/RBI/IncomeTax) + human curation + (optionally) paid web-search. Vetted human templates + AI drafting is the right model.
 - **Drafting quality:** resolution/notice prompts (`RES_SYS`, `DOC_SYS`) were tuned to a senior-CS standard (exact sub-section citations with read-with clauses, SEBI LODR cross-refs, full RESOLVED THAT/FURTHER THAT cascade, standard severally-authorised CS clause, Certified True Copy headers, Section 102 explanatory statements, MCA form+deadline line). There's an anti-reasoning guard telling the model to output ONLY the final document (some free models leaked their chain-of-thought). Keep these standards.
 - **Child/again:** all AI legal output must carry a "verify on MCA/SEBI portal before filing" caveat — the CS signs and carries professional responsibility.
@@ -2020,7 +2110,7 @@ Suite **330 → 350**, mutations **56 → 61 caught, 0 missed**.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v174.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v175.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

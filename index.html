@@ -1505,7 +1505,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v174">
+      <meta id="build-version" content="v175">
     </div>
   </div>
   <div class="cc-search">
@@ -9217,7 +9217,7 @@ var CALC_TABS = [
   ['s123', 'Dividend'],
   ['s180', 'Borrowing powers'],
   ['dep',  'Is it a deposit?'],
-  ['fees', 'Late filing fee'],
+  ['fees', 'Late fee and penalty'],
   ['llpfee','LLP filing fee'],
   ['board','Board composition']
 ];
@@ -9364,27 +9364,331 @@ function calc186Limit(paidUp, freeReserves, secPremium, already, proposed){
 }
 
 // ── Section 403 — what a late filing costs ──────────────────────
-// The first proviso to s.403(1) fixes the additional fee for s.92 and s.137
-// filings at not less than one hundred rupees per day. Every other form's
-// multiplier lives in the Companies (Registration Offices and Fees) Rules,
-// which are NOT in reference/ — so this refuses to price them rather than
-// guessing. Same treatment as PAS-3 under Rule 12.
+// TWO liabilities, and the first cut of this computed only one of them.
+//
+//   ADDITIONAL FEE — the first proviso to s.403(1). "not less than one hundred
+//   rupees per day", stated for filings under section 92 or 137 ONLY, and the
+//   Act fixes NO maximum for it.
+//
+//   PENALTY — under the section the form is filed under. A separate liability,
+//   which s.403(2) preserves in terms: the company and its officers are liable
+//   for it "without prejudice to the liability for the payment of fee and
+//   additional fee". Nearly every one of these IS capped.
+//
+// Folding them together understated the exposure on the two forms that were
+// priced, and left every other form answering nothing at all — because the fee
+// is the half the Act mostly does not state and the penalty is the half it
+// does. The multipliers for other forms are in the Companies (Registration
+// Offices and Fees) Rules, which are not in reference/, so the fee still
+// refuses to guess. The penalty does not have to.
+//
+// ── the one-day trap, inside a single sub-section ──
+// s.137(3) says the COMPANY pays a further penalty "for each day during which
+// such failure continues" and, in the same breath, that the MANAGING DIRECTOR
+// and CFO pay "for each day after the first". A uniform implementation is wrong
+// by one day's penalty on one of the two legs every single time, so each leg
+// carries the count its own provision states.
+
 var CALC_FEE_FORMS = [
-  ['mgt7', 'MGT-7 / MGT-7A — annual return', 92,  true],
-  ['aoc4', 'AOC-4 — financial statements',  137, true],
-  ['other','Any other form',                 0,  false]
+
+{ key:'mgt7', label:'MGT-7 / MGT-7A — annual return',
+  section:'Section 92(4)', match:/^Sec(?:tion)?s?\.?\s*92(?!\s*\()/i,
+  fee:{section:'92', perDay:100},
+  pen:{ cite:'s.92(5)',
+    words:'If any company fails to file its annual return under sub-section (4), before the '+
+      'expiry of the period specified therein, such company and its every officer who is in '+
+      'default shall be liable to a penalty of ten thousand rupees and in case of continuing '+
+      'failure, with a further penalty of one hundred rupees for each day after the first '+
+      'during which such failure continues, subject to a maximum of two lakh rupees in case of '+
+      'a company and fifty thousand rupees in case of an officer who is in default.',
+    co: {who:'The company', base:10000, day:100, dayFrom:'after-first', cap:200000},
+    off:{who:'Every officer in default', base:10000, day:100, dayFrom:'after-first', cap:50000} } },
+
+{ key:'aoc4', label:'AOC-4 / AOC-4 CFS / AOC-4 XBRL — financial statements',
+  section:'Section 137(1)', match:/^Sec(?:tion)?s?\.?\s*137\b/i,
+  fee:{section:'137', perDay:100},
+  pen:{ cite:'s.137(3)',
+    words:'the company shall be liable to a penalty of ten thousand rupees and in case of '+
+      'continuing failure, with a further penalty of one hundred rupees for each day during '+
+      'which such failure continues, subject to a maximum of two lakh rupees, and the managing '+
+      'director and the Chief Financial Officer of the company, if any ... shall be liable to a '+
+      'penalty of ten thousand rupees and in case of continuing failure, with a further penalty '+
+      'of one hundred rupees for each day after the first during which such failure continues, '+
+      'subject to a maximum of fifty thousand rupees.',
+    note:'Read the two counts. The company pays for <b>each day</b> the failure continues; the '+
+      'officers pay for each day <b>after the first</b>. That is one day of difference between '+
+      'the two legs, in the same sub-section.',
+    co: {who:'The company', base:10000, day:100, dayFrom:'each-day', cap:200000},
+    off:{who:'The MD and the CFO; failing them, the director charged by the Board; failing him '+
+             'or her, all the directors',
+         base:10000, day:100, dayFrom:'after-first', cap:50000} } },
+
+{ key:'mgt14', label:'MGT-14 — resolutions and agreements',
+  section:'Section 117(1)', match:/^Sec(?:tion)?s?\.?\s*117\b/i,
+  pen:{ cite:'s.117(2)',
+    words:'If any company fails to file the resolution or the agreement under sub-section (1) '+
+      'before the expiry of the period specified therein, such company shall be liable to a '+
+      'penalty of ten thousand rupees and in case of continuing failure, with a further penalty '+
+      'of one hundred rupees for each day after the first during which such failure continues, '+
+      'subject to a maximum of two lakh rupees and every officer of the company who is in '+
+      'default including liquidator of the company, if any, shall be liable to a penalty of ten '+
+      'thousand rupees ... subject to a maximum of fifty thousand rupees.',
+    co: {who:'The company', base:10000, day:100, dayFrom:'after-first', cap:200000},
+    off:{who:'Every officer in default, including the liquidator if there is one',
+         base:10000, day:100, dayFrom:'after-first', cap:50000} } },
+
+{ key:'dir12', label:'DIR-12 — appointment, change or cessation of a director or KMP',
+  section:'Section 170(2)', match:/^Sec(?:tion)?s?\.?\s*1(?:68|70)\b/i,
+  pen:{ cite:'s.172',
+    words:'If a company is in default in complying with any of the provisions of this Chapter '+
+      'and for which no specific penalty or punishment is provided therein, the company and '+
+      'every officer of the company who is in default shall be liable to a penalty of fifty '+
+      'thousand rupees, and in case of continuing failure, with a further penalty of five '+
+      'hundred rupees for each day during which such failure continues, subject to a maximum of '+
+      'three lakh rupees in case of a company and one lakh rupees in case of an officer who is '+
+      'in default.',
+    note:'s.172 is the residual penalty for <b>Chapter XI</b> (sections 149 to 172, directors). '+
+      'It bites only where that Chapter provides no specific penalty for the default in '+
+      'question — check the section itself first.',
+    co: {who:'The company', base:50000, day:500, dayFrom:'each-day', cap:300000},
+    off:{who:'Every officer in default', base:50000, day:500, dayFrom:'each-day', cap:100000} } },
+
+{ key:'pas3', label:'PAS-3 — return of allotment',
+  section:'Section 39(4)', match:/^Sec(?:tion)?s?\.?\s*39\b/i,
+  pen:{ cite:'s.39(5)',
+    words:'In case of any default under sub-section (3) or sub-section (4), the company and its '+
+      'officer who is in default shall be liable to a penalty, for each default, of one thousand '+
+      'rupees for each day during which such default continues or one lakh rupees, whichever is '+
+      'less.',
+    note:'&ldquo;Whichever is less&rdquo; is the cap, and at a thousand rupees a day it is '+
+      'reached in a hundred days. Note also &ldquo;<b>for each default</b>&rdquo; — a separate '+
+      'allotment is a separate default with its own hundred-day run.',
+    co: {who:'The company', base:0, day:1000, dayFrom:'each-day', cap:100000},
+    off:{who:'Its officer in default', base:0, day:1000, dayFrom:'each-day', cap:100000} } },
+
+{ key:'chg', label:'CHG-1 / CHG-4 — creation, modification or satisfaction of a charge',
+  section:'Sections 77(1), 82(1)', match:/^Sec(?:tion)?s?\.?\s*(?:77|82)\b/i,
+  pen:{ cite:'s.86(1)',
+    words:'If any company is in default in complying with any of the provisions of this Chapter, '+
+      'the company shall be liable to a penalty of five lakh rupees and every officer of the '+
+      'company who is in default shall be liable to a penalty of fifty thousand rupees.',
+    note:'This one is <b>not calculated by the day and has no maximum</b>, because it is not a '+
+      'continuing penalty — it is a fixed amount, and it is the same on day one as on day three '+
+      'hundred. It is also the largest penalty on this screen. s.77 allows a further sixty days '+
+      'on additional fees and s.82 three hundred, but both are applications to the Registrar, '+
+      'not an extension of the date the filing is owed.',
+    co: {who:'The company', kind:'flat', base:500000},
+    off:{who:'Every officer in default', kind:'flat', base:50000} } },
+
+{ key:'mgt6', label:'MGT-6 — declaration of beneficial interest',
+  section:'Section 89(6)', match:/^Sec(?:tion)?s?\.?\s*89\b/i,
+  pen:{ cite:'s.89(7)',
+    words:'If a company, required to file a return under sub-section (6), fails to do so before '+
+      'the expiry of the time specified therein, the company and every officer of the company '+
+      'who is in default shall be liable to a penalty of one thousand rupees for each day during '+
+      'which such failure continues, subject to a maximum of five lakh rupees in the case of a '+
+      'company and two lakh rupees in case of an officer who is in default.',
+    note:'The thirty days runs from the <b>date the company receives the declaration</b>, not '+
+      'from the date the beneficial interest changed. The two are often weeks apart.',
+    co: {who:'The company', base:0, day:1000, dayFrom:'each-day', cap:500000},
+    off:{who:'Every officer in default', base:0, day:1000, dayFrom:'each-day', cap:200000} } },
+
+{ key:'ben2', label:'BEN-2 — return of significant beneficial owners',
+  section:'Section 90(4)', match:/^Sec(?:tion)?s?\.?\s*90\b/i,
+  pen:{ cite:'s.90(11)',
+    words:'If a company, required to maintain register under sub-section (2) and file the '+
+      'information under sub-section (4) ... fails to do so or denies inspection as provided '+
+      'therein, the company shall be liable to a penalty of one lakh rupees and in case of '+
+      'continuing failure, with a further penalty of five hundred rupees for each day, after the '+
+      'first during which such failure continues, subject to a maximum of five lakh rupees and '+
+      'every officer of the company who is in default shall be liable to a penalty of twenty-'+
+      'five thousand rupees and in case of continuing failure, with a further penalty of two '+
+      'hundred rupees for each day, after the first during which such failure continues, subject '+
+      'to a maximum of one lakh rupees.',
+    note:'The <b>period</b> for BEN-2 is thirty days under the Significant Beneficial Owners '+
+      'Rules 2018, which are not in <span class="calc-mono">reference/</span> — s.90(4) says '+
+      'only &ldquo;within such time as may be prescribed&rdquo;. The penalty below is from the '+
+      'Act; the deadline it is measured from is not.',
+    co: {who:'The company', base:100000, day:500, dayFrom:'after-first', cap:500000},
+    off:{who:'Every officer in default', base:25000, day:200, dayFrom:'after-first', cap:100000} } },
+
+{ key:'msme1', label:'MSME-1 — half-yearly return of dues to micro and small enterprises',
+  section:'Section 405(1)', match:/^Sec(?:tion)?s?\.?\s*405\b/i,
+  pen:{ cite:'s.405(4)',
+    words:'If any company fails to comply with an order made under sub-section (1) or '+
+      'sub-section (3), or furnishes any information or statistics which is incorrect or '+
+      'incomplete in any material respect, the company and every officer of the company who is '+
+      'in default, shall be liable to a penalty of twenty thousand rupees and in case of '+
+      'continuing failure, with a further penalty of one thousand rupees for each day after the '+
+      'first during which such failure continues, subject to a maximum of three lakh rupees.',
+    note:'The three-lakh maximum is stated once, for &ldquo;the company and every officer of the '+
+      'company who is in default&rdquo; — the sub-section does not split it the way s.92(5) and '+
+      's.137(3) do, so the same ceiling is shown against both.',
+    co: {who:'The company', base:20000, day:1000, dayFrom:'after-first', cap:300000},
+    off:{who:'Every officer in default', base:20000, day:1000, dayFrom:'after-first', cap:300000} } },
+
+{ key:'inc22', label:'INC-22 — registered office, situation or change',
+  section:'Section 12', match:/^Sec(?:tion)?s?\.?\s*12(?!\d)\b/i,
+  pen:{ cite:'s.12(8)',
+    words:'If any default is made in complying with the requirements of this section, the '+
+      'company and every officer who is in default shall be liable to a penalty of one thousand '+
+      'rupees for every day during which the default continues but not exceeding one lakh rupees.',
+    co: {who:'The company', base:0, day:1000, dayFrom:'each-day', cap:100000},
+    off:{who:'Every officer in default', base:0, day:1000, dayFrom:'each-day', cap:100000} } },
+
+{ key:'mgt15', label:'MGT-15 — report on the annual general meeting (listed public company)',
+  section:'Section 121(2)', match:/^Sec(?:tion)?s?\.?\s*121\b/i,
+  pen:{ cite:'s.121(3)',
+    words:'If the company fails to file the report under sub-section (2) before the expiry of '+
+      'the period specified therein, such company shall be liable to a penalty of one lakh '+
+      'rupees and in case of continuing failure, with a further penalty of five hundred rupees '+
+      'for each day after the first during which such failure continues, subject to a maximum of '+
+      'five lakh rupees and every officer of the company who is in default shall be liable to a '+
+      'penalty which shall not be less than twenty-five thousand rupees ... subject to a maximum '+
+      'of one lakh rupees.',
+    note:'Only a <b>listed public company</b> files this. Note that the officer amount is a '+
+      'floor — &ldquo;not less than twenty-five thousand rupees&rdquo; — so the figure below is '+
+      'the minimum, not the maximum.',
+    co: {who:'The company', base:100000, day:500, dayFrom:'after-first', cap:500000},
+    off:{who:'Every officer in default (this leg is a floor)',
+         base:25000, day:500, dayFrom:'after-first', cap:100000} } },
+
+{ key:'adt1', label:'ADT-1 — intimation of appointment of auditor',
+  section:'Section 139(1), third proviso', match:/^Sec(?:tion)?s?\.?\s*139\b/i,
+  pen:{ cite:'s.147(1)', kind:'fine',
+    words:'If any of the provisions of sections 139 to 146 (both inclusive) is contravened, the '+
+      'company shall be punishable with fine which shall not be less than twenty-five thousand '+
+      'rupees but which may extend to five lakh rupees and every officer of the company who is '+
+      'in default shall be punishable with fine which shall not be less than ten thousand rupees '+
+      'but which may extend to one lakh rupees.',
+    note:'This one is a <b>fine, not a penalty</b>, and the difference is not cosmetic. A '+
+      'penalty is adjudicated by the Registrar on a formula the Act states, which is why every '+
+      'other row on this screen can be computed. A fine is imposed by a court within a range, '+
+      'and no amount inside that range can be calculated from a number of days. The range is '+
+      'shown; a figure is not, because there is not one to give.',
+    co: {who:'The company', kind:'fine', min:25000, max:500000},
+    off:{who:'Every officer in default', kind:'fine', min:10000, max:100000} } },
+
+{ key:'other', label:'Any other form — where the Act fixes no penalty of its own',
+  section:'', match:null,
+  pen:{ cite:'s.450', residual:true,
+    words:'If a company or any officer of a company or any other person contravenes any of the '+
+      'provisions of this Act or the rules made thereunder ... and for which no penalty or '+
+      'punishment is provided elsewhere in this Act, the company and every officer of the '+
+      'company who is in default or such other person shall be liable to a penalty of ten '+
+      'thousand rupees, and in case of continuing contravention, with a further penalty of one '+
+      'thousand rupees for each day after the first during which the contravention continue, '+
+      'subject to a maximum of two lakh rupees in case of a company and fifty thousand rupees in '+
+      'case of an officer who is in default or any other person.',
+    note:'s.450 is a <b>residual</b> and applies only where no penalty is provided elsewhere in '+
+      'the Act for this default. <b>Check the section the form is filed under first</b> — if it '+
+      'states its own penalty, that one governs and this figure is wrong. The forms listed above '+
+      'are the ones whose own sections state a penalty.',
+    co: {who:'The company', base:10000, day:1000, dayFrom:'after-first', cap:200000},
+    off:{who:'Every officer in default, or the other person',
+         base:10000, day:1000, dayFrom:'after-first', cap:50000} } }
 ];
+
+function calc403Form(key){
+  for(var i=0;i<CALC_FEE_FORMS.length;i++)
+    if(CALC_FEE_FORMS[i].key === key) return CALC_FEE_FORMS[i];
+  return null;
+}
+
+// One leg of a penalty — the company's, or the officers'. Three shapes, because
+// the Act uses three: a continuing penalty with a maximum, a fixed amount that
+// does not grow, and a fine fixed by a court within a range.
+function calc403Leg(leg, days){
+  if(!leg) return null;
+  var o = {who: leg.who, kind: leg.kind || 'penalty'};
+  if(o.kind === 'fine'){ o.min = leg.min; o.max = leg.max; return o; }
+  if(o.kind === 'flat'){ o.base = leg.base; o.amount = leg.base; return o; }
+  // "for each day after the first" and "for each day during which" differ by
+  // exactly one day's penalty, and both appear inside s.137(3).
+  var n = leg.dayFrom === 'each-day' ? days : Math.max(0, days - 1);
+  var raw = leg.base + n * leg.day;
+  o.base = leg.base; o.dayRate = leg.day; o.dayCount = n;
+  o.dayFrom = leg.dayFrom; o.cap = leg.cap; o.uncapped = raw;
+  o.capped = (leg.cap != null && raw >= leg.cap);
+  o.amount = o.capped ? leg.cap : raw;
+  return o;
+}
+
+// How many days late the filing has to be before the maximum bites. A liability
+// that has stopped growing is a different fact from one that has not, and it is
+// the fact that decides whether filing tomorrow costs anything more.
+function calc403CapDay(leg){
+  if(!leg || leg.kind === 'fine' || leg.kind === 'flat') return null;
+  if(leg.cap == null || !leg.day) return null;
+  var need = Math.ceil((leg.cap - leg.base) / leg.day);
+  if(need < 0) need = 0;
+  return leg.dayFrom === 'each-day' ? need : need + 1;
+}
+
 function calc403Fee(formKey, dueOn, filedOn){
-  var f = null;
-  for(var i=0;i<CALC_FEE_FORMS.length;i++) if(CALC_FEE_FORMS[i][0]===formKey) f = CALC_FEE_FORMS[i];
+  var f = calc403Form(formKey);
   if(!f) return {error:'Pick a form.'};
-  if(!dueOn || !filedOn) return {error:'Both dates are needed.'};
+  if(!dueOn || !filedOn) return {form:f, error:'Both dates are needed.'};
   var d1 = new Date(dueOn + 'T00:00:00'), d2 = new Date(filedOn + 'T00:00:00');
-  if(isNaN(d1) || isNaN(d2)) return {error:'Those dates do not read as dates.'};
+  if(isNaN(d1.getTime()) || isNaN(d2.getTime()))
+    return {form:f, error:'Those dates do not read as dates.'};
   var days = Math.round((d2 - d1) / 86400000);
   if(days <= 0) return {form:f, days:0, late:false};
-  if(!f[3]) return {form:f, days:days, late:true, unpriced:true};
-  return {form:f, days:days, late:true, perDay:100, fee:days * 100, section:f[2]};
+
+  var out = {form:f, days:days, late:true, due:dueOn, filed:filedOn};
+
+  // ── the fee ──
+  // Only s.92 and s.137 filings. The first proviso names no other section, and
+  // the slabs for the rest are in the Fees Rules, which are not held here.
+  if(f.fee) out.fee = {perDay:f.fee.perDay, section:f.fee.section, amount: days * f.fee.perDay};
+  else out.feeUnpriced = true;
+
+  // ── the penalty, which is where the maximum lives ──
+  if(f.pen){
+    var p = f.pen;
+    out.pen = {cite:p.cite, kind:p.kind || 'penalty', words:p.words,
+               note:p.note || '', residual:!!p.residual,
+               co: calc403Leg(p.co, days), off: calc403Leg(p.off, days)};
+    var cd = calc403CapDay(p.co), od = calc403CapDay(p.off);
+    // Reported only once actually reached. A future date is a projection, and
+    // this screen states what is owed as at the date filed.
+    if(cd != null && days >= cd) out.pen.coCapDate = lodrAddDays(dueOn, cd);
+    if(od != null && days >= od) out.pen.offCapDate = lodrAddDays(dueOn, od);
+  }
+  return out;
+}
+
+// ── the due date the register already knows ─────────────────────
+// This screen used to make you type a due date the product had computed on the
+// screen next door. A hand-typed due date is a date with nothing behind it —
+// the §2k defect, arriving through the keyboard instead of through the engine.
+//
+// Matched on the SECTION, which is what the register displays and what the
+// reader can therefore check, and which is the same key the penalty table turns
+// on. Read across all years deliberately: a late filing is usually a filing for
+// a year that has closed, so honouring the year filter would hide exactly the
+// row this calculator exists for.
+function calc403DueOptions(c, formKey){
+  var f = calc403Form(formKey);
+  if(!c || !f || !f.match) return [];
+  var rows = [];
+  try{ rows = getComplianceChart(c, {allYears:true}) || []; }catch(e){ return []; }
+  var seen = {}, out = [];
+  rows.forEach(function(r){
+    if(!r.due || !f.match.test(String(r.section || ''))) return;
+    // Rows sharing a due date collapse to one option — three s.137 rows fall
+    // due together and offering the same date three times helps nobody. But
+    // the count is KEPT: a silent dedupe hid a mutation that widened the MGT-7
+    // matcher onto s.92(2), because the MGT-8 certification falls due on the
+    // same day and the wrong row vanished into the right one.
+    if(seen[r.due] != null){ out[seen[r.due]].shared.push(String(r.section || '')); return; }
+    seen[r.due] = out.length;
+    out.push({due:r.due, section:String(r.section || ''),
+              obligation:String(r.obligation || ''),
+              periodEnd:r.periodEnd || '', fyAssumed:!!r.fyAssumed, shared:[]});
+  });
+  out.sort(function(a, b){ return a.due < b.due ? 1 : (a.due > b.due ? -1 : 0); });
+  return out;
 }
 
 // ── Sections 149, 177, 178 — is the board lawfully composed ─────
@@ -9610,11 +9914,15 @@ function calcField(k, label, cite, ph){
       'placeholder="'+entEsc(ph || '0')+'">'+
     '</div>';
 }
-function calcSelect(k, label, opts, cite){
+// `onch` is for the two selects that have to redraw the FORM and not only the
+// working — changing the form changes which due dates the register can offer,
+// and calcLive() repaints the answer without repainting the question.
+function calcSelect(k, label, opts, cite, onch){
   return '<div class="calc-f">'+
     '<label class="calc-l" for="calc-'+k+'">'+label+
       (cite ? '<span class="calc-cite">'+cite+'</span>' : '')+'</label>'+
-    '<select id="calc-'+k+'" class="lg-field calc-in" data-calc="'+k+'" onchange="calcLive()">'+
+    '<select id="calc-'+k+'" class="lg-field calc-in" data-calc="'+k+'" onchange="'+
+      (onch || 'calcLive()')+'">'+
       opts.map(function(o){
         return '<option value="'+entEsc(o[0])+'"'+
           (String(CALC_V[k]) === String(o[0]) ? ' selected' : '')+'>'+o[1]+'</option>';
@@ -9631,7 +9939,53 @@ function calcDate(k, label, cite){
     '<input id="calc-'+k+'" class="lg-field calc-in" data-calc="'+k+'" type="date" '+
       'oninput="calcLive()" onchange="calcLive()" value="'+entEsc(CALC_V[k] || '')+'"></div>';
 }
+// Changing the form drops the seeded due date. A due date belongs to the form
+// it was taken for, and carrying MGT-7's date onto AOC-4 would price a delay
+// that never happened — quietly, and with a plausible number.
+function calcFeeForm(v){
+  calcRead();
+  CALC_V.feeform = v;
+  CALC_V.feedue_for = null;
+  renderCalc();
+}
+function calcFeeDue(v){
+  calcRead();
+  CALC_V.feesrc = v;
+  if(v) CALC_V.feedue = v;
+  renderCalc();
+}
+
 function calcNote(html){ return '<div class="calc-note">'+html+'</div>'; }
+// One row of the penalty table. Three shapes, because the Act uses three, and
+// flattening them into a single "amount" column would report a court's
+// discretionary range and an arithmetic result as if they were the same claim.
+function calc403LegRow(leg){
+  if(!leg) return '';
+  if(leg.kind === 'fine')
+    return '<tr><td>'+leg.who+'</td><td>fixed by the court within the range &mdash; '+
+      'not calculable from a number of days</td>'+
+      '<td class="calc-mono">'+calcMoney(leg.min)+' to '+calcMoney(leg.max)+'</td>'+
+      '<td>'+calcMoney(leg.max)+'</td></tr>';
+  if(leg.kind === 'flat')
+    return '<tr><td>'+leg.who+'</td><td>a fixed amount &mdash; it does not grow by the day</td>'+
+      '<td class="calc-mono">'+calcMoney(leg.amount)+'</td>'+
+      '<td>none stated <span class="calc-sub">it does not accrue</span></td></tr>';
+  var work = (leg.base ? calcMoney(leg.base) : '')+
+    (leg.base && leg.dayCount ? ' + ' : '')+
+    (leg.dayCount ? leg.dayCount+' &times; '+calcMoney(leg.dayRate) : '')+
+    (!leg.base && !leg.dayCount ? '&mdash;' : '')+
+    '<div class="calc-sub">'+
+      (leg.dayFrom === 'each-day' ? 'every day the failure continues'
+                                  : 'each day after the first')+
+      (leg.capped ? ' &mdash; would be '+calcMoney(leg.uncapped)+' but for the maximum' : '')+
+    '</div>';
+  return '<tr><td>'+leg.who+'</td><td>'+work+'</td>'+
+    '<td class="calc-mono">'+calcMoney(leg.amount)+'</td>'+
+    '<td>'+(leg.cap == null ? 'none stated'
+      : calcMoney(leg.cap)+(leg.capped ? ' <span class="calc-no">reached</span>' : ''))+
+    '</td></tr>';
+}
+
 function calcResult(label, value, sub){
   return '<div class="calc-res"><div class="calc-res-l">'+label+'</div>'+
     '<div class="calc-res-v">'+value+'</div>'+
@@ -9793,17 +10147,61 @@ function calcForm(){
         'of the LLP and sit in Annexure A to the Rules. This will count the delay and name what '+
         'governs the fee; it will not state an amount it cannot cite.');
 
-  case 'fees':
+  case 'fees': {
+    var fk = CALC_V.feeform || 'mgt7';
+    var fOpts = calc403DueOptions(c, fk);
+    // Seed the due date from the register, once per form. Re-taken whenever the
+    // form changes so one form's date can never be priced against another's.
+    if(CALC_V.feedue_for !== fk){
+      CALC_V.feedue_for = fk;
+      CALC_V.feedue = fOpts.length ? fOpts[0].due : '';
+      CALC_V.feesrc = fOpts.length ? fOpts[0].due : '';
+    }
+    var srcOpts = fOpts.map(function(o){
+      // The obligation is named as well as the section. "Sections 139, 140"
+      // dates both the ADT-1 appointment and the ADT-3 resignation, and a
+      // reader picking a date needs to see which of the two it belongs to.
+      return [o.due, ccFmtDate(o.due)+' — '+entEsc(o.obligation || o.section)+
+        ' ('+entEsc(o.section)+')'+
+        (o.periodEnd ? ' · period ended '+ccFmtDate(o.periodEnd) : '')+
+        (o.shared && o.shared.length ? ' · +'+o.shared.length+' more on this date' : '')+
+        (o.fyAssumed ? ' · ASSUMED year end' : '')];
+    });
+    srcOpts.push(['', 'Not from the register — I will enter the date']);
     return '<div class="calc-grid">'+
-      calcSelect('feeform','Form', CALC_FEE_FORMS.map(function(f){ return [f[0], f[1]]; }), 's.403')+
-      calcDate('feedue','Due date under the section')+
+      calcSelect('feeform','Form', CALC_FEE_FORMS.map(function(f){ return [f.key, f.label]; }),
+                 'and the section it is filed under', 'calcFeeForm(this.value)')+
+      (fOpts.length
+        ? calcSelect('feesrc','Due date, taken from this entity&rsquo;s register', srcOpts,
+                     'computed, not typed', 'calcFeeDue(this.value)')
+        : '')+
+      calcDate('feedue','Due date used')+
       calcDate('feefiled','Date actually filed, or today')+
       '</div>'+
-      calcNote('Only s.92 and s.137 filings are priced here. The first proviso to s.403(1) '+
-        'fixes their additional fee at <b>not less than one hundred rupees per day</b>. '+
-        'Every other form&rsquo;s multiplier lives in the Companies (Registration Offices '+
-        'and Fees) Rules, which are not in <span class="calc-mono">reference/</span> — so '+
-        'this refuses to price them rather than guessing.');
+      (c && !fOpts.length
+        ? calcNote('<b>The register has no dated obligation '+
+            (calc403Form(fk) && calc403Form(fk).section
+              ? 'under '+entEsc(calc403Form(fk).section)+' '
+              : '')+
+            // The company name may already end in a full stop ("SONA BISCUITS
+            // LTD."), and a second one is the kind of thing a reader notices
+            // instead of reading the sentence.
+            'for '+entEsc(String(c.name).replace(/\.\s*$/, ''))+'.</b> '+
+            'Most of these run from an event &mdash; a charge '+
+            'created, securities allotted, a resolution passed &mdash; so the register can only '+
+            'date them once that event is recorded against the entity. Until then the due date '+
+            'has to be entered here, and it is a figure you are supplying rather than one this '+
+            'product computed.')
+        : '')+
+      calcNote('Two liabilities, not one. The <b>additional fee</b> under the first proviso to '+
+        's.403(1) is stated in the Act for filings under s.92 and s.137 only, at <b>not less '+
+        'than one hundred rupees per day</b>, with <b>no maximum</b>; every other form&rsquo;s '+
+        'multiplier is in the Companies (Registration Offices and Fees) Rules, which are not in '+
+        '<span class="calc-mono">reference/</span>. The <b>penalty</b> is separate, is stated in '+
+        'the Act for most of these forms, and is <b>capped</b>. s.403(2) keeps both alive at '+
+        'once: the penalty applies &ldquo;without prejudice to the liability for the payment of '+
+        'fee and additional fee&rdquo;.');
+  }
 
   case 'board':
     return c ? '' : '';
@@ -10046,26 +10444,95 @@ function calcOutput(){
 
   case 'fees': {
     var F = calc403Fee(CALC_V.feeform || 'mgt7', CALC_V.feedue, CALC_V.feefiled);
+    var FF = F.form;
     if(F.error) return '<div class="cc-card"><div class="cc-card-b"><div class="cc-none">'+
       F.error+'</div></div></div>';
     if(!F.late) return '<div class="cc-card"><div class="cc-card-b"><div class="calc-ok">'+
-      'Filed on or before the due date. No additional fee arises under s.403.</div></div></div>';
-    if(F.unpriced) return '<div class="cc-card"><div class="cc-card-h">'+F.days+
-      ' days late</div><div class="cc-card-b"><div class="calc-warn">'+
-      '<b>This form cannot be priced here.</b> s.403(1) says the fee is &ldquo;such fee as may '+
-      'be prescribed&rdquo;, and the slabs for forms other than those under s.92 and s.137 are '+
-      'in the Companies (Registration Offices and Fees) Rules, which are not in '+
-      '<span class="calc-mono">reference/</span>. Naming a number we cannot cite would be worse '+
-      'than saying so.</div></div></div>';
-    return '<div class="cc-card"><div class="cc-card-h">'+F.days+' days late</div>'+
-      '<div class="cc-card-b">'+
-      calcResult('Additional fee', calcMoney(F.fee),
-        F.days+' days &times; ₹100 per day')+
-      '<div class="calc-note">The first proviso to s.403(1) fixes the additional fee for a '+
-      'filing under <b>section '+F.section+'</b> at <b>not less than one hundred rupees per '+
-      'day</b>, and allows different amounts for different classes of company. This is the '+
-      'floor the Act itself states; confirm the amount on MCA21 before paying. s.403(2) keeps '+
-      'the penalty for the default itself alive on top of the fee.</div></div></div>';
+      'Filed on or before the due date. No additional fee arises under s.403'+
+      (FF && FF.pen ? ', and no penalty under '+FF.pen.cite : '')+'.</div></div></div>';
+
+    // Where did the due date come from? A date this product computed and a date
+    // somebody typed are different kinds of fact, and the reader is entitled to
+    // know which one the answer rests on.
+    var srcRow = calc403DueOptions(c, F.form.key).filter(function(o){
+      return o.due === CALC_V.feedue; })[0];
+    var prov = srcRow
+      ? '<div class="calc-base-line">Due date <span class="calc-mono">'+ccFmtDate(F.due)+
+        '</span> taken from the register &mdash; '+entEsc(srcRow.section)+
+        (srcRow.periodEnd ? ', for the period ended '+ccFmtDate(srcRow.periodEnd) : '')+'</div>'+
+        (srcRow.fyAssumed
+          ? '<div class="calc-warn"><b>That date rests on an assumed year end.</b> No financial '+
+            'year end is recorded for this entity, so the register assumed 31 March. Every '+
+            'figure below moves if that assumption is wrong.</div>'
+          : '')
+      : '<div class="calc-base-line">Due date <span class="calc-mono">'+ccFmtDate(F.due)+
+        '</span> &mdash; <b>entered by hand</b>, not taken from the register. Nothing in this '+
+        'product has checked it.</div>';
+
+    // ── the fee ──
+    var feeHtml = F.fee
+      ? calcResult('Additional fee &mdash; s.403(1), first proviso', calcMoney(F.fee.amount),
+          F.days+' days &times; '+calcMoney(F.fee.perDay)+' per day')+
+        '<div class="calc-note">The Act states this as a <b>floor</b> &mdash; &ldquo;not less '+
+        'than one hundred rupees per day&rdquo; &mdash; for a document filed under <b>section '+
+        F.fee.section+'</b>, and allows different amounts for different classes of company. '+
+        '<b>The Act fixes no maximum for the fee.</b> Confirm the amount actually payable on '+
+        'MCA21 before paying.</div>'
+      : '<div class="calc-warn"><b>The additional fee cannot be computed for this form.</b> '+
+        's.403(1) says the fee is &ldquo;such fee as may be prescribed&rdquo;, and the first '+
+        'proviso names a figure only for filings under s.92 and s.137. Every other slab is in '+
+        'the Companies (Registration Offices and Fees) Rules, which are not in '+
+        '<span class="calc-mono">reference/</span>. The penalty below is from the Act and is '+
+        'computed; the fee is not, and a number we cannot cite is worse than the gap.</div>';
+
+    // ── the penalty ──
+    var penHtml = '';
+    if(F.pen){
+      var P2 = F.pen;
+      var capNote = '';
+      if(P2.coCapDate || P2.offCapDate){
+        // Assembled from clauses, so the sentence has to survive any one of them
+        // being absent. It read "The maximum has been reached. the officer's
+        // stopped on ..." whenever the company leg was still under its cap.
+        var parts = [];
+        if(P2.coCapDate) parts.push('The company&rsquo;s penalty stopped growing on '+
+          '<span class="calc-mono">'+ccFmtDate(P2.coCapDate)+'</span>');
+        if(P2.offCapDate) parts.push('The officer&rsquo;s stopped on '+
+          '<span class="calc-mono">'+ccFmtDate(P2.offCapDate)+'</span>');
+        capNote = '<div class="calc-warn"><b>The maximum has been reached'+
+          (parts.length === 1 ? ' on one leg' : '')+'.</b> '+
+          parts.join('. ')+'. Filing later does not increase it further &mdash; a fact '+
+          'about the penalty alone. <b>The additional fee has no maximum and keeps '+
+          'running.</b></div>';
+      }
+      penHtml =
+        '<div class="calc-h">Penalty &mdash; <span class="calc-mono">'+P2.cite+'</span>'+
+        (P2.kind === 'fine' ? ' <span class="calc-cite">a fine, not a penalty</span>' : '')+
+        '</div>'+
+        (P2.residual ? '<div class="calc-warn"><b>This is a residual provision.</b> It applies '+
+          'only where the Act fixes no penalty of its own for this default. Check the section '+
+          'the form is filed under before relying on the figures below.</div>' : '')+
+        '<table class="brd-tbl calc-tbl"><thead><tr><th>Who is liable</th><th>Working</th>'+
+        '<th>Amount</th><th>Maximum</th></tr></thead><tbody>'+
+        calc403LegRow(P2.co)+calc403LegRow(P2.off)+
+        '</tbody></table>'+
+        capNote+
+        (P2.note ? '<div class="calc-note">'+P2.note+'</div>' : '')+
+        '<div class="calc-note"><b>'+P2.cite+'</b>, as it stands in '+
+        '<span class="calc-mono">reference/</span>: &ldquo;'+P2.words+'&rdquo;</div>';
+    }
+
+    return '<div class="cc-card"><div class="cc-card-h">'+F.days+' days late &mdash; '+
+      entEsc(F.form.label)+'</div><div class="cc-card-b">'+
+      prov+feeHtml+penHtml+
+      '<div class="calc-note"><b>Both are owed.</b> s.403(2): where a company fails to file '+
+      'within the period specified, the company and its officers in default are liable for the '+
+      'penalty &ldquo;<b>without prejudice to the liability for the payment of fee and '+
+      'additional fee</b>&rdquo;. The fee is what the Registrar takes to accept the late '+
+      'filing; the penalty is a separate liability for the default itself, and it is the one '+
+      'with a maximum. The Act in <span class="calc-mono">reference/</span> is amended only to '+
+      '<b>01.04.2021</b> &mdash; check any figure here against a current compilation before you '+
+      'advise on it.</div></div></div>';
   }
 
   case 'board': {

@@ -124,10 +124,6 @@ const MUTATIONS = [
     from: '  var limit = Math.max(a, b);',
     to:   '  var limit = Math.min(a, b);' },
 
-  { name: 's.403 prices a form whose fee rules are not held (§2y)',
-    from: '  if(!f[3]) return {form:f, days:days, late:true, unpriced:true};',
-    to:   '  if(false) return {form:f, days:days, late:true, unpriced:true};' },
-
   { name: 's.149(4) rounds the one-third down (§2y — the Explanation rounds up)',
     from: '    var need = Math.ceil(n / 3);',
     to:   '    var need = Math.floor(n / 3);' },
@@ -292,7 +288,69 @@ const MUTATIONS = [
     from: "        if(gap > 120 || gap < 0)",
     to:   "        if(gap > 1200 || gap < 0)" },
 
-  // ── the export (§3h) ────────────────────────────────────────
+  // ── the late-filing fee and the penalty beside it (§3m) ─────
+  // Every mutation here yields a plausible figure, which is exactly the
+  // failure this calculator shipped with: a card reading "Additional fee
+  // Rs 6,200" that a CS would have repeated to a director, when the real
+  // exposure was that plus Rs 16,100 on the company and Rs 16,100 on its
+  // officers under s.92(5).
+
+  { name: 'the maximum is computed and then not applied (§3m)',
+    from: '  o.amount = o.capped ? leg.cap : raw;',
+    to:   '  o.amount = raw;' },
+
+  { name: 'the s.92(5) two-lakh maximum removed altogether (§3m)',
+    from: "    co: {who:'The company', base:10000, day:100, dayFrom:'after-first', cap:200000},\n    off:{who:'Every officer in default', base:10000, day:100, dayFrom:'after-first', cap:50000} } },\n\n{ key:'aoc4'",
+    to:   "    co: {who:'The company', base:10000, day:100, dayFrom:'after-first', cap:null},\n    off:{who:'Every officer in default', base:10000, day:100, dayFrom:'after-first', cap:50000} } },\n\n{ key:'aoc4'" },
+
+  { name: 'the maximum is applied to the FEE as well (§3m — the Act caps no fee)',
+    from: "  if(f.fee) out.fee = {perDay:f.fee.perDay, section:f.fee.section, amount: days * f.fee.perDay};",
+    to:   "  if(f.fee) out.fee = {perDay:f.fee.perDay, section:f.fee.section, amount: Math.min(200000, days * f.fee.perDay)};" },
+
+  { name: 'one day-count for both legs of s.137(3) (§3m — the sub-section uses two)',
+    from: "  var n = leg.dayFrom === 'each-day' ? days : Math.max(0, days - 1);",
+    to:   "  var n = Math.max(0, days - 1);" },
+
+  { name: 'the day the maximum bit is projected instead of reported (§3m)',
+    from: "    if(cd != null && days >= cd) out.pen.coCapDate = lodrAddDays(dueOn, cd);",
+    to:   "    if(cd != null) out.pen.coCapDate = lodrAddDays(dueOn, cd);" },
+
+  { name: 'the additional fee is guessed for forms the Fees Rules price (§3m)',
+    from: "{ key:'other', label:'Any other form — where the Act fixes no penalty of its own',\n  section:'', match:null,",
+    to:   "{ key:'other', label:'Any other form — where the Act fixes no penalty of its own',\n  section:'', match:null, fee:{section:'403', perDay:100}," },
+
+  { name: 's.450 stops saying it is a residual (§3m)',
+    from: "  pen:{ cite:'s.450', residual:true,",
+    to:   "  pen:{ cite:'s.450',",
+    note: 'A residual read as the answer prices a form whose own section says otherwise.' },
+
+  { name: 'MGT-7 takes its due date from s.92(2) as well (§3m — that is MGT-8)',
+    from: "  section:'Section 92(4)', match:/^Sec(?:tion)?s?\\.?\\s*92(?!\\s*\\()/i,",
+    to:   "  section:'Section 92(4)', match:/^Sec(?:tion)?s?\\.?\\s*92/i," },
+
+  { name: 'INC-22 matches section 128 and 123 too (§3m)',
+    from: "  section:'Section 12', match:/^Sec(?:tion)?s?\\.?\\s*12(?!\\d)\\b/i,",
+    to:   "  section:'Section 12', match:/^Sec(?:tion)?s?\\.?\\s*12/i," },
+
+  { name: 'the assumed year end is dropped from the due date offered (§3m/§3j)',
+    from: "              periodEnd:r.periodEnd || '', fyAssumed:!!r.fyAssumed, shared:[]});",
+    to:   "              periodEnd:r.periodEnd || '', fyAssumed:false, shared:[]});" },
+
+  { name: 'the dedupe swallows a row without counting it (§3m)',
+    from: "    if(seen[r.due] != null){ out[seen[r.due]].shared.push(String(r.section || '')); return; }",
+    to:   "    if(seen[r.due] != null){ return; }",
+    note: 'This is the mechanism that hid the s.92(2) mutation: a row absorbed '+
+          'into another produced output identical to the correct build.' },
+
+  { name: 's.86(1) is treated as a daily penalty (§3m — it is a fixed amount)',
+    from: "    co: {who:'The company', kind:'flat', base:500000},",
+    to:   "    co: {who:'The company', base:500000, day:1000, dayFrom:'each-day', cap:null}," },
+
+  { name: 'a court-fixed fine is presented as a computed amount (§3m)',
+    from: "  if(o.kind === 'fine'){ o.min = leg.min; o.max = leg.max; return o; }",
+    to:   "  if(o.kind === 'fine'){ o.min = leg.min; o.max = leg.max; o.amount = leg.min; return o; }" },
+
+  // ── the export (§3h) ──────────────────────────────────────────────
   // An export that drops a table silently is worse than none: it looks like a
   // backup. Both mutations make the drop invisible rather than breaking it.
 
