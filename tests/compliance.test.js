@@ -1202,6 +1202,68 @@ describe('SEBI-specified timelines');
      !app.lgNoDeadlineWhy({ key: 'LODR-REG-13-3', due: null }), 'still mapped');
 }
 
+// ── 11l. The back-test, against real entity shapes (§3i) ────
+// One assertion here does a lot of work: if the back-test reports no defects on
+// clean entities, then EVERY mutation in tests/mutation.js that introduces one
+// is caught by it as well as by whatever assertion targets it directly. It is a
+// second, independent net over the same engines.
+describe('back-test');
+{
+  const CRb = 10000000;
+  const listed = { id: 'BT-L', name: 'BT Listed', type: 'listed', fyend: '2026-03-31',
+                   capital: 120 * CRb, turnover: 800 * CRb, networth: 600 * CRb,
+                   netprofit: 20 * CRb, borrowings: 0,
+                   cin: 'L17110MH2009PLC191234', chart: {} };
+  const unlisted = { id: 'BT-U', name: 'BT Unlisted', type: 'private', fyend: '2026-03-31',
+                     capital: 5 * CRb, turnover: 40 * CRb, networth: 10 * CRb,
+                     netprofit: 1 * CRb, borrowings: 0,
+                     cin: 'U51909MH2018PTC300111', chart: {} };
+
+  const withClients = (list, fn) => {
+    const prev = app.CLIENTS.slice();
+    app.CLIENTS.length = 0; list.forEach(c => app.CLIENTS.push(c));
+    try { return fn(); } finally { app.CLIENTS.length = 0; prev.forEach(c => app.CLIENTS.push(c)); }
+  };
+  const defects = (r) => r.findings.filter(f => f.sev === 'fail');
+
+  const clean = withClients([listed, unlisted], () => app.lgBackTest());
+  ok('it actually runs a meaningful number of checks', clean.checked >= 30, clean.checked);
+  check('and sees both entities', clean.entities, 2);
+  ok('a listed and an unlisted company produce NO defects',
+     defects(clean).length === 0,
+     defects(clean).map(f => f.kind + ': ' + f.check).join(' | '));
+
+  // It must still be able to fail, or the assertion above proves nothing. The
+  // CIN encodes listing status, so a mismatch is a real data-entry error and one
+  // this can construct without breaking the code.
+  const bad = withClients([Object.assign({}, listed, { cin: 'U17110MH2009PLC191234' })],
+                          () => app.lgBackTest());
+  check('a CIN that disagrees with the entity type is a defect', defects(bad).length, 1);
+  check('and it is reported as a class problem', defects(bad)[0].kind, 'CLASS');
+  ok('naming both sides of the disagreement',
+     /CIN starts/.test(defects(bad)[0].detail) && /type is/.test(defects(bad)[0].detail),
+     defects(bad)[0].detail);
+
+  // Missing financial columns are a GAP, not a defect: the limb is skipped, not
+  // failed, and calling that a defect would cry wolf on every real record.
+  const sparse = withClients([{ id: 'BT-S', name: 'BT Sparse', type: 'private',
+                                fyend: '2026-03-31', capital: CRb, turnover: 2 * CRb,
+                                cin: 'U51909MH2018PTC300111', chart: {} }],
+                             () => app.lgBackTest());
+  check('an entity with no net worth or net profit raises no defect',
+        defects(sparse).length, 0);
+  ok('but it is reported as a gap, naming the limbs it cannot evaluate',
+     sparse.findings.some(f => f.sev === 'warn' && /cannot be evaluated/.test(f.check)),
+     'not reported');
+  ok('and says a blank is skipped rather than passed',
+     sparse.findings.some(f => /SKIPPED, not passed/.test(f.detail || '')), 'not stated');
+
+  // An empty register is a gap too — §2w's rule that an empty database is not
+  // the same as nothing having happened.
+  ok('empty registers are reported',
+     sparse.findings.some(f => /Registers with no rows/.test(f.check)), 'not reported');
+}
+
 // ── 12. Dashboard invariants ────────────────────────────────
 describe('dashboard invariants');
 {

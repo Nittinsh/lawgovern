@@ -1732,6 +1732,69 @@ Suite **299 → 312**, mutations **49 → 52 caught, 0 missed**.
 
 ---
 
+## 3i. BACK-TEST (v172) — the first run against real entities
+
+**Administration → Back-test.** `lgBackTest()`.
+
+The owner put two real companies in — one listed, one unlisted — and asked for deep back-testing.
+Row-level security means nothing outside their session can see that data, so the audit runs inside
+the app, as `lgAccessCheck` does (§3c).
+
+### It reports disagreements, not figures
+Not another dashboard. **Each check computes something two different ways, or tests a claim against
+its stated basis, and says nothing unless they differ.** A clean run prints what it checked and
+that is all.
+
+| kind | what it looks for |
+|---|---|
+| **RECONCILE** | the same number two ways — dashboard vs register, state legend vs total, duplicate keys |
+| **BASIS** | no date without a traceable source; nothing claims compliance without evidence; no undated row in a date-driven state |
+| **CLASS** | the right law for the entity — LLP, OPC, listed-only SEBI, and **the CIN against the type** |
+| **CONTRADICT** | a row with a date *and* an explanation for having none; a companion with no date |
+| **DATA** | what the entity record is missing, and **which statutory limbs cannot be evaluated because of it** |
+
+### One assertion turns every existing mutation into a back-test
+`compliance.test.js` asserts the back-test reports **zero defects on clean entities**. So any
+mutation in `mutation.js` that introduces a defect is caught by the back-test as well as by whatever
+assertion targets it directly — **a second, independent net over the same engines.** Verified by
+reintroducing the §2z LLP bug: with no assertion aimed at it, the back-test reports
+*"An LLP is being given Companies Act obligations — e.g. Sec 173(1)"* on its own.
+
+### The first run found two things
+**1. Mine.** The traceability check accepted `exact` and `companion` but not **`stated`**, which is
+what the LLP rows carry. Three correctly-sourced rows were reported as unsourced. **A check that
+cries wolf gets ignored** — the same lesson as the smoke test reporting the login button missing
+(§2x).
+
+**2. Real.** The **FLA return is dated 15 July on every entity in the book and nothing on the row
+said why.** The date is right; the row could not prove it. That is exactly the standard §2k held
+everything else to when it removed 63 dates — and this one survived because it is **hardcoded rather
+than generated**, so no audit had ever looked at it. It now carries its source, and states that the
+RBI Master Direction is **not in `reference/`**, so the date rests on the owner's knowledge rather
+than a held text.
+
+### The DATA findings are the ones real entities make possible
+On an invented company every field is filled and this class of finding cannot occur. On a real
+record it is the whole point:
+- **s.135 CSR net worth and net profit limbs cannot be evaluated** — and a blank is **skipped, not
+  passed** (§2c). The net-profit limb is the one most likely to catch a real client.
+- **Every register is empty** — obligations that run from a charge, an allotment or a meeting cannot
+  be dated, and an empty register is not the same as nothing having happened (§2w).
+- **No results board meeting recorded** — so the PIT trading window rests on the quarter end alone
+  and Reg 47(1) has no date.
+
+Those are not defects and are not reported as such. Calling a missing optional column a defect would
+cry wolf on every real record.
+
+### What it says it cannot check
+Whether a rule states the law correctly — only reading the provision does that, and Rule Governance
+is where it gets recorded. Whether a filing was actually made — nothing here reaches MCA21. And
+anything depending on data not yet entered, which is what the gaps are for.
+
+Suite **312 → 322**, mutations 52, 0 missed.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -1800,7 +1863,7 @@ Suite **299 → 312**, mutations **49 → 52 caught, 0 missed**.
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (312 assertions, run against `index.html` itself), `node tests/mutation.js` (52 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (322 assertions, run against `index.html` itself), `node tests/mutation.js` (52 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **No AI model auto-updates to current law.** Staying current = fetch fresh sources (RSS via rss2json/allorigins for SEBI/MCA/IBBI/RBI/IncomeTax) + human curation + (optionally) paid web-search. Vetted human templates + AI drafting is the right model.
 - **Drafting quality:** resolution/notice prompts (`RES_SYS`, `DOC_SYS`) were tuned to a senior-CS standard (exact sub-section citations with read-with clauses, SEBI LODR cross-refs, full RESOLVED THAT/FURTHER THAT cascade, standard severally-authorised CS clause, Certified True Copy headers, Section 102 explanatory statements, MCA form+deadline line). There's an anti-reasoning guard telling the model to output ONLY the final document (some free models leaked their chain-of-thought). Keep these standards.
 - **Child/again:** all AI legal output must carry a "verify on MCA/SEBI portal before filing" caveat — the CS signs and carries professional responsibility.
@@ -1809,7 +1872,7 @@ Suite **299 → 312**, mutations **49 → 52 caught, 0 missed**.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v171.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v172.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**
