@@ -1861,6 +1861,88 @@ Suite **322 → 330**, mutations **52 → 56 caught, 0 missed**.
 
 ---
 
+## 3k. WHICH FINANCIAL YEAR AM I LOOKING AT (v174)
+
+The owner, working with two real companies: *"there should be an option to set financial year as
+this taking data for past years also which is not relevant."*
+
+Measured before building anything. For a 31 March company on 7 September 2026:
+
+| period end | rows | |
+|---|---|---|
+| 31 Mar 2026 | 18 | the year that **CLOSED** — AGM, AOC-4, MGT-7, ADT-1 |
+| 30 Sep 2026 | 2 | inside the year in progress |
+| *(none)* | 33 | continuous — belong to no year |
+
+Correct as far as it went — in September a CS **is** working on last year's annual filings — but
+there was no way to ask for one year, and the closed year and the open one were one undifferentiated
+list. On a listed entity it is 237 rows across two years and four quarters.
+
+### Filtered by the period it RELATES TO, never by the due date
+AOC-4 for the year ended 31 March 2026 is **due 30 October 2026** and belongs to **2025-26**.
+Filtering on the deadline would file it under the year it lands in, beside quarterlies it has
+nothing to do with.
+
+### A continuous obligation belongs to no year and always shows
+Thirty-three of fifty-three rows have no period end — *"maintain the registered office"*, *"prior to
+the transaction"*. Hiding those behind a year would mean **choosing a year silently switched off
+duties that never stop applying.** They stay, and a mutation checks they cannot be filtered out.
+
+### The selector is in the header, and lists the UNION
+A filtered register that looks like the whole one is the same defect as a date with nothing behind
+it, so the control that filtered it is visible from every screen. `allYears` bypasses the filter
+because `lgFyList` needs the whole register — **a filter that hid years from its own selector could
+never be turned off again**, and there is a mutation for that too.
+
+First cut built the list from `CLIENTS[0]` alone, which offered 2025-26 only while the listed
+company also spanned 2026-27 — a year that existed and could not be selected. Now the union.
+
+### And a self-inflicted one, caught immediately
+Inserting the selector's build step into the login chain added a **second `loadCloudClients()`**,
+fetching every company twice on login. Caught by reading the chain back rather than by anything
+failing — it worked perfectly, just twice.
+
+---
+
+## 3l. AN AGM-ANCHORED FILING REPORTS ON THE YEAR, NOT THE MEETING (v174)
+
+Adding the year filter exposed a bug that had been shipping since the register was built.
+
+`agm_offset` set `periodEnd` to **the AGM date itself**. So AOC-4 and MGT-7 carried period end
+**30 September 2026** — the date of the meeting — when what they report on is the year ended
+**31 March 2026**.
+
+**Their own companions had it right.** XBRL and MGT-8 take the financial year end, because §3d
+resolves a companion from the parent's *date* and not its *period*. Parents wrong, children right,
+in adjacent rows.
+
+```
+Section 96   (AGM)      periodEnd 2026-03-31   ✓
+Section 137  (AOC-4)    periodEnd 2026-09-30   ✗   <- the AGM date
+Section 137  (XBRL)     periodEnd 2026-03-31   ✓   <- its own companion
+Section 92   (MGT-7)    periodEnd 2026-09-30   ✗
+Section 92(2)(MGT-8)    periodEnd 2026-03-31   ✓   <- its own companion
+```
+
+**It was harmless until `periodEnd` started deciding which year a row belongs to.** Nothing read it
+for these rows, so being wrong cost nothing. The moment a year filter existed, **choosing 2025-26
+hid the annual return and the financial statements for 2025-26** — the two filings that year is
+mostly about.
+
+The due date is untouched: still the AGM plus the offset, which is what the Act says. Only the year
+the row is **filed under** changed.
+
+### Three assertions had to be rewritten, and all three were asserting the bug
+"Choosing a year removes rows" — after the fix a private company's whole annual cycle sits in **one**
+year, so selecting it keeps everything. "The year list has at least two years" — likewise. Both were
+really asserting that the annual filings were scattered across two years, which was the defect.
+**An assertion written against broken behaviour passes for the wrong reason and fails when it is
+fixed.**
+
+Suite **330 → 350**, mutations **56 → 61 caught, 0 missed**.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -1929,7 +2011,7 @@ Suite **322 → 330**, mutations **52 → 56 caught, 0 missed**.
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (330 assertions, run against `index.html` itself), `node tests/mutation.js` (56 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (350 assertions, run against `index.html` itself), `node tests/mutation.js` (61 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **No AI model auto-updates to current law.** Staying current = fetch fresh sources (RSS via rss2json/allorigins for SEBI/MCA/IBBI/RBI/IncomeTax) + human curation + (optionally) paid web-search. Vetted human templates + AI drafting is the right model.
 - **Drafting quality:** resolution/notice prompts (`RES_SYS`, `DOC_SYS`) were tuned to a senior-CS standard (exact sub-section citations with read-with clauses, SEBI LODR cross-refs, full RESOLVED THAT/FURTHER THAT cascade, standard severally-authorised CS clause, Certified True Copy headers, Section 102 explanatory statements, MCA form+deadline line). There's an anti-reasoning guard telling the model to output ONLY the final document (some free models leaked their chain-of-thought). Keep these standards.
 - **Child/again:** all AI legal output must carry a "verify on MCA/SEBI portal before filing" caveat — the CS signs and carries professional responsibility.
@@ -1938,7 +2020,7 @@ Suite **322 → 330**, mutations **52 → 56 caught, 0 missed**.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v173.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v174.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

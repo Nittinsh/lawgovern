@@ -550,6 +550,11 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 .chk-row{display:flex;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line-soft);cursor:pointer;align-items:flex-start;transition:.12s;}
 .nic-count{font-size:12px;color:var(--ink-soft);margin-bottom:10px;font-weight:600;}
 .lg-org-slot{display:flex;align-items:center;}
+.lg-fy-slot{display:flex;flex-direction:column;gap:2px;}
+.lg-fy-l{font-size:9.5px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em;}
+.lg-fy-sel{font-size:12.5px;font-weight:600;color:var(--navy);border:1px solid var(--line);border-radius:8px;padding:5px 8px;background:#fff;max-width:170px;}
+.lg-fy-sel.on{border-color:var(--blue);background:var(--blue-wash);}
+@media(max-width:640px){.lg-fy-slot{display:none;}}
 .lg-org-one{display:flex;flex-direction:column;font-size:12.5px;font-weight:700;color:var(--navy);line-height:1.3;}
 .lg-org-role{font-size:10.5px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;}
 .lg-org-sel{font-size:12.5px;font-weight:600;color:var(--navy);border:1px solid var(--line);border-radius:8px;padding:6px 9px;background:#fff;max-width:190px;}
@@ -1314,6 +1319,10 @@ function enterApp(){
       .catch(function(){})
       .then(function(){ if(typeof lgOrgHeader === 'function') lgOrgHeader(); })
       .then(function(){ return loadCloudClients(); })
+      // The year selector lists the years present in the register, so it can
+      // only be built once the companies are loaded — but ONCE. Inserting a
+      // second loadCloudClients() here fetched every company twice on login.
+      .then(function(){ if(typeof lgFyHeader === 'function') lgFyHeader(); })
       .then(function(){ return (typeof lgLoadRegisters === 'function') ? lgLoadRegisters() : null; })
       .then(function(){
       if(typeof renderCommandCenter === 'function') renderCommandCenter();
@@ -1496,7 +1505,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v173">
+      <meta id="build-version" content="v174">
     </div>
   </div>
   <div class="cc-search">
@@ -1508,6 +1517,7 @@ input[type="text"], input[type="password"], textarea, select {
   </div>
   <div class="appheader-right">
     <div id="lg-org-slot" class="lg-org-slot"></div>
+    <div id="lg-fy-slot" class="lg-fy-slot"></div>
     <div class="hdr-ent" id="hdr-ent" onclick="sw('entities')" title="Manage entities">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>
       <div><div class="hdr-ent-n" id="hdr-ent-name">No entity</div>
@@ -4702,9 +4712,21 @@ function cmDueDatesRaw(rule, c, agmIso){
       var day = Math.min(p[2], lastDay);
       return [{due: lodrFmt(tgtY, tgtM + 1, day), periodEnd: pe, label:'FY'}];
     }
-    case 'agm_offset':
+    case 'agm_offset': {
       if(!agmIso) return [];
-      return [{due: lodrAddDays(agmIso, d.days||0), periodEnd: agmIso, label:'post-AGM'}];
+      // The period end is the FINANCIAL YEAR the filing reports on, not the
+      // date of the meeting. AOC-4 and MGT-7 for the year ended 31 March are
+      // filed after the September AGM and still belong to that March year —
+      // their own companions (XBRL, MGT-8) had it right all along.
+      //
+      // Harmless until §3k made periodEnd decide which year a row belongs to.
+      // Then choosing 2025-26 hid the annual return and the financial
+      // statements for 2025-26, which is most of what the year is about.
+      var agmFy = fyA;
+      return [{due: lodrAddDays(agmIso, d.days||0),
+               periodEnd: lodrLast(agmFy.month, agmFy.day),
+               label:'post-AGM'}];
+    }
     case 'event_offset':
       return [];                                    // needs an actual trigger date
     case 'quarterly': {
@@ -5828,6 +5850,74 @@ function lgResolveCompanions(rows, fyMonth, fyDay){
 // Exposed so a partial run is visible rather than silent.
 var LG_COMPANION_STATS = {resolved: 0, failed: 0};
 
+// ═══════════════════════════════════════════════════
+// FINANCIAL YEAR — which one am I looking at
+// ═══════════════════════════════════════════════════
+// The register mixed years and never said so. For a 31 March company in
+// September, the AGM, AOC-4, MGT-7 and ADT-1 all relate to the year that CLOSED
+// the previous March, sitting beside items from the year in progress.
+//
+// Filtered by the period an obligation RELATES TO, never by the date its
+// deadline falls on: AOC-4 for the year ended 31 March 2026 is due in October
+// 2026 and belongs to 2025-26. Filing it under the due date would put it beside
+// the quarterlies of a year it has nothing to do with.
+
+var LG_FY = 'all';
+try{ LG_FY = localStorage.getItem('lg_fy') || 'all'; }catch(e){}
+
+// A period end falls in the financial year that ENDS on it. With a 31 March
+// year end, 31 March 2026 closes FY 2025-26.
+function lgFyOfPeriod(periodEnd, fyMonth, fyDay){
+  if(!periodEnd) return null;
+  var p = String(periodEnd).split('-').map(Number);
+  if(p.length < 3 || !p[0]) return null;
+  var endY = p[0];
+  // A period ending before the year end date belongs to the year that closes
+  // later in the same calendar year; one ending after it belongs to the next.
+  var m = p[1], d = p[2];
+  var closesThisYear = (m < fyMonth) || (m === fyMonth && d <= fyDay);
+  var fyEndYear = closesThisYear ? endY : endY + 1;
+  var startYear = fyEndYear - 1;
+  // A December year end makes the label a single year, not a span.
+  if(fyMonth === 12 && fyDay === 31) return String(fyEndYear);
+  return String(startYear) + '-' + String(fyEndYear).slice(2);
+}
+
+// Every financial year present in one entity's register, newest first.
+function lgFyList(c){
+  var out = {};
+  try{
+    var raw = String((c && c.fyend) || '').trim().split('-').map(Number);
+    var fyMonth = 3, fyDay = 31;
+    if(raw.length === 3 && raw[1] >= 1 && raw[1] <= 12){ fyMonth = raw[1]; fyDay = raw[2]; }
+    else if(raw.length === 2 && raw[0] >= 1 && raw[0] <= 12){ fyMonth = raw[0]; fyDay = raw[1]; }
+    (getComplianceChart(c, {allYears:true}) || []).forEach(function(r){
+      var fy = lgFyOfPeriod(r.periodEnd, fyMonth, fyDay);
+      if(fy) out[fy] = (out[fy] || 0) + 1;
+    });
+  }catch(e){}
+  return Object.keys(out).sort().reverse().map(function(k){ return {fy:k, n:out[k]}; });
+}
+
+function lgSetFy(v){
+  LG_FY = v || 'all';
+  try{ localStorage.setItem('lg_fy', LG_FY); }catch(e){}
+  // Every screen counts from the register, so all of them move together.
+  location.reload();
+}
+
+// Applied inside getComplianceChart so no screen can show a different total
+// from another. A row with NO period end belongs to no year and always stays:
+// hiding "maintain the registered office" behind a year filter would let
+// choosing a year silently switch off a duty that never stops applying.
+function lgApplyFyFilter(rows, fyMonth, fyDay){
+  if(!LG_FY || LG_FY === 'all') return rows;
+  return rows.filter(function(r){
+    if(!r.periodEnd) return true;
+    return lgFyOfPeriod(r.periodEnd, fyMonth, fyDay) === LG_FY;
+  });
+}
+
 function getComplianceChart(c, opts){
   var y  = new Date().getFullYear();
 
@@ -6014,6 +6104,14 @@ function getComplianceChart(c, opts){
   // exported, and put in front of a board.
   if(fyAssumed){
     rows.forEach(function(r){ if(r.due) r.fyAssumed = true; });
+  }
+
+  // ── the financial year in view ──────────────────────────────
+  // Last, so every other engine has already seen the full set. `allYears`
+  // bypasses it — lgFyList needs the whole register to know which years exist,
+  // and a filter that hid years from its own selector could never be turned off.
+  if(!(opts && opts.allYears) && typeof lgApplyFyFilter === 'function'){
+    try{ rows = lgApplyFyFilter(rows, fyMonth, fyDay); }catch(e){ console.error('[fy]', e); }
   }
 
   // A user's "not applicable" overrides the engine, which cannot know whether
@@ -10555,6 +10653,38 @@ function lgCurrentOrg(){
 
 // The organisation sits in the header beside the account, because "which
 // practice am I looking at" changes what every number on the screen means.
+// The year sits in the header, not on a panel. A filtered register that looks
+// like the whole one is the same defect as a date with nothing behind it, so the
+// control that filtered it has to be visible from every screen.
+function lgFyHeader(){
+  var slot = document.getElementById('lg-fy-slot');
+  if(!slot) return;
+  if(typeof CLIENTS === 'undefined' || !CLIENTS.length){ slot.innerHTML = ''; return; }
+  // The UNION across every entity, not the first one's. Companies have
+  // different year ends and different registers: building the list from
+  // CLIENTS[0] alone offered 2025-26 only, while the listed company also
+  // spanned 2026-27 — so a year that existed could not be selected.
+  var tally = {};
+  CLIENTS.forEach(function(x){
+    try{
+      lgFyList(x).forEach(function(y){ tally[y.fy] = (tally[y.fy] || 0) + y.n; });
+    }catch(e){}
+  });
+  var years = Object.keys(tally).sort().reverse().map(function(k){
+    return {fy:k, n:tally[k]};
+  });
+  if(!years.length){ slot.innerHTML = ''; return; }
+  slot.innerHTML =
+    '<label class="lg-fy-l" for="lg-fy-sel">Financial year</label>'+
+    '<select id="lg-fy-sel" class="lg-fy-sel'+(LG_FY !== 'all' ? ' on' : '')+
+      '" onchange="lgSetFy(this.value)">'+
+    '<option value="all"'+(LG_FY==='all'?' selected':'')+'>All years</option>'+
+    years.map(function(y){
+      return '<option value="'+entEsc(y.fy)+'"'+(LG_FY===y.fy?' selected':'')+'>'+
+        entEsc(y.fy)+' ('+y.n+')</option>';
+    }).join('')+'</select>';
+}
+
 function lgOrgHeader(){
   var slot = document.getElementById('lg-org-slot');
   if(!slot) return;

@@ -1306,6 +1306,107 @@ describe('back-test');
      decContradict.every(f => /the AGM row is/.test(f.detail)), 'not named');
 }
 
+// ── 11m. The financial year in view (§3k) ───────────────────
+// The register mixed years and never said so: for a 31 March company in
+// September, the AGM and AOC-4 relate to the year that CLOSED while quarterly
+// items belong to the year in progress.
+describe('financial year filter');
+{
+  const CRf = 10000000;
+  const co = { id: 'FY-1', name: 'FY Co', type: 'private', fyend: '2026-03-31',
+               capital: 5 * CRf, turnover: 40 * CRf, networth: CRf, netprofit: CRf,
+               borrowings: 0, cin: 'U51909MH2018PTC300111', chart: {} };
+  const withFy = (v, fn) => {
+    const prev = app.LG_FY;
+    app.LG_FY = v;
+    try { return fn(); } finally { app.LG_FY = prev; }
+  };
+
+  // A period end falls in the year that ENDS on it. 31 March 2026 closes 2025-26.
+  check('31 March 2026 closes FY 2025-26', app.lgFyOfPeriod('2026-03-31', 3, 31), '2025-26');
+  check('a September half-year sits inside 2026-27',
+        app.lgFyOfPeriod('2026-09-30', 3, 31), '2026-27');
+  check('31 March 2027 closes 2026-27', app.lgFyOfPeriod('2027-03-31', 3, 31), '2026-27');
+  // A December year end is a single calendar year, not a span.
+  check('a December year end labels a single year',
+        app.lgFyOfPeriod('2025-12-31', 12, 31), '2025');
+  check('and no period end belongs to no year', app.lgFyOfPeriod(null, 3, 31), null);
+
+  const all = withFy('all', () => app.getComplianceChart(co));
+  const y26 = withFy('2025-26', () => app.getComplianceChart(co));
+  const y27 = withFy('2026-27', () => app.getComplianceChart(co));
+
+  // After §3l a private company's whole annual cycle sits in ONE year, so
+  // selecting that year keeps everything and selecting the next keeps only the
+  // continuous duties. An earlier draft asserted that BOTH removed rows, which
+  // was really asserting the bug that scattered them across two years.
+  check('selecting the year the register covers keeps every row', y26.length, all.length);
+  ok('selecting a year it does not cover leaves only the continuous duties',
+     y27.length < all.length && y27.every(r => !r.periodEnd),
+     y27.length + ' rows, ' + y27.filter(r => r.periodEnd).length + ' with a period end');
+  ok('and keeps only period ends inside it',
+     y26.filter(r => r.periodEnd).every(r => app.lgFyOfPeriod(r.periodEnd, 3, 31) === '2025-26'),
+     'a foreign period end survived');
+  // A listed entity really does span two years — quarterly returns for the year
+  // in progress alongside the annual cycle of the year that closed.
+  const lAll = withFy('all', () => app.getComplianceChart(LISTED));
+  const lYears = [...new Set(lAll.filter(r => r.periodEnd)
+    .map(r => app.lgFyOfPeriod(r.periodEnd, 3, 31)))].filter(Boolean);
+  ok('a listed register spans more than one financial year', lYears.length >= 2,
+     lYears.join(','));
+  lYears.forEach(function(fy){
+    const sel = withFy(fy, () => app.getComplianceChart(LISTED));
+    ok('selecting ' + fy + ' keeps only that year',
+       sel.filter(r => r.periodEnd).every(r => app.lgFyOfPeriod(r.periodEnd, 3, 31) === fy),
+       'a foreign period end survived');
+  });
+
+  // A continuous obligation belongs to no year. Hiding it behind a year filter
+  // would let choosing a year silently switch off a duty that never stops.
+  const cont = (rs) => rs.filter(r => !r.periodEnd).length;
+  ok('a continuous obligation is never filtered out',
+     cont(all) === cont(y26) && cont(all) === cont(y27),
+     cont(all) + ' / ' + cont(y26) + ' / ' + cont(y27));
+  ok('and there are a meaningful number of them', cont(all) > 20, cont(all));
+
+  // AOC-4 relates to the year that closed, not the year its deadline falls in.
+  // Filtering on the due date would file it under the wrong year entirely.
+  // §3l: agm_offset used to set periodEnd to the AGM DATE, so AOC-4 and MGT-7
+  // were filed under the year of the meeting rather than the year they report
+  // on — and choosing 2025-26 hid the two filings that year is mostly about.
+  // Their own companions had it right, in adjacent rows.
+  [['Section 137; Accounts', 'AOC-4'], ['Section 92', 'MGT-7'],
+   ['Section 96', 'the AGM']].forEach(function(pair){
+    const r = y26.filter(x => String(x.section).indexOf(pair[0]) === 0)[0];
+    ok(pair[1] + ' belongs to the year it reports on, not the year it is due',
+       !!r && r.periodEnd === '2026-03-31',
+       r ? 'periodEnd ' + r.periodEnd : 'absent from 2025-26');
+  });
+  ok('and AOC-4 is still DUE after the AGM, which is what the Act says',
+     (y26.filter(x => String(x.section).indexOf('Section 137; Accounts') === 0)[0] || {}).due
+       > (y26.filter(x => String(x.section).indexOf('Section 96') === 0)[0] || {}).due,
+     'the due date moved with the period end, and it should not have');
+
+  // The selector lists the years in the register, so it must see the WHOLE
+  // register. A filter that hid years from its own selector could never be
+  // turned off again.
+  // Compared against itself rather than against a count: after §3l moved the
+  // AGM-anchored filings into the year they report on, a private company's
+  // register covers ONE year, and an assertion expecting two was really
+  // asserting the bug.
+  const listedAll = withFy('all', () => app.lgFyList(LISTED));
+  const listedFiltered = withFy(listedAll[0] && listedAll[0].fy,
+                                () => app.lgFyList(LISTED));
+  ok('the year list is the same whether or not a year is selected',
+     listedAll.map(y => y.fy).join(',') === listedFiltered.map(y => y.fy).join(','),
+     listedAll.map(y=>y.fy).join(',') + '  vs  ' + listedFiltered.map(y=>y.fy).join(','));
+  ok('and a listed entity spans more than one year', listedAll.length >= 2,
+     listedAll.map(y => y.fy).join(','));
+  ok('and allYears bypasses the filter',
+     withFy('2025-26', () => app.getComplianceChart(co, { allYears: true })).length === all.length,
+     'allYears was filtered');
+}
+
 // ── 12. Dashboard invariants ────────────────────────────────
 describe('dashboard invariants');
 {

@@ -250,6 +250,28 @@ const MUTATIONS = [
 
   // ── the SEBI-specified group (§3e) ──────────────────────────
 
+  // ── the financial year in view (§3k, §3l) ───────────────────
+
+  { name: 'a continuous obligation gets filtered out by the year (§3k)',
+    from: '    if(!r.periodEnd) return true;',
+    to:   '    if(!r.periodEnd) return false;' },
+
+  { name: 'the year filter reads the due date instead of the period (§3k)',
+    from: '    return lgFyOfPeriod(r.periodEnd, fyMonth, fyDay) === LG_FY;',
+    to:   '    return lgFyOfPeriod(r.due, fyMonth, fyDay) === LG_FY;' },
+
+  { name: 'allYears stops bypassing the filter, hiding years from the selector (§3k)',
+    from: "  if(!(opts && opts.allYears) && typeof lgApplyFyFilter === 'function'){",
+    to:   "  if(typeof lgApplyFyFilter === 'function'){" },
+
+  { name: 'AOC-4 goes back to being filed under the AGM year (§3l)',
+    from: "               periodEnd: lodrLast(agmFy.month, agmFy.day),",
+    to:   "               periodEnd: agmIso," },
+
+  { name: 'a period ending on the year-end date rolls into the next year (§3k)',
+    from: '  var closesThisYear = (m < fyMonth) || (m === fyMonth && d <= fyDay);',
+    to:   '  var closesThisYear = (m < fyMonth);' },
+
   // ── what the first real back-test found (§3j) ───────────────
   // Both mutations return the product to SILENCE about something it assumed.
   // That is the failure mode: every one of these looked normal on screen.
