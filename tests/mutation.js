@@ -250,6 +250,26 @@ const MUTATIONS = [
 
   // ── the SEBI-specified group (§3e) ──────────────────────────
 
+  // ── what the first real back-test found (§3j) ───────────────
+  // Both mutations return the product to SILENCE about something it assumed.
+  // That is the failure mode: every one of these looked normal on screen.
+
+  { name: 'a missing year end stops being marked as assumed (§3j)',
+    from: "    rows.forEach(function(r){ if(r.due) r.fyAssumed = true; });",
+    to:   "    rows.forEach(function(r){ if(r.due) r.fyAssumed = false; });" },
+
+  { name: 'reading a real year end still marks it assumed (§3j — cries wolf)',
+    from: "  if(fyRaw.length===3 && fyRaw[1]>=1 && fyRaw[1]<=12){ fyMonth=fyRaw[1]; fyDay=fyRaw[2]; fyAssumed=false; }        // YYYY-MM-DD",
+    to:   "  if(fyRaw.length===3 && fyRaw[1]>=1 && fyRaw[1]<=12){ fyMonth=fyRaw[1]; fyDay=fyRaw[2]; }        // YYYY-MM-DD" },
+
+  { name: 'the assumed year end is downgraded from a defect to a gap (§3j)',
+    from: "      btAdd(F,'fail','BASIS',c.name,'Every annual date rests on an ASSUMED year end',",
+    to:   "      btAdd(F,'warn','BASIS',c.name,'Every annual date rests on an ASSUMED year end'," },
+
+  { name: 'the AGM-anchor window widens until nothing disagrees (§3j)',
+    from: "        if(gap > 120 || gap < 0)",
+    to:   "        if(gap > 1200 || gap < 0)" },
+
   // ── the export (§3h) ────────────────────────────────────────
   // An export that drops a table silently is worse than none: it looks like a
   // backup. Both mutations make the drop invisible rather than breaking it.

@@ -1496,7 +1496,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v172">
+      <meta id="build-version" content="v173">
     </div>
   </div>
   <div class="cc-search">
@@ -5835,8 +5835,15 @@ function getComplianceChart(c, opts){
   // Reading split('-')[0] as the month sent every AGM-derived deadline ~170 years out.
   var fyRaw   = String(c.fyend||'').trim().split('-').map(function(n){ return parseInt(n,10); });
   var fyMonth = 3, fyDay = 31;                                  // default: 31 March
-  if(fyRaw.length===3 && fyRaw[1]>=1 && fyRaw[1]<=12){ fyMonth=fyRaw[1]; fyDay=fyRaw[2]; }        // YYYY-MM-DD
-  else if(fyRaw.length===2 && fyRaw[0]>=1 && fyRaw[0]<=12){ fyMonth=fyRaw[0]; fyDay=fyRaw[1]; }   // MM-DD
+  // Whether that default was USED matters and was invisible until the first
+  // back-test on real data. A missing net worth makes the engine abstain; a
+  // missing year end makes it assume 31 March and carry on producing dates that
+  // look computed. For an Indian company that is usually right, which is
+  // precisely what makes it dangerous — the one client with a December year end
+  // gets a silently wrong calendar. Every row derived from it now says so.
+  var fyAssumed = true;
+  if(fyRaw.length===3 && fyRaw[1]>=1 && fyRaw[1]<=12){ fyMonth=fyRaw[1]; fyDay=fyRaw[2]; fyAssumed=false; }        // YYYY-MM-DD
+  else if(fyRaw.length===2 && fyRaw[0]>=1 && fyRaw[0]<=12){ fyMonth=fyRaw[0]; fyDay=fyRaw[1]; fyAssumed=false; }   // MM-DD
 
   // AGM: within 6 months of FY end (Sec 96). Wrap across the year boundary properly.
   var agmM = ((fyMonth + 6 - 1) % 12) + 1;
@@ -6001,6 +6008,13 @@ function getComplianceChart(c, opts){
   try{
     if(typeof lgResolveCompanions === 'function') rows = lgResolveCompanions(rows, fyMonth, fyDay);
   }catch(e){ console.error('[companion]', e); }
+
+  // A date computed from a year end nobody entered must say so. Marked on the
+  // row rather than shown once at the top, because the row is what gets read,
+  // exported, and put in front of a board.
+  if(fyAssumed){
+    rows.forEach(function(r){ if(r.due) r.fyAssumed = true; });
+  }
 
   // A user's "not applicable" overrides the engine, which cannot know whether
   // this company accepts deposits, has a subsidiary or holds foreign assets.
@@ -11037,6 +11051,35 @@ function lgBackTest(){
     }
 
     // ── CONTRADICT ────────────────────────────────────────────
+    // AOC-4 is "within thirty days of the AGM" and MGT-7 "within sixty". Both
+    // must follow the AGM ON THIS CHART. Where they are computed from a later
+    // one, the register says in one row that the meeting is overdue and in the
+    // next that the filing which follows it is a year away.
+    //
+    // This does not arise for a 31 March company, whose AGM is still ahead —
+    // which is why every test entity in this project having a March year end
+    // hid it until a December one was tried.
+    checked++;
+    var agmRow = rows.filter(function(r){
+      return typeof lgRowIsAGM === 'function' && lgRowIsAGM(r) && r.due; })[0];
+    if(agmRow){
+      [['Section 137', 'AOC-4', 30], ['Section 92', 'MGT-7', 60]].forEach(function(pair){
+        var r = rows.filter(function(x){
+          return String(x.section).indexOf(pair[0]) === 0 && x.due &&
+                 !/XBRL|92\(2\)/.test(String(x.section)); })[0];
+        if(!r) return;
+        // Generous window: the filing must fall within a quarter of its AGM.
+        // Anything beyond that is not an offset, it is a different AGM.
+        var gap = Math.round((new Date(r.due + 'T00:00:00') -
+                              new Date(agmRow.due + 'T00:00:00')) / 86400000);
+        if(gap > 120 || gap < 0)
+          btAdd(F,'fail','CONTRADICT',c.name,
+            pair[1] + ' is dated from a different AGM than the one on this chart',
+            'the AGM row is ' + agmRow.due + ' and ' + pair[1] + ' is ' + r.due + ' — ' +
+            gap + ' days apart, where the Act allows ' + pair[2] + '. One of the two is ' +
+            'describing a different year.');
+      });
+    }
     checked++;
     var bothWays = rows.filter(function(r){
       return r.due && typeof lgNoDeadlineWhy === 'function' && lgNoDeadlineWhy(r);
@@ -11052,15 +11095,28 @@ function lgBackTest(){
         orphanCompanion[0].section);
 
     // ── DATA — the part real entities make possible ───────────
+    // A missing year end is NOT the same kind of thing as a missing net worth,
+    // and the first run against real companies is what made that clear. A
+    // missing net worth SKIPS the limb; a missing year end makes the engine
+    // ASSUME 31 March and produce dates that look computed. One abstains, the
+    // other guesses, so this is a defect and the rest are gaps.
+    checked++;
+    var datedRows = rows.filter(function(r){ return r.due; });
+    if(datedRows.some(function(r){ return r.fyAssumed; }))
+      btAdd(F,'fail','BASIS',c.name,'Every annual date rests on an ASSUMED year end',
+        'No financial year end is recorded, so the register has assumed 31 March and produced ' +
+        datedRows.length + ' dated obligation(s) from it — AGM, AOC-4, MGT-7 and ADT-1 among ' +
+        'them. For most Indian companies 31 March is right, which is why a wrong one would not ' +
+        'look wrong. Set it on the entity record.');
+
     checked++;
     var missing = [];
-    if(!c.fyend) missing.push('financial year end');
     if(!c.cin) missing.push('CIN');
     if(c.capital === null || c.capital === undefined || c.capital === '') missing.push('paid-up capital');
     if(c.turnover === null || c.turnover === undefined || c.turnover === '') missing.push('turnover');
     if(missing.length)
       btAdd(F,'warn','DATA',c.name,'Entity record incomplete', missing.join(', ') +
-        ' — applicability is decided from these');
+        ' — applicability is decided from these, and a blank limb is skipped rather than passed');
 
     // Which statutory limbs cannot be evaluated at all. This is the finding
     // that only appears against a real record: on an invented company every
@@ -15898,6 +15954,14 @@ function lgWhy(entityId, key){
 
       '<div class="lg-h">Due date</div>'+
       '<div class="lg-kv"><span>Calculated due date</span><b class="mono">'+entEsc(row.due||'—')+'</b></div>'+
+      (row.fyAssumed
+        ? '<div style="font-size:12px;line-height:1.65;color:var(--ink);background:rgba(245,158,11,.12);'+
+          'border-left:3px solid var(--warn);border-radius:0 8px 8px 0;padding:10px 12px;margin:6px 0 10px;">'+
+          '<b>This date rests on an assumed year end.</b> No financial year end is recorded for '+
+          'this entity, so the register has assumed <b>31 March</b>. For most Indian companies '+
+          'that is right &mdash; which is exactly why it is worth checking. Set it on the entity '+
+          'record and every annual date recomputes.</div>'
+        : '')+
       // A companion takes another filing's date. Say which, and quote the
       // wording that ties them, or the reader has a date with no derivation.
       // A blank reads the same for a continuous duty, an annual review, and a

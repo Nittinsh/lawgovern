@@ -1795,6 +1795,72 @@ Suite **312 → 322**, mutations 52, 0 missed.
 
 ---
 
+## 3j. WHAT THE FIRST REAL BACK-TEST FOUND (v173)
+
+The owner ran §3i against their two real companies. **0 defects, 7 gaps** — and one of those "gaps"
+was the most important finding this project has had since §2k.
+
+### Both companies have NO financial year end, and the engine assumed one
+`getComplianceChart` defaults to 31 March when `fyend` is absent. Verified: with `fyend` null it
+produces **AGM 30 September and AOC-4 30 October — byte for byte the dates a 31 March company
+gets**, with nothing on screen saying an assumption was made. **79 dated obligations across the two
+entities (14 + 65) rested on a year end nobody entered.**
+
+**A missing net worth and a missing year end are not the same kind of thing**, and only real data
+made the difference visible:
+
+| | what the engine does |
+|---|---|
+| missing **net worth** | the s.135 limb is **SKIPPED**. It abstains, and §2c says so out loud |
+| missing **year end** | it **ASSUMES 31 March and carries on**, producing dates that look computed |
+
+One abstains. The other guesses. That is the §2k defect class exactly — a date that looks like a
+date with nothing behind it — and the back-test had filed it beside the harmless one.
+
+**For an Indian company 31 March is usually right, which is precisely what makes it dangerous.** It
+is right often enough that the one client with a December year end gets a silently wrong calendar
+and no warning at all.
+
+Now: every row derived from an assumed year end carries `fyAssumed`, the Why panel says so in
+amber, and the back-test reports it as a **defect**.
+
+### A second finding, from reading the December case
+Chasing that turned up a disagreement the back-test could not see:
+
+```
+Section 96  (AGM)     due 2026-06-30   period end 2025-12-31   <- overdue
+Section 137 (AOC-4)   due 2027-07-30   period end 2027-06-30
+Section 92  (MGT-7)   due 2027-08-29   period end 2027-06-30
+```
+
+AOC-4 is *"within thirty days of the AGM"* and MGT-7 *"within sixty"*. **Both are computed from a
+LATER AGM than the AGM row on the same chart.** So the register says the annual general meeting is
+overdue and, in the next row, that the filing which follows it is not due for another thirteen
+months. A CS reading that has a year in hand on a filing already late.
+
+**It does not arise for a 31 March company**, whose AGM is still ahead — which is why it survived:
+every test entity in this project has had a March year end. Real data with a different one is the
+only thing that would ever have shown it.
+
+### Reported, not silently repaired
+The arithmetic that rolls an annual obligation to its next occurrence is shared by every annual
+rule, and the 31 March path is correct today. **Changing it from here would be guessing at a fix
+that could break the common case to mend the uncommon one.** So the back-test now sees it, names
+both rows and the gap between them, and the owner decides — the same treatment §2v gives a period
+mismatch.
+
+The check is deliberately generous: a quarter's window. Anything beyond that is not an offset, it is
+a different AGM. Verified to fire on 31 December and **not** on 31 March or 30 June.
+
+### The lesson
+**Every synthetic entity in this project had a March year end and every field filled.** Two real
+companies, entered by hand and incomplete in the ordinary way, surfaced two defects in one run —
+one of which had been shipping since the register was built.
+
+Suite **322 → 330**, mutations **52 → 56 caught, 0 missed**.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -1863,7 +1929,7 @@ Suite **312 → 322**, mutations 52, 0 missed.
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (322 assertions, run against `index.html` itself), `node tests/mutation.js` (52 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (330 assertions, run against `index.html` itself), `node tests/mutation.js` (56 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **No AI model auto-updates to current law.** Staying current = fetch fresh sources (RSS via rss2json/allorigins for SEBI/MCA/IBBI/RBI/IncomeTax) + human curation + (optionally) paid web-search. Vetted human templates + AI drafting is the right model.
 - **Drafting quality:** resolution/notice prompts (`RES_SYS`, `DOC_SYS`) were tuned to a senior-CS standard (exact sub-section citations with read-with clauses, SEBI LODR cross-refs, full RESOLVED THAT/FURTHER THAT cascade, standard severally-authorised CS clause, Certified True Copy headers, Section 102 explanatory statements, MCA form+deadline line). There's an anti-reasoning guard telling the model to output ONLY the final document (some free models leaked their chain-of-thought). Keep these standards.
 - **Child/again:** all AI legal output must carry a "verify on MCA/SEBI portal before filing" caveat — the CS signs and carries professional responsibility.
@@ -1872,7 +1938,7 @@ Suite **312 → 322**, mutations 52, 0 missed.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v172.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v173.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

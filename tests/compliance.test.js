@@ -1262,6 +1262,48 @@ describe('back-test');
   // the same as nothing having happened.
   ok('empty registers are reported',
      sparse.findings.some(f => /Registers with no rows/.test(f.check)), 'not reported');
+
+  // ── §3j: found by the first run against two REAL companies ──
+  // A missing net worth SKIPS a limb. A missing year end makes the engine
+  // ASSUME 31 March and produce dates that look computed. One abstains, the
+  // other guesses — so this one is a defect and the rest are gaps.
+  const noFy = { id: 'BT-N', name: 'BT No FY', type: 'private', fyend: null,
+                 capital: 5 * CRb, turnover: 40 * CRb, networth: CRb, netprofit: CRb,
+                 borrowings: 0, cin: 'U51909MH2018PTC300111', chart: {} };
+  const assumed = withClients([noFy], () => app.lgBackTest());
+  const aDef = defects(assumed);
+  check('a missing financial year end is a DEFECT, not a gap', aDef.length, 1);
+  ok('and it says the year end was assumed',
+     /ASSUMED year end/.test(aDef[0].check), aDef[0].check);
+  ok('naming how many dates rest on it',
+     /dated obligation/.test(aDef[0].detail), aDef[0].detail);
+
+  // Every date produced from the assumed year end must carry the mark, or the
+  // warning cannot reach the row that needs it.
+  const noFyRows = app.getComplianceChart(noFy).filter(r => r.due);
+  ok('every dated row is marked as resting on an assumed year end',
+     noFyRows.length > 0 && noFyRows.every(r => r.fyAssumed), noFyRows.length);
+  const realFyRows = app.getComplianceChart(
+    Object.assign({}, noFy, { fyend: '2026-03-31' })).filter(r => r.due);
+  ok('and none is marked when a year end IS recorded',
+     realFyRows.every(r => !r.fyAssumed),
+     realFyRows.filter(r => r.fyAssumed).length + ' wrongly marked');
+
+  // AOC-4 and MGT-7 follow the AGM. Where they are computed from a LATER AGM,
+  // the register says the meeting is overdue and the filing that follows it is
+  // a year away. Invisible on a 31 March company, whose AGM is still ahead —
+  // which is why every test entity here having March hid it.
+  const mkFy = (fy) => ({ id: 'BT-' + fy, name: 'BT ' + fy, type: 'private', fyend: fy,
+                          capital: 5 * CRb, turnover: 40 * CRb, networth: CRb,
+                          netprofit: CRb, borrowings: 0,
+                          cin: 'U51909MH2018PTC300111', chart: {} });
+  const march = withClients([mkFy('2026-03-31')], () => app.lgBackTest());
+  check('a 31 March company has no AGM-anchor contradiction', defects(march).length, 0);
+  const dec = withClients([mkFy('2026-12-31')], () => app.lgBackTest());
+  const decContradict = defects(dec).filter(f => f.kind === 'CONTRADICT');
+  check('a 31 December company has two', decContradict.length, 2);
+  ok('and both name the AGM they disagree with',
+     decContradict.every(f => /the AGM row is/.test(f.detail)), 'not named');
 }
 
 // ── 12. Dashboard invariants ────────────────────────────────
