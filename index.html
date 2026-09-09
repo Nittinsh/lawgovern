@@ -747,6 +747,13 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
    is legitimately wider than the others. .cu-tablewrap is overflow:hidden
    above 900px and every other table that uses it fits, so this scrolls on its
    own rather than changing shared behaviour to suit one screen. */
+.cu-pager{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;}
+.cu-pager-l{font-size:11.5px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em;}
+.cu-pager-sel{font-size:12.5px;font-weight:600;padding:5px 8px;max-width:150px;}
+.cu-pager-b{font-size:12.5px;font-weight:600;color:var(--navy);background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer;}
+.cu-pager-b:hover:not([disabled]){border-color:var(--blue);color:var(--blue);}
+.cu-pager-b[disabled]{opacity:.4;cursor:default;}
+.cu-pager-n{font-size:12.5px;font-weight:600;color:var(--ink);}
 .pen-tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 .pen-tablewrap .cu-table{min-width:860px;}
 .cu-table{width:100%;border-collapse:collapse;font-size:13px;}
@@ -1511,7 +1518,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v176">
+      <meta id="build-version" content="v177">
     </div>
   </div>
   <div class="cc-search">
@@ -15159,6 +15166,50 @@ function ccFmtDate(d){
 var CU_FILTERS = { na:'', within:'', entity:'', law:'', risk:'', status:'', freq:'', q:'', vstatus:'', vmethod:'', listing:'' };
 var CU_SORT = { col:'due', dir:1 };
 
+// A book of thirty companies is 2,122 obligations. Rendering all of them put
+// 39,890 nodes on the page, made it 221,033 pixels tall and cost 1.36 seconds
+// through layout on a desktop. Nobody reads a register that way - they filter
+// it - so it is paged, and the footer states the true total beside the page so
+// a page can never read as the whole thing.
+var CU_PAGE = 0;
+var CU_PAGE_SIZE = 100;          // 0 means every row, and only when asked for
+var CU_PAGE_SIZES = [[100,'100 a page'],[250,'250 a page'],[0,'All rows']];
+
+// Any change to WHICH rows match invalidates where you were in them. Sorting
+// counts: page 5 of one order has nothing to do with page 5 of another.
+function cuPageReset(){ CU_PAGE = 0; }
+
+// Pure on purpose. The interesting part is not the slice, it is the clamping:
+// a filter can shrink the result under your feet while you sit on page 22, and
+// landing on an empty table would read as "nothing matches".
+function cuPageSlice(rows, page, size){
+  var matched  = rows.length;
+  var pageSize = (size > 0) ? size : matched;
+  var pageCount = Math.max(1, Math.ceil(matched / Math.max(1, pageSize)));
+  var p = page;
+  if(p >= pageCount) p = pageCount - 1;
+  if(p < 0) p = 0;
+  var from = p * pageSize;
+  return { rows: (size > 0) ? rows.slice(from, from + pageSize) : rows,
+           page: p, pageCount: pageCount, from: from,
+           matched: matched, pageSize: pageSize };
+}
+
+function cuGoPage(n){
+  CU_PAGE = n;
+  renderUniverse();
+  // Without this you land at the bottom of a fresh page, which reads as though
+  // nothing happened.
+  var t = document.querySelector('#cu-root .cu-tablewrap');
+  if(t && t.scrollIntoView) try{ t.scrollIntoView({block:'start'}); }catch(e){}
+}
+
+function cuSetPageSize(n){
+  CU_PAGE_SIZE = +n || 0;
+  cuPageReset();
+  renderUniverse();
+}
+
 function cuBuildRows(){
   var all = [];
   if(typeof CLIENTS==='undefined' || !CLIENTS.length) return all;
@@ -15309,6 +15360,14 @@ function renderUniverse(){
     var av=(a[c]||'')+'',bv=(b[c]||'')+''; return av.localeCompare(bv)*d;
   });
 
+  // ── the page ──────────────────────────────────────────────
+  // Sliced after the sort, so the page is a window on the ordered result and
+  // not a subset that got sorted afterwards.
+  var pg = cuPageSlice(rows, CU_PAGE, CU_PAGE_SIZE);
+  CU_PAGE = pg.page;                                  // clamped, so the pager
+  var pageRows = pg.rows, matched = pg.matched;       // and the footer agree
+  var pageCount = pg.pageCount, pageFrom = pg.from, pageSize = pg.pageSize;
+
   // Summary counts
   var cOver=all.filter(function(r){return r.status==='overdue';}).length;
   var cSoon=all.filter(function(r){return r.status==='due-soon';}).length;
@@ -15408,7 +15467,7 @@ function renderUniverse(){
             ' <a onclick="cuClear()" style="color:var(--blue);cursor:pointer;">Clear filters</a></td></tr>';
         })();
   } else {
-    rows.forEach(function(r){
+    pageRows.forEach(function(r){
       body+='<tr onclick="cuOpenDetail(\''+r.entityId+'\',\''+r.key+'\')">'+
         '<td data-label="Compliance"><div class="cu-oblig">'+r.obligation+'</div><div class="cu-oblig-sub">'+(r.form&&r.form!=='—'?'<span class="mono">'+r.form+'</span> · ':'')+r.owner+'</div></td>'+
         '<td data-label="Law"><span class="cu-law">'+cuLawShort(r.law)+'</span></td>'+
@@ -15437,25 +15496,55 @@ function renderUniverse(){
       th('Entity','entity')+th('Frequency','freq')+th('Due Date','due')+
       th('Risk','risk')+th('Status','status')+'<th></th>'+
     '</tr></thead><tbody>'+body+'</tbody></table></div>'+
-    '<div class="cu-foot">Showing <b>'+rows.length+'</b> of '+
-      ccPlural(all.filter(function(x){return !x.userNA;}).length,'obligation','obligations')+
+    '<div class="cu-foot">'+
+      // The page and the total in one sentence. A page that reads as the whole
+      // register is the same defect as a filter that does not say it filtered.
+      (CU_PAGE_SIZE > 0 && matched > pageSize
+        ? 'Rows <b>'+(pageFrom+1)+'&ndash;'+Math.min(pageFrom+pageSize, matched)+
+          '</b> of <b>'+matched+'</b> matching'
+        : 'Showing <b>'+matched+'</b>')+
+      ' &middot; '+ccPlural(all.filter(function(x){return !x.userNA;}).length,
+                            'obligation','obligations')+' on the register'+
       (naCount
         ? ' &middot; <a class="cc-link" onclick="cuSetFilter(\'na\',\''+
           (CU_FILTERS.na==='show'?'':'show')+'\')">'+
           (CU_FILTERS.na==='show' ? 'hide' : 'show')+' '+naCount+' marked not applicable</a>'
-        : '')+'</div>';
+        : '')+
+      '<div class="cu-pager">'+
+        '<label class="cu-pager-l" for="cu-pagesize">Show</label>'+
+        '<select id="cu-pagesize" class="lg-field cu-pager-sel" '+
+          'onchange="cuSetPageSize(this.value)">'+
+          CU_PAGE_SIZES.map(function(o){
+            return '<option value="'+o[0]+'"'+(CU_PAGE_SIZE===o[0]?' selected':'')+'>'+
+              o[1]+'</option>'; }).join('')+
+        '</select>'+
+        (pageCount > 1
+          ? '<button class="cu-pager-b" '+(CU_PAGE<=0?'disabled ':'')+
+              'onclick="cuGoPage('+(CU_PAGE-1)+')">&larr; Previous</button>'+
+            '<span class="cu-pager-n">Page '+(CU_PAGE+1)+' of '+pageCount+'</span>'+
+            '<button class="cu-pager-b" '+(CU_PAGE>=pageCount-1?'disabled ':'')+
+              'onclick="cuGoPage('+(CU_PAGE+1)+')">Next &rarr;</button>'
+          : '')+
+      '</div>'+
+      '</div>';
 
   root.innerHTML = head + filters + table;
 }
 
-function cuSetFilter(k,v){ CU_FILTERS[k]=v; if(k==='q'){ // keep focus
-    var all=cuBuildRows(); renderUniverse();
+function cuSetFilter(k,v){ CU_FILTERS[k]=v; cuPageReset(); if(k==='q'){ // keep focus
+    // `var all=cuBuildRows()` stood here, assigned and never read, while
+    // renderUniverse built the same 2,122 rows again - so every keystroke in
+    // the search box built the register twice and threw one copy away.
+    renderUniverse();
     var qi=document.getElementById('cu-q'); if(qi){qi.focus();qi.setSelectionRange(qi.value.length,qi.value.length);}
   } else renderUniverse();
 }
-function cuQuick(k,v){ CU_FILTERS[k]=v; renderUniverse(); }
-function cuClear(){ CU_FILTERS={na:'',within:'',entity:'',law:'',risk:'',status:'',freq:'',q:'',vstatus:'', vmethod:'', listing:''}; renderUniverse(); }
-function cuSort(col){ if(CU_SORT.col===col) CU_SORT.dir*=-1; else {CU_SORT.col=col;CU_SORT.dir=1;} renderUniverse(); }
+function cuQuick(k,v){ CU_FILTERS[k]=v; cuPageReset(); renderUniverse(); }
+function cuClear(){ CU_FILTERS={na:'',within:'',entity:'',law:'',risk:'',status:'',freq:'',q:'',vstatus:'', vmethod:'', listing:''}; cuPageReset(); renderUniverse(); }
+// Sorting resets the page too: page 5 of one order has nothing to do with
+// page 5 of another, so staying put would land the reader among rows that had
+// nothing to do with where they were.
+function cuSort(col){ if(CU_SORT.col===col) CU_SORT.dir*=-1; else {CU_SORT.col=col;CU_SORT.dir=1;} cuPageReset(); renderUniverse(); }
 
 function cuOpenDetail(entityId,key){
   // Placeholder: will open full compliance detail page (next module)

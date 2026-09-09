@@ -744,6 +744,109 @@ describe('section 403 — the due date comes from the register');
   check('no register section resolves to two forms', ambiguous.join(' | '), '');
 }
 
+describe('the register is paged, and says so');
+{
+  const rows = (n) => Array.from({length:n}, (_, i) => ({i}));
+  const S = app.cuPageSlice;
+
+  const a = S(rows(2122), 0, 100);
+  check('a full page is a full page', a.rows.length, 100);
+  check('and starts at the beginning', a.from, 0);
+  check('2,122 rows at 100 a page is 22 pages', a.pageCount, 22);
+  check('the true total travels with the page', a.matched, 2122);
+
+  const b = S(rows(2122), 21, 100);
+  check('the last page carries the remainder', b.rows.length, 22);
+  check('and starts where the 21 full pages ended', b.from, 2100);
+  check('the last row is the last row', b.rows[b.rows.length-1].i, 2121);
+
+  // The one that bites: a filter shrinks the result while you sit on page 22.
+  // Without the clamp the reader gets an empty table, which says "nothing
+  // matches" about a register that matched 40 things.
+  const c = S(rows(40), 21, 100);
+  check('a page past the end is pulled back to the last one', c.page, 0);
+  check('and shows the rows that are there', c.rows.length, 40);
+  check('rather than an empty table', c.rows.length > 0, true);
+  const d = S(rows(250), 9, 100);
+  check('pulled back to the LAST page, not the first', d.page, 2);
+  check('negative pages are clamped too', S(rows(250), -3, 100).page, 0);
+
+  // Exactly one past the end — the case `>=` catches and `>` does not. Every
+  // clamp assertion above passes with the off-by-one in place, because they all
+  // sit far past the end where either test fires. The mutation check found it.
+  const g = S(rows(250), 3, 100);          // 3 pages exist: 0, 1, 2
+  check('page 3 of 3 pages is pulled back to page 2', g.page, 2);
+  check('and shows the rows that are there, not an empty table', g.rows.length, 50);
+  check('the first row of it is the 201st', g.rows[0].i, 200);
+
+  // Boundaries, both sides.
+  check('an exact multiple does not add an empty page', S(rows(200), 0, 100).pageCount, 2);
+  check('one row over does', S(rows(201), 0, 100).pageCount, 3);
+  check('one row under does not', S(rows(199), 0, 100).pageCount, 2);
+  check('a single row is one page', S(rows(1), 0, 100).pageCount, 1);
+
+  // An empty result is one empty page, not zero pages — pageCount 0 would make
+  // "Page 1 of 0" and the clamp would compute page -1.
+  const e = S(rows(0), 0, 100);
+  check('no matches is still one page', e.pageCount, 1);
+  check('on page zero', e.page, 0);
+  check('with nothing on it', e.rows.length, 0);
+
+  // Size 0 is the reader asking for everything, explicitly.
+  const f = S(rows(2122), 0, 0);
+  check('all rows means all rows', f.rows.length, 2122);
+  check('and one page', f.pageCount, 1);
+  check('so the pager has nothing to offer', f.from, 0);
+
+  // The default has to be a page, not the whole register: rendering 2,122 rows
+  // cost 39,890 DOM nodes and 1.36s of layout on a desktop.
+  check('the register does not default to every row', app.CU_PAGE_SIZE > 0, true);
+  check('and the default page is a sane size',
+        app.CU_PAGE_SIZE >= 25 && app.CU_PAGE_SIZE <= 250, true);
+  check('"all rows" is still offered',
+        app.CU_PAGE_SIZES.some(o => o[0] === 0), true);
+
+  // Anything that changes WHICH rows match must return to the first page, or
+  // the reader is left among rows that have nothing to do with where they were.
+  const src = require('fs').readFileSync(process.env.LG_INDEX ||
+    require('path').join(__dirname, '..', 'index.html'), 'utf8');
+  // Comments stripped. This is the SECOND time an assertion here matched the
+  // comment that explains a bug rather than the code that fixes it — the res.ok
+  // ordering check did exactly the same. Prose must not be able to satisfy or
+  // break an assertion about code.
+  const decomment = (s) => s.split('\n').filter(l => !/^\s*\/\//.test(l)).join('\n');
+  // Stops at whichever comes first: the closing brace on its own line, or the
+  // next function. cuClear is a ONE-LINER, so slicing to '\n}' ran past it into
+  // cuSort — and cuSort has a cuPageReset() of its own, so removing cuClear's
+  // changed nothing the assertion could see. The mutation check found that too.
+  const fnOf = (name) => {
+    const i = src.indexOf('function ' + name + '(');
+    const ends = [src.indexOf('\n}', i), src.indexOf('\nfunction ', i)].filter(x => x > i);
+    return decomment(src.slice(i, Math.min.apply(null, ends)));
+  };
+  ['cuSetFilter', 'cuQuick', 'cuClear', 'cuSort'].forEach(fn => {
+    check(fn + ' returns to the first page', /cuPageReset\(\)/.test(fnOf(fn)), true);
+  });
+
+  // The footer states the true total beside the page. A page that reads as the
+  // whole register is the §3k defect — a filter that does not say it filtered.
+  const ru = src.slice(src.indexOf('function renderUniverse()'),
+                       src.indexOf('function cuSetFilter'));
+  check('the footer names the matching total', /of <b>'\+matched\+'<\/b> matching/.test(ru), true);
+  check('and the register total beside it', /on the register/.test(ru), true);
+
+  // The export is the whole register, never the page — somebody keeps it.
+  const ex = fnOf('cuExport');
+  check('the export does not know about pages', /CU_PAGE|pageRows/.test(ex), false);
+  check('it builds its own rows', /cuBuildRows\(\)/.test(ex), true);
+
+  // The dead double-build: `var all=cuBuildRows()` sat in cuSetFilter, assigned
+  // and never read, while renderUniverse built the same 2,122 rows again — so
+  // every keystroke in the search box built the register twice.
+  check('no discarded rebuild on the search path',
+        /var all\s*=\s*cuBuildRows\(\)/.test(fnOf('cuSetFilter')), false);
+}
+
 describe('penalties — one source, and it is the verified one');
 {
   // The Penalties screen kept its own copy of these figures and it had gone

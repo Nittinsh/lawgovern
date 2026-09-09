@@ -2134,6 +2134,96 @@ correcting the numbers without closing the door would just restart the clock.
 
 ---
 
+## 3o. THE REGISTER IS PAGED (v177)
+
+§3n measured the owner&rsquo;s real book &mdash; thirty companies &mdash; and found
+one screen an order of magnitude worse than every other:
+
+| panel | rows | DOM nodes | height | through layout |
+|---|---|---|---|---|
+| **universe** | **2,122** | **39,890** | **221,033 px** | **1,360 ms** |
+| cal | &mdash; | 3,487 | 23,127 px | 68 ms |
+| mywork | &mdash; | 1,693 | 9,268 px | 115 ms |
+| home | &mdash; | 338 | 1,755 px | 174 ms |
+
+A page 221 metres long, and 1.36 seconds through layout **on a desktop**.
+
+### It was never the computation
+`cuBuildRows()` takes **25 ms** for all thirty companies and `getComplianceChart`
+is **1 ms** each. The cost was building 2,122 rows of HTML and asking the browser
+to lay out forty thousand nodes &mdash; so the fix is to render fewer rows.
+**No cache was introduced**, and it would have bought nothing here anyway: a
+stale compliance register is a worse defect than a slow one.
+
+### Filtered, not truncated
+A hundred rows a page. The register is not a document to scroll; it is a thing to
+filter, and with any filter applied most results are one page.
+
+**The footer states the page and the true total in one sentence** &mdash;
+*&ldquo;Rows 1&ndash;100 of 2122 matching &middot; 2122 obligations on the
+register&rdquo;*. A page that reads as the whole register is the §3k defect
+exactly: a filter that does not say it filtered. **&ldquo;All rows&rdquo; stays
+on the menu**, because someone may genuinely want to search the page or print
+it &mdash; choosing it is the reader&rsquo;s decision; doing it by default was
+one the product made for them, thirty times over.
+
+| | before | after |
+|---|---|---|
+| through layout, warm | 1,360 ms | **26&ndash;30 ms** |
+| DOM nodes | 39,890 | **1,990** |
+| page height | 221,033 px | **17,297 px** |
+| all 2,122 rows, by choice | &mdash; | 406 ms |
+
+**~48x**, and the honest comparison is like-for-like warm renders at 1280px.
+
+### The clamp is the part with the risk, so it is pure
+`cuPageSlice(rows, page, size)` is a pure function, because the slice is trivial
+and the **clamping** is not: a filter can shrink the result while the reader sits
+on page 22, and landing on an empty table would say *&ldquo;nothing
+matches&rdquo;* about a register that matched forty things. §2y&rsquo;s rule
+&mdash; a calculation reachable only through a form is one nobody can test.
+
+Everything that changes **which** rows match returns to page 1. Sorting counts:
+page 5 of one order has nothing to do with page 5 of another.
+
+### A rebuild nobody used
+```js
+function cuSetFilter(k,v){ CU_FILTERS[k]=v; if(k==='q'){
+    var all=cuBuildRows(); renderUniverse();     // assigned, never read
+```
+`all` was discarded and `renderUniverse` built the same 2,122 rows again, so
+**every keystroke in the search box built the register twice**. Three keystrokes
+now cost 78 ms in total.
+
+### Three things the mutation check found, all in the new work
+- **The clamp assertion was too weak.** Every case sat *far* past the end, where
+  `>=` and `>` both fire. The off-by-one only shows at exactly one page past the
+  end &mdash; page 3 of 3 &mdash; which is where a reader actually lands.
+- **`fnOf` ran past a one-liner.** `cuClear` is a single line, so slicing to
+  `\n}` swept up `cuSort`, which has a `cuPageReset()` of its own &mdash; so
+  removing `cuClear`&rsquo;s changed nothing the assertion could see.
+- **An assertion matched a comment again.** Second time in two sessions; `fnOf`
+  strips comments now. *Prose must not be able to satisfy an assertion about
+  code.*
+
+### Measured and deliberately left
+- **The dashboard builds every chart five times** &mdash; 150 calls to
+  `getComplianceChart` for thirty companies where 30 would do, worth ~150 ms.
+  There are **35 call sites** across the app, so threading the charts through as
+  parameters is a large refactor, and the cheap alternative is a cache that could
+  serve a stale register. 174 ms on a panel switch is not worth that trade.
+- **Board reported 2.4&ndash;2.9 s in the browser pane and 18&ndash;31 ms in
+  isolation, for 183 nodes.** 183 nodes cannot take two seconds; the large
+  readings are pane artifacts. **Recorded rather than chased** &mdash; and worth
+  remembering that this pane&rsquo;s timings are unreliable when it is hidden
+  (`window.innerWidth` reads 0, which also puts measurements in the &lt;640px
+  branch).
+
+### Coverage
+Suite **435 &rarr; 472**, mutations **85 &rarr; 98 caught, 0 missed, 0 skipped**.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -2202,7 +2292,7 @@ correcting the numbers without closing the door would just restart the clock.
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (435 assertions, run against `index.html` itself), `node tests/mutation.js` (85 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (472 assertions, run against `index.html` itself), `node tests/mutation.js` (98 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **No AI model auto-updates to current law.** Staying current = fetch fresh sources (RSS via rss2json/allorigins for SEBI/MCA/IBBI/RBI/IncomeTax) + human curation + (optionally) paid web-search. Vetted human templates + AI drafting is the right model.
 - **Drafting quality:** resolution/notice prompts (`RES_SYS`, `DOC_SYS`) were tuned to a senior-CS standard (exact sub-section citations with read-with clauses, SEBI LODR cross-refs, full RESOLVED THAT/FURTHER THAT cascade, standard severally-authorised CS clause, Certified True Copy headers, Section 102 explanatory statements, MCA form+deadline line). There's an anti-reasoning guard telling the model to output ONLY the final document (some free models leaked their chain-of-thought). Keep these standards.
 - **Child/again:** all AI legal output must carry a "verify on MCA/SEBI portal before filing" caveat — the CS signs and carries professional responsibility.
@@ -2211,7 +2301,7 @@ correcting the numbers without closing the door would just restart the clock.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v176.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v177.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

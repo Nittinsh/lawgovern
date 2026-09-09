@@ -288,6 +288,63 @@ const MUTATIONS = [
     from: "        if(gap > 120 || gap < 0)",
     to:   "        if(gap > 1200 || gap < 0)" },
 
+  // ── the paged register (§3o) ────────────────────────────────
+  // Each of these leaves a register that looks perfectly normal. The clamp is
+  // the dangerous one: an empty table reads as "nothing matches", which is a
+  // false statement about the register rather than a slow screen.
+
+  { name: 'a page past the end is no longer pulled back (§3o — empty table)',
+    from: "  if(p >= pageCount) p = pageCount - 1;",
+    to:   "  if(p > pageCount) p = pageCount - 1;" },
+
+  { name: 'the clamp lands on the FIRST page instead of the last (§3o)',
+    from: "  if(p >= pageCount) p = pageCount - 1;\n  if(p < 0) p = 0;",
+    to:   "  if(p >= pageCount) p = 0;\n  if(p < 0) p = 0;" },
+
+  { name: 'an empty result reports zero pages (§3o — "Page 1 of 0")',
+    from: "  var pageCount = Math.max(1, Math.ceil(matched / Math.max(1, pageSize)));",
+    to:   "  var pageCount = Math.ceil(matched / Math.max(1, pageSize));" },
+
+  { name: 'the page runs to the end of the register (§3o — every row again)',
+    from: "  return { rows: (size > 0) ? rows.slice(from, from + pageSize) : rows,",
+    to:   "  return { rows: (size > 0) ? rows.slice(from) : rows," },
+
+  { name: 'an exact multiple gains an empty last page (§3o)',
+    from: "  var pageCount = Math.max(1, Math.ceil(matched / Math.max(1, pageSize)));\n  var p = page;",
+    to:   "  var pageCount = Math.max(1, Math.floor(matched / Math.max(1, pageSize)) + 1);\n  var p = page;" },
+
+  { name: 'the register goes back to rendering every row by default (§3o)',
+    from: "var CU_PAGE_SIZE = 100;",
+    to:   "var CU_PAGE_SIZE = 0;" },
+
+  { name: '"all rows" stops being offered (§3o — truncation with no way out)',
+    from: "var CU_PAGE_SIZES = [[100,'100 a page'],[250,'250 a page'],[0,'All rows']];",
+    to:   "var CU_PAGE_SIZES = [[100,'100 a page'],[250,'250 a page']];" },
+
+  { name: 'filtering leaves you on the page you were on (§3o)',
+    from: "function cuSetFilter(k,v){ CU_FILTERS[k]=v; cuPageReset(); if(k==='q'){",
+    to:   "function cuSetFilter(k,v){ CU_FILTERS[k]=v; if(k==='q'){" },
+
+  { name: 'sorting leaves you on the page you were on (§3o)',
+    from: "function cuSort(col){ if(CU_SORT.col===col) CU_SORT.dir*=-1; else {CU_SORT.col=col;CU_SORT.dir=1;} cuPageReset(); renderUniverse(); }",
+    to:   "function cuSort(col){ if(CU_SORT.col===col) CU_SORT.dir*=-1; else {CU_SORT.col=col;CU_SORT.dir=1;} renderUniverse(); }" },
+
+  { name: 'clearing the filters leaves you deep in the pages (§3o)',
+    from: "listing:''}; cuPageReset(); renderUniverse(); }",
+    to:   "listing:''}; renderUniverse(); }" },
+
+  { name: 'the footer stops naming the matching total (§3o — a page reads as the whole)',
+    from: "        ? 'Rows <b>'+(pageFrom+1)+'&ndash;'+Math.min(pageFrom+pageSize, matched)+\n          '</b> of <b>'+matched+'</b> matching'",
+    to:   "        ? 'Rows <b>'+(pageFrom+1)+'&ndash;'+Math.min(pageFrom+pageSize, matched)+'</b>'" },
+
+  { name: 'the export starts exporting only the page (§3o)',
+    from: "function cuExport(){\n  var rows=cuBuildRows();",
+    to:   "function cuExport(){\n  var rows=cuBuildRows().slice(CU_PAGE*CU_PAGE_SIZE, (CU_PAGE+1)*CU_PAGE_SIZE);" },
+
+  { name: 'the discarded rebuild comes back on every keystroke (§3o)',
+    from: "    renderUniverse();\n    var qi=document.getElementById('cu-q');",
+    to:   "    var all=cuBuildRows(); renderUniverse();\n    var qi=document.getElementById('cu-q');" },
+
   // ── penalties: one source, and the AI deadline (§3n) ────────
   // The first three restore the defect the audit found — a second copy of these
   // figures, carrying the law as it stood before the Companies (Amendment) Act
