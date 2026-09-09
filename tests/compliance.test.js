@@ -744,6 +744,108 @@ describe('section 403 — the due date comes from the register');
   check('no register section resolves to two forms', ambiguous.join(' | '), '');
 }
 
+describe('penalties — one source, and it is the verified one');
+{
+  // The Penalties screen kept its own copy of these figures and it had gone
+  // stale by five years. It reads the verified table now.
+  const v = app.lgPenaltyFor('AOC-4');
+  check('AOC-4 resolves to the verified entry', v.pen.cite, 's.137(3)');
+  check('and to the s.137 figures, not the pre-2020 ones', v.pen.co.day, 100);
+  check('with the maximum the 2020 amendment introduced', v.pen.co.cap, 200000);
+  check('MGT-7A shares MGT-7s entry', app.lgPenaltyFor('MGT-7A').pen.cite, 's.92(5)');
+  check('AOC-4 XBRL shares AOC-4s entry', app.lgPenaltyFor('AOC-4 XBRL').pen.cite, 's.137(3)');
+  check('CHG-4 shares the charge entry', app.lgPenaltyFor('CHG-4').pen.cite, 's.86(1)');
+  check('the lookup is case- and space-tolerant',
+        app.lgPenaltyFor('  aoc-4  ').pen.cite, 's.137(3)');
+  check('a form the Act does not cover here resolves to nothing',
+        app.lgPenaltyFor('INC-20A'), null);
+  check('and so does a blank', app.lgPenaltyFor(''), null);
+
+  // Each shape has to read as what it is. Flattening a court-fixed fine and an
+  // accruing penalty into one sentence is the same error as flattening them
+  // into one column (§3m).
+  const t = (f) => app.lgPenaltyLegText(app.lgPenaltyFor(f).pen.co);
+  check('a continuing penalty names its maximum', /max/.test(t('AOC-4')), true);
+  check('a flat penalty says it does not accrue',
+        /does not grow by the day/.test(t('CHG-1')), true);
+  check('a fine says a court fixes it', /fine/.test(t('ADT-1')), true);
+  check('a leg with no cap says so, rather than going quiet',
+        app.lgPenaltyLegText({base:1000, day:100}),
+        app.calcMoney(1000) + ' + ' + app.calcMoney(100) + ' per day, <b>no maximum stated</b>');
+  check('no leg, no text', app.lgPenaltyLegText(null), '');
+
+  // Every form the screen can label "verified" must actually carry both legs
+  // and a citation, or the label is doing work the data cannot support.
+  let thin = [];
+  Object.keys(app.LG_PENALTY_FORM).forEach(f => {
+    const e = app.lgPenaltyFor(f);
+    if (!e || !e.pen.cite || !e.pen.co || !e.pen.words) thin.push(f);
+  });
+  check('every mapped form carries a cite, a company leg and the words', thin.join(','), '');
+
+  // ── the door, not the numbers ──────────────────────────────────
+  // Read the shipped file. Three copies of these figures is what let two of
+  // them go stale; correcting them without closing the door resets the clock.
+  const src = require('fs').readFileSync(process.env.LG_INDEX ||
+    require('path').join(__dirname, '..', 'index.html'), 'utf8');
+  const qa = src.slice(src.indexOf('var QA = ['), src.indexOf('\n];', src.indexOf('var QA = [')));
+  const claims = (qa.match(/Penalt(?:y|ies)[^"]{0,120}/g) || []).filter(s => s.includes('Rs.'));
+  check('the chat bank states no penalty figure of its own', claims.join(' | '), '');
+
+  // Asserting the engine is not asserting the screen. The mutation check caught
+  // this: blanking lgPenaltyFor inside renderPenalties changed nothing any
+  // assertion looked at, because every one of them called the engine directly.
+  // That is the §2j shape — a value that is computed correctly and reaches no
+  // screen — and here it would put the stale figures straight back on display.
+  const rp = src.slice(src.indexOf('function renderPenalties()'),
+                       src.indexOf('function renderPenalties()') + 3000);
+  // Counted, not just present. lgPenaltyFor appears once in the row FILTER and
+  // once per row for the figures; blanking the second left the first behind, so
+  // a presence check passed against the bug and the mutation went unnoticed.
+  check('the Penalties screen asks the verified table for each row',
+        (rp.match(/lgPenaltyFor\(/g) || []).length >= 2, true);
+  check('and dereferences what it gets back', /v\.pen\./.test(rp), true);
+  check('and renders the legs it returns, not a stored string',
+        /lgPenaltyLegText\(/.test(rp), true);
+  check('an unverified row is labelled as such', /not verified/.test(rp), true);
+
+  // The register says MGT-8 is live; the chat said it was abolished. Neither
+  // can be settled from a 01.04.2021 Act text, so the contradiction is
+  // reported rather than decided (§3j).
+  check('the MGT-8 conflict is disclosed, not resolved',
+        /The register in this app\s*disagrees/.test(qa.replace(/<[^>]+>/g, ' ')), true);
+}
+
+describe('the AI call has a deadline and reads the status');
+{
+  const src = require('fs').readFileSync(process.env.LG_INDEX ||
+    require('path').join(__dirname, '..', 'index.html'), 'utf8');
+  // Slice to the end of the function, not a guessed number of characters — a
+  // window too short makes indexOf return -1 and the ordering check below then
+  // passes or fails for a reason that has nothing to do with the code.
+  const fnStart = src.indexOf('async function callAIProxy');
+  const fn = src.slice(fnStart, src.indexOf('return data.text;', fnStart) + 40);
+  // Comments stripped before the ordering check below. The first cut compared
+  // raw text and matched the COMMENT that explains the bug — which names
+  // res.json() several lines above the call — so it reported the guard as
+  // absent while looking straight at it. An assertion that can be satisfied or
+  // broken by prose is not testing the code.
+  const code = fn.split('\n').filter(l => !/^\s*\/\//.test(l)).join('\n');
+  check('both landmarks are inside the slice',
+        code.includes('if(!res.ok)') && code.includes('res.json()'), true);
+  check('a timeout is set', /LG_AI_TIMEOUT_MS/.test(fn), true);
+  check('and it is wired to the fetch', /signal:\s*ctl/.test(fn), true);
+  check('the abort is distinguished from a network failure',
+        /AbortError/.test(fn), true);
+  check('the HTTP status is checked before parsing', /if\(!res\.ok\)/.test(fn), true);
+  check('res.ok is tested BEFORE res.json is reached',
+        code.indexOf('if(!res.ok)') < code.indexOf('res.json()'), true);
+  check('a non-JSON body is caught rather than thrown raw',
+        /was not JSON/.test(fn), true);
+  check('the timeout is a sane length', app.LG_AI_TIMEOUT_MS >= 15000 &&
+        app.LG_AI_TIMEOUT_MS <= 120000, true);
+}
+
 describe('board composition — sections 149, 177, 178');
 {
   const dirs = (n, designation, extra) => Array.from({ length: n }, (_, i) =>

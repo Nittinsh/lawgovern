@@ -2033,6 +2033,107 @@ on the card, not only in this file.
 
 ---
 
+## 3n. THE QUALITY AUDIT, AND THE TWO TABLES IT FOUND (v176)
+
+A full audit before pitching the product as a prototype. **Every gate green, all
+40 screens driven with zero console errors, only the anon key in the file, 2 dead
+functions out of 545.** And then the actual finding, which no gate could have
+caught because it was not in the engines at all.
+
+### The same figures lived in three places, and two were quoting repealed law
+
+| | source | audited? |
+|---|---|---|
+| `CALC_FEE_FORMS` (§3m) | quoted verbatim from the Act in `reference/` | yes &mdash; cited on screen, 56 assertions |
+| `rules/forms_master.json` &rarr; **Penalties screen** | a free-text string per form | **no source, no date** |
+| the chat&rsquo;s offline **QA bank** | 29 answers, 75 rupee figures | **no source, no caveat** |
+
+**Of the nine forms the first two both described, all nine disagreed, and the
+screen was wrong every time.**
+
+```
+AOC-4, the screen   "Rs.1,000/day (max Rs.10 Lakh per document)"
+s.137(3), the Act    Rs.10,000 + Rs.100/day, max Rs.2 lakh
+```
+
+That string is **word for word the old s.137(3)** &mdash; the wording the
+Companies (Amendment) Act 2020 replaced with effect from **21 December 2020**.
+Ten times the daily rate and five times the maximum, on the commonest filing
+there is. CHG-1 was the same story (Rs.5,000 + Rs.500/day where s.86(1) now says
+**Rs.5,00,000 flat**).
+
+**And the chat contradicted the register outright.** The register carries
+*&ldquo;MGT-8 certification applicability&rdquo;* as a live obligation dated
+29 November 2026; the chat said *&ldquo;MGT-8 &mdash; ABOLISHED from July 14,
+2025&rdquo;*. Same product, opposite answers, on a question a CS acts on.
+
+### The fix is architectural, because arithmetic would only reset the clock
+Correcting the numbers in two more places leaves three copies to drift again, and
+drift is exactly what happened over five years. §2r&rsquo;s rule applies: **one
+feature, one authoritative implementation.**
+
+- `lgPenaltyFor` / `lgPenaltyLegText` &mdash; the Penalties screen **reads
+  `CALC_FEE_FORMS`**. Every row shows both legs and cites its sub-section.
+  Verified rows went 0 &rarr; **17**; the 9 the Act does not settle here say
+  **&ldquo;not verified &mdash; from the forms spreadsheet, not from a text held
+  here&rdquo;** rather than being hidden or dressed up as law.
+- The **chat bank states no penalty figure at all** now. It has no way to cite
+  anything, so it must not be a second source; it points at the screen that can.
+- **MGT-8 is reported, not decided.** The abolition would post-date the Act text
+  held here, so nothing in this project can settle it &mdash; §3j&rsquo;s rule.
+
+### Three shapes, and the screen has to keep them apart
+`lgPenaltyLegText` renders a continuing penalty with its maximum, s.86(1)&rsquo;s
+**flat** amount as *&ldquo;fixed, it does not grow by the day&rdquo;*, and
+s.147(1)&rsquo;s **fine** as a range *&ldquo;fixed by a court&rdquo;*. Flattening
+a court&rsquo;s discretion and an arithmetic result into one cell is the same
+error §3m avoided in the calculator.
+
+### The AI call could hang for ever, and never read the status
+Nine call sites, **no timeout on any of them**, and `res.json()` ran whether the
+response was 200 or 502 &mdash; so a gateway error surfaced as
+`Unexpected token '<'` and an expired session read the same way. The one error
+the code did handle was the only one unreachable when the call actually failed.
+
+`LG_AI_TIMEOUT_MS` (45s) + `AbortController`, `res.ok` checked **before**
+parsing, 401 and 404 named, and every failure says what still works without it
+&mdash; the register, the calculators and the checklists need no AI at all.
+
+### Three bugs in the new work, all found by driving it
+- **A mutation went MISSED**: blanking `lgPenaltyFor` inside `renderPenalties`
+  changed nothing, because every assertion called the engine **directly**. The
+  §2j shape exactly &mdash; a value computed correctly that reaches no screen.
+  And a presence check still passed, because `lgPenaltyFor` also appears in the
+  row filter. **Counted, not tested for presence.**
+- **An assertion matched my own comment.** `res.ok is tested BEFORE res.json` read
+  the raw slice, and the comment explaining the bug names `res.json()` several
+  lines above the call. Comments are stripped before the ordering check now:
+  *an assertion that prose can satisfy is not testing code.*
+- **The new column was clipped and unreachable.** Six columns pushed the table to
+  1394px inside a 988px wrapper whose `overflow-x` is **hidden** above 900px.
+  The citation column simply was not there, and the page looked fine. §2j again.
+  Merged to five columns; `.pen-tablewrap` scrolls on its own rather than
+  changing shared behaviour for one screen &mdash; and the first attempt at that
+  rule **landed inside `@media(min-width:641px) and (max-width:900px)`**, so it
+  was inert at exactly the width that needed it.
+
+### Measured, and worth keeping
+- **30 companies = 2,122 obligation rows, ~40,000 DOM nodes, a page 221,000px
+  tall, 1.36s through layout on a desktop.** Every test in this project uses one
+  or two entities. Not fixed here; the Universe says *&ldquo;Showing 2122 of
+  2122&rdquo;*, so it is honest, but it is the next performance job.
+- Load 571ms local, 3 external requests, no horizontal overflow at 375px.
+- **No `<main>`/`<nav>` landmarks and ~45 unlabelled form fields** &mdash;
+  screen-reader navigation is the weakest dimension in the product.
+
+### Coverage
+Suite **406 &rarr; 435**, mutations **73 &rarr; 85 caught, 0 missed, 0 skipped**.
+The chat-bank assertion reads the shipped file and refuses to let a penalty
+figure back in: three copies is what let two of them go stale for five years, and
+correcting the numbers without closing the door would just restart the clock.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -2101,7 +2202,7 @@ on the card, not only in this file.
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (406 assertions, run against `index.html` itself), `node tests/mutation.js` (73 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (435 assertions, run against `index.html` itself), `node tests/mutation.js` (85 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **No AI model auto-updates to current law.** Staying current = fetch fresh sources (RSS via rss2json/allorigins for SEBI/MCA/IBBI/RBI/IncomeTax) + human curation + (optionally) paid web-search. Vetted human templates + AI drafting is the right model.
 - **Drafting quality:** resolution/notice prompts (`RES_SYS`, `DOC_SYS`) were tuned to a senior-CS standard (exact sub-section citations with read-with clauses, SEBI LODR cross-refs, full RESOLVED THAT/FURTHER THAT cascade, standard severally-authorised CS clause, Certified True Copy headers, Section 102 explanatory statements, MCA form+deadline line). There's an anti-reasoning guard telling the model to output ONLY the final document (some free models leaked their chain-of-thought). Keep these standards.
 - **Child/again:** all AI legal output must carry a "verify on MCA/SEBI portal before filing" caveat — the CS signs and carries professional responsibility.
@@ -2110,7 +2211,7 @@ on the card, not only in this file.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v175.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v176.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

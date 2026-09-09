@@ -288,6 +288,59 @@ const MUTATIONS = [
     from: "        if(gap > 120 || gap < 0)",
     to:   "        if(gap > 1200 || gap < 0)" },
 
+  // ── penalties: one source, and the AI deadline (§3n) ────────
+  // The first three restore the defect the audit found — a second copy of these
+  // figures, carrying the law as it stood before the Companies (Amendment) Act
+  // 2020. Every one of them produces a number a CS would repeat to a director.
+
+  { name: 'the Penalties screen goes back to its own stale copy (§3n)',
+    from: "    var v = lgPenaltyFor(f.form);",
+    to:   "    var v = null;" },
+
+  { name: 'AOC-4 reverts to the pre-2020 rate and cap (§3n)',
+    from: "    co: {who:'The company', base:10000, day:100, dayFrom:'each-day', cap:200000},\n    off:{who:'The MD and the CFO; failing them, the director charged by the Board; failing him '+",
+    to:   "    co: {who:'The company', base:0, day:1000, dayFrom:'each-day', cap:1000000},\n    off:{who:'The MD and the CFO; failing them, the director charged by the Board; failing him '+" },
+
+  { name: 'MGT-7A stops resolving, so a real form silently loses its penalty (§3n)',
+    from: "  'MGT-7':'mgt7', 'MGT-7A':'mgt7',",
+    to:   "  'MGT-7':'mgt7'," },
+
+  { name: 'the form lookup stops tolerating case (§3n)',
+    from: "  var k = LG_PENALTY_FORM[String(formName || '').trim().toUpperCase()];",
+    to:   "  var k = LG_PENALTY_FORM[String(formName || '')];" },
+
+  { name: 'a leg with no maximum goes quiet instead of saying so (§3n)',
+    from: "         (leg.cap != null ? ', <b>max '+calcMoney(leg.cap)+'</b>'\n                          : ', <b>no maximum stated</b>');",
+    to:   "         (leg.cap != null ? ', <b>max '+calcMoney(leg.cap)+'</b>' : '');" },
+
+  { name: 'a court-fixed fine is presented as an accruing penalty (§3n)',
+    from: "  if(leg.kind === 'fine')\n    return calcMoney(leg.min)+' to '+calcMoney(leg.max)+' &mdash; a <b>fine</b>, fixed by a court';",
+    to:   "  if(leg.kind === 'fine')\n    return calcMoney(leg.min)+' to '+calcMoney(leg.max);" },
+
+  { name: 'a flat penalty stops saying it does not accrue (§3n)',
+    from: "    return calcMoney(leg.base)+' &mdash; fixed, it does not grow by the day';",
+    to:   "    return calcMoney(leg.base);" },
+
+  { name: 'the chat bank starts quoting penalties again (§3n)',
+    from: '<strong>Key Penalties</strong><br><br>These are not listed here any more.',
+    to:   '<strong>Key Penalties</strong><br><br>AOC-4: Penalty Rs.1,000/day (max Rs.10 Lakh).' },
+
+  { name: 'the MGT-8 conflict is hidden again (§3n)',
+    from: "<strong>The register in this app disagrees.</strong>",
+    to:   "<strong>The register agrees.</strong>" },
+
+  { name: 'the AI call loses its deadline (§3n — the button spins for ever)',
+    from: "      signal: ctl ? ctl.signal : undefined",
+    to:   "      signal: undefined" },
+
+  { name: 'the HTTP status stops being checked (§3n — a 502 reads as a JSON error)',
+    from: "  if(!res.ok){",
+    to:   "  if(false){" },
+
+  { name: 'a timeout so long it is no timeout at all (§3n)',
+    from: "var LG_AI_TIMEOUT_MS = 45000;",
+    to:   "var LG_AI_TIMEOUT_MS = 3600000;" },
+
   // ── the late-filing fee and the penalty beside it (§3m) ─────
   // Every mutation here yields a plausible figure, which is exactly the
   // failure this calculator shipped with: a card reading "Additional fee

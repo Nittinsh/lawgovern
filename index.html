@@ -743,6 +743,12 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 .cu-clear{font-family:'Manrope';font-size:12.5px;font-weight:600;color:var(--red);background:var(--rose-bg);border:1px solid transparent;border-radius:9px;padding:8px 12px;cursor:pointer;}
 
 .cu-tablewrap{background:var(--paper);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(11,18,32,.05),0 8px 24px rgba(11,18,32,.04);}
+/* The Penalties table carries two penalty legs and a citation per row, so it
+   is legitimately wider than the others. .cu-tablewrap is overflow:hidden
+   above 900px and every other table that uses it fits, so this scrolls on its
+   own rather than changing shared behaviour to suit one screen. */
+.pen-tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.pen-tablewrap .cu-table{min-width:860px;}
 .cu-table{width:100%;border-collapse:collapse;font-size:13px;}
 .cu-table thead th{text-align:left;padding:12px 14px;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);font-weight:700;background:var(--bg);border-bottom:1px solid var(--line);cursor:pointer;white-space:nowrap;user-select:none;}
 .cu-table thead th:hover{color:var(--blue);}
@@ -1505,7 +1511,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v175">
+      <meta id="build-version" content="v176">
     </div>
   </div>
   <div class="cc-search">
@@ -2630,35 +2636,35 @@ async function callGroq(question, history) {
 // OFFLINE KNOWLEDGE BASE
 // ═══════════════════════════════════════════════════
 var QA = [
-{k:["company secretary penalty","not appointing cs","cs not appointed","penalty cs","penalty company secretary","penalty secretary","sec 203","203 penalty","whole time cs"],a:"<strong>Penalty for Not Appointing Company Secretary — Sec 203(5)</strong><br><br><strong>Who must appoint whole-time CS:</strong><ul><li>Every <strong>listed company</strong> (mandatory)</li><li>Every company with <strong>paid-up capital ≥ Rs.10 Crore</strong> (private or public)</li><li>Every public company with <strong>paid-up ≥ Rs.5 Crore</strong></li></ul><br><strong>Penalty:</strong><ul><li><strong>Company:</strong> Rs.1 Lakh to Rs.5 Lakh</li><li><strong>Every officer in default:</strong> Rs.1 Lakh to Rs.5 Lakh</li><li><strong>Continuing default:</strong> Rs.500/day for each day vacancy continues beyond 6 months</li></ul><br><strong>Vacancy rule:</strong> Must be filled within <strong>6 months</strong> of vacancy arising."},
+{k:["company secretary penalty","not appointing cs","cs not appointed","penalty cs","penalty company secretary","penalty secretary","sec 203","203 penalty","whole time cs"],a:"<strong>Penalty for Not Appointing Company Secretary — Sec 203(5)</strong><br><br><strong>Who must appoint whole-time CS:</strong><ul><li>Every <strong>listed company</strong> (mandatory)</li><li>Every company with <strong>paid-up capital ≥ Rs.10 Crore</strong> (private or public)</li><li>Every public company with <strong>paid-up ≥ Rs.5 Crore</strong></li></ul><br><strong><strong>Penalty:</strong> not stated here &mdash; see <b>Reference &rsaquo; Penalties</b>, where each figure is quoted from the Act text held in this app with the sub-section it comes from, and the <b>Late fee and penalty</b> calculator, which works it out for a given number of days.<br><strong>Vacancy rule:</strong> Must be filled within <strong>6 months</strong> of vacancy arising."},
 {k:["small company board","small company meeting","small co board","sec 173","173(5)","board meeting small"],a:"<strong>Board Meetings — Small Company (Sec 173(5))</strong><br><br>Small companies need only <strong>MINIMUM 2 BOARD MEETINGS per year</strong> — NOT 4.<br><br><strong>Rules:</strong><ul><li>1 meeting in first half of calendar year (Jan–Jun)</li><li>1 meeting in second half (Jul–Dec)</li><li>Gap between 2 meetings: minimum 90 days</li></ul><br><strong>Small Company definition (2021):</strong> Paid-up ≤ Rs.4 Crore AND Turnover ≤ Rs.40 Crore. Cannot be holding/subsidiary/Sec 8 company.<br><br><strong>Other exemptions for small companies:</strong> MGT-7A (not MGT-7), no cash flow statement, no secretarial audit, no internal audit, no auditor rotation, simplified Directors' Report."},
-{k:["section 8 board","sec 8 meeting","section 8 company board"],a:"<strong>Board Meetings — Section 8 Company</strong><br><br>Section 8 companies need only <strong>MINIMUM 2 BOARD MEETINGS per year</strong> — per Companies (Meetings of Board) Second Amendment Rules 2017.<br><br><strong>Rules:</strong><ul><li>1 meeting in each half-year (minimum)</li><li>Gap: at least 90 days between 2 consecutive meetings</li></ul><br><strong>Note:</strong> Violation = penalty Rs.25,000 per director per default meeting."},
+{k:["section 8 board","sec 8 meeting","section 8 company board"],a:"<strong>Board Meetings — Section 8 Company</strong><br><br>Section 8 companies need only <strong>MINIMUM 2 BOARD MEETINGS per year</strong> — per Companies (Meetings of Board) Second Amendment Rules 2017.<br><br><strong>Rules:</strong><ul><li>1 meeting in each half-year (minimum)</li><li>Gap: at least 90 days between 2 consecutive meetings</li></ul><br><strong>Note:</strong> For what a default costs, see Reference &rsaquo; Penalties."},
 {k:["opc board","one person company board","opc meeting","173(5) opc"],a:"<strong>Board Meetings — OPC (One Person Company)</strong><br><br><ul><li><strong>Single director OPC:</strong> No formal board meeting required — any resolution passed by sole director = deemed board meeting (Sec 173(5)). Must enter resolution in minutes book within 30 days.</li><li><strong>OPC with 2+ directors:</strong> Minimum 2 per year — 1 per half-year, ≥90 days gap</li></ul><br><strong>OPC is also exempt from:</strong> AGM, cash flow statement. AOC-4 due within 180 days of FY end."},
-{k:["mgt-8","mgt8","pcs certification"],a:"<strong>MGT-8 — ABOLISHED from July 14, 2025</strong><br><br>MGT-8 is <strong>no longer a separate e-form</strong>. PCS certification is now embedded directly inside <strong>MGT-7</strong>.<br><br>Do not file MGT-8 separately — it will be rejected. PCS certifies within MGT-7 using DSC on MCA V3 portal.<br><br><strong>Who needs PCS certification in MGT-7:</strong> Listed companies + Public companies with paid-up ≥ Rs.10 Crore."},
-{k:["mr-1","mr1","managerial remuneration who"],a:"<strong>MR-1 — Who Must File</strong><br><br><ul><li>✅ <strong>Public Companies</strong> — mandatory</li><li>✅ <strong>Private companies that are subsidiaries of public companies</strong> — mandatory</li><li>❌ <strong>Independent private companies</strong> — EXEMPT</li><li>❌ <strong>OPC, Small Company (independent)</strong> — EXEMPT</li></ul><br><strong>Form:</strong> Substituted on MCA V3 (January 23, 2023)<br><strong>Timeline:</strong> Within 60 days of appointment<br><strong>Penalty:</strong> Rs.50,000 + Rs.500/day"},
-{k:["dpt-3","dpt3","deposit return","deposit due date"],a:"<strong>DPT-3 — Due Date and Rules</strong><br><br><strong>Due Date: 30 JUNE every year</strong> (NOT 31 May — very common error)<br><br><ul><li>All companies must file — including NIL return</li><li>Reports deposits and outstanding loans as on 31 March</li><li>Migrated to MCA V3 Lot 3 (July 14, 2025)</li><li>Penalty: Rs.5,000–Rs.25,000/day for company + each officer</li></ul>"},
+{k:["mgt-8","mgt8","pcs certification"],a:"<strong>MGT-8 — ABOLISHED from July 14, 2025</strong><br><br>MGT-8 is <strong>no longer a separate e-form</strong>. PCS certification is now embedded directly inside <strong>MGT-7</strong>.<br><br><strong>The register in this app disagrees.</strong> It still carries <em>MGT-8 certification applicability</em> under Section 92(2) r/w Rule 11(2) as a live obligation. The abolition would post-date the Companies Act text held here (amended only to 01.04.2021), so nothing in this app can settle which is right — <strong>check on MCA before you rely on either.</strong><br><br>If the abolition holds, do not file MGT-8 separately — it will be rejected. PCS certifies within MGT-7 using DSC on MCA V3 portal.<br><br><strong>Who needs PCS certification in MGT-7:</strong> Listed companies + Public companies with paid-up ≥ Rs.10 Crore."},
+{k:["mr-1","mr1","managerial remuneration who"],a:"<strong>MR-1 — Who Must File</strong><br><br><ul><li>✅ <strong>Public Companies</strong> — mandatory</li><li>✅ <strong>Private companies that are subsidiaries of public companies</strong> — mandatory</li><li>❌ <strong>Independent private companies</strong> — EXEMPT</li><li>❌ <strong>OPC, Small Company (independent)</strong> — EXEMPT</li></ul><br><strong>Form:</strong> Substituted on MCA V3 (January 23, 2023)<br><strong>Timeline:</strong> Within 60 days of appointment<br><strong><strong>Penalty:</strong> not stated here &mdash; see <b>Reference &rsaquo; Penalties</b>, where each figure is quoted from the Act text held in this app with the sub-section it comes from, and the <b>Late fee and penalty</b> calculator, which works it out for a given number of days."},
+{k:["dpt-3","dpt3","deposit return","deposit due date"],a:"<strong>DPT-3 — Due Date and Rules</strong><br><br><strong>Due Date: 30 JUNE every year</strong> (NOT 31 May — very common error)<br><br><ul><li>All companies must file — including NIL return</li><li>Reports deposits and outstanding loans as on 31 March</li><li>Migrated to MCA V3 Lot 3 (July 14, 2025)</li><li>Penalty: see Reference &rsaquo; Penalties</li></ul>"},
 {k:["lodr 2026","lodr amendment 2026","january 2026 lodr"],a:"<strong>SEBI LODR Amendment 2026 — Effective January 20, 2026</strong><br><br><ul><li><strong>HVDLE threshold:</strong> Rs.1,000 Cr → <strong>Rs.5,000 Cr</strong> outstanding listed NCD</li><li><strong>Board meeting frequency:</strong> Now on financial year basis (Apr–Mar)</li><li><strong>Material subsidiary:</strong> 'turnover or net worth' (replaces 'income or net worth')</li><li><strong>Securities:</strong> Demat only for investor service requests within 30 days</li><li><strong>Physical transfer window:</strong> Feb 5, 2026 – Feb 4, 2027 for pre-2019 rejected deeds</li></ul>"},
 {k:["lodr third amendment","third amendment 2024","december 2024 lodr","moa website","director profile website"],a:"<strong>SEBI LODR Third Amendment 2024 — Effective December 12, 2024</strong><br><br><ul><li><strong>Website mandatory:</strong> MOA, AOA, and brief profile of ALL directors (all directorships + full-time positions)</li><li><strong>Deadline:</strong> By March 31, 2025</li><li><strong>Board rationale:</strong> Required for special business at AGM</li></ul>"},
 {k:["auditor ratification","ratification mandatory","annual ratification"],a:"<strong>Annual Auditor Ratification — NOT Mandatory</strong><br><br>Removed by <strong>Companies Amendment Act 2017</strong>. Auditor is appointed for a 5-year term. No annual AGM ratification needed. ADT-1 filed once per appointment term. Migrated to MCA V3 Lot 3 (July 14, 2025)."},
 {k:["auditor rotation","rotation mandatory","sec 139"],a:"<strong>Mandatory Auditor Rotation — Sec 139(2)</strong><br><br><strong>Rotation mandatory for:</strong><ul><li>All listed companies</li><li>Unlisted public with paid-up ≥ Rs.10 Crore</li><li>Companies with paid-up ≥ Rs.50 Crore</li><li>Companies accepting public deposits</li></ul><strong>Exempt:</strong> Independent private companies, OPC, Small Companies<br><strong>Term:</strong> Individual: 5 years max; Firm: 10 years max (2 consecutive terms)"},
-{k:["trading window","pit circular","window closure","upsi trading"],a:"<strong>Trading Window — SEBI PIT Circular 2019</strong><br><br><ul><li>Closes at <strong>end of each quarter</strong> (last trading day of Mar/Jun/Sep/Dec)</li><li>Reopens <strong>48 hours after public disclosure</strong> of financial results</li><li>CS must notify all Designated Persons (DPs) immediately on closure</li><li>Also closes on generation of any other UPSI</li></ul><strong>Penalty:</strong> Rs.10 Lakh–Rs.25 Crore or 3× profit"},
+{k:["trading window","pit circular","window closure","upsi trading"],a:"<strong>Trading Window — SEBI PIT Circular 2019</strong><br><br><ul><li>Closes at <strong>end of each quarter</strong> (last trading day of Mar/Jun/Sep/Dec)</li><li>Reopens <strong>48 hours after public disclosure</strong> of financial results</li><li>CS must notify all Designated Persons (DPs) immediately on closure</li><li>Also closes on generation of any other UPSI</li></ul><strong><strong>Penalty:</strong> under the SEBI Act, which is <b>not held in this app</b> &mdash; not stated here."},
 {k:["iepf","unclaimed dividend","iepf transfer","iepf dates"],a:"<strong>IEPF — Annual Timeline</strong><br><br><ul><li><strong>31 July:</strong> IEPF-4 individual notice to shareholders + website publication</li><li><strong>31 August:</strong> Update unclaimed dividend list on company website</li><li><strong>30 Sep:</strong> IEPF-2 statement (within 90 days of AGM)</li><li><strong>31 Oct:</strong> Transfer dividend (7+ years unclaimed) — IEPF-1</li><li><strong>31 Oct:</strong> Transfer shares of affected shareholders to IEPF demat</li></ul><strong>Penalty:</strong> 2× amount + imprisonment ≤2 years"},
 {k:["ipo t+3","t+3","allotment timeline","listing timeline"],a:"<strong>IPO Allotment & Listing — T+3 Regime</strong><br><br><ul><li><strong>Mainboard IPOs:</strong> T+3 mandatory from March 1, 2024</li><li><strong>SME IPOs:</strong> T+3 from August 1, 2024</li><li>Allotment finalisation + listing happen on <strong>same day (T+3)</strong></li><li><strong>T+6 is obsolete</strong> — no longer applicable</li></ul>"},
 {k:["mca v3","lot 3","lot 1","form migration","substituted forms"],a:"<strong>MCA V3 Portal — Form Migrations</strong><br><br><strong>Lot 1 — January 23, 2023:</strong> MR-1, MR-2, DIR-2, DIR-3, DIR-3 KYC, DIR-12, INC-20A, INC-32 (SPICe+), SH-7, SH-8, MSC-1, MSC-3, MSC-4 and others. INC-14, INC-15 omitted.<br><br><strong>Lot 3 — July 14, 2025:</strong> AOC-4, AOC-4 CFS, MGT-7, MGT-7A, ADT-1, ADT-3, ADT-4 (now e-form), CRA-2, CRA-4, DPT-3, PAS-3. <strong>MGT-8 abolished.</strong>"},
 {k:["msc-3","dormant company","dormant return"],a:"<strong>MSC-3 — Dormant Company Annual Return</strong><br><br><strong>Due Date: 31 MARCH</strong> (NOT September — very common mistake)<br><br>If not filed for 3 consecutive years: dormant status automatically cancelled. MSC-4 for revival."},
 {k:["board meeting","how many board meeting","minimum board meeting","number of board"],a:"<strong>Board Meetings — Company-wise Requirements</strong><br><br><ul><li><strong>Private Limited (independent):</strong> Minimum 4/year — gap ≤120 days (Sec 173(1))</li><li><strong>Public Limited (unlisted):</strong> Minimum 4/year — gap ≤120 days</li><li><strong>Listed Company:</strong> Minimum 4/year + Audit Committee before each for financials</li><li><strong>Small Company:</strong> <strong>Only 2/year</strong> — 1 in Jan–Jun + 1 in Jul–Dec, ≥90 days gap (Sec 173(5))</li><li><strong>Section 8 Company:</strong> <strong>Only 2/year</strong> — same as small company (Board Rules 2017)</li><li><strong>OPC (single director):</strong> <strong>No formal meeting needed</strong> — written resolution suffices</li></ul>"},
-{k:["csr","csr-2","corporate social responsibility"],a:"<strong>CSR Compliance — Sec 135</strong><br><br><strong>Applicable if (preceding FY):</strong> Net worth ≥ Rs.500 Cr OR Turnover ≥ Rs.1,000 Cr OR Net profit ≥ Rs.5 Cr<br><strong>Obligation:</strong> Spend ≥ 2% of average net profit of preceding 3 FYs<br><strong>CSR-2:</strong> Now a LINKED filing with AOC-4 (not separate)<br><strong>Unspent amount:</strong> Transfer to designated account within 30 days of FY end<br><strong>Penalty:</strong> 2× unspent or Rs.1 Crore; officer: up to Rs.2 Lakh"},
-{k:["secretarial audit","mr-3","mr3","pcs mandatory"],a:"<strong>Secretarial Audit MR-3 — Mandatory For (Sec 204)</strong><br><br><ul><li>All <strong>listed companies</strong></li><li>Public companies with <strong>paid-up ≥ Rs.50 Crore</strong></li><li>Public companies with <strong>turnover ≥ Rs.250 Crore</strong></li><li>Companies with <strong>outstanding loans ≥ Rs.100 Crore</strong></li></ul><strong>Exempt:</strong> Independent private companies, OPC, small companies<br><strong>Penalty:</strong> Company Rs.1 Lakh–Rs.5 Lakh; officer same"},
+{k:["csr","csr-2","corporate social responsibility"],a:"<strong>CSR Compliance — Sec 135</strong><br><br><strong>Applicable if (preceding FY):</strong> Net worth ≥ Rs.500 Cr OR Turnover ≥ Rs.1,000 Cr OR Net profit ≥ Rs.5 Cr<br><strong>Obligation:</strong> Spend ≥ 2% of average net profit of preceding 3 FYs<br><strong>CSR-2:</strong> Now a LINKED filing with AOC-4 (not separate)<br><strong>Unspent amount:</strong> Transfer to designated account within 30 days of FY end<br><strong><strong>Penalty:</strong> not stated here &mdash; see <b>Reference &rsaquo; Penalties</b>, where each figure is quoted from the Act text held in this app with the sub-section it comes from, and the <b>Late fee and penalty</b> calculator, which works it out for a given number of days."},
+{k:["secretarial audit","mr-3","mr3","pcs mandatory"],a:"<strong>Secretarial Audit MR-3 — Mandatory For (Sec 204)</strong><br><br><ul><li>All <strong>listed companies</strong></li><li>Public companies with <strong>paid-up ≥ Rs.50 Crore</strong></li><li>Public companies with <strong>turnover ≥ Rs.250 Crore</strong></li><li>Companies with <strong>outstanding loans ≥ Rs.100 Crore</strong></li></ul><strong>Exempt:</strong> Independent private companies, OPC, small companies<br><strong><strong>Penalty:</strong> not stated here &mdash; see <b>Reference &rsaquo; Penalties</b>, where each figure is quoted from the Act text held in this app with the sub-section it comes from, and the <b>Late fee and penalty</b> calculator, which works it out for a given number of days."},
 {k:["independent director","id mandatory","sec 149"],a:"<strong>Independent Directors — Sec 149</strong><br><br><strong>Mandatory for:</strong><ul><li>All listed companies: ≥1/3 of board must be IDs (≥50% if public SH ≥50%)</li><li>Public companies: paid-up ≥ Rs.10 Cr OR turnover ≥ Rs.100 Cr OR loans ≥ Rs.50 Cr: at least 2 IDs</li></ul><strong>Tenure:</strong> 5 years, renewable once (max 10 years). Cooling off: 3 years.<br><strong>Databank:</strong> All IDs must register on IICA MCA databank."},
 {k:["audit committee","sec 177"],a:"<strong>Audit Committee — Sec 177</strong><br><br><strong>Mandatory for:</strong><ul><li>All listed companies</li><li>Public companies: paid-up ≥ Rs.10 Cr OR turnover ≥ Rs.100 Cr OR loans ≥ Rs.50 Cr</li></ul><strong>Composition:</strong> Min 3 directors, majority IDs, chairperson = ID<br><strong>Meetings:</strong> Min 4/year (before each Board meeting for financials)"},
-{k:["ben-2","ben2","significant beneficial","sbo"],a:"<strong>BEN-2 — Significant Beneficial Ownership</strong><br><br>SBO = individual with ≥10% beneficial interest. Company sends BEN-4 notice → SBO files BEN-1 → company files BEN-2 within 30 days of BEN-1. Maintain BEN-3 register.<br><br><strong>Penalty:</strong> Rs.1 Lakh + Rs.1,000/day — actively enforced by MCA"},
+{k:["ben-2","ben2","significant beneficial","sbo"],a:"<strong>BEN-2 — Significant Beneficial Ownership</strong><br><br>SBO = individual with ≥10% beneficial interest. Company sends BEN-4 notice → SBO files BEN-1 → company files BEN-2 within 30 days of BEN-1. Maintain BEN-3 register.<br><br><strong><strong>Penalty:</strong> not stated here &mdash; see <b>Reference &rsaquo; Penalties</b>, where each figure is quoted from the Act text held in this app with the sub-section it comes from, and the <b>Late fee and penalty</b> calculator, which works it out for a given number of days."},
 {k:["dir-3 kyc","din kyc","kyc director","dir-3 kyc","dir3 kyc","din holder kyc","director kyc","din kyc due date"],a:"<strong>DIR-3 KYC — Annual DIN KYC</strong><br><br><strong>Due: 30 September</strong> (FY 2024-25 extended to 31 October 2025)<br>Every DIN holder must file annually — even if no longer an active director.<br><ul><li><strong>DIR-3 KYC:</strong> For first time or if mobile/email/address changed — requires OTP on both registered mobile and email</li><li><strong>DIR-3 KYC Web:</strong> Simpler form — only if no change in details</li></ul><strong>Default:</strong> DIN deactivated immediately on non-filing. Reactivation fee: Rs.5,000.<br><strong>Portal:</strong> MCA V3 (substituted January 23, 2023)"},
 {k:["dir-3","din application","obtain din","new din","apply din"],a:"<strong>DIR-3 — DIN Application</strong><br><br>Every individual who wants to become a director must first obtain a DIN.<br><strong>Portal:</strong> MCA V3 (substituted January 23, 2023)<br><strong>Documents:</strong> PAN, Aadhaar, photograph, address proof<br><strong>Note:</strong> DIN must be obtained BEFORE filing DIR-12 for appointment. Annual KYC (DIR-3 KYC) required every September to keep DIN active."},
-{k:["agm","annual general meeting","agm deadline","when agm","hold agm"],a:"<strong>AGM — Annual General Meeting</strong><br><br><strong>Deadline:</strong><ul><li>First AGM: within 9 months of first FY end</li><li>Subsequent AGMs: within 6 months of FY end — by <strong>30 September</strong></li><li>Gap between consecutive AGMs: ≤ 15 months</li></ul><strong>Notice:</strong> 21 clear days (shorter with 95% member consent)<br><strong>NOT required for:</strong> OPC — fully exempt under Sec 96<br><strong>Penalty:</strong> Company ≤ Rs.1 Lakh + Rs.5,000/day; each director up to Rs.1 Lakh"},
-{k:["nrc","nomination remuneration","sec 178","178 committee"],a:"<strong>NRC — Nomination & Remuneration Committee (Sec 178)</strong><br><br><strong>Mandatory for:</strong><ul><li>All listed companies</li><li>Public companies: paid-up ≥ Rs.10 Cr OR turnover ≥ Rs.100 Cr OR loans ≥ Rs.50 Cr</li></ul><strong>Composition:</strong> ≥3 non-executive directors, majority IDs<br><strong>Functions:</strong> Director appointment criteria, remuneration policy, Board evaluation<br><strong>Penalty:</strong> Rs.1 Lakh–Rs.5 Lakh (company and officer)"},
+{k:["agm","annual general meeting","agm deadline","when agm","hold agm"],a:"<strong>AGM — Annual General Meeting</strong><br><br><strong>Deadline:</strong><ul><li>First AGM: within 9 months of first FY end</li><li>Subsequent AGMs: within 6 months of FY end — by <strong>30 September</strong></li><li>Gap between consecutive AGMs: ≤ 15 months</li></ul><strong>Notice:</strong> 21 clear days (shorter with 95% member consent)<br><strong>NOT required for:</strong> OPC — fully exempt under Sec 96<br><strong><strong>Penalty:</strong> not stated here &mdash; see <b>Reference &rsaquo; Penalties</b>, where each figure is quoted from the Act text held in this app with the sub-section it comes from, and the <b>Late fee and penalty</b> calculator, which works it out for a given number of days."},
+{k:["nrc","nomination remuneration","sec 178","178 committee"],a:"<strong>NRC — Nomination & Remuneration Committee (Sec 178)</strong><br><br><strong>Mandatory for:</strong><ul><li>All listed companies</li><li>Public companies: paid-up ≥ Rs.10 Cr OR turnover ≥ Rs.100 Cr OR loans ≥ Rs.50 Cr</li></ul><strong>Composition:</strong> ≥3 non-executive directors, majority IDs<br><strong>Functions:</strong> Director appointment criteria, remuneration policy, Board evaluation<br><strong><strong>Penalty:</strong> not stated here &mdash; see <b>Reference &rsaquo; Penalties</b>, where each figure is quoted from the Act text held in this app with the sub-section it comes from, and the <b>Late fee and penalty</b> calculator, which works it out for a given number of days."},
 {k:["pas-6","pas6","demat reconciliation","share capital audit","share reconciliation"],a:"<strong>PAS-6 — Reconciliation of Share Capital Audit</strong><br><br><strong>Listed companies:</strong> Quarterly — within 30 days of each quarter end (filed with SE)<br><strong>Unlisted public companies:</strong> Half-yearly — within 60 days of Sep 30 and Mar 31 (filed with MCA)<br><br>Conducted by Practising CS. Reconciles issued capital vs demat shares in NSDL + CDSL.<br><strong>Authority:</strong> SEBI Circular + Rule 9A"},
-{k:["inc-20a","commencement of business","start business","20a"],a:"<strong>INC-20A — Declaration for Commencement of Business</strong><br><br><strong>Due:</strong> Within 180 days of incorporation (one-time)<br><strong>Who:</strong> Every company with share capital incorporated on/after November 2, 2018<br><strong>CRITICAL:</strong> Cannot commence business or borrow money until INC-20A is filed.<br><strong>Requires:</strong> Bank statement showing paid-up capital deposited by subscribers<br><strong>Penalty:</strong> Company Rs.50,000; each director Rs.1,000/day; ROC may initiate removal."},
-{k:["penalty list","all penalties","key penalties","penalties quick reference","common penalties","list of penalties","sec 454"],a:"<strong>Key Penalties — Quick Reference</strong><br><br><ul><li><strong>Not appointing CS (Sec 203):</strong> Rs.1 Lakh–Rs.5 Lakh + Rs.500/day continuing</li><li><strong>MGT-7:</strong> Rs.50,000 + Rs.100/day</li><li><strong>AOC-4:</strong> Rs.1,000/day (max Rs.10 Lakh)</li><li><strong>AGM failure:</strong> Rs.1 Lakh + Rs.5,000/day</li><li><strong>Board meeting default:</strong> Rs.25,000 per director</li><li><strong>DIR-12:</strong> Rs.50,000 + Rs.500/day</li><li><strong>INC-20A:</strong> Company Rs.50,000; director Rs.1,000/day</li><li><strong>CHG-1 (Charge):</strong> Rs.5,000 + Rs.500/day</li><li><strong>MGT-14 (SR):</strong> Company Rs.5 Lakh; officer Rs.1 Lakh</li><li><strong>BEN-2 (SBO):</strong> Rs.1 Lakh + Rs.1,000/day</li><li><strong>DPT-3:</strong> Rs.5,000–Rs.25,000/day</li><li><strong>DIN KYC default:</strong> DIN deactivated; Rs.5,000 to reactivate</li><li><strong>IEPF default:</strong> 2× amount + imprisonment ≤2 years</li><li><strong>Insider trading (PIT):</strong> Rs.10 Lakh–Rs.25 Crore or 3× profit</li></ul>"},
+{k:["inc-20a","commencement of business","start business","20a"],a:"<strong>INC-20A — Declaration for Commencement of Business</strong><br><br><strong>Due:</strong> Within 180 days of incorporation (one-time)<br><strong>Who:</strong> Every company with share capital incorporated on/after November 2, 2018<br><strong>CRITICAL:</strong> Cannot commence business or borrow money until INC-20A is filed.<br><strong>Requires:</strong> Bank statement showing paid-up capital deposited by subscribers<br><strong><strong>Penalty:</strong> not stated here &mdash; see <b>Reference &rsaquo; Penalties</b>, where each figure is quoted from the Act text held in this app with the sub-section it comes from, and the <b>Late fee and penalty</b> calculator, which works it out for a given number of days."},
+{k:["penalty list","all penalties","key penalties","penalties quick reference","common penalties","list of penalties","sec 454"],a:"<strong>Key Penalties</strong><br><br>These are not listed here any more. This answer used to carry fourteen figures with nothing behind them, and they had gone stale &mdash; AOC-4 was shown at <strong>Rs.1,000/day capped at Rs.10 Lakh</strong>, which is what s.137(3) said <em>before</em> the Companies (Amendment) Act 2020 replaced it on 21 December 2020. It is now <strong>Rs.10,000 + Rs.100/day, capped at Rs.2 Lakh</strong> for the company.<br><br>Go to <strong>Reference &rsaquo; Penalties</strong>: every figure there is quoted from the Companies Act text held in this app and names the sub-section it comes from. For a specific delay, use the <strong>Late fee and penalty</strong> calculator &mdash; it computes the s.403 additional fee and the penalty separately, because they are two liabilities and only the penalty is capped."},
 ];
 
 // Forms & filings master. Generated by rules/build_forms.py — do not hand-edit
@@ -6902,19 +6908,65 @@ function saveClients(){ /* cloud auto-saves - no-op */ }
 
 
 // ══ AI VIA HIDDEN PROXY ══
+// The free OpenRouter tier is a low-priority queue (section 4), so a slow answer
+// is normal and a hung one is indistinguishable from it without a deadline.
+var LG_AI_TIMEOUT_MS = 45000;
+
 async function callAIProxy(messages, maxTokens){
   if(!supaClient || !CURRENT_USER) throw new Error('Please log in to use AI features.');
   var session = await supaClient.auth.getSession();
   var token = session.data.session ? session.data.session.access_token : '';
-  var res = await fetch(SUPA_URL+'/functions/v1/ai-proxy', {
-    method:'POST',
-    headers:{
-      'Content-Type':'application/json',
-      'Authorization':'Bearer '+token
-    },
-    body:JSON.stringify({messages:messages, max_tokens:maxTokens||3000})
-  });
-  var data = await res.json();
+
+  // Without this the request can sit for ever and the button spins with no way
+  // out, which reads as broken rather than slow.
+  var ctl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+  var timer = ctl ? setTimeout(function(){ ctl.abort(); }, LG_AI_TIMEOUT_MS) : null;
+  var done = function(){ if(timer){ clearTimeout(timer); timer = null; } };
+
+  var res;
+  try{
+    res = await fetch(SUPA_URL+'/functions/v1/ai-proxy', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer '+token
+      },
+      body:JSON.stringify({messages:messages, max_tokens:maxTokens||3000}),
+      signal: ctl ? ctl.signal : undefined
+    });
+  }catch(e){
+    done();
+    if(e && e.name === 'AbortError')
+      throw new Error('The AI service did not answer within '+
+        Math.round(LG_AI_TIMEOUT_MS/1000)+' seconds. It runs on a free tier that queues '+
+        'requests, so this happens. Nothing was saved. The register, the calculators and the '+
+        'checklists do not use it and are unaffected.');
+    throw new Error('Could not reach the AI service: '+
+      ((e && e.message) ? e.message : String(e))+
+      '. The register, the calculators and the checklists do not use it.');
+  }
+  done();
+
+  // The status was never checked, so a 502 or an HTML error page went straight
+  // into res.json() and surfaced as "Unexpected token '<'" - which tells the
+  // reader nothing about what went wrong.
+  if(!res.ok){
+    var detail = '';
+    try{ detail = (await res.text()).slice(0, 160); }catch(e2){}
+    throw new Error('The AI service returned '+res.status+
+      (res.status === 401 ? ' — your session may have expired. Sign in again.'
+       : res.status === 404 ? ' — the ai-proxy Edge Function is not deployed. Run '+
+         'supabase functions deploy ai-proxy.'
+       : '')+
+      (detail ? ' Response began: '+detail : ''));
+  }
+
+  var data;
+  try{ data = await res.json(); }
+  catch(e3){
+    throw new Error('The AI service replied with something that was not JSON. That usually '+
+      'means the Edge Function errored before it could answer.');
+  }
   if(data.error) throw new Error(data.error);
   return data.text;
 }
@@ -14956,6 +15008,55 @@ function ccForm(f){
 // Working out an exact figure needs the Section 403 additional-fee slabs and
 // current per-day amounts; those are money figures and are not authored here.
 // What is shown is the provision as recorded against the form, verbatim.
+// ── what a default costs: ONE source ────────────────────────────
+// CALC_FEE_FORMS (section 3m) carries these figures quoted from the Act text in
+// reference/, cited on screen and covered by the suite. This screen kept its own
+// copy in rules/forms_master.json and the two had drifted: of the nine forms
+// both described, ALL NINE disagreed, and this screen was wrong every time.
+//
+//     AOC-4, this screen   "Rs.1,000/day (max Rs.10 Lakh per document)"
+//     s.137(3), the Act    Rs.10,000 + Rs.100/day, max Rs.2 lakh
+//
+// That string is word for word the OLD s.137(3) - the wording the Companies
+// (Amendment) Act 2020 replaced on 21 December 2020. Ten times the daily rate
+// and five times the maximum, on the commonest filing there is.
+//
+// Correcting it in place would have left two copies to drift again, which is how
+// this happened. So the screen reads the verified table, and a form that table
+// does not cover says its figure is UNVERIFIED rather than passing a spreadsheet
+// string off as the Act.
+var LG_PENALTY_FORM = {
+  'MGT-7':'mgt7', 'MGT-7A':'mgt7',
+  'AOC-4':'aoc4', 'AOC-4 CFS':'aoc4', 'AOC-4 XBRL':'aoc4', 'AOC-4 NBFC':'aoc4',
+  'MGT-14':'mgt14', 'DIR-12':'dir12', 'PAS-3':'pas3',
+  'CHG-1':'chg', 'CHG-4':'chg', 'CHG-9':'chg',
+  'MGT-6':'mgt6', 'BEN-2':'ben2',
+  'MSME-1':'msme1', 'MSME FORM I':'msme1',
+  'INC-22':'inc22', 'MGT-15':'mgt15', 'ADT-1':'adt1'
+};
+
+function lgPenaltyFor(formName){
+  var k = LG_PENALTY_FORM[String(formName || '').trim().toUpperCase()];
+  if(!k || typeof calc403Form !== 'function') return null;
+  var f = calc403Form(k);
+  return (f && f.pen) ? f : null;
+}
+
+// One leg as the Act STATES it, not as an amount. This screen answers "what does
+// this cost" in general; the calculator answers it for a given number of days.
+function lgPenaltyLegText(leg){
+  if(!leg) return '';
+  if(leg.kind === 'fine')
+    return calcMoney(leg.min)+' to '+calcMoney(leg.max)+' &mdash; a <b>fine</b>, fixed by a court';
+  if(leg.kind === 'flat')
+    return calcMoney(leg.base)+' &mdash; fixed, it does not grow by the day';
+  return (leg.base ? calcMoney(leg.base) : '')+
+         (leg.base && leg.day ? ' + ' : '')+
+         (leg.day ? calcMoney(leg.day)+' per day' : '')+
+         (leg.cap != null ? ', <b>max '+calcMoney(leg.cap)+'</b>'
+                          : ', <b>no maximum stated</b>');
+}
+
 function renderPenalties(){
   var root = document.getElementById('pen-root');
   if(!root) return;
@@ -14966,7 +15067,12 @@ function renderPenalties(){
 
   var qEl = document.getElementById('pen-q');
   var q = qEl ? qEl.value.trim().toLowerCase() : '';
-  var rows = FORMS_MASTER.forms.filter(function(f){ return f.penalty; });
+  // A form belongs here if the Act tells us what its default costs (the verified
+  // table) OR the forms master carries a figure. The second kind is shown, and
+  // labelled, rather than hidden - a reader who came looking for it should find
+  // out that it is not sourced, not find nothing.
+  var rows = FORMS_MASTER.forms.filter(function(f){
+    return f.penalty || lgPenaltyFor(f.form); });
   if(q) rows = rows.filter(function(f){
     return (f.form + ' ' + (f.purpose||'') + ' ' + (f.section||'') + ' ' +
             (f.aliases||[]).join(' ')).toLowerCase().indexOf(q) >= 0;
@@ -14979,23 +15085,53 @@ function renderPenalties(){
     return;
   }
 
-  var html = '<div class="cu-tablewrap"><table class="cu-table"><thead><tr>'+
-    '<th>Form</th><th>What it is</th><th>Section</th><th>Deadline</th><th>Penalty stated</th>'+
+  var nVerified = 0, nUnverified = 0;
+  var html = '<div class="cu-tablewrap pen-tablewrap"><table class="cu-table"><thead><tr>'+
+    '<th>Form</th><th>What it is</th><th>Section</th><th>Deadline</th>'+
+    '<th>What a default costs, and on what authority</th>'+
     '</tr></thead><tbody>';
   rows.forEach(function(f){
+    var v = lgPenaltyFor(f.form);
+    var cost;
+    if(v){
+      nVerified++;
+      cost = '<div><b>The company</b> &mdash; '+lgPenaltyLegText(v.pen.co)+'</div>'+
+             (v.pen.off ? '<div style="margin-top:3px;"><b>Officer in default</b> &mdash; '+
+                lgPenaltyLegText(v.pen.off)+'</div>' : '')+
+             '<div class="calc-sub" style="margin-top:5px;">'+
+               '<span class="calc-mono">'+entEsc(v.pen.cite)+'</span>'+
+               ' &middot; quoted from the Act text held here</div>';
+    }else{
+      nUnverified++;
+      cost = '<span style="color:var(--ink-soft);">'+entEsc(f.penalty||'')+'</span>'+
+             '<div class="calc-sub" style="margin-top:5px;">'+
+               '<span class="calc-unk">not verified</span>'+
+               ' &middot; from the forms spreadsheet, not from a text held here</div>';
+    }
     html += '<tr onclick="fmOpen('+lgArg(f.form)+')">'+
       '<td data-label="Form" class="mono"><b>'+entEsc(f.form)+'</b></td>'+
-      '<td data-label="What it is" style="max-width:230px;">'+entEsc((f.purpose||'').slice(0,90))+'</td>'+
+      '<td data-label="What it is" style="max-width:150px;">'+
+        entEsc((f.purpose||'').slice(0,52))+((f.purpose||'').length > 52 ? '&hellip;' : '')+
+        '</td>'+
       '<td data-label="Section" class="cu-sec">'+entEsc(f.section||'')+'</td>'+
-      '<td data-label="Deadline" class="cu-due">'+entEsc((f.timeline||'').slice(0,52))+'</td>'+
-      '<td data-label="Penalty stated" style="color:var(--crit);font-weight:600;max-width:250px;">'+
-        entEsc(f.penalty)+'</td></tr>';
+      '<td data-label="Deadline" class="cu-due" style="max-width:130px;">'+
+        entEsc((f.timeline||'').slice(0,34))+((f.timeline||'').length > 34 ? '&hellip;' : '')+
+        '</td>'+
+      '<td data-label="What a default costs" style="min-width:250px;font-weight:600;">'+
+        cost+'</td></tr>';
   });
   html += '</tbody></table></div>'+
-    '<div class="cu-foot">'+ccPlural(rows.length,'form','forms')+' with a penalty on record. '+
-    'These are the provisions as stated &mdash; the amount actually payable depends on the '+
-    'additional fee under Section 403 and the current fee rules, so confirm on the MCA portal '+
-    'before you rely on a figure.</div>';
+    '<div class="cu-foot"><b>'+nVerified+'</b> of these are quoted from the Companies Act text '+
+    'held in <span class="calc-mono">reference/</span>, with the sub-section they come from; '+
+    '<b>'+nUnverified+'</b> come from the forms spreadsheet and <b>have not been checked '+
+    'against any text</b>, so they are marked and not dressed up as law. '+
+    'Until v175 this screen carried its own figures and they had gone stale: AOC-4 read '+
+    '&ldquo;Rs.1,000/day, max Rs.10 lakh&rdquo;, which is the wording s.137(3) had before the '+
+    '<b>Companies (Amendment) Act 2020</b> replaced it on 21 December 2020. '+
+    'A penalty is separate from the <b>additional fee</b> under s.403 &mdash; s.403(2) keeps both '+
+    'alive at once &mdash; and the <b>Late fee and penalty</b> calculator works out either for a '+
+    'given number of days. The Act held here is amended only to <b>01.04.2021</b>: check any '+
+    'figure against a current compilation before you advise on it.</div>';
 
   root.innerHTML = html;
 }
