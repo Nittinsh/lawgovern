@@ -2224,6 +2224,86 @@ Suite **435 &rarr; 472**, mutations **85 &rarr; 98 caught, 0 missed, 0 skipped**
 
 ---
 
+## 3p. ONE RENDER, ONE CHART PER COMPANY (v178)
+
+§3o measured this and left it. Instrumented in the browser &mdash; thirty
+companies, one `sw('home')`:
+
+| caller | builds |
+|---|---|
+| `ccComputeStats < renderCommandCenter` | 30 |
+| `renderCommandCenter` &rarr; the summary card | 30 |
+| `ccComputeStats < notifItems < notifRefresh` | 30 &nbsp;&larr; the bell recomputes **all** the stats |
+| `aprQueue < aprRefreshBadge` | 30 &nbsp;&larr; a nav badge |
+| `excBuild < excBadge` | 30 &nbsp;&larr; a nav badge |
+| | **150** |
+
+Five independent readers of the same thing inside one synchronous render, and
+three of them are the little counts beside the nav items.
+
+**150 &rarr; 30.**
+
+### Why a pass and not a cache
+§3o declined a cache in terms: *&ldquo;a stale compliance register is a worse
+defect than a slow one&rdquo;*. That still holds. A **pass** is a different
+thing &mdash; it is opened and closed around one synchronous call and cannot
+outlive it.
+
+Every function on that path was checked **before** this was written, not
+assumed: none is async, none writes, and none mutates a row it is handed. So the
+answer cannot change between the first reader and the fifth.
+
+`lgChartPass(fn)` is re-entrant (badges run inside the dashboard **and** on
+their own, so an inner pass joins the outer rather than emptying it) and closes
+in a `finally`, so a throw closes it too.
+
+### The two traps that would have made it wrong
+- **Options are part of the key.** `includeNA` and `allYears` produce different
+  registers, and handing a caller the wrong one changes what it sees without
+  changing anything it could check. The key is built from sorted option keys, so
+  `{allYears,includeNA}` and `{includeNA,allYears}` are one entry.
+- **The array is copied on the way out.** A reader that sorts or splices must
+  not reorder another's. The row *objects* are shared, which is safe only
+  because nothing mutates them.
+
+### Getting from 60 to 30
+Keying on options alone left it at **60**, because the dashboard asks for two
+registers &mdash; the plain one and the `includeNA` one. But `includeNA`'s only
+effect is a single filter at the end of the row build, so **the plain chart is
+the includeNA chart minus the rows a user marked not applicable**. Building the
+superset once serves both. `allYears` still keys separately: it is a genuinely
+different register and cannot be derived.
+
+The suite asserts the derivation against a real uncached build, so the day
+`includeNA` gains a second effect this **fails** instead of drifting.
+
+### The proof that matters
+The dashboard renders **byte-identical** with the pass and with it stubbed out
+&mdash; 3,365 characters, character for character &mdash; and every option set
+returns exactly what an uncached build returns.
+
+### Three things the mutation check found, again all in the new work
+- **A comment quoting code broke a mutation.** The explanation reproduced
+  `if(r.userNA && !(opts && opts.includeNA)) return false;` verbatim, so a §2j
+  mutation anchored on that line matched **twice** and was silently skipped.
+  Third time in three sessions that prose has interfered with a check &mdash;
+  §3n and §3o were assertions matching their own comments, this one is a
+  comment matching the code. **Do not reproduce a line of code in a comment
+  beside it.**
+- **The copy test only covered one branch.** `includeNA` leaves by `slice` and
+  the plain register by `filter`; testing only the plain one let an uncopied
+  `includeNA` result through.
+- **The NA fixture set the wrong field.** `userNA` is what the chart puts on a
+  row; `notApplicable` is what the record stores. Setting the former made both
+  registers identical, which would have let the derivation pass untested.
+
+### Coverage
+Suite **472 &rarr; 494**, mutations **98 &rarr; 108 caught, 0 missed, 0
+skipped**. Ten of the new mutations are about the pass failing to close, because
+that is the one failure that would put a stale row in front of a CS.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -2292,7 +2372,7 @@ Suite **435 &rarr; 472**, mutations **85 &rarr; 98 caught, 0 missed, 0 skipped**
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (472 assertions, run against `index.html` itself), `node tests/mutation.js` (98 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (494 assertions, run against `index.html` itself), `node tests/mutation.js` (108 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **No AI model auto-updates to current law.** Staying current = fetch fresh sources (RSS via rss2json/allorigins for SEBI/MCA/IBBI/RBI/IncomeTax) + human curation + (optionally) paid web-search. Vetted human templates + AI drafting is the right model.
 - **Drafting quality:** resolution/notice prompts (`RES_SYS`, `DOC_SYS`) were tuned to a senior-CS standard (exact sub-section citations with read-with clauses, SEBI LODR cross-refs, full RESOLVED THAT/FURTHER THAT cascade, standard severally-authorised CS clause, Certified True Copy headers, Section 102 explanatory statements, MCA form+deadline line). There's an anti-reasoning guard telling the model to output ONLY the final document (some free models leaked their chain-of-thought). Keep these standards.
 - **Child/again:** all AI legal output must carry a "verify on MCA/SEBI portal before filing" caveat — the CS signs and carries professional responsibility.
@@ -2301,7 +2381,7 @@ Suite **435 &rarr; 472**, mutations **85 &rarr; 98 caught, 0 missed, 0 skipped**
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v177.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v178.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

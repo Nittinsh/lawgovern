@@ -1518,7 +1518,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v177">
+      <meta id="build-version" content="v178">
     </div>
   </div>
   <div class="cc-search">
@@ -5931,7 +5931,73 @@ function lgApplyFyFilter(rows, fyMonth, fyDay){
   });
 }
 
+// ── one render, one chart per company ───────────────────────────
+// Opening the dashboard built every company's register FIVE times: the stats,
+// the summary card, the notification bell (which recomputes the stats in full),
+// the approvals badge and the exceptions badge. 150 builds for thirty companies
+// where 30 would do.
+//
+// They are five independent readers of the same thing inside one synchronous
+// render, so the answer is memoised for the length of that render and thrown
+// away at the end of it.
+//
+// This is NOT a cache with a lifetime. §3o declined one because a register that
+// serves a stale row is a worse defect than a slow screen; a pass that cannot
+// outlive the synchronous call which opened it is a different thing. Every
+// function on the dashboard path was checked first: none is async, none writes,
+// and none mutates a row it is handed.
+var LG_CHART_PASS = null;
+
+function lgChartPass(fn){
+  // Re-entrant. The badges run inside renderCommandCenter and also on their
+  // own, so an inner pass joins the outer one instead of closing it on the way
+  // out - otherwise the first badge to finish would empty the pass under the
+  // ones still to run.
+  if(LG_CHART_PASS) return fn();
+  LG_CHART_PASS = {};
+  try{ return fn(); }
+  finally{ LG_CHART_PASS = null; }   // a throw closes it too
+}
+
 function getComplianceChart(c, opts){
+  var pass = LG_CHART_PASS;
+  if(!pass || !c || c.id == null) return getComplianceChartRaw(c, opts);
+
+  // Keying on the options alone left the dashboard at sixty builds, because it
+  // asks for two registers: the plain one and the includeNA one. But the ONLY
+  // effect of includeNA is a single filter at the end of the row build, which
+  // drops a row when `userNA` is set and the option is not --
+  //
+  //   (see the last rows.filter in getComplianceChartRaw; quoting it verbatim
+  //    here made a mutation anchor match twice and silently skip)
+  //
+  // -- so the plain chart is the includeNA chart minus the rows a user marked
+  // not applicable. Building the superset once serves both, and thirty charts
+  // do the work of sixty. Every other option still keys separately: allYears
+  // produces a genuinely different register and cannot be derived from this
+  // one. The suite asserts the derivation against a real uncached build, so
+  // the day includeNA gains a second effect this fails instead of drifting.
+  var wantNA = !!(opts && opts.includeNA);
+  var superOpts = {};
+  if(opts) for(var pk in opts)
+    if(Object.prototype.hasOwnProperty.call(opts, pk)) superOpts[pk] = opts[pk];
+  superOpts.includeNA = true;
+
+  // Sorted, so {allYears,includeNA} and {includeNA,allYears} are one key.
+  var k = c.id + '|' + Object.keys(superOpts).sort().map(function(x){
+    return x + '=' + superOpts[x]; }).join(',');
+
+  if(!Object.prototype.hasOwnProperty.call(pass, k))
+    pass[k] = getComplianceChartRaw(c, superOpts);
+  var v = pass[k];
+  if(!Array.isArray(v)) return v;
+  // Both branches return a NEW array, so a reader that sorts or splices cannot
+  // reorder another's. The row objects are shared, which is safe only because
+  // nothing mutates them -- checked across the consumers, not assumed.
+  return wantNA ? v.slice() : v.filter(function(r){ return !r.userNA; });
+}
+
+function getComplianceChartRaw(c, opts){
   var y  = new Date().getFullYear();
 
   // fyend arrives either as 'MM-DD' (legacy) or 'YYYY-MM-DD' (Supabase date column).
@@ -14433,7 +14499,14 @@ function setToggle(id){
   if(id === 'lg_require_check' && typeof renderApprovals === 'function') aprRefreshBadge();
 }
 
+// Wrapped rather than edited: the body has early returns, and a pass that is
+// opened but not closed is exactly the stale-register failure this must not
+// have. lgChartPass closes it in a finally.
 function renderCommandCenter(){
+  return lgChartPass(renderCommandCenterInner);
+}
+
+function renderCommandCenterInner(){
   ccSyncHeaderEntity();
   var root = document.getElementById('cc-dash-root');
   if(!root) return;

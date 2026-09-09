@@ -288,6 +288,51 @@ const MUTATIONS = [
     from: "        if(gap > 120 || gap < 0)",
     to:   "        if(gap > 1200 || gap < 0)" },
 
+  // ── one render, one chart per company (§3p) ─────────────────
+  // The dangerous ones here are not the slow ones. A pass that outlives its
+  // render is a cache with no lifetime, and every reader after it gets rows
+  // that were true when the pass opened.
+
+  { name: 'the render pass is never closed (§3p — a cache with no lifetime)',
+    from: "  try{ return fn(); }\n  finally{ LG_CHART_PASS = null; }",
+    to:   "  try{ return fn(); }\n  finally{ }" },
+
+  { name: 'a throw leaves the pass open (§3p)',
+    from: "  LG_CHART_PASS = {};\n  try{ return fn(); }\n  finally{ LG_CHART_PASS = null; }",
+    to:   "  LG_CHART_PASS = {};\n  var r = fn(); LG_CHART_PASS = null; return r;" },
+
+  { name: 'an inner pass empties the outer one (§3p — badges run inside the dashboard)',
+    from: "  if(LG_CHART_PASS) return fn();\n  LG_CHART_PASS = {};",
+    to:   "  LG_CHART_PASS = {};" },
+
+  { name: 'the options drop out of the key (§3p — allYears served from the plain chart)',
+    from: "  var k = c.id + '|' + Object.keys(superOpts).sort().map(function(x){\n    return x + '=' + superOpts[x]; }).join(',');",
+    to:   "  var k = c.id;" },
+
+  { name: 'the key stops sorting, so option order makes a second entry (§3p)',
+    from: "  var k = c.id + '|' + Object.keys(superOpts).sort().map(function(x){",
+    to:   "  var k = c.id + '|' + Object.keys(superOpts).map(function(x){" },
+
+  { name: 'the plain register keeps the rows marked not applicable (§3p)',
+    from: "  return wantNA ? v.slice() : v.filter(function(r){ return !r.userNA; });",
+    to:   "  return v.slice();" },
+
+  { name: 'the includeNA register loses them instead (§3p)',
+    from: "  return wantNA ? v.slice() : v.filter(function(r){ return !r.userNA; });",
+    to:   "  return v.filter(function(r){ return !r.userNA; });" },
+
+  { name: 'the array is handed out uncopied, so one sort reorders everyone (§3p)',
+    from: "  if(!Array.isArray(v)) return v;\n  // Both branches return a NEW array",
+    to:   "  if(!Array.isArray(v)) return v;\n  if(wantNA) return v;\n  // Both branches return a NEW array" },
+
+  { name: 'the superset is not built, so includeNA loses its rows (§3p)',
+    from: "  superOpts.includeNA = true;",
+    to:   "  superOpts.includeNA = wantNA;" },
+
+  { name: 'the dashboard stops opening a pass (§3p — back to 150 builds)',
+    from: "  return lgChartPass(renderCommandCenterInner);",
+    to:   "  return renderCommandCenterInner();" },
+
   // ── the paged register (§3o) ────────────────────────────────
   // Each of these leaves a register that looks perfectly normal. The clamp is
   // the dangerous one: an empty table reads as "nothing matches", which is a

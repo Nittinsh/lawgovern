@@ -744,6 +744,117 @@ describe('section 403 — the due date comes from the register');
   check('no register section resolves to two forms', ambiguous.join(' | '), '');
 }
 
+describe('one render, one chart per company');
+{
+  const co = { id: 'PASS-1', name: 'Pass Test Ltd', type: 'listed', fyend: '2026-03-31',
+               capital: 5e8, turnover: 8e9, cin: 'L15412WB1993PLC000001' };
+  // A row marked not-applicable, so includeNA genuinely changes the answer and
+  // the derivation below is actually being exercised.
+  const firstKey = app.getComplianceChartRaw(co)[0].key;
+  // The stored field is `notApplicable`; `userNA` is what getComplianceChart
+  // puts on the row from it. Setting the wrong one made the two registers
+  // identical, which would have let the derivation below pass untested.
+  co.chart = {}; co.chart[firstKey] = { notApplicable: true };
+
+  const sig = (a) => a.map(r => r.key + '@' + (r.due || '')).join('|');
+  const raw   = { plain: app.getComplianceChartRaw(co),
+                  na:    app.getComplianceChartRaw(co, {includeNA:true}),
+                  yrs:   app.getComplianceChartRaw(co, {allYears:true}) };
+  check('marking a row NA really does change the two registers',
+        sig(raw.plain) === sig(raw.na), false);
+
+  // ── the property that matters: same answer as no pass at all ──
+  let got = {};
+  app.lgChartPass(() => {
+    got.plain = app.getComplianceChart(co);
+    got.na    = app.getComplianceChart(co, {includeNA:true});
+    got.yrs   = app.getComplianceChart(co, {allYears:true});
+  });
+  check('the plain register is unchanged by the pass', sig(got.plain), sig(raw.plain));
+  check('the includeNA register is unchanged', sig(got.na), sig(raw.na));
+  check('and allYears is unchanged', sig(got.yrs), sig(raw.yrs));
+  check('outside a pass nothing is memoised at all',
+        sig(app.getComplianceChart(co)), sig(raw.plain));
+
+  // ── how many raw builds it takes ──────────────────────────────
+  const countBuilds = (fn) => {
+    let n = 0; const orig = app.getComplianceChartRaw;
+    app.getComplianceChartRaw = function(){ n++; return orig.apply(this, arguments); };
+    try { fn(); } finally { app.getComplianceChartRaw = orig; }
+    return n;
+  };
+  check('the same chart twice is built once',
+        countBuilds(() => app.lgChartPass(() => {
+          app.getComplianceChart(co); app.getComplianceChart(co); })), 1);
+  // The dashboard asks for both, and includeNA's only effect is one filter, so
+  // the superset serves both. This is what took it from 60 builds back to 30.
+  check('the plain chart is derived from the includeNA one',
+        countBuilds(() => app.lgChartPass(() => {
+          app.getComplianceChart(co); app.getComplianceChart(co, {includeNA:true}); })), 1);
+  check('allYears is NOT derived — it is a different register',
+        countBuilds(() => app.lgChartPass(() => {
+          app.getComplianceChart(co); app.getComplianceChart(co, {allYears:true}); })), 2);
+  check('and outside a pass every call builds',
+        countBuilds(() => { app.getComplianceChart(co); app.getComplianceChart(co); }), 2);
+  check('option order does not create a second key',
+        countBuilds(() => app.lgChartPass(() => {
+          app.getComplianceChart(co, {allYears:true, includeNA:true});
+          app.getComplianceChart(co, {includeNA:true, allYears:true}); })), 1);
+
+  // Each caller gets its own array, so one that sorts cannot reorder another's.
+  app.lgChartPass(() => {
+    const a1 = app.getComplianceChart(co);
+    a1.sort((x, y) => String(x.key).localeCompare(String(y.key)));
+    const a2 = app.getComplianceChart(co);
+    check('a caller that sorts its copy does not reorder the next one',
+          sig(a2), sig(raw.plain));
+    a2.length = 0;
+    check('nor one that empties it', app.getComplianceChart(co).length, raw.plain.length);
+
+    // The includeNA branch takes a different route out (slice, not filter), so
+    // it needs its own case — the plain branch builds a new array anyway, and
+    // testing only that let an uncopied includeNA result through unnoticed.
+    const n1 = app.getComplianceChart(co, {includeNA:true});
+    n1.sort((x, y) => String(x.key).localeCompare(String(y.key)));
+    check('the includeNA copy is a copy too',
+          sig(app.getComplianceChart(co, {includeNA:true})), sig(raw.na));
+    n1.length = 0;
+    check('and emptying it leaves the next caller whole',
+          app.getComplianceChart(co, {includeNA:true}).length, raw.na.length);
+  });
+
+  // ── it must not outlive the call that opened it ───────────────
+  check('the pass is shut before it starts', app.LG_CHART_PASS, null);
+  app.lgChartPass(() => { check('open inside', !!app.LG_CHART_PASS, true); });
+  check('and shut again on a normal return', app.LG_CHART_PASS, null);
+  try { app.lgChartPass(() => { throw new Error('boom'); }); } catch (e) { /* expected */ }
+  check('a throw closes it too — this is the one that would go stale',
+        app.LG_CHART_PASS, null);
+
+  // Badges run inside renderCommandCenter and also on their own, so an inner
+  // pass has to join the outer one instead of emptying it on the way out.
+  let innerSaw = null, afterInner = null;
+  app.lgChartPass(() => {
+    app.getComplianceChart(co);
+    app.lgChartPass(() => { innerSaw = !!app.LG_CHART_PASS; });
+    afterInner = !!app.LG_CHART_PASS;
+  });
+  check('an inner pass sees the outer one', innerSaw, true);
+  check('and does not close it on the way out', afterInner, true);
+  check('re-entry does not discard what the outer pass held',
+        countBuilds(() => app.lgChartPass(() => {
+          app.getComplianceChart(co);
+          app.lgChartPass(() => {});
+          app.getComplianceChart(co); })), 1);
+
+  // The dashboard is the reason this exists.
+  const src = require('fs').readFileSync(process.env.LG_INDEX ||
+    require('path').join(__dirname, '..', 'index.html'), 'utf8');
+  const rcc = src.slice(src.indexOf('function renderCommandCenter()'),
+                        src.indexOf('function renderCommandCenterInner()'));
+  check('the dashboard render opens a pass', /lgChartPass\(/.test(rcc), true);
+}
+
 describe('the register is paged, and says so');
 {
   const rows = (n) => Array.from({length:n}, (_, i) => ({i}));
