@@ -747,6 +747,9 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
    is legitimately wider than the others. .cu-tablewrap is overflow:hidden
    above 900px and every other table that uses it fits, so this scrolls on its
    own rather than changing shared behaviour to suit one screen. */
+.skip-link{position:absolute;left:-9999px;top:0;z-index:300;background:var(--navy);color:#fff;padding:11px 18px;border-radius:0 0 10px 0;font-weight:700;font-size:13px;text-decoration:none;}
+.skip-link:focus{left:0;}
+.appmain:focus{outline:none;}
 .cu-pager{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;}
 .cu-pager-l{font-size:11.5px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em;}
 .cu-pager-sel{font-size:12.5px;font-weight:600;padding:5px 8px;max-width:150px;}
@@ -1375,12 +1378,12 @@ document.addEventListener('DOMContentLoaded', checkSession);
 
     <div style="margin-bottom:12px;">
       <div style="font-size:11px;color:var(--slate2);margin-bottom:5px;font-weight:600;">Email</div>
-      <input id="auth-email" type="email" placeholder="you@example.com" autocomplete="email"
+      <input id="auth-email" aria-label="Email address" type="email" placeholder="you@example.com" autocomplete="email"
         style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:11px 13px;font-size:14px;outline:none;box-sizing:border-box;">
     </div>
     <div style="margin-bottom:16px;">
       <div style="font-size:11px;color:var(--slate2);margin-bottom:5px;font-weight:600;">Password</div>
-      <input id="auth-pass" type="password" placeholder="••••••••" autocomplete="current-password"
+      <input id="auth-pass" aria-label="Password" type="password" placeholder="••••••••" autocomplete="current-password"
         style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:9px;padding:11px 13px;font-size:14px;outline:none;box-sizing:border-box;">
     </div>
 
@@ -1505,7 +1508,10 @@ input[type="text"], input[type="password"], textarea, select {
 <!-- old access overlay removed - Supabase auth handles login -->
 
 <!-- HEADER -->
-<div class="appheader">
+<!-- Thirty nav items sit between the top of the page and the content, so
+     without this a keyboard user tabs through all of them on every screen. -->
+<a class="skip-link" href="#appmain">Skip to main content</a>
+<div class="appheader" role="banner">
   <button class="mobile-menu-btn" onclick="toggleMobileNav()" aria-label="Menu">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
   </button>
@@ -1518,12 +1524,12 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v178">
+      <meta id="build-version" content="v179">
     </div>
   </div>
   <div class="cc-search">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
-    <input placeholder="Search entities, obligations, regulations, forms…" id="globalSearch"
+    <input placeholder="Search entities, obligations, regulations, forms…" id="globalSearch" aria-label="Search entities, obligations, regulations and forms"
       autocomplete="off" oninput="gsSearch(this.value)" onkeydown="gsKey(event)"
       onfocus="if(this.value) gsSearch(this.value)">
     <div id="gs-results" class="gs-results" style="display:none;"></div>
@@ -1553,10 +1559,10 @@ input[type="text"], input[type="password"], textarea, select {
 </div>
 <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="closeMobileNav()"></div>
 <div class="appshell">
-<aside class="appside"><div class="navitem on" onclick="sw('home')" id="t-home"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span>Dashboard</span></div><div class="navgrp" id="ng-cmp"><div class="navhead" onclick="navToggle('cmp')"><span>Compliance</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What applies, what is due, what is evidenced</div><div class="navbody"><div class="navitem" onclick="sw('universe')" id="t-universe"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg><span>Compliance Universe</span></div><div class="navitem" onclick="sw('mywork')" id="t-mywork"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3 8-8M20 12v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h9"/></svg><span>My Work</span></div><div class="navitem" onclick="sw('cal')" id="t-cal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Calendar</span></div><div class="navitem" onclick="sw('applies')" id="t-applies"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke-linecap="round"/></svg><span>What Applies</span></div><div class="navitem" onclick="sw('exceptions')" id="t-exceptions"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3L12 3z"/><path d="M12 10v4" stroke-linecap="round"/></svg><span>Exceptions</span><span class="nav-badge" id="nav-exc-n" style="display:none">0</span></div><div class="navitem" onclick="sw('calc')" id="t-calc"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15v4M8 19h4" stroke-linecap="round"/></svg><span>Calculators</span></div><div class="navitem" onclick="sw('checks')" id="t-checks"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12l1.5 1.5L14 10" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Checklists</span></div></div></div><div class="navgrp" id="ng-evt"><div class="navhead" onclick="navToggle('evt')"><span>Events & change</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What happened, and what changed</div><div class="navbody"><div class="navitem" onclick="sw('impact')" id="t-impact"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9z" stroke-linejoin="round"/></svg><span>Event Impact</span></div><div class="navitem" onclick="sw('events')" id="t-events"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 8v5l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>Material Events</span></div><div class="navitem" onclick="sw('tracker')" id="t-tracker"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v3M12 18v3"/></svg><span>Regulatory Radar</span></div></div></div><div class="navgrp" id="ng-pit"><div class="navhead" onclick="navToggle('pit')"><span>Insider trading</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">Is the window open, and who knows what</div><div class="navbody"><div class="navitem" onclick="sw('pit')" id="t-pit"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3" stroke-linecap="round"/></svg><span>PIT Control Centre</span></div><div class="navitem" onclick="sw('dp')" id="t-dp"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0112 0M17 11h4M19 9v4" stroke-linecap="round"/></svg><span>Designated Persons</span></div><div class="navitem" onclick="sw('upsi')" id="t-upsi"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3z" stroke-linejoin="round"/><path d="M12 10v4M12 17h.01" stroke-linecap="round"/></svg><span>UPSI Register</span></div><div class="navitem" onclick="sw('sdd')" id="t-sdd"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><span>SDD &mdash; UPSI access</span></div><div class="navitem" onclick="sw('preclear')" id="t-preclear"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9" stroke-linecap="round"/></svg><span>Pre-clearance</span></div></div></div>
+<aside class="appside" role="navigation" aria-label="Sections"><div class="navitem on" onclick="sw('home')" id="t-home"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span>Dashboard</span></div><div class="navgrp" id="ng-cmp"><div class="navhead" onclick="navToggle('cmp')"><span>Compliance</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What applies, what is due, what is evidenced</div><div class="navbody"><div class="navitem" onclick="sw('universe')" id="t-universe"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg><span>Compliance Universe</span></div><div class="navitem" onclick="sw('mywork')" id="t-mywork"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3 8-8M20 12v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h9"/></svg><span>My Work</span></div><div class="navitem" onclick="sw('cal')" id="t-cal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Calendar</span></div><div class="navitem" onclick="sw('applies')" id="t-applies"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke-linecap="round"/></svg><span>What Applies</span></div><div class="navitem" onclick="sw('exceptions')" id="t-exceptions"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3L12 3z"/><path d="M12 10v4" stroke-linecap="round"/></svg><span>Exceptions</span><span class="nav-badge" id="nav-exc-n" style="display:none">0</span></div><div class="navitem" onclick="sw('calc')" id="t-calc"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15v4M8 19h4" stroke-linecap="round"/></svg><span>Calculators</span></div><div class="navitem" onclick="sw('checks')" id="t-checks"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12l1.5 1.5L14 10" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Checklists</span></div></div></div><div class="navgrp" id="ng-evt"><div class="navhead" onclick="navToggle('evt')"><span>Events & change</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What happened, and what changed</div><div class="navbody"><div class="navitem" onclick="sw('impact')" id="t-impact"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9z" stroke-linejoin="round"/></svg><span>Event Impact</span></div><div class="navitem" onclick="sw('events')" id="t-events"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 8v5l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>Material Events</span></div><div class="navitem" onclick="sw('tracker')" id="t-tracker"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v3M12 18v3"/></svg><span>Regulatory Radar</span></div></div></div><div class="navgrp" id="ng-pit"><div class="navhead" onclick="navToggle('pit')"><span>Insider trading</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">Is the window open, and who knows what</div><div class="navbody"><div class="navitem" onclick="sw('pit')" id="t-pit"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3" stroke-linecap="round"/></svg><span>PIT Control Centre</span></div><div class="navitem" onclick="sw('dp')" id="t-dp"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0112 0M17 11h4M19 9v4" stroke-linecap="round"/></svg><span>Designated Persons</span></div><div class="navitem" onclick="sw('upsi')" id="t-upsi"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3z" stroke-linejoin="round"/><path d="M12 10v4M12 17h.01" stroke-linecap="round"/></svg><span>UPSI Register</span></div><div class="navitem" onclick="sw('sdd')" id="t-sdd"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><span>SDD &mdash; UPSI access</span></div><div class="navitem" onclick="sw('preclear')" id="t-preclear"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9" stroke-linecap="round"/></svg><span>Pre-clearance</span></div></div></div>
 <div class="navgrp" id="ng-reg"><div class="navhead" onclick="navToggle('reg')"><span>Registers</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What we know about the entity</div><div class="navbody"><div class="navitem" onclick="sw('entities')" id="t-entities"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h2m-2 4h2m-2 4h2m4-8h2m-2 4h2m-2 4h2"/></svg><span>Entities</span></div><div class="navitem" onclick="sw('directors')" id="t-directors"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-8 0v2"/><circle cx="12" cy="7" r="4"/></svg><span>Directors &amp; KMP</span></div><div class="navitem" onclick="sw('meetings')" id="t-meetings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Board &amp; Meetings</span></div><div class="navitem" onclick="sw('charges')" id="t-charges"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10V6z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Charges</span></div><div class="navitem" onclick="sw('allotments')" id="t-allotments"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M7 8h7a3 3 0 010 6H7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Allotments</span></div><div class="navitem" onclick="sw('beneficial')" id="t-beneficial"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20a6.5 6.5 0 0113 0" stroke-linecap="round"/><path d="M17.5 4.5l2 2 3-3" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Beneficial Interest</span></div><div class="navitem" onclick="sw('internal')" id="t-internal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg><span>Internal Compliance</span></div></div></div><div class="navgrp" id="ng-evd"><div class="navhead" onclick="navToggle('evd')"><span>Evidence</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">Can I prove it was done</div><div class="navbody"><div class="navitem" onclick="sw('filings')" id="t-filings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11l5 5v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M15 4v5h5M8 14h8M8 17h5"/></svg><span>Filings &amp; Records</span></div><div class="navitem" onclick="sw('documents')" id="t-documents"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Documents</span></div><div class="navitem" onclick="sw('approvals')" id="t-approvals"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Approvals</span><span class="nav-badge" id="nav-approvals-n" style="display:none">0</span></div></div></div><div class="navgrp" id="ng-rpt"><div class="navhead" onclick="navToggle('rpt')"><span>Reports</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navsub">What can I present</div><div class="navbody"><div class="navitem" onclick="sw('board')" id="t-board"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v13H4z" stroke-linejoin="round"/><path d="M9 21h6M12 17v4M8 12l2.5 2.5L16 9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Board Report</span></div><div class="navitem" onclick="sw('audit')" id="t-audit"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>Audit Trail</span></div></div></div><div class="navgrp closed" id="ng-drf"><div class="navhead" onclick="navToggle('drf')"><span>Drafting</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navbody"><div class="navitem" onclick="sw('res')" id="t-res"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg><span>Resolutions</span></div><div class="navitem" onclick="sw('docs')" id="t-docs"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 5h16M4 12h16M4 19h10"/></svg><span>Notices &amp; Minutes</span></div></div></div><div class="navgrp closed" id="ng-ref"><div class="navhead" onclick="navToggle('ref')"><span>Reference</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navbody"><div class="navitem" onclick="sw('ff')" id="t-ff"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><span>Forms &amp; Filings</span></div><div class="navitem" onclick="sw('nic')" id="t-nic"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 13h8M8 16h5" stroke-linecap="round"/></svg><span>NIC Codes</span></div><div class="navitem" onclick="sw('chat')" id="t-chat"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3.2"/></svg><span>AI Compliance</span></div><div class="navitem" onclick="sw('penalty')" id="t-penalty"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 3h12M6 8h12M9 3c0 6 6 6 6 11a4 4 0 0 1-8 0"/></svg><span>Penalties</span></div><div class="navitem" onclick="sw('deeplaw')" id="t-deeplaw"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3l9 4v5c0 5-3.5 8-9 9-5.5-1-9-4-9-9V7l9-4z"/></svg><span>Deep Law</span></div></div></div><div class="navgrp closed" id="ng-adm"><div class="navhead" onclick="navToggle('adm')"><span>Administration</span><svg class="navchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="navbody"><div class="navitem" onclick="sw('governance')" id="t-governance"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16M4 12h16M4 19h10" stroke-linecap="round"/><circle cx="18.5" cy="19" r="2.6"/><path d="M17.3 19l.9.9 1.9-1.9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Rule Governance</span></div><div class="navitem" onclick="sw('backtest')" id="t-backtest"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9" stroke-linecap="round"/><circle cx="6" cy="9" r="1.4"/></svg><span>Back-test</span></div><div class="navitem" onclick="sw('team')" id="t-team"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke-linecap="round"/></svg><span>Team</span></div><div class="navitem" onclick="sw('settings')" id="t-settings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Settings</span></div><div class="navitem" onclick="sw('admin')" id="t-admin" style="display:none"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.3l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2.2-1.3L14 2h-4l-.3 2.2a7 7 0 0 0-2.2 1.3l-2.3-1-2 3.4 2 1.5A7 7 0 0 0 5 12a7 7 0 0 0 .1 1.3l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2.2 1.3L10 22h4l.3-2.2a7 7 0 0 0 2.2-1.3l2.3 1 2-3.4-2-1.5z"/></svg><span>Administration</span></div></div></div>
 </aside>
-<div class="appmain">
+<div class="appmain" role="main" id="appmain" tabindex="-1">
 
 <div class="panel on" id="p-home">
   <div id="cc-dash-root">
@@ -1627,7 +1633,7 @@ input[type="text"], input[type="password"], textarea, select {
   </div>
   <div class="cbar">
     <span id="modeind" class="offmode">● Offline</span>
-    <input class="ci" id="ci" placeholder="Ask any compliance question — forms, penalties, deadlines, amendments..." onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendMsg()">
+    <input class="ci" id="ci" aria-label="Your compliance question" placeholder="Ask any compliance question — forms, penalties, deadlines, amendments..." onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendMsg()">
     <button class="sb" id="checksrcbtn" onclick="sendMsgLive()" title="Check latest official sources (MCA/SEBI/RBI) before answering" style="margin-right:6px;background:var(--gold);font-size:12px;padding:0 12px;">◉ Sources</button><button class="sb" id="sendbtn" onclick="sendMsg()">➤</button>
   </div>
 </div>
@@ -1692,7 +1698,7 @@ input[type="text"], input[type="password"], textarea, select {
       </div>
       <div id="res-dropdown-area">
         <div class="cc-toolrow">
-          <select id="restype" class="lg-field" style="flex:1;min-width:220px;" onchange="updateResHint()">
+          <select id="restype" aria-label="Resolution type" class="lg-field" style="flex:1;min-width:220px;" onchange="updateResHint()">
             <option value="">Select a purpose</option>
           </select>
           <button class="cc-btn-primary" onclick="draftRes()">Draft</button>
@@ -1702,7 +1708,7 @@ input[type="text"], input[type="password"], textarea, select {
       </div>
       <div id="res-custom-area" style="display:none;">
         <label class="lg-label" for="custom-res-input">Describe the resolution</label>
-        <textarea id="custom-res-input" class="lg-field" style="width:100%;min-height:96px;resize:vertical;"
+        <textarea id="custom-res-input" aria-label="Describe the resolution you need" class="lg-field" style="width:100%;min-height:96px;resize:vertical;"
           placeholder="For example: conversion of a loan of Rs 50 lakh from ABC Ltd into equity shares; or appointment of a nominee director."></textarea>
         <div class="cc-toolrow" style="justify-content:space-between;margin-top:10px;">
           <div style="font-size:12px;color:var(--ink-soft);">Plain English is fine &mdash; it is drafted into legal form.</div>
@@ -1738,16 +1744,16 @@ input[type="text"], input[type="password"], textarea, select {
         <button class="rcatb" id="dcatb-minutes" onclick="setDCat(this,'minutes')">Minutes</button>
       </div>
       <div class="cc-toolrow" style="margin-bottom:11px;">
-        <select id="doctype" class="lg-field" style="flex:1;min-width:200px;" onchange="updateDocHint()">
+        <select id="doctype" aria-label="Document type" class="lg-field" style="flex:1;min-width:200px;" onchange="updateDocHint()">
           <option value="">Select a meeting type</option>
         </select>
-        <select id="doclisted" class="lg-field">
+        <select id="doclisted" aria-label="Listed or unlisted entity" class="lg-field">
           <option value="unlisted">Unlisted company</option>
           <option value="listed">Listed company</option>
         </select>
       </div>
       <label class="lg-label" for="docdetails">Details (optional)</label>
-      <textarea id="docdetails" class="lg-field" style="width:100%;min-height:84px;resize:vertical;"
+      <textarea id="docdetails" aria-label="Details for the document" class="lg-field" style="width:100%;min-height:84px;resize:vertical;"
         placeholder="Company name, date, venue, agenda items, director names, quarter, figures &mdash; anything that should appear in the draft."></textarea>
       <div class="cc-toolrow" style="justify-content:space-between;margin-top:11px;">
         <div id="dochint" style="font-size:12px;color:var(--ink-soft);"></div>
@@ -1778,7 +1784,7 @@ input[type="text"], input[type="password"], textarea, select {
     </div>
     <div class="cc-card cc-toolbar">
       <div class="cc-toolrow">
-        <input id="pen-q" class="lg-field" style="flex:1;min-width:220px;" type="text"
+        <input id="pen-q" aria-label="Search penalties by form or section" class="lg-field" style="flex:1;min-width:220px;" type="text"
           placeholder="Form or section &mdash; AOC-4, DPT-3, Section 137"
           oninput="renderPenalties()">
       </div>
@@ -1805,10 +1811,10 @@ input[type="text"], input[type="password"], textarea, select {
            had no button at all. -->
       <div class="cc-chiprow" id="trk-sources"></div>
       <div class="cc-toolrow">
-        <input id="trk-search" type="text" class="lg-field" style="flex:1;min-width:220px;"
+        <input id="trk-search" aria-label="Search circulars and notifications" type="text" class="lg-field" style="flex:1;min-width:220px;"
           placeholder="Search circulars &mdash; LODR, related party, insider trading, annual return"
           oninput="searchCirculars(this.value)">
-        <select id="trk-year" class="lg-field">
+        <select id="trk-year" aria-label="Filter circulars by year" class="lg-field">
           <option value="2026">2026</option><option value="2025">2025</option>
           <option value="2024">2024</option><option value="all" selected>All recent</option>
         </select>
@@ -1838,7 +1844,7 @@ input[type="text"], input[type="password"], textarea, select {
     <div class="cc-card cc-toolbar">
       <div class="cc-chiprow"><button class="rcatb" onclick="deepEx(this)">Can director who resigned be liable for acts after resignation?</button><button class="rcatb" onclick="deepEx(this)">Can Section 8 company pay sitting fees to directors?</button><button class="rcatb" onclick="deepEx(this)">Private company register if 100% demat shares?</button><button class="rcatb" onclick="deepEx(this)">Director absent from 3 consecutive meetings &mdash; what happens?</button><button class="rcatb" onclick="deepEx(this)">Can OPC have more than one director?</button><button class="rcatb" onclick="deepEx(this)">Loan to director &mdash; exactly what is permitted under Sec 185?</button><button class="rcatb" onclick="deepEx(this)">Can a company accept deposit from its own director?</button><button class="rcatb" onclick="deepEx(this)">When does UPSI period actually begin for quarterly results?</button></div>
       <div class="cc-toolrow">
-        <input id="deeplaw-input" class="lg-field" style="flex:1;min-width:220px;" type="text"
+        <input id="deeplaw-input" aria-label="Your interpretation question" class="lg-field" style="flex:1;min-width:220px;" type="text"
           placeholder="Ask the hardest compliance question you have &mdash; interpretation, grey area, edge case"
           onkeydown="if(event.key==='Enter')runDeepLaw()">
         <button class="cc-btn-primary" onclick="runDeepLaw()">Analyse</button>
@@ -3114,12 +3120,12 @@ function renderForms(){
       '<div class="cu-search">'+
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+
         '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>'+
-        '<input id="fm-q" placeholder="Form number, alias or purpose  e.g.  MGT-7   SPICe+   charge   Reg 33"'+
+        '<input id="fm-q" aria-label="Search forms by number, alias or purpose" placeholder="Form number, alias or purpose  e.g.  MGT-7   SPICe+   charge   Reg 33"'+
         ' value="'+entEsc(f.q)+'"'+
         ' oninput="FM_FILTERS.q=this.value;fmRenderTable();"></div>'+
-      '<select onchange="fmSet(\'law\',this.value)">'+opts(laws, f.law)+'</select>'+
-      '<select onchange="fmSet(\'category\',this.value)">'+opts(cats, f.category)+'</select>'+
-      '<select onchange="fmSet(\'type\',this.value)">'+opts(types, f.type)+'</select>'+
+      '<select aria-label="Filter forms by law" onchange="fmSet(\'law\',this.value)">'+opts(laws, f.law)+'</select>'+
+      '<select aria-label="Filter forms by category" onchange="fmSet(\'category\',this.value)">'+opts(cats, f.category)+'</select>'+
+      '<select aria-label="Filter forms by type" onchange="fmSet(\'type\',this.value)">'+opts(types, f.type)+'</select>'+
       '<button class="cu-clear" onclick="fmClear()">Clear</button>'+
     '</div>'+
     '<div id="fm-list"></div>';
@@ -3873,9 +3879,9 @@ function showCorrectionForm(outputId, question, aiAnswer) {
   var formHtml = '<div class="correction-form open" id="' + formId + '">' +
     '<div style="font-size:12px;font-weight:700;color:#e05555;margin-bottom:8px;">⚑ Report Incorrect Answer</div>' +
     '<div style="font-size:11px;color:var(--slate);margin-bottom:6px;">What is the correct answer? Your correction will be saved and used to improve future responses.</div>' +
-    '<textarea id="cf-text-' + outputId + '" placeholder="Type the correct legal position, correct form numbers, correct authority, correct procedure..."></textarea>' +
+    '<textarea aria-label="The correct legal position" id="cf-text-' + outputId + '" placeholder="Type the correct legal position, correct form numbers, correct authority, correct procedure..."></textarea>' +
     '<div style="font-size:11px;color:var(--slate);margin-bottom:6px;">Source (optional): case citation, MCA circular number, section reference</div>' +
-    '<input type="text" id="cf-src-' + outputId + '" placeholder="e.g. Rule 21 Companies (Incorporation) Rules 2014" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:7px;padding:8px 10px;font-size:12px;box-sizing:border-box;outline:none;margin-bottom:8px;">' +
+    '<input aria-label="Source for the correction" type="text" id="cf-src-' + outputId + '" placeholder="e.g. Rule 21 Companies (Incorporation) Rules 2014" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:7px;padding:8px 10px;font-size:12px;box-sizing:border-box;outline:none;margin-bottom:8px;">' +
     '<div class="cf-btns">' +
     '<button class="cf-save" onclick="saveCorrectionForm(\'' + outputId + '\',\'' + encodeURIComponent(question.slice(0,300)) + '\',\'' + encodeURIComponent(aiAnswer.slice(0,500)) + '\')">💾 Save Correction</button>' +
     '<button class="cf-cancel" onclick="document.getElementById(\'cf-' + outputId + '\').classList.remove(\'open\')">Cancel</button>' +
@@ -4091,7 +4097,7 @@ function showComplianceWizard(){
       <div style="display:grid;gap:12px;">
         <div>
           <div style="font-size:11px;color:var(--gold);font-weight:700;margin-bottom:5px;">1. Company Type</div>
-          <select id="wiz-type" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:8px;padding:9px 12px;font-size:13px;outline:none;">
+          <select id="wiz-type" aria-label="Company type" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:8px;padding:9px 12px;font-size:13px;outline:none;">
             <option value="private">Private Limited Company</option>
             <option value="public">Public Limited (Unlisted)</option>
             <option value="listed">Listed Company (BSE/NSE)</option>
@@ -4103,7 +4109,7 @@ function showComplianceWizard(){
         </div>
         <div>
           <div style="font-size:11px;color:var(--gold);font-weight:700;margin-bottom:5px;">2. Industry / Sector</div>
-          <select id="wiz-industry" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:8px;padding:9px 12px;font-size:13px;outline:none;">
+          <select id="wiz-industry" aria-label="Industry" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:8px;padding:9px 12px;font-size:13px;outline:none;">
             <option value="general">General / Trading / Services</option>
             <option value="manufacturing">Manufacturing</option>
             <option value="nbfc">NBFC / Financial Services</option>
@@ -4118,7 +4124,7 @@ function showComplianceWizard(){
         </div>
         <div>
           <div style="font-size:11px;color:var(--gold);font-weight:700;margin-bottom:5px;">3. Company Size (Paid-up Capital)</div>
-          <select id="wiz-size" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:8px;padding:9px 12px;font-size:13px;outline:none;">
+          <select id="wiz-size" aria-label="Company size" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:8px;padding:9px 12px;font-size:13px;outline:none;">
             <option value="small">Below ₹4 crore (Small Company)</option>
             <option value="medium">₹4 crore – ₹50 crore</option>
             <option value="large">Above ₹50 crore</option>
@@ -4132,7 +4138,7 @@ function showComplianceWizard(){
         </div>
         <div>
           <div style="font-size:11px;color:var(--gold);font-weight:700;margin-bottom:5px;">5. State of Registered Office</div>
-          <select id="wiz-state" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:8px;padding:9px 12px;font-size:13px;outline:none;">
+          <select id="wiz-state" aria-label="State" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:8px;padding:9px 12px;font-size:13px;outline:none;">
             <option value="general">Most States (Standard)</option>
             <option value="mh">Maharashtra</option>
             <option value="dl">Delhi</option>
@@ -6733,29 +6739,29 @@ function showComplianceWizard(){
 
     '<div style="display:grid;gap:12px;">' +
     '<div><div style="font-size:11px;color:var(--gold);font-weight:700;margin-bottom:4px;">1. Company Type</div>' +
-    '<select id="wiz-type" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:7px;padding:8px 10px;font-size:13px;outline:none;">' +
+    '<select id="wiz-type" aria-label="Company type" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:7px;padding:8px 10px;font-size:13px;outline:none;">' +
     '<option value="private">Private Limited</option><option value="public">Public (Unlisted)</option><option value="listed">Listed (BSE/NSE)</option><option value="opc">OPC</option><option value="sec8">Section 8</option><option value="llp">LLP</option><option value="nidhi">Nidhi Company</option></select></div>' +
 
     '<div><div style="font-size:11px;color:var(--gold);font-weight:700;margin-bottom:4px;">2. Industry</div>' +
-    '<select id="wiz-industry" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:7px;padding:8px 10px;font-size:13px;outline:none;">' +
+    '<select id="wiz-industry" aria-label="Industry" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:7px;padding:8px 10px;font-size:13px;outline:none;">' +
     '<option value="general">General / Trading / Services</option><option value="manufacturing">Manufacturing</option><option value="nbfc">NBFC / Financial Services</option><option value="realestate">Real Estate</option><option value="pharma">Pharma / Healthcare</option><option value="it">IT / Software</option><option value="food">Food / FSSAI</option></select></div>' +
 
     '<div><div style="font-size:11px;color:var(--gold);font-weight:700;margin-bottom:4px;">3. Size (Paid-up Capital)</div>' +
-    '<select id="wiz-size" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:7px;padding:8px 10px;font-size:13px;outline:none;">' +
+    '<select id="wiz-size" aria-label="Company size" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:7px;padding:8px 10px;font-size:13px;outline:none;">' +
     '<option value="small">Below ₹4 crore (Small Company)</option><option value="medium">₹4 – ₹50 crore</option><option value="large">Above ₹50 crore</option></select></div>' +
 
     '<div><div style="font-size:11px;color:var(--gold);font-weight:700;margin-bottom:4px;">4. Activities (check all applicable)</div>' +
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">' +
-    '<label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--slate2);cursor:pointer;"><input type="checkbox" id="wiz-fdi" style="accent-color:var(--gold);"> Received FDI</label>' +
-    '<label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--slate2);cursor:pointer;"><input type="checkbox" id="wiz-deposits"> Accepted Deposits</label>' +
-    '<label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--slate2);cursor:pointer;"><input type="checkbox" id="wiz-employees"> Has Employees (10+)</label>' +
-    '<label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--slate2);cursor:pointer;"><input type="checkbox" id="wiz-ecommerce"> E-Commerce</label>' +
-    '<label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--slate2);cursor:pointer;"><input type="checkbox" id="wiz-export"> Exports</label>' +
-    '<label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--slate2);cursor:pointer;"><input type="checkbox" id="wiz-listed2"> Has listed debt/NCD</label>' +
+    '<label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--slate2);cursor:pointer;"><input type="checkbox" id="wiz-fdi" aria-label="Has foreign investment" style="accent-color:var(--gold);"> Received FDI</label>' +
+    '<label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--slate2);cursor:pointer;"><input type="checkbox" id="wiz-deposits" aria-label="Accepts deposits"> Accepted Deposits</label>' +
+    '<label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--slate2);cursor:pointer;"><input type="checkbox" id="wiz-employees" aria-label="Has employees"> Has Employees (10+)</label>' +
+    '<label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--slate2);cursor:pointer;"><input type="checkbox" id="wiz-ecommerce" aria-label="Operates e-commerce"> E-Commerce</label>' +
+    '<label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--slate2);cursor:pointer;"><input type="checkbox" id="wiz-export" aria-label="Exports"> Exports</label>' +
+    '<label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--slate2);cursor:pointer;"><input type="checkbox" id="wiz-listed2" aria-label="Is listed"> Has listed debt/NCD</label>' +
     '</div></div>' +
 
     '<div><div style="font-size:11px;color:var(--gold);font-weight:700;margin-bottom:4px;">5. State of Registered Office</div>' +
-    '<select id="wiz-state" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:7px;padding:8px 10px;font-size:13px;outline:none;">' +
+    '<select id="wiz-state" aria-label="State" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:7px;padding:8px 10px;font-size:13px;outline:none;">' +
     '<option value="general">Most States</option><option value="mh">Maharashtra</option><option value="dl">Delhi</option><option value="ka">Karnataka</option><option value="tn">Tamil Nadu</option><option value="gj">Gujarat</option><option value="wb">West Bengal</option></select></div>' +
     '</div>' +
 
@@ -7248,7 +7254,7 @@ function renderVetBox(category, templateKey, title, outputElId){
   return '<div id="'+boxId+'" style="margin-top:16px;border:1px solid var(--gold);border-radius:9px;padding:16px;background:var(--ink3);">' +
     '<div style="font-size:12px;color:var(--gold);font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">⚖ Admin — Review &amp; Vet This Template</div>' +
     '<div style="font-size:12px;color:var(--slate2);margin-bottom:10px;">Edit the draft to your professional standard, then save it. Users will get your vetted version.</div>' +
-    '<textarea id="'+boxId+'_text" style="width:100%;min-height:220px;background:var(--paper);border:1px solid var(--ink4);border-radius:7px;padding:12px;font-family:IBM Plex Sans,sans-serif;font-size:14px;line-height:1.6;color:var(--ink);resize:vertical;box-sizing:border-box;"></textarea>' +
+    '<textarea aria-label="Drafted text" id="'+boxId+'_text" style="width:100%;min-height:220px;background:var(--paper);border:1px solid var(--ink4);border-radius:7px;padding:12px;font-family:IBM Plex Sans,sans-serif;font-size:14px;line-height:1.6;color:var(--ink);resize:vertical;box-sizing:border-box;"></textarea>' +
     '<button class="vet-save-btn" style="margin-top:10px;background:var(--navy);color:#fff;border:none;border-radius:7px;padding:11px 20px;font-weight:600;font-size:14px;cursor:pointer;">Save as Vetted Template</button>' +
     '</div>';
 }
@@ -7768,14 +7774,14 @@ function renderFilings(){
   var filters = '<div class="cu-filters">'+
     '<div class="cu-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+
       '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>'+
-      '<input id="fil-q" placeholder="Obligation, entity or reference" value="'+entEsc(FIL_F.q)+'" '+
+      '<input id="fil-q" aria-label="Search filings by obligation, entity or reference" placeholder="Obligation, entity or reference" value="'+entEsc(FIL_F.q)+'" '+
       'oninput="FIL_F.q=this.value;renderFilings();"></div>'+
     (Object.keys(entities).length > 1
-      ? '<select onchange="FIL_F.entity=this.value;renderFilings();"><option value="">All entities</option>'+
+      ? '<select aria-label="Filter filings by entity" onchange="FIL_F.entity=this.value;renderFilings();"><option value="">All entities</option>'+
         Object.keys(entities).sort().map(function(e){
           return '<option value="'+entEsc(e)+'"'+(FIL_F.entity===e?' selected':'')+'>'+entEsc(e)+'</option>';
         }).join('')+'</select>' : '')+
-    '<select onchange="FIL_F.timing=this.value;renderFilings();">'+
+    '<select aria-label="Filter filings by timing" onchange="FIL_F.timing=this.value;renderFilings();">'+
       ['','ontime','late','noref','nodoc'].map(function(v){
         var l = {'':'All records','ontime':'On time','late':'Filed late',
                  'noref':'No reference recorded','nodoc':'No document attached'}[v];
@@ -7932,7 +7938,7 @@ function pasteOpen(key){
         ? 'The DIN is found by its shape, so column order does not matter.'
         : 'Columns are read in the order shown below.')+'</div>'+
     '<pre class="dir-pre">'+entEsc(example)+'</pre>'+
-    '<textarea id="paste-in" class="lg-field" style="width:100%;min-height:150px;resize:vertical;font-family:\'IBM Plex Mono\';font-size:12px;" '+
+    '<textarea id="paste-in" aria-label="Paste the text to read" class="lg-field" style="width:100%;min-height:150px;resize:vertical;font-family:\'IBM Plex Mono\';font-size:12px;" '+
       'placeholder="Paste here"></textarea>'+
     '<div id="paste-prev"></div>'+
     '<div class="cc-headbtns" style="margin-top:16px;justify-content:flex-end;">'+
@@ -8150,7 +8156,7 @@ async function dirImport(){
       d.directors.map(function(x, i){
         var dup = x.din && existing[String(x.din)];
         return '<label class="set-chk" style="border-bottom:1px solid var(--line-soft);padding:9px 0;">'+
-          '<input type="checkbox" data-i="'+i+'"'+(dup?'':' checked')+'>'+
+          '<input aria-label="Include this row" type="checkbox" data-i="'+i+'"'+(dup?'':' checked')+'>'+
           '<span><b>'+entEsc(x.name||'(no name)')+'</b>'+
           (x.din?' <span class="mono" style="color:var(--ink-soft)">DIN '+entEsc(x.din)+'</span>':'')+
           '<div class="set-n" style="margin-top:2px;">'+entEsc(x.designationRaw||x.designation)+
@@ -8520,7 +8526,7 @@ function regRender(key){
 
   var entSel = '';
   if(cfg.scoped && typeof CLIENTS !== 'undefined' && CLIENTS.length > 1){
-    entSel = '<select class="lg-field" onchange="REG_ENTITY['+lgArg(key)+']=this.value;REG_DATA['+
+    entSel = '<select class="lg-field" aria-label="Entity" onchange="REG_ENTITY['+lgArg(key)+']=this.value;REG_DATA['+
       lgArg(key)+']=null;regRender('+lgArg(key)+');">'+
       CLIENTS.map(function(c){
         return '<option value="'+entEsc(c.id)+'"'+(String(regCompany(key))===String(c.id)?' selected':'')+
@@ -8954,7 +8960,7 @@ function renderPIT(){
   var w = pitWindow(c);
 
   var entSel = listed.length > 1
-    ? '<select id="pit-entity" class="lg-field" onchange="renderPIT()">'+
+    ? '<select id="pit-entity" aria-label="Entity" class="lg-field" onchange="renderPIT()">'+
       listed.map(function(x){
         return '<option value="'+entEsc(x.id)+'"'+(String(c.id)===String(x.id)?' selected':'')+'>'+
           entEsc(x.name)+'</option>';
@@ -9230,7 +9236,7 @@ function govOpen(ruleId){
         '<div style="margin-bottom:12px;">'+
           '<div style="font-size:11px;color:var(--ink-soft);font-weight:600;margin-bottom:4px;">'+
             'Status</div>'+
-          '<select id="gov-status" class="lg-field" style="width:100%">'+
+          '<select id="gov-status" aria-label="Verification status" class="lg-field" style="width:100%">'+
             Object.keys(GOV_STATUS).map(function(k){
               return '<option value="'+k+'"'+((v.status||'current')===k?' selected':'')+'>'+
                 GOV_STATUS[k].label+'</option>';
@@ -11103,7 +11109,7 @@ function renderNIC(){
     '<p class="cc-sub">All 21 sections and all 88 divisions. Search by what the business '+
     'actually does.</p></div></div>'+
     '<div class="cc-card cc-toolbar"><div class="cc-toolrow">'+
-    '<input id="nic-q" class="lg-field" type="text" placeholder="software, trading, hotel, '+
+    '<input id="nic-q" aria-label="Search NIC activities" class="lg-field" type="text" placeholder="software, trading, hotel, '+
     'pharma, construction&hellip;" value="'+entEsc(NIC_Q)+'" oninput="nicSearch(this.value)">'+
     '</div></div>'+
     '<div class="calc-note" style="margin:0 0 16px;"><b>This goes to division level, and stops '+
@@ -11143,7 +11149,7 @@ function renderChecks(){
   var entSel = (typeof CLIENTS !== 'undefined' && CLIENTS.length)
     ? '<div class="cc-card cc-toolbar"><div class="cc-toolrow">'+
       '<div class="calc-f" style="margin:0;"><label class="calc-l">Entity</label>'+
-      '<select id="chk-entity" class="lg-field" onchange="renderChecks()">'+
+      '<select id="chk-entity" aria-label="Entity" class="lg-field" onchange="renderChecks()">'+
       CLIENTS.map(function(x){
         return '<option value="'+entEsc(x.id)+'">'+entEsc(x.name)+'</option>';
       }).join('')+'</select></div></div></div>'
@@ -11188,7 +11194,7 @@ function renderChecks(){
       '<div class="calc-note">Headings in the order s.134(3) sets them, with the s.134(5) '+
       'statement written out. <b>Every figure is left blank.</b> A Board&rsquo;s report with '+
       'invented numbers in it is the one thing this product must never hand you to sign.</div>'+
-      '<textarea id="chk-report" class="chk-report" readonly>'+
+      '<textarea id="chk-report" aria-label="Generated report text" class="chk-report" readonly>'+
       entEsc(chkBuildDirReport(c))+'</textarea></div></div>';
   }
 
@@ -11287,7 +11293,7 @@ function lgOrgHeader(){
       '<span class="lg-org-role">'+lgRoleLabel(CURRENT_ROLE)+'</span></span>';
     return;
   }
-  slot.innerHTML = '<select class="lg-org-sel" onchange="lgSwitchOrg(this.value)">'+
+  slot.innerHTML = '<select aria-label="Practice" class="lg-org-sel" onchange="lgSwitchOrg(this.value)">'+
     CURRENT_ORGS.map(function(o){
       return '<option value="'+entEsc(o.id)+'"'+
         (String(o.id)===String(CURRENT_ORG)?' selected':'')+'>'+entEsc(o.name)+'</option>';
@@ -12017,7 +12023,7 @@ function renderTeam(){
   var rows = (TEAM_MEMBERS||[]).map(function(m){
     var isMe = String(m.user_id) === mine;
     var sel = lgCanAdmin()
-      ? '<select class="lg-field team-role" onchange="teamSetRole('+lgArg(m.user_id)+',this.value)">'+
+      ? '<select aria-label="Role" class="lg-field team-role" onchange="teamSetRole('+lgArg(m.user_id)+',this.value)">'+
         LG_ROLES.map(function(r){
           return '<option value="'+r[0]+'"'+(m.role===r[0]?' selected':'')+'>'+r[1]+'</option>';
         }).join('')+'</select>'
@@ -12049,9 +12055,9 @@ function renderTeam(){
     ? '<div class="cc-card"><div class="cc-card-h">Invite someone</div><div class="cc-card-b">'+
       '<div class="calc-grid">'+
       '<div class="calc-f"><label class="calc-l" for="team-email">Email address</label>'+
-      '<input id="team-email" class="lg-field" type="email" placeholder="name@firm.com"></div>'+
+      '<input id="team-email" aria-label="Email address to invite" class="lg-field" type="email" placeholder="name@firm.com"></div>'+
       '<div class="calc-f"><label class="calc-l" for="team-role">Role</label>'+
-      '<select id="team-role" class="lg-field">'+
+      '<select id="team-role" aria-label="Role" class="lg-field">'+
       LG_ROLES.filter(function(r){ return r[0] !== 'owner'; }).map(function(r){
         return '<option value="'+r[0]+'"'+(r[0]==='member'?' selected':'')+'>'+r[1]+
           ' — '+r[2]+'</option>';
@@ -12087,7 +12093,7 @@ function renderTeam(){
     '<label class="calc-l" for="acc-probe">Cross-tenant probe &mdash; optional'+
     '<span class="calc-cite">Paste a company id from ANOTHER account. You should not be able to '+
     'see it.</span></label>'+
-    '<input id="acc-probe" class="lg-field" type="text" placeholder="paste a company id from the '+
+    '<input id="acc-probe" aria-label="Company id from the other account" class="lg-field" type="text" placeholder="paste a company id from the '+
     'other account" value=""></div>'+
     (sample ? '<div class="calc-base-line">Your own first company id, for the other account to '+
       'paste into <i>their</i> probe: <span class="calc-mono acc-id">'+entEsc(sample)+
@@ -12139,7 +12145,7 @@ function renderCalc(){
     'clause it comes from.</p></div></div>';
 
   var entSel = (typeof CLIENTS !== 'undefined' && CLIENTS.length)
-    ? '<select id="calc-entity" class="lg-field" onchange="calcEntityChange()">'+
+    ? '<select id="calc-entity" aria-label="Entity" class="lg-field" onchange="calcEntityChange()">'+
       CLIENTS.map(function(x){
         return '<option value="'+entEsc(x.id)+'">'+entEsc(x.name)+'</option>';
       }).join('')+'</select>'
@@ -12265,7 +12271,7 @@ function renderGovernance(){
   }
 
   var bar = '<div class="cc-card cc-toolbar"><div class="cc-toolrow">'+
-    '<input id="gov-q" class="lg-field" style="flex:1;min-width:200px;" placeholder="Search a '+
+    '<input id="gov-q" aria-label="Search a provision or rule" class="lg-field" style="flex:1;min-width:200px;" placeholder="Search a '+
       'provision or rule&hellip;" value="'+entEsc(GOV_Q)+'" oninput="govSearch(this.value)">'+
     '<span class="aud-days">'+pick.length+' shown</span>'+
   '</div></div>';
@@ -12435,7 +12441,7 @@ function renderBoard(){
   var d = brdBuild(c, from, to);
 
   var entSel = CLIENTS.length > 1
-    ? '<select id="brd-entity" class="lg-field" onchange="renderBoard()">'+
+    ? '<select id="brd-entity" aria-label="Entity" class="lg-field" onchange="renderBoard()">'+
       CLIENTS.map(function(x){
         return '<option value="'+entEsc(x.id)+'"'+(String(c.id)===String(x.id)?' selected':'')+'>'+
           entEsc(x.name)+'</option>';
@@ -12445,10 +12451,10 @@ function renderBoard(){
   var bar = '<div class="cc-card cc-toolbar brd-noprint"><div class="cc-toolrow">'+
     entSel+
     '<span class="aud-lbl">From</span>'+
-    '<input type="date" id="brd-from" class="lg-field" style="max-width:165px;" value="'+
+    '<input type="date" id="brd-from" aria-label="Report period, from" class="lg-field" style="max-width:165px;" value="'+
       entEsc(from)+'" onchange="brdSet()">'+
     '<span class="aud-lbl">to</span>'+
-    '<input type="date" id="brd-to" class="lg-field" style="max-width:165px;" value="'+
+    '<input type="date" id="brd-to" aria-label="Report period, to" class="lg-field" style="max-width:165px;" value="'+
       entEsc(to)+'" onchange="brdSet()">'+
     '<div style="flex:1;"></div>'+
     '<button class="cc-btn-primary" onclick="brdPrint()">Print / save as PDF</button>'+
@@ -12680,7 +12686,7 @@ function renderApplies(){
 
   var c = appEntity();
   var entSel = CLIENTS.length > 1
-    ? '<select id="app-entity" class="lg-field" onchange="renderApplies()">'+
+    ? '<select id="app-entity" aria-label="Entity" class="lg-field" onchange="renderApplies()">'+
       CLIENTS.map(function(x){
         return '<option value="'+entEsc(x.id)+'"'+(String(c.id)===String(x.id)?' selected':'')+'>'+
           entEsc(x.name)+'</option>';
@@ -13405,7 +13411,7 @@ function impMinutesBlock(c){
 function renderImpactMinutes(root, head, modes, c, entSel){
   var form = modes + '<div class="cc-card cc-toolbar">'+
     '<div class="cc-toolrow" style="align-items:flex-start;">'+
-      '<textarea id="imp-minutes" class="lg-field" style="flex:1;min-width:240px;min-height:200px;'+
+      '<textarea id="imp-minutes" aria-label="Board minutes text" class="lg-field" style="flex:1;min-width:240px;min-height:200px;'+
         'resize:vertical;font-size:12.5px;line-height:1.6;" '+
         'placeholder="Paste the minutes, or just the resolutions. Each RESOLVED THAT starts a new '+
         'decision; RESOLVED FURTHER THAT stays with the one above it.">'+
@@ -13459,7 +13465,7 @@ function renderImpact(){
 
   var c = impEntity();
   var entSel = CLIENTS.length > 1
-    ? '<select id="imp-entity" class="lg-field" onchange="impRun()">'+
+    ? '<select id="imp-entity" aria-label="Entity" class="lg-field" onchange="impRun()">'+
       CLIENTS.map(function(x){
         return '<option value="'+entEsc(x.id)+'"'+(String(c.id)===String(x.id)?' selected':'')+'>'+
           entEsc(x.name)+'</option>';
@@ -13478,7 +13484,7 @@ function renderImpact(){
 
   var form = modes + '<div class="cc-card cc-toolbar">'+
     '<div class="cc-toolrow" style="align-items:flex-start;">'+
-      '<textarea id="imp-q" class="lg-field" style="flex:1;min-width:240px;min-height:74px;resize:vertical;" '+
+      '<textarea id="imp-q" aria-label="Describe what happened" class="lg-field" style="flex:1;min-width:240px;min-height:74px;resize:vertical;" '+
         'placeholder="What happened? For example: the board approved borrowing of Rs 50 crore from a bank, '+
         'secured against the company&rsquo;s plant.">'+entEsc(IMP_LAST?IMP_LAST.text:'')+'</textarea>'+
       '<div style="display:flex;flex-direction:column;gap:8px;">'+entSel+
@@ -14017,7 +14023,7 @@ function renderAuditDigest(root, head){
 
   var controls = '<div class="cc-card cc-toolbar"><div class="cc-toolrow">'+
     '<label class="aud-lbl">Since</label>'+
-    '<input type="date" id="aud-since" class="lg-field" style="max-width:180px;" value="'+
+    '<input type="date" id="aud-since" aria-label="Show changes since" class="lg-field" style="max-width:180px;" value="'+
       entEsc(since)+'" onchange="audSetReviewPoint(this.value)">'+
     '<span class="aud-days">'+nDays+' '+(nDays===1?'day':'days')+'</span>'+
     '<div style="flex:1;"></div>'+
@@ -14387,7 +14393,9 @@ function renderSettings(){
   var toggle = function(id, on, label, note){
     return '<div class="set-row">'+
       '<div><div class="set-t">'+label+'</div><div class="set-n">'+note+'</div></div>'+
-      '<button class="set-sw'+(on?' on':'')+'" id="'+id+'" onclick="setToggle('+lgArg(id)+')">'+
+      '<button class="set-sw'+(on?' on':'')+'" id="'+id+'" role="switch" '+
+      'aria-checked="'+(on?'true':'false')+'" aria-label="'+entEsc(label)+'" '+
+      'onclick="setToggle('+lgArg(id)+')">'+
       '<span></span></button></div>';
   };
   root.innerHTML =
@@ -14416,7 +14424,7 @@ function renderSettings(){
         'entities, every register, filing evidence, applicability decisions and rule sign-offs. '+
         '<b>JSON</b> keeps the structure; <b>CSV</b> opens in a spreadsheet.</div>'+
         '<div class="calc-f"><label class="calc-l" for="exp-scope">What to export</label>'+
-        '<select id="exp-scope" class="lg-field">'+
+        '<select id="exp-scope" aria-label="What to export" class="lg-field">'+
           '<option value="all">Every entity you can see</option>'+
           ((typeof CLIENTS !== 'undefined' ? CLIENTS : []).map(function(c){
             return '<option value="'+entEsc(c.id)+'">'+entEsc(c.name)+'</option>';
@@ -14462,7 +14470,7 @@ function renderSettings(){
         '<div class="set-n" style="margin-bottom:11px;">Uncheck a card to hide it from the command centre.</div>'+
         CMD_CARDS.map(function(c){
           var on = ccCardVisible(c.id);
-          return '<label class="set-chk"><input type="checkbox"'+(on?' checked':'')+
+          return '<label class="set-chk"><input type="checkbox" aria-label="Show the '+entEsc(c.label)+' card"'+(on?' checked':'')+
             ' onchange="ccCardToggle('+lgArg(c.id)+',this.checked)"> '+entEsc(c.label)+'</label>';
         }).join('')+
       '</div>'+
@@ -15464,27 +15472,27 @@ function renderUniverse(){
 
   var filters=
     '<div class="cu-filters">'+
-      '<div class="cu-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><input id="cu-q" placeholder="Search obligations, sections, forms…" value="'+(f.q||'')+'" oninput="cuSetFilter(\'q\',this.value)"></div>'+
-      '<select onchange="cuSetFilter(\'entity\',this.value)"><optgroup label="Entity">'+opts(entities,f.entity)+'</optgroup></select>'+
-      '<select onchange="cuSetFilter(\'law\',this.value)"><optgroup label="Law">'+opts(laws,f.law)+'</optgroup></select>'+
-      '<select onchange="cuSetFilter(\'risk\',this.value)"><option value="">Any risk</option><option value="high"'+(f.risk==='high'?' selected':'')+'>High/Critical</option><option value="medium"'+(f.risk==='medium'?' selected':'')+'>Medium</option><option value="low"'+(f.risk==='low'?' selected':'')+'>Low</option></select>'+
-      '<select onchange="cuSetFilter(\'status\',this.value)"><option value="">Any status</option>'+
+      '<div class="cu-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><input id="cu-q" aria-label="Search obligations, sections and forms" placeholder="Search obligations, sections, forms…" value="'+(f.q||'')+'" oninput="cuSetFilter(\'q\',this.value)"></div>'+
+      '<select aria-label="Filter by entity" onchange="cuSetFilter(\'entity\',this.value)"><optgroup label="Entity">'+opts(entities,f.entity)+'</optgroup></select>'+
+      '<select aria-label="Filter by law" onchange="cuSetFilter(\'law\',this.value)"><optgroup label="Law">'+opts(laws,f.law)+'</optgroup></select>'+
+      '<select aria-label="Filter by risk" onchange="cuSetFilter(\'risk\',this.value)"><option value="">Any risk</option><option value="high"'+(f.risk==='high'?' selected':'')+'>High/Critical</option><option value="medium"'+(f.risk==='medium'?' selected':'')+'>Medium</option><option value="low"'+(f.risk==='low'?' selected':'')+'>Low</option></select>'+
+      '<select aria-label="Filter by status" onchange="cuSetFilter(\'status\',this.value)"><option value="">Any status</option>'+
         ['overdue','due-soon','upcoming','scheduled','completed'].map(function(s){var lbl={'overdue':'Overdue','due-soon':'Due soon','upcoming':'Upcoming','scheduled':'Scheduled','completed':'Completed'}[s];return '<option value="'+s+'"'+(f.status===s?' selected':'')+'>'+lbl+'</option>';}).join('')+'</select>'+
-      '<select onchange="cuSetFilter(\'vstatus\',this.value)"><optgroup label="Verification status">'+
+      '<select aria-label="Filter by verification status" onchange="cuSetFilter(\'vstatus\',this.value)"><optgroup label="Verification status">'+
         '<option value="">Any verification status</option>'+
         Object.keys(LG_STATE).map(function(k){
           return '<option value="'+k+'"'+(f.vstatus===k?' selected':'')+'>'+LG_STATE[k].label+'</option>';
         }).join('')+'</optgroup></select>'+
-      '<select onchange="cuSetFilter(\'vmethod\',this.value)"><optgroup label="Verification method">'+
+      '<select aria-label="Filter by verification method" onchange="cuSetFilter(\'vmethod\',this.value)"><optgroup label="Verification method">'+
         '<option value="">Any method</option>'+
         ['None','Client-supplied reference','Manual confirmation by authorised user','Authoritative source']
           .map(function(m){ return '<option value="'+m+'"'+(f.vmethod===m?' selected':'')+'>'+m+'</option>'; }).join('')+
         '</optgroup></select>'+
-      '<select onchange="cuSetFilter(\'listing\',this.value)">'+
+      '<select aria-label="Filter by listed or unlisted" onchange="cuSetFilter(\'listing\',this.value)">'+
         '<option value="">Listed &amp; unlisted</option>'+
         '<option value="listed"'+(f.listing==='listed'?' selected':'')+'>Listed only</option>'+
         '<option value="unlisted"'+(f.listing==='unlisted'?' selected':'')+'>Unlisted only</option></select>'+
-      '<select onchange="cuSetFilter(\'freq\',this.value)"><option value="">Any frequency</option>'+
+      '<select aria-label="Filter by frequency" onchange="cuSetFilter(\'freq\',this.value)"><option value="">Any frequency</option>'+
         (function(){
           // Count against rows that already satisfy every OTHER filter, so the
           // number beside an option is what you will actually get.
@@ -16192,7 +16200,7 @@ function bulkOpen(){
       '<div class="mono" style="font-size:11px;color:var(--ink-soft);background:var(--ink3);border:1px solid var(--ink4);'+
         'border-radius:7px;padding:9px 11px;margin-bottom:14px;overflow-x:auto;white-space:nowrap;">'+
         'Name · CIN · Type · FY End · Capital · Turnover · Net Worth · Net Profit · Borrowings</div>'+
-      '<textarea id="bulk-text" placeholder="Name&#9;CIN&#9;Turnover&#9;Net Profit&#10;Acme Industries Pvt Ltd&#9;U74999MH2015PTC123456&#9;90&#9;6" '+
+      '<textarea id="bulk-text" aria-label="Paste one entity per line" placeholder="Name&#9;CIN&#9;Turnover&#9;Net Profit&#10;Acme Industries Pvt Ltd&#9;U74999MH2015PTC123456&#9;90&#9;6" '+
         'style="width:100%;height:150px;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);'+
         'border-radius:8px;padding:11px;font-size:12px;font-family:\'IBM Plex Mono\',monospace;outline:none;'+
         'box-sizing:border-box;resize:vertical;"></textarea>'+
@@ -16699,7 +16707,7 @@ function lgNAOpen(entityId, key){
           (row.naReason?'. Reason given: &ldquo;'+entEsc(row.naReason)+'&rdquo;':'')+
         '. Reinstating puts it back into the register and it will be tracked again.</div>'
       : '<label class="lg-label" for="lg-na-why">Why does this not apply?</label>'+
-        '<textarea id="lg-na-why" class="lg-field" style="width:100%;min-height:74px;resize:vertical;" '+
+        '<textarea id="lg-na-why" aria-label="Why this does not apply" class="lg-field" style="width:100%;min-height:74px;resize:vertical;" '+
           'placeholder="For example: the company has never accepted deposits; no subsidiary; no foreign assets."></textarea>'+
         '<div class="reg-hint">Recorded against your name so the decision can be explained later. '+
         'It stays in the register and can be reinstated at any time.</div>')+
@@ -16973,7 +16981,7 @@ function lgRecordOpen(entityId, key){
           ['yes','no','unknown'].map(function(v){
             var cur = ev.filedFlag || (ev.filedOn ? 'yes' : '');
             return '<label class="lg-f3'+(cur===v?' on':'')+'">'+
-              '<input type="radio" name="lg-filed" value="'+v+'"'+(cur===v?' checked':'')+
+              '<input aria-label="Has this been filed" type="radio" name="lg-filed" value="'+v+'"'+(cur===v?' checked':'')+
               ' onchange="lgFiledToggle()">'+
               {yes:'Yes, filed', no:'Not filed', unknown:'Not known yet'}[v]+'</label>';
           }).join('')+
@@ -16989,7 +16997,7 @@ function lgRecordOpen(entityId, key){
         '<div style="font-size:11px;color:var(--ink-soft);font-weight:600;margin-bottom:4px;">'+
           'Attach supporting document <span style="font-weight:400;opacity:.75;">— optional · PDF or image, max 10 MB</span></div>'+
         lgPrivacyPanelHtml()+
-        '<input id="lg-file" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" '+
+        '<input id="lg-file" aria-label="Evidence document to upload" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" '+
           'style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);'+
           'border-radius:8px;padding:8px;font-size:12px;outline:none;box-sizing:border-box;">'+
         (ev.evidenceFile
@@ -17619,7 +17627,7 @@ function lgPrivacyPanelHtml(){
     '<div style="font-size:11px;color:var(--ink-soft);margin-bottom:10px;">'+entEsc(LG_PRIVACY_BLURB)+'</div>'+
 
     '<div style="font-size:11px;color:var(--ink-soft);margin-bottom:4px;font-weight:600;">Where it will be stored</div>'+
-    '<select id="lg-doc-storage" style="width:100%;background:var(--ink2);border:1px solid var(--ink4);'+
+    '<select id="lg-doc-storage" aria-label="Where this document is stored" style="width:100%;background:var(--ink2);border:1px solid var(--ink4);'+
       'color:var(--white);border-radius:7px;padding:8px 10px;font-size:12px;outline:none;margin-bottom:4px;">'+
       connected.map(function(s){ return '<option value="'+s.id+'">'+entEsc(s.name)+'</option>'; }).join('')+
       others.map(function(s){ return '<option value="'+s.id+'" disabled>'+entEsc(s.name)+' — not connected</option>'; }).join('')+
@@ -17628,7 +17636,7 @@ function lgPrivacyPanelHtml(){
       entEsc(LG_STORAGE[0].detail)+'</div>'+
 
     '<div style="font-size:11px;color:var(--ink-soft);margin-bottom:4px;font-weight:600;">Retention</div>'+
-    '<select id="lg-doc-retention" style="width:100%;background:var(--ink2);border:1px solid var(--ink4);'+
+    '<select id="lg-doc-retention" aria-label="How long this document is kept" style="width:100%;background:var(--ink2);border:1px solid var(--ink4);'+
       'color:var(--white);border-radius:7px;padding:8px 10px;font-size:12px;outline:none;margin-bottom:6px;">'+
       lgRetentionOptions('permanent')+'</select>'+
     '<div id="lg-retention-note" style="font-size:11px;color:var(--ink-soft);margin-bottom:10px;"></div>'+
@@ -17641,7 +17649,7 @@ function lgPrivacyPanelHtml(){
       '<b>Not used for:</b> training, indexing, or access by any other client.</div>'+
 
     '<label style="display:flex;gap:8px;align-items:flex-start;font-size:12px;cursor:pointer;">'+
-      '<input type="checkbox" id="lg-doc-consent" style="margin-top:3px;">'+
+      '<input type="checkbox" id="lg-doc-consent" aria-label="The client has consented to this document being held" style="margin-top:3px;">'+
       '<span>I have read the above and consent to this document being stored on the terms shown.</span></label>'+
   '</div>';
 }
@@ -17921,7 +17929,7 @@ async function lgOverrideOpen(entityId, key){
       entField('lg-ovr-date','Filing date','',' ','date')+
       '<div style="margin-bottom:12px;">'+
         '<div style="font-size:11px;color:var(--ink-soft);font-weight:600;margin-bottom:4px;">Reason (required)</div>'+
-        '<textarea id="lg-ovr-why" rows="3" placeholder="e.g. MCA source unavailable; filing acknowledgement reviewed by authorised CS." '+
+        '<textarea id="lg-ovr-why" aria-label="Why this status is being overridden" rows="3" placeholder="e.g. MCA source unavailable; filing acknowledgement reviewed by authorised CS." '+
           'style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);'+
           'border-radius:8px;padding:9px 11px;font-size:13px;outline:none;box-sizing:border-box;resize:vertical;"></textarea></div>'+
       '<div id="lg-ovr-err" style="display:none;font-size:12px;color:#EF4444;margin:8px 0;"></div>'+
@@ -18104,10 +18112,10 @@ function lgRegOpen(entityId){
       '<td class="mono" style="white-space:nowrap;'+(overdue?'color:#B45309;font-weight:600;':'')+'">'+
         entEsc(r.due||'—')+'</td>'+
       '<td>'+lgPill(st.state)+'</td>'+
-      '<td><input type="date" class="lg-reg-date" value="'+entEsc(filed)+'" '+
+      '<td><input aria-label="Date filed" type="date" class="lg-reg-date" value="'+entEsc(filed)+'" '+
         'style="background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:7px;'+
         'padding:6px 8px;font-size:12px;outline:none;width:150px;"></td>'+
-      '<td><input type="text" class="lg-reg-ref" value="'+entEsc(ref)+'" placeholder="SRN / ref" '+
+      '<td><input aria-label="Filing reference" type="text" class="lg-reg-ref" value="'+entEsc(ref)+'" placeholder="SRN / ref" '+
         'style="background:var(--ink3);border:1px solid var(--ink4);color:var(--white);border-radius:7px;'+
         'padding:6px 8px;font-size:12px;outline:none;width:150px;font-family:\'IBM Plex Mono\',monospace;"></td>'+
       '</tr>';
@@ -18465,8 +18473,8 @@ function renderEvents(){
     body =
       '<div class="cu-filters">'+
         '<div class="cu-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>'+
-          '<input placeholder="Search events…" value="'+entEsc(f.q)+'" oninput="mevSetFilter(\'q\',this.value)"></div>'+
-        '<select onchange="mevSetFilter(\'part\',this.value)"><option value="">All parts</option>'+
+          '<input aria-label="Search events" placeholder="Search events…" value="'+entEsc(f.q)+'" oninput="mevSetFilter(\'q\',this.value)"></div>'+
+        '<select aria-label="Filter by Schedule III part" onchange="mevSetFilter(\'part\',this.value)"><option value="">All parts</option>'+
           Object.keys(parts).sort().map(function(p){
             return '<option value="'+entEsc(p)+'"'+(f.part===p?' selected':'')+'>'+entEsc(p)+'</option>'; }).join('')+
         '</select>'+
@@ -18568,25 +18576,25 @@ function mevLogOpen(eventId){
         'Record the actual time.</div>'+
 
       '<div style="margin-bottom:12px;"><div style="font-size:11px;color:var(--ink-soft);font-weight:600;margin-bottom:4px;">Entity</div>'+
-        '<select id="mev-entity" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);'+
+        '<select id="mev-entity" aria-label="Entity" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);'+
         'border-radius:8px;padding:9px 11px;font-size:13px;outline:none;">'+entOpts+'</select></div>'+
 
       '<div style="margin-bottom:12px;"><div style="font-size:11px;color:var(--ink-soft);font-weight:600;margin-bottom:4px;">Event (Schedule III)</div>'+
-        '<select id="mev-event" onchange="mevPreview()" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);'+
+        '<select id="mev-event" aria-label="Event" onchange="mevPreview()" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);'+
         'color:var(--white);border-radius:8px;padding:9px 11px;font-size:12px;outline:none;">'+evOpts+'</select></div>'+
 
       '<div style="margin-bottom:12px;"><div style="font-size:11px;color:var(--ink-soft);font-weight:600;margin-bottom:4px;">When did it occur?</div>'+
-        '<input id="mev-when" type="datetime-local" value="'+localNow+'" onchange="mevPreview()" '+
+        '<input id="mev-when" aria-label="When it occurred" type="datetime-local" value="'+localNow+'" onchange="mevPreview()" '+
         'style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);'+
         'border-radius:8px;padding:9px 11px;font-size:13px;outline:none;box-sizing:border-box;"></div>'+
 
       '<div id="mev-basis-wrap" style="margin-bottom:12px;display:none;">'+
         '<div style="font-size:11px;color:var(--ink-soft);font-weight:600;margin-bottom:4px;">Which limb applies?</div>'+
-        '<select id="mev-basis" onchange="mevPreview()" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);'+
+        '<select id="mev-basis" aria-label="Basis" onchange="mevPreview()" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);'+
         'color:var(--white);border-radius:8px;padding:9px 11px;font-size:12px;outline:none;"></select></div>'+
 
       '<div style="margin-bottom:12px;"><div style="font-size:11px;color:var(--ink-soft);font-weight:600;margin-bottom:4px;">Materiality</div>'+
-        '<select id="mev-materiality" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);'+
+        '<select id="mev-materiality" aria-label="Materiality" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);'+
         'border-radius:8px;padding:9px 11px;font-size:13px;outline:none;">'+
         '<option value="pending">Not yet decided</option>'+
         '<option value="material">Material - disclose</option>'+
@@ -18814,14 +18822,14 @@ function renderInternal(){
   var filters =
     '<div class="cu-filters">'+
       '<div class="cu-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>'+
-        '<input placeholder="Search title, reference, owner…" value="'+entEsc(f.q)+'" oninput="intSetFilter(\'q\',this.value)"></div>'+
-      '<select onchange="intSetFilter(\'category\',this.value)"><option value="">All categories</option>'+
+        '<input aria-label="Search internal compliance items" placeholder="Search title, reference, owner…" value="'+entEsc(f.q)+'" oninput="intSetFilter(\'q\',this.value)"></div>'+
+      '<select aria-label="Filter by category" onchange="intSetFilter(\'category\',this.value)"><option value="">All categories</option>'+
         INT_CATEGORIES.map(function(c){ return '<option value="'+c[0]+'"'+(f.category===c[0]?' selected':'')+'>'+c[1]+'</option>'; }).join('')+'</select>'+
-      '<select onchange="intSetFilter(\'status\',this.value)">'+
+      '<select aria-label="Filter by status" onchange="intSetFilter(\'status\',this.value)">'+
         ['active','paused','retired'].map(function(s){
           return '<option value="'+s+'"'+(f.status===s?' selected':'')+'>'+s.charAt(0).toUpperCase()+s.slice(1)+'</option>'; }).join('')+
         '<option value=""'+(f.status===''?' selected':'')+'>All</option></select>'+
-      '<select onchange="intSetFilter(\'entity\',this.value)">'+entOpts+'</select>'+
+      '<select aria-label="Filter by entity" onchange="intSetFilter(\'entity\',this.value)">'+entOpts+'</select>'+
       '<button class="cu-clear" onclick="intClear()">Clear</button>'+
     '</div>';
 
@@ -18899,7 +18907,7 @@ function intOpen(id){
       entField('int-ref','Reference','(optional) internal doc no. / ISO clause', r.reference||'')+
       sel('int-category','Category', INT_CATEGORIES, r.category||'policy')+
       '<div style="margin-bottom:12px;"><div style="font-size:11px;color:var(--ink-soft);font-weight:600;margin-bottom:4px;">Entity</div>'+
-        '<select id="int-entity" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);'+
+        '<select id="int-entity" aria-label="Entity" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);'+
         'border-radius:8px;padding:9px 11px;font-size:13px;outline:none;">'+entOpts+'</select></div>'+
       sel('int-freq','Frequency', INT_FREQUENCIES, r.frequency||'annual')+
       sel('int-crit','Criticality', [['low','Low'],['medium','Medium'],['high','High'],['critical','Critical']], r.criticality||'medium')+
@@ -18908,7 +18916,7 @@ function intOpen(id){
       entField('int-lastdone','Last completed','(optional)', r.last_completed||'', 'date')+
       sel('int-status','Status', [['active','Active'],['paused','Paused'],['retired','Retired']], r.status||'active')+
       '<div style="margin-bottom:12px;"><div style="font-size:11px;color:var(--ink-soft);font-weight:600;margin-bottom:4px;">Notes</div>'+
-        '<textarea id="int-notes" rows="2" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);'+
+        '<textarea id="int-notes" aria-label="Notes" rows="2" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);'+
         'color:var(--white);border-radius:8px;padding:9px 11px;font-size:13px;outline:none;box-sizing:border-box;resize:vertical;">'+
         entEsc(r.description||'')+'</textarea></div>'+
 
@@ -19237,9 +19245,14 @@ function renderEntities(){
 }
 
 function entField(id,label,hint,value,type){
+  // The caption was a <div>: the text was on screen and tied to nothing, so a
+  // screen reader announced "edit text" and clicking the caption did nothing.
+  // A real <label for> makes the visible words the accessible name, which beats
+  // an aria-label that can drift away from what is displayed.
   return '<div style="margin-bottom:12px;">'+
-    '<div style="font-size:11px;color:var(--ink-soft);font-weight:600;margin-bottom:4px;">'+label+
-      (hint?' <span style="font-weight:400;opacity:.75;">'+hint+'</span>':'')+'</div>'+
+    '<label for="'+id+'" style="display:block;font-size:11px;color:var(--ink-soft);'+
+      'font-weight:600;margin-bottom:4px;">'+label+
+      (hint?' <span style="font-weight:400;opacity:.75;">'+hint+'</span>':'')+'</label>'+
     '<input id="'+id+'" type="'+(type||'text')+'" value="'+entEsc(value)+'" '+
       'style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);'+
       'border-radius:8px;padding:9px 11px;font-size:13px;outline:none;box-sizing:border-box;"></div>';
@@ -19276,7 +19289,7 @@ function entOpen(id){
       '<div style="margin-bottom:12px;">'+
         '<div style="font-size:11px;color:var(--ink-soft);font-weight:600;margin-bottom:4px;">CIN '+
           '<span style="font-weight:400;opacity:.75;">— fills in type, listed status, state and year</span></div>'+
-        '<input id="ent-cin" type="text" value="'+entEsc(c.cin||'')+'" oninput="entCinChanged()" '+
+        '<input id="ent-cin" aria-label="CIN" type="text" value="'+entEsc(c.cin||'')+'" oninput="entCinChanged()" '+
           'placeholder="U74999MH2015PTC123456" spellcheck="false" '+
           'style="width:100%;background:var(--ink3);border:1px solid var(--ink4);color:var(--white);'+
           'border-radius:8px;padding:9px 11px;font-size:13px;outline:none;box-sizing:border-box;'+
@@ -19290,7 +19303,7 @@ function entOpen(id){
       '</div>'+
 
       '<div style="margin-bottom:12px;"><div style="font-size:11px;color:var(--ink-soft);font-weight:600;margin-bottom:4px;">Company type</div>'+
-      '<select id="ent-type" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);'+
+      '<select id="ent-type" aria-label="Entity type" style="width:100%;background:var(--ink3);border:1px solid var(--ink4);'+
         'color:var(--white);border-radius:8px;padding:9px 11px;font-size:13px;outline:none;">'+opts+'</select></div>'+
 
       entField('ent-fyend','Financial year end','(only day & month are used)',c.fyend||'','date')+
@@ -19573,7 +19586,7 @@ function cdPriorityOpen(){
       'It drives the order things appear in, and what a lapse costs the health score.</div>'+
     ['critical','high','medium','low'].map(function(p){
       return '<label class="ob-prio'+(cur===p?' on':'')+'">'+
-        '<input type="radio" name="cd-prio" value="'+p+'"'+(cur===p?' checked':'')+'>'+
+        '<input aria-label="Priority" type="radio" name="cd-prio" value="'+p+'"'+(cur===p?' checked':'')+'>'+
         '<span class="exc-pri '+p+'"></span>'+
         '<b>'+p.charAt(0).toUpperCase()+p.slice(1)+'</b></label>';
     }).join('')+

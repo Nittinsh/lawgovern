@@ -2304,6 +2304,91 @@ that is the one failure that would put a stale row in front of a CS.
 
 ---
 
+## 3q. LANDMARKS AND CONTROL NAMES (v179)
+
+§3n named this the weakest dimension in the product: **zero landmarks in the
+whole app, and controls a screen reader could only announce as &ldquo;edit
+text&rdquo; or &ldquo;combo box&rdquo;.**
+
+### Landmarks by ROLE, not by retagging
+`role="banner"`, `role="navigation"` and `role="main"` produce **exactly the
+same landmarks for assistive technology** as `<header>`, `<nav>` and `<main>`.
+In a 2.6 MB single file where the closing tags are thousands of lines away and
+the structure is nested divs, retagging is closing-tag surgery for no gain a
+screen reader can detect. One attribute each, and no CSS moved because nothing
+selects these by element &mdash; checked first.
+
+### A skip link, which is the part a keyboard user actually feels
+**Thirty nav items sit between the top of the page and the content.** Without a
+skip link, reaching the main region by keyboard is thirty tab stops, on every
+screen. It is the highest-value thing here and it is nine lines.
+
+Verified by driving it: Shift+Tab from the search box lands on `.skip-link`,
+`left: 0` and `:focus` matching &mdash; **off-screen until focused, on screen
+when it is**. `tabindex="-1"` on the target matters: without it the target takes
+the scroll but not the focus, so the next Tab returns to the top of the nav and
+the link achieves nothing.
+
+### Three counts, none of them right on its own
+
+| how | found | why it was wrong |
+|---|---|---|
+| driving the browser | 43 | only sees what has been rendered &mdash; misses every modal and flow nobody opened |
+| scanning the markup | 79 | cannot resolve an id built in JavaScript, nor match a `<label for>` built the same way |
+| **both, filtered** | **62 named** | |
+
+The static scan reported the register field builder as unnamed **when it emits a
+proper `<label for>`** &mdash; 27 healthy controls among the 79. A check that
+cries wolf on those is a check nobody runs (§2x), so it now skips interpolated
+ids and matches `<label[^>]*for=` rather than the bare tag.
+
+And the browser sweep missed the entity modal entirely, where `entField`
+rendered its caption as a **`<div>`**: the words were on screen and tied to
+nothing. That is now a real `<label for>`, which beats an aria-label because the
+visible text becomes the accessible name and cannot drift away from it.
+
+### Named at the source, not in sixty-two places
+Eight filter selects in `renderUniverse` keyed by their own filter name, one
+entity picker in `regRender` serving **all nine register panels**, three filters
+in the forms master, and the settings toggle &mdash; which also became a real
+**`role="switch"` with `aria-checked`**, having previously been an empty
+`<button>` containing a `<span>`: no name, no state, no role.
+
+**Result: 0 unnamed controls and 0 unnamed buttons**, across all 40 panels and
+the register, entity and event modals, at 375px and 1280px, with no console
+errors.
+
+### The mutation runner was only ever exercising half the suite
+This is the finding worth carrying. `mutation.js` ran **`compliance.test.js`
+only**, so a mutation that deleted the main landmark, or stripped a control's
+name, **passed** &mdash; nothing that ran could see the markup.
+
+It runs **both suites** now, and stops at the first that notices. That did not
+just cover the new work: **every structural check written since §2x** &mdash;
+nav/panel pairing, live inline handlers, defined classes, the build marker
+&mdash; was unproven until this change.
+
+### Two bugs in the new checks, both the same shape
+- **The generator window was one guessed distance for all entries.**
+  `entField`'s label carries a style attribute and an optional hint span, so it
+  sits further back than an aria-label written straight onto the tag &mdash; and
+  a real label read as missing. The window is per entry now.
+- **The scan's own false positives**, above: 27 of 79.
+
+Both are §2x again: *a check that cries wolf is worse than no check.*
+
+### Coverage
+Smoke **12 &rarr; 30 checks**, mutations **108 &rarr; 121 caught, 0 missed, 0
+skipped**. Thirteen of the new mutations are accessibility, and none of them
+could have been caught before the runner started exercising the smoke test.
+
+### Not done
+`lang="en"` is present and every control is named, but this is not a WCAG audit:
+focus order, contrast ratios, live-region announcements and keyboard traps in
+the modals are unmeasured. What was fixed is what §3n measured.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -2372,7 +2457,7 @@ that is the one failure that would put a stale row in front of a CS.
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (12 structural checks), `node tests/compliance.test.js` (494 assertions, run against `index.html` itself), `node tests/mutation.js` (108 bugs reintroduced, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (30 structural checks), `node tests/compliance.test.js` (494 assertions, run against `index.html` itself), `node tests/mutation.js` (121 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **No AI model auto-updates to current law.** Staying current = fetch fresh sources (RSS via rss2json/allorigins for SEBI/MCA/IBBI/RBI/IncomeTax) + human curation + (optionally) paid web-search. Vetted human templates + AI drafting is the right model.
 - **Drafting quality:** resolution/notice prompts (`RES_SYS`, `DOC_SYS`) were tuned to a senior-CS standard (exact sub-section citations with read-with clauses, SEBI LODR cross-refs, full RESOLVED THAT/FURTHER THAT cascade, standard severally-authorised CS clause, Certified True Copy headers, Section 102 explanatory statements, MCA form+deadline line). There's an anti-reasoning guard telling the model to output ONLY the final document (some free models leaked their chain-of-thought). Keep these standards.
 - **Child/again:** all AI legal output must carry a "verify on MCA/SEBI portal before filing" caveat — the CS signs and carries professional responsibility.
@@ -2381,7 +2466,7 @@ that is the one failure that would put a stale row in front of a CS.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v178.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v179.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

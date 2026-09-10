@@ -288,6 +288,62 @@ const MUTATIONS = [
     from: "        if(gap > 120 || gap < 0)",
     to:   "        if(gap > 1200 || gap < 0)" },
 
+  // ── landmarks and control names (§3q) ───────────────────────
+  // Facts about the markup, so they are caught by smoke.test.js — which the
+  // runner only started exercising when these were written.
+
+  { name: 'the main landmark is removed (§3q — nothing to skip to)',
+    from: '<div class="appmain" role="main" id="appmain" tabindex="-1">',
+    to:   '<div class="appmain" id="appmain" tabindex="-1">' },
+
+  { name: 'the navigation landmark is removed (§3q)',
+    from: '<aside class="appside" role="navigation" aria-label="Sections">',
+    to:   '<aside class="appside">' },
+
+  { name: 'the banner landmark is removed (§3q)',
+    from: '<div class="appheader" role="banner">',
+    to:   '<div class="appheader">' },
+
+  { name: 'the skip link is removed (§3q — thirty tab stops to the content)',
+    from: '<a class="skip-link" href="#appmain">Skip to main content</a>',
+    to:   '' },
+
+  { name: 'the skip target cannot take focus (§3q — scrolls, then Tab goes back to the nav)',
+    from: 'id="appmain" tabindex="-1"',
+    to:   'id="appmain"' },
+
+  { name: 'the skip link stays off-screen when focused (§3q — present but invisible)',
+    from: '.skip-link:focus{left:0;}',
+    to:   '.skip-link:focus{left:-9999px;}' },
+
+  { name: 'the skip link is always on screen (§3q — it should hide until focused)',
+    from: '.skip-link{position:absolute;left:-9999px;',
+    to:   '.skip-link{position:absolute;left:0;' },
+
+  { name: 'the settings toggles stop being switches (§3q — announce as "button")',
+    from: '\'" role="switch" \'+',
+    to:   '\'" \'+' },
+
+  { name: 'the settings toggles lose their name (§3q)',
+    from: 'aria-label="\'+entEsc(label)+\'" \'+',
+    to:   '\'+' },
+
+  { name: 'the register entity picker loses its name — nine panels at once (§3q)',
+    from: 'entSel = \'<select class="lg-field" aria-label="Entity" onchange="REG_ENTITY[\'',
+    to:   'entSel = \'<select class="lg-field" onchange="REG_ENTITY[\'' },
+
+  { name: 'a universe filter loses its name (§3q)',
+    from: '<select aria-label="Filter by risk" onchange="cuSetFilter(\\\'risk\\\',this.value)">',
+    to:   '<select onchange="cuSetFilter(\\\'risk\\\',this.value)">' },
+
+  { name: 'the entity form caption goes back to a div (§3q — text on screen, tied to nothing)',
+    from: "'<label for=\"'+id+'\" style=\"display:block;font-size:11px;color:var(--ink-soft);'+",
+    to:   "'<div style=\"font-size:11px;color:var(--ink-soft);'+" },
+
+  { name: 'the document stops declaring a language (§3q)',
+    from: '<html lang="en">',
+    to:   '<html>' },
+
   // ── one render, one chart per company (§3p) ─────────────────
   // The dangerous ones here are not the slow ones. A pass that outlives its
   // render is a cache with no lifetime, and every reader after it gets rows
@@ -559,14 +615,15 @@ const src = fs.readFileSync(INDEX, 'utf8');
 fs.mkdirSync(TMP, { recursive: true });
 
 // A clean build must pass, or nothing below means anything.
-let r = spawnSync(process.execPath, [path.join(__dirname, 'compliance.test.js')],
-                  { encoding: 'utf8' });
-if (r.status !== 0) {
-  console.log('The suite does not pass against the current build — fix that first.\n');
-  console.log(r.stdout);
-  process.exit(1);
+for (const s of ['compliance.test.js', 'smoke.test.js']) {
+  const r = spawnSync(process.execPath, [path.join(__dirname, s)], { encoding: 'utf8' });
+  if (r.status !== 0) {
+    console.log(s + ' does not pass against the current build — fix that first.\n');
+    console.log(r.stdout);
+    process.exit(1);
+  }
 }
-console.log('baseline: suite passes against the current build\n');
+console.log('baseline: both suites pass against the current build\n');
 
 let caught = 0, missed = 0, skipped = 0;
 for (const m of MUTATIONS) {
@@ -578,8 +635,18 @@ for (const m of MUTATIONS) {
   }
   const mutant = path.join(TMP, 'index.html');
   fs.writeFileSync(mutant, src.replace(m.from, m.to));
-  const run = spawnSync(process.execPath, [path.join(__dirname, 'compliance.test.js')],
-                        { encoding: 'utf8', env: Object.assign({}, process.env, { LG_INDEX: mutant }) });
+  // BOTH suites. compliance.test.js knows the law; smoke.test.js knows the
+  // markup — landmarks, control names, class definitions, handler targets.
+  // Running only the first left every structural check unproven: a mutation
+  // that removed the main landmark or a control's name passed, because nothing
+  // that ran could see the markup. Both honour LG_INDEX.
+  const env = Object.assign({}, process.env, { LG_INDEX: mutant });
+  const suites = ['compliance.test.js', 'smoke.test.js'];
+  let run = null;
+  for (const s of suites) {
+    run = spawnSync(process.execPath, [path.join(__dirname, s)], { encoding: 'utf8', env });
+    if (run.status !== 0) break;      // one suite noticing is enough
+  }
   // A mutant can also crash rather than fail assertions — still caught, but
   // there is no "N FAILED" line to read.
   const hits = (run.stdout.match(/(\d+) FAILED/) || [])[1];

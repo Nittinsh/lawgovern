@@ -154,6 +154,97 @@ function eq(name, a, b) { ok(name, a === b, `${a} !== ${b}`); }
   ok('a build version marker is present', !!m, 'missing');
 }
 
+// ── 6. accessibility: landmarks, a skip link, and named controls ──
+// None of this existed until v179. A screen reader had no way to jump to the
+// content, and forty-three controls announced as "edit text" or "combo box".
+{
+  const roles = ['banner', 'navigation', 'main'];
+  roles.forEach(r => {
+    ok('there is a ' + r + ' landmark', html.indexOf('role="' + r + '"') >= 0, 'missing');
+  });
+
+  // Thirty nav items sit between the top of the page and the content, so
+  // without this a keyboard user tabs through all of them on every screen.
+  const skip = html.match(/<a class="skip-link" href="#([\w-]+)"/);
+  ok('a skip link is present', !!skip, 'missing');
+  if (skip) {
+    const target = skip[1];
+    ok('the skip link points at something that exists',
+       html.indexOf('id="' + target + '"') >= 0, '#' + target + ' not found');
+    ok('and that something is the main landmark',
+       new RegExp('id="' + target + '"[^>]*role="main"|role="main"[^>]*id="' + target + '"')
+         .test(html), 'target is not the main landmark');
+    // Without tabindex the target takes the scroll but not the focus, so the
+    // next Tab returns to the top of the nav and the link achieves nothing.
+    ok('the skip target can take focus',
+       new RegExp('id="' + target + '"[^>]*tabindex|tabindex[^>]*id="' + target + '"')
+         .test(html), 'no tabindex on the skip target');
+    ok('the skip link is off-screen until focused',
+       /\.skip-link\{[^}]*left:-\d{3,}px/.test(html), 'not hidden');
+    ok('and comes back on focus', /\.skip-link:focus\{[^}]*left:0/.test(html), 'stays hidden');
+  }
+
+  // Every control written directly into the markup carries a name.
+  // The first cut of this reported 79 unnamed controls and most were healthy.
+  // An id built in JavaScript cannot be resolved by reading the markup, and
+  // neither can the <label for> that names it — the register field builder
+  // emits a proper label and was reported as unnamed anyway. A check that
+  // cries wolf on twenty-seven working controls is a check nobody runs (§2x).
+  const nameless = [];
+  const re = /<(input|select|textarea)\b[^>]*?>/gi;
+  let m, generated = 0;
+  while ((m = re.exec(html))) {
+    const tag = m[0];
+    if (/type="hidden"/i.test(tag)) continue;
+    if (/aria-label|aria-labelledby/i.test(tag)) continue;
+    const id = (tag.match(/id="([^"]*)"/) || [])[1];
+    if (id && (id.includes("'+") || id.includes("' +"))) { generated++; continue; }
+    // The label may carry a class, so match the attribute rather than the tag.
+    if (id && new RegExp('<label[^>]*for="' + id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '"')
+                .test(html)) continue;
+    nameless.push(tag.slice(0, 90));
+  }
+  ok('the scan found controls to look at', html.indexOf('<input') > 0, 'none found');
+  ok('every control in the markup has an accessible name',
+     nameless.length === 0, nameless.join('\n        '));
+
+  // Controls built in JavaScript cannot be found by reading the markup, so what
+  // is asserted is that the generator emits a name.
+  const gen = [
+    ['the register entity picker', "onchange=\"REG_ENTITY[", 'aria-label="Entity"'],
+    ['the universe filters',       "cuSetFilter(\\'entity\\'", 'aria-label="Filter by entity"'],
+    ['the forms-master filters',   "fmSet(\\'law\\'",          'aria-label="Filter forms by law"'],
+    // entField's caption was a <div>: on screen, tied to nothing. The scan
+    // above cannot see it, because the id is built in JavaScript — so the
+    // generator is asserted directly. A mutation reverting it to a div passed
+    // until this line existed.
+    ['the entity form caption',    "<input id=\"'+id+'\" type=", '<label for="\'+id+\'"', 400],
+  ];
+  // The window is per entry. entField's label carries a style attribute and an
+  // optional hint span, so it sits further back than an aria-label written
+  // straight onto the tag — one guessed distance for all of them made a real
+  // label read as missing.
+  gen.forEach(([what, near, want, back]) => {
+    const i = html.indexOf(near);
+    ok(what + ' names itself',
+       i > 0 && html.slice(Math.max(0, i - (back || 200)), i).indexOf(want) >= 0,
+       i > 0 ? 'found the control, no ' + want : 'could not find ' + near);
+  });
+
+  // The settings toggles were an empty <button> with a <span> in it: no name,
+  // no state, no role. A switch is what they are.
+  // Plain attributes inside a JS string — nothing is backslash-escaped in the
+  // file, so these are substring checks rather than regexes.
+  ok('the settings toggles are switches with a state',
+     html.includes('role="switch"') &&
+     html.includes("aria-checked=\"'+(on?'true':'false')+'\""), 'not a switch');
+  ok('and they carry the label beside them',
+     html.includes("aria-label=\"'+entEsc(label)+'\""), 'unnamed');
+
+  ok('the document declares a language', /<html[^>]*\blang="/i.test(html) ||
+     html.indexOf('lang="en"') >= 0, 'no lang');
+}
+
 // ── report ────────────────────────────────────────────────────
 const total = pass + failures.length;
 console.log('\n' + '─'.repeat(64));
