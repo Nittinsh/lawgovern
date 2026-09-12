@@ -1,0 +1,241 @@
+<!doctype html>
+<!--
+  ────────────────────────────────────────────────────────────────────────────
+  DRAFT.  The factual statements about what the product does and does not do
+  were checked against index.html on 12 September 2026.
+
+  Before this goes live:
+    1.  Have it reviewed.  Sections 8 (liability), 9 (indemnity) and 11
+        (governing law) are the ones that need a lawyer, not a checker.
+        Section 8 is deliberately modest — a blanket exclusion from a product
+        that could contribute to a missed statutory filing is both unattractive
+        to a buyer and of doubtful enforceability.  That is a judgement call
+        someone qualified should make, not me.
+    2.  Fill in every  [ ]  placeholder — there are six.
+    3.  Delete the amber DRAFT banner below (the <div class="draft"> block).
+    4.  Section 6 says the service is free.  The moment you charge for it this
+        section is wrong and needs fees, renewal, refunds and taxes.
+  ────────────────────────────────────────────────────────────────────────────
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Terms of Use — LawGovern</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B1220; --ink:#1E293B; --soft:#64748B; --line:#E2E8F0;
+    --paper:#FFFFFF; --ice:#F7F9FC; --blue:#2563EB; --warn:#F59E0B;
+    --warn-wash:#FEF6E7; --crit:#EF4444; --crit-wash:#FEF0F0;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--ice);color:var(--ink);
+       font:16px/1.7 Manrope,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+  .wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px;}
+  header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:28px;}
+  .brand{font-size:20px;font-weight:800;color:var(--navy);letter-spacing:-.01em;}
+  .brand span{color:var(--blue);}
+  h1{font-size:30px;font-weight:800;color:var(--navy);margin:18px 0 6px;letter-spacing:-.02em;}
+  .meta{font-size:13px;color:var(--soft);}
+  h2{font-size:19px;font-weight:700;color:var(--navy);margin:36px 0 10px;letter-spacing:-.01em;}
+  h3{font-size:15px;font-weight:700;color:var(--navy);margin:22px 0 6px;}
+  p,li{font-size:15px;}
+  ul{padding-left:22px;}
+  li{margin-bottom:7px;}
+  a{color:var(--blue);}
+  strong{font-weight:700;color:var(--navy);}
+  .draft{background:var(--warn-wash);border:1px solid var(--warn);border-radius:10px;
+         padding:14px 16px;margin-bottom:26px;font-size:14px;}
+  .draft b{color:#8A5A00;}
+  .box{background:var(--paper);border:1px solid var(--line);border-radius:12px;
+       padding:16px 18px;margin:16px 0;}
+  .box.crit{border-left:4px solid var(--crit);background:var(--crit-wash);}
+  .box.warn{border-left:4px solid var(--warn);background:var(--warn-wash);}
+  .box.key{border-left:4px solid var(--blue);}
+  footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--line);
+         font-size:13px;color:var(--soft);}
+  @media(max-width:640px){ h1{font-size:24px;} .wrap{padding:22px 16px 60px;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="brand">Law<span>Govern</span></div>
+</header>
+
+<!-- DELETE THIS BLOCK BEFORE PUBLISHING -->
+<div class="draft">
+  <b>Draft — not yet reviewed by a lawyer.</b> The statements about what the
+  software does were checked against it on 12 September 2026. The legal terms,
+  particularly the liability and indemnity clauses, have not been settled by
+  anyone qualified to settle them, and six details are still marked
+  <code>[ ]</code>.
+</div>
+
+<h1>Terms of Use</h1>
+<p class="meta">Effective [ date ] &middot; Last reviewed 12 September 2026</p>
+
+<p>These terms govern your use of LawGovern. By creating an account you accept
+them. If you are accepting on behalf of a firm, you confirm you may bind it.</p>
+
+<h2>1. What LawGovern is</h2>
+<p>A working tool for Company Secretaries and compliance teams. It keeps a
+register of what applies to each entity you enter, computes statutory deadlines
+where a provision states one, records the evidence that a filing was made, runs
+statutory calculations, and reports where those things disagree with one another.</p>
+
+<h2>2. What LawGovern is not</h2>
+
+<div class="box crit">
+  <h3 style="margin-top:0;">It is not legal or professional advice</h3>
+  <p style="margin-bottom:0;">Nothing the product outputs is advice. You are the
+  professional. You sign the filing, you carry the responsibility for it, and
+  nothing here displaces your own judgement or your obligations to your client
+  and to your institute.</p>
+</div>
+
+<div class="box crit">
+  <h3 style="margin-top:0;">Nothing is verified against MCA21 or the exchanges</h3>
+  <p>The product has no connection to MCA21, to the stock exchanges, or to any
+  other official filing system. It cannot confirm that a filing was actually
+  made.</p>
+  <p style="margin-bottom:0;">When a screen shows a filing as recorded, that
+  means <strong>somebody typed it in</strong>. Where the register says nothing is
+  recorded against an obligation, that is a statement about the register and not
+  an assertion that the filing was missed. <strong>Verify on the MCA or SEBI
+  portal before you rely on any of it.</strong></p>
+</div>
+
+<div class="box warn">
+  <h3 style="margin-top:0;">The rule corpus is not guaranteed to be current</h3>
+  <p>The obligations, deadlines and thresholds in the product were built from
+  spreadsheets and from published texts held within it. As at the date above:</p>
+  <ul>
+    <li>the <strong>SEBI LODR</strong> text held is amended to <strong>14 July 2026</strong>;</li>
+    <li>the <strong>SEBI PIT</strong> text held is amended to <strong>12 March 2025</strong>;</li>
+    <li>the <strong>Companies Act, 2013</strong> text held is amended only to
+    <strong>1 April 2021</strong>, which is over five years old.</li>
+  </ul>
+  <p style="margin-bottom:0;">Every rule carries a verification status you can
+  read at Administration &rarr; Rule Governance, and a rule nobody has checked
+  says <em>&ldquo;never checked&rdquo;</em> rather than pretending otherwise.
+  <strong>Check the provision before you act on a figure or a date.</strong></p>
+</div>
+
+<p>It is also not a filing service, not a registered office service, and not a
+substitute for professional indemnity insurance.</p>
+
+<h2>3. Accounts</h2>
+<ul>
+  <li>An account requires approval before it can be used. We may decline or
+  withdraw approval.</li>
+  <li>You are responsible for your credentials and for what is done under your
+  account. Tell us promptly if you think it has been compromised.</li>
+  <li>Do not share a login. Where two people need access, invite the second
+  person — the maker-checker control depends on the product being able to tell
+  them apart, and sharing a login silently defeats it.</li>
+  <li>A practice owner or administrator can see and change what members of that
+  practice can access.</li>
+</ul>
+
+<h2>4. What you are responsible for</h2>
+<ul>
+  <li><strong>The accuracy of what you enter.</strong> Deadlines are computed
+  from the financial year end, the entity class and the figures you supply. If
+  those are wrong, the dates will be wrong and will still look like dates.</li>
+  <li><strong>Having the right to put it in.</strong> You confirm you are
+  entitled to enter your clients&rsquo; information, including personal data of
+  directors and employees, and that you have met your own obligations to them.</li>
+  <li><strong>Your own copy.</strong> Use the export under Administration &rarr;
+  Settings. See section 7.</li>
+  <li><strong>Checking before filing.</strong> Every drafted document and every
+  computed figure is a starting point for your review, not an output to be used
+  unread.</li>
+</ul>
+
+<h2>5. Acceptable use</h2>
+<p>Do not use LawGovern to store data you have no right to hold, attempt to
+reach another practice&rsquo;s data, probe or attack the service, resell access
+without our agreement, or upload malware. Do not use the AI features for
+unpublished price-sensitive information — see the
+<a href="privacy.html">Privacy Policy</a>, which explains where that text goes.</p>
+
+<h2>6. Availability, and what it costs</h2>
+
+<div class="box warn">
+  <p><strong>The service is currently provided free of charge, with no service
+  level agreement.</strong> The hosting is on a free tier. There is no uptime
+  commitment, no guaranteed backup and no point-in-time recovery.</p>
+  <p style="margin-bottom:0;">It may be slow, unavailable, or changed without
+  notice. <strong>Do not make it the only copy of your compliance record.</strong></p>
+</div>
+
+<p>We may add, change or withdraw features. Where a change removes something you
+depend on we will try to give notice, but on these terms we do not promise to.</p>
+
+<h2>7. Your data, and getting it back</h2>
+<ul>
+  <li>What you enter remains yours. We claim no ownership of it.</li>
+  <li>The export under Administration &rarr; Settings returns your entities,
+  every register, your filing evidence, your applicability decisions and your
+  rule sign-offs, as JSON or CSV. It does not include the uploaded documents
+  themselves — their paths are listed so you can find them.</li>
+  <li>On closure of your account we delete your data as described in the
+  <a href="privacy.html">Privacy Policy</a>. Export first.</li>
+  <li>We may suspend or close an account that breaches these terms. Where we do,
+  we will give you a reasonable opportunity to export first unless the breach
+  makes that inappropriate.</li>
+</ul>
+
+<h2>8. Liability</h2>
+
+<div class="box key">
+  <p>The honest position, rather than a blanket exclusion:</p>
+  <ul>
+    <li>The product is a tool. <strong>Your professional judgement governs</strong>,
+    and the limitations in section 2 are stated on the screens themselves and not
+    only here.</li>
+    <li>We do not exclude liability for anything that cannot lawfully be
+    excluded, including fraud.</li>
+    <li>Subject to that, and because the service is provided free of charge, we
+    are <strong>not liable for indirect or consequential loss</strong>, including
+    loss of profit, loss of business, penalties imposed on you or your client, or
+    loss of data — and our total liability is limited to
+    <strong>[ amount, or the fees paid in the preceding twelve months ]</strong>.</li>
+    <li>We do not warrant that the product is free of error, that a computed date
+    is correct, or that the rule corpus is current. Sections 2 and 4 say why.</li>
+  </ul>
+  <p style="margin-bottom:0;"><em>A clause of this kind needs a lawyer&rsquo;s
+  eye, particularly where a defect could contribute to a missed statutory
+  filing.</em></p>
+</div>
+
+<h2>9. Indemnity</h2>
+<p>You will indemnify us against claims arising from your use of the product in
+breach of these terms, from data you had no right to enter, or from your own
+professional advice to a client. <strong>[ Confirm scope with a lawyer. ]</strong></p>
+
+<h2>10. Changes to these terms</h2>
+<p>We may change these terms. The date at the top will change with them, and
+where the change is significant we will tell account holders directly. Continuing
+to use the product after a change means you accept it.</p>
+
+<h2>11. Governing law</h2>
+<p>These terms are governed by the laws of India, and the courts at
+<strong>[ city ]</strong> have exclusive jurisdiction.</p>
+
+<h2>12. Contact</h2>
+<p><strong>[ legal name of the operating person or firm ]</strong>,
+<strong>[ registered address ]</strong> &mdash;
+<a href="mailto:lawgovernsolutions@gmail.com">lawgovernsolutions@gmail.com</a>.</p>
+
+<footer>
+  <p>See also the <a href="privacy.html">Privacy Policy</a>.</p>
+</footer>
+
+</div>
+</body>
+</html>

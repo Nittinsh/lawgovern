@@ -1,0 +1,315 @@
+<!doctype html>
+<!--
+  ────────────────────────────────────────────────────────────────────────────
+  DRAFT.  Every factual statement here was checked against index.html on
+  12 September 2026 and is true of the build shipping that day.  What has NOT
+  happened is a lawyer reading it.
+
+  Before this goes live:
+    1.  Have it reviewed.  The DPDP Act 2023 obligations, the
+        Fiduciary/Processor split in section 2 and the grievance route in
+        section 11 are the parts that carry legal weight.
+    2.  Fill in every  [ ]  placeholder — there are six.
+    3.  Delete the amber DRAFT banner below (the <div class="draft"> block).
+
+  If the product changes, these statements go stale.  The ones most likely to:
+  the third-party table (section 5), the AI disclosure (section 6), and the
+  hosting/backup position (section 10).
+  ────────────────────────────────────────────────────────────────────────────
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Privacy Policy — LawGovern</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B1220; --ink:#1E293B; --soft:#64748B; --line:#E2E8F0;
+    --paper:#FFFFFF; --ice:#F7F9FC; --blue:#2563EB; --warn:#F59E0B;
+    --warn-wash:#FEF6E7; --crit:#EF4444;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--ice);color:var(--ink);
+       font:16px/1.7 Manrope,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+  .wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px;}
+  header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:28px;}
+  .brand{font-size:20px;font-weight:800;color:var(--navy);letter-spacing:-.01em;}
+  .brand span{color:var(--blue);}
+  h1{font-size:30px;font-weight:800;color:var(--navy);margin:18px 0 6px;letter-spacing:-.02em;}
+  .meta{font-size:13px;color:var(--soft);}
+  h2{font-size:19px;font-weight:700;color:var(--navy);margin:36px 0 10px;letter-spacing:-.01em;}
+  h3{font-size:15px;font-weight:700;color:var(--navy);margin:22px 0 6px;}
+  p,li{font-size:15px;}
+  ul{padding-left:22px;}
+  li{margin-bottom:7px;}
+  a{color:var(--blue);}
+  strong{font-weight:700;color:var(--navy);}
+  .draft{background:var(--warn-wash);border:1px solid var(--warn);border-radius:10px;
+         padding:14px 16px;margin-bottom:26px;font-size:14px;}
+  .draft b{color:#8A5A00;}
+  .box{background:var(--paper);border:1px solid var(--line);border-radius:12px;
+       padding:16px 18px;margin:16px 0;}
+  .box.key{border-left:4px solid var(--blue);}
+  .box.warn{border-left:4px solid var(--warn);background:var(--warn-wash);}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px;
+        background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden;}
+  th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;
+     color:var(--soft);padding:10px 12px;border-bottom:1px solid var(--line);background:var(--ice);}
+  td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  .tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px;
+       background:var(--ice);border:1px solid var(--line);color:var(--soft);}
+  footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--line);
+         font-size:13px;color:var(--soft);}
+  @media(max-width:640px){ h1{font-size:24px;} .wrap{padding:22px 16px 60px;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="brand">Law<span>Govern</span></div>
+</header>
+
+<!-- DELETE THIS BLOCK BEFORE PUBLISHING -->
+<div class="draft">
+  <b>Draft — not yet reviewed by a lawyer.</b> The facts in this document were
+  checked against the software on 12 September 2026. The legal drafting has not
+  been settled by anyone qualified to settle it, and six details are still
+  marked <code>[ ]</code>.
+</div>
+
+<h1>Privacy Policy</h1>
+<p class="meta">Effective [ date ] &middot; Last reviewed 12 September 2026</p>
+
+<p>LawGovern is a compliance tool for Company Secretaries and their teams. This
+policy explains what happens to information you put into it, who else can see
+that information, and what you can ask us to do about it.</p>
+
+<p>It is written to be checked rather than believed. Where it describes what the
+software does, that behaviour is in the product and you can verify most of it
+yourself from the screens named.</p>
+
+<h2>1. Who is responsible</h2>
+<p>LawGovern is operated by <strong>[ legal name of the operating person or firm ]</strong>,
+of <strong>[ registered address ]</strong>. In this policy &ldquo;we&rdquo; means that
+operator and &ldquo;you&rdquo; means the person holding a LawGovern account.</p>
+
+<h2>2. Two kinds of information, and two different roles</h2>
+<p>This distinction governs everything below, so it comes first.</p>
+
+<div class="box key">
+  <h3 style="margin-top:0;">Your own information — we are the Data Fiduciary</h3>
+  <p style="margin-bottom:0;">Your email address, your display name, your role in
+  your practice, and the record of what you did in the product. We decide why
+  this is held, so the responsibility under the Digital Personal Data Protection
+  Act, 2023 is ours.</p>
+</div>
+
+<div class="box key">
+  <h3 style="margin-top:0;">Your clients&rsquo; information — you are the Data Fiduciary, we are a Data Processor</h3>
+  <p>Company records, directors and their DINs, meetings, charges, allotments,
+  beneficial interests, designated persons and their trading declarations, filing
+  references, and any document you upload.</p>
+  <p style="margin-bottom:0;">You decide what goes in and why. We hold it and
+  process it on your instructions and for no other purpose. <strong>We do not
+  use it to train anything, we do not sell it, and we do not look at it except
+  where you ask us to help with a fault you have reported.</strong></p>
+</div>
+
+<p>Some of the people in those records never signed up for anything — a director
+whose DIN you record, an employee named as a designated person. Their information
+reaches us because you put it there, and your own obligations to them under the
+DPDP Act are not transferred to us by your using this product.</p>
+
+<h2>3. What we collect</h2>
+<table>
+  <thead><tr><th>What</th><th>Why</th><th>Where it comes from</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Email address</strong></td><td>To identify your account, sign you in, and send password resets</td><td>You, at sign-up</td></tr>
+    <tr><td><strong>Password</strong></td><td>To sign you in</td><td>You. Stored by our authentication provider as a hash &mdash; we never see or hold the password itself</td></tr>
+    <tr><td><strong>Your practice and role</strong></td><td>To decide which companies you can see and what you may change</td><td>Set by whoever invited you</td></tr>
+    <tr><td><strong>Everything you enter about companies</strong></td><td>To work out what applies, what is due, and what has been evidenced</td><td>You, by typing, importing a spreadsheet, or uploading a document</td></tr>
+    <tr><td><strong>An audit record</strong></td><td>To show who recorded or confirmed a filing and when &mdash; this is the point of a maker-checker control</td><td>Generated as you use the product</td></tr>
+  </tbody>
+</table>
+
+<div class="box">
+  <p style="margin:0;"><strong>We run no analytics and no trackers.</strong> There
+  is no Google Analytics, no advertising pixel, no session recorder and no
+  cross-site tracking of any kind in this product. We do not build a profile of
+  you and there is nothing here to sell.</p>
+</div>
+
+<h2>4. Where it is stored</h2>
+<p>In a <strong>Supabase</strong> project hosted in the <strong>Mumbai (ap-south-1)
+region</strong>, so the database sits in India. Access is enforced at the database
+itself by row-level security: a query from your account can only return rows
+belonging to a practice you are a member of. That is not a filter applied by the
+screen — the database refuses the rest.</p>
+
+<p>Documents you upload are kept in a <strong>private storage area</strong> that
+serves nothing publicly. When you open one, the product mints a link that expires
+in <strong>five minutes</strong>. There is no public URL for any document you
+upload.</p>
+
+<h2>5. Who else can see anything</h2>
+<p>The complete list. Each of these is a request your browser or our server makes;
+none of them receives your clients&rsquo; records except where the table says so.</p>
+
+<table>
+  <thead><tr><th>Who</th><th>What reaches them</th><th>When</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Supabase</strong><br><span class="tag">India</span></td>
+      <td>Everything. They host the database, the authentication and the file storage.</td>
+      <td>Always</td>
+    </tr>
+    <tr>
+      <td><strong>OpenRouter</strong> and the AI model provider it routes to<br><span class="tag">outside India</span></td>
+      <td><strong>Whatever you type into an AI feature.</strong> See section 6 &mdash; this is the disclosure that matters most.</td>
+      <td>Only when you use an AI feature</td>
+    </tr>
+    <tr>
+      <td><strong>Google Fonts</strong><br><span class="tag">outside India</span></td>
+      <td>Your IP address and browser, because the page loads two fonts from them. No account or company data.</td>
+      <td>Every page load</td>
+    </tr>
+    <tr>
+      <td><strong>jsDelivr</strong><br><span class="tag">outside India</span></td>
+      <td>Your IP address and browser, because the database client library is loaded from them. No account or company data.</td>
+      <td>Every page load</td>
+    </tr>
+    <tr>
+      <td><strong>rss2json</strong> and <strong>AllOrigins</strong><br><span class="tag">outside India</span></td>
+      <td>Your IP address, and the address of the public SEBI/MCA/RBI feed being fetched. They are used to read public regulator feeds your browser cannot fetch directly. No account or company data.</td>
+      <td>Only on the Regulatory Radar screen</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>We do not otherwise disclose anything to anyone, except where we are required
+to by law or by a court, in which case we will tell you unless we are forbidden
+to.</p>
+
+<h2>6. The AI features — read this one</h2>
+
+<div class="box warn">
+  <p><strong>When you use an AI feature, the text you typed leaves India.</strong>
+  It goes to our own server function, which forwards it to OpenRouter, a company
+  outside India, which routes it to a language-model provider. We hold the key so
+  that it is not in your browser; we cannot control what those providers do with
+  the text beyond their own terms.</p>
+  <p style="margin-bottom:0;"><strong>So do not type anything into an AI feature
+  that you would not be willing to send to a third party outside India.</strong>
+  A client&rsquo;s name, an unannounced transaction, or unpublished price-sensitive
+  information should not go into one.</p>
+</div>
+
+<h3>Which screens use AI, and which do not</h3>
+<p>This matters, because most of the product does not.</p>
+<ul>
+  <li><strong>Uses AI when you ask it to:</strong> AI Compliance (the chat), Deep
+  Law Interpretation, Resolution Drafting, Notices &amp; Minutes drafting, and
+  the optional summary on Regulatory Radar.</li>
+  <li><strong>Never uses AI:</strong> the register, the calculators, the
+  checklists, every entity register, the Event Impact engine, the board-minutes
+  analysis, the applicability engine, the exceptions list, the board report and
+  the back-test. These run entirely on your own device and our own database.</li>
+</ul>
+
+<div class="box key">
+  <p style="margin:0;"><strong>Board minutes you paste are analysed in your
+  browser and are not sent anywhere.</strong> The Event Impact screen splits the
+  minutes and matches each decision against the obligation register using code
+  running on your own machine. The text is not transmitted to us, to OpenRouter,
+  or to anyone else. It is not saved unless you save it.</p>
+</div>
+
+<p>An AI feature is never triggered automatically. Nothing is sent unless you
+click a button that says it will.</p>
+
+<h2>7. What is kept in your browser</h2>
+<p>The product stores a small number of viewing preferences in your browser&rsquo;s
+local storage: which navigation groups you have collapsed, which financial year
+you have selected, where you had read up to in the change digest, which dashboard
+cards you have hidden, and your ticks on a checklist. These never leave your
+device and contain no client data. Clearing your browser data removes them.</p>
+
+<h2>8. How long we keep things</h2>
+<ul>
+  <li><strong>While your account is open:</strong> everything you have entered,
+  because a compliance record is only useful as a history.</li>
+  <li><strong>If you close your account:</strong> tell us and we will delete your
+  account and the records belonging to your practice within
+  <strong>[ number ] days</strong>. Export your data first — the product has a
+  one-click export under Administration &rarr; Settings and we would rather you
+  used it than asked us for a copy afterwards.</li>
+  <li><strong>Backups</strong> may retain deleted content for a short period
+  before they cycle out.</li>
+</ul>
+
+<h2>9. Your rights</h2>
+<p>Under the Digital Personal Data Protection Act, 2023, in respect of
+<em>your own</em> personal data, you may:</p>
+<ul>
+  <li>ask what we hold about you and how it has been processed;</li>
+  <li>have it corrected, completed or updated — most of it you can edit yourself;</li>
+  <li>have it erased, unless we are required to keep it;</li>
+  <li>withdraw consent, which for most of what is here means closing your account;</li>
+  <li>nominate someone to exercise these rights if you die or become incapacitated;</li>
+  <li>complain to us first, and then to the Data Protection Board of India if we
+  have not resolved it.</li>
+</ul>
+<p>For your <em>clients&rsquo;</em> data we act on your instructions. If one of your
+clients — or a director on one of your registers — asks us directly, we will
+point them to you, because you are the Data Fiduciary for that record.</p>
+
+<h2>10. Security, and its limits</h2>
+<p>What is in place:</p>
+<ul>
+  <li>Access is enforced by the database, not by the screen. A query for another
+  practice&rsquo;s rows returns nothing.</li>
+  <li>Uploaded documents are in a private store with short-lived links.</li>
+  <li>Passwords are hashed by the authentication provider and never reach us.</li>
+  <li>A filing recorded by one person can be set to require confirmation by a
+  different person, and the database enforces that the two are not the same.</li>
+  <li>Every status change is recorded with who made it and when.</li>
+  <li>You can run an access check against your own account, from
+  Administration &rarr; Team, and see for yourself that another practice&rsquo;s
+  data is unreachable.</li>
+</ul>
+
+<div class="box warn">
+  <p style="margin-bottom:0;"><strong>What is not in place, stated plainly.</strong>
+  The hosting is currently on a free tier. That means <strong>there is no service
+  level agreement and no point-in-time recovery</strong>. Keep your own exports.
+  We are not offering, and you should not assume, a guaranteed backup of your
+  compliance record.</p>
+</div>
+
+<h2>11. If something goes wrong</h2>
+<p>If personal data we hold is breached, we will notify the Data Protection Board
+of India and every affected person, in the manner and within the time the DPDP
+Act requires.</p>
+
+<p><strong>Grievances.</strong> Write to
+<strong>[ grievance officer name and email ]</strong>. We will acknowledge within
+[ number ] working days. If you are not satisfied with the outcome you may
+complain to the Data Protection Board of India.</p>
+
+<h2>12. Changes to this policy</h2>
+<p>If we change what the product does with your information, we will change this
+page and update the date at the top. Where the change is significant we will tell
+account holders directly rather than relying on you to re-read it.</p>
+
+<footer>
+  <p>Questions about this policy: <a href="mailto:lawgovernsolutions@gmail.com">lawgovernsolutions@gmail.com</a><br>
+  See also the <a href="terms.html">Terms of Use</a>.</p>
+</footer>
+
+</div>
+</body>
+</html>

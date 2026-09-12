@@ -245,6 +245,59 @@ function eq(name, a, b) { ok(name, a === b, `${a} !== ${b}`); }
      html.indexOf('lang="en"') >= 0, 'no lang');
 }
 
+// -- 7. the terms and the privacy policy -----------------------
+// A privacy notice reachable only AFTER signing up is not a notice: the DPDP
+// Act wants it at or before the point of collection, and the point of
+// collection is the sign-up button.
+{
+  const legalDir = path.dirname(INDEX);
+  const pages = ['terms.html', 'privacy.html'];
+  const read = {};
+
+  pages.forEach(f => {
+    const p = path.join(legalDir, f);
+    const there = fs.existsSync(p);
+    ok(f + ' exists', there, 'missing');
+    if (there) read[f] = fs.readFileSync(p, 'utf8');
+  });
+
+  pages.forEach(f => {
+    ok('the app links to ' + f, html.indexOf('href="' + f + '"') >= 0, 'not linked');
+  });
+
+  // The sign-up button and the links have to be on the same card, or the
+  // notice is not given at the point of collection.
+  // The window was 9,000 characters and the links sit 19,120 past the overlay,
+  // so the check failed against a page that was correct. And 'lgSignUp()' alone
+  // matched the function DEFINITION, which is earlier in the file than the
+  // overlay — the button is what has to be on the card, so match the handler.
+  const i = html.indexOf('id="auth-overlay"');
+  const card = i >= 0 ? html.slice(i, i + 25000) : '';
+  ok('the login card links to the terms', card.indexOf('href="terms.html"') >= 0, 'not on the card');
+  ok('the login card links to the privacy policy',
+     card.indexOf('href="privacy.html"') >= 0, 'not on the card');
+  ok('and they sit with the sign-up button, not somewhere else',
+     card.indexOf('onclick="lgSignUp()"') >= 0, 'sign-up button is elsewhere');
+
+  pages.forEach(f => {
+    const s = read[f];
+    if (!s) return;
+    ok(f + ' declares a language', /<html[^>]*\blang="/i.test(s), 'no lang');
+    ok(f + ' has a title', /<title>[^<]{6,}<\/title>/i.test(s), 'no title');
+    const other = f === 'terms.html' ? 'privacy.html' : 'terms.html';
+    ok(f + ' links to ' + other, s.indexOf('href="' + other + '"') >= 0, 'no cross-link');
+
+    // The invariant. Placeholders OR no banner — never both. Asserting the
+    // banner is present would fail the moment it is correctly removed.
+    const blanks = (s.match(/\[[^\]<>\n]{2,60}\]/g) || [])
+                     .filter(x => !/^\[\s*\]$/.test(x));
+    const banner = s.indexOf('class="draft"') >= 0;
+    ok(f + ' does not publish blanks without saying it is a draft',
+       blanks.length === 0 || banner,
+       blanks.length + ' placeholder(s) and no draft banner: ' + blanks.join(' '));
+  });
+}
+
 // ── report ────────────────────────────────────────────────────
 const total = pass + failures.length;
 console.log('\n' + '─'.repeat(64));

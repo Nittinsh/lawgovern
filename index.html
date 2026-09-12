@@ -1393,6 +1393,9 @@ document.addEventListener('DOMContentLoaded', checkSession);
     <button onclick="lgSignIn()" style="width:100%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--ink);font-weight:700;font-size:14px;border:none;border-radius:10px;padding:13px;cursor:pointer;margin-bottom:10px;">Sign In →</button>
     <button onclick="lgSignUp()" style="width:100%;background:var(--ink3);color:var(--gold2);font-weight:600;font-size:13px;border:1px solid var(--ink4);border-radius:10px;padding:12px;cursor:pointer;">Create New Account</button>
     <div style="text-align:center;margin-top:12px;"><a onclick="lgResetPassword()" style="font-size:12px;color:var(--slate);cursor:pointer;text-decoration:underline;">Forgot your password?</a></div>
+    <!-- A privacy notice readable only AFTER signing up is not a notice. The
+         point of collection is the button above it, so the link sits here. -->
+    <div style="text-align:center;margin-top:16px;padding-top:14px;border-top:1px solid var(--ink4);font-size:11px;color:var(--slate);line-height:1.7;">By creating an account you accept the<br><a href="terms.html" target="_blank" rel="noopener" style="color:var(--slate);text-decoration:underline;">Terms of Use</a> and the <a href="privacy.html" target="_blank" rel="noopener" style="color:var(--slate);text-decoration:underline;">Privacy Policy</a>.</div>
 
     
   </div>
@@ -1524,7 +1527,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v180">
+      <meta id="build-version" content="v181">
     </div>
   </div>
   <div class="cc-search">
@@ -14398,6 +14401,23 @@ function renderSettings(){
       'onclick="setToggle('+lgArg(id)+')">'+
       '<span></span></button></div>';
   };
+
+  // Reachable from inside too, for somebody who wants to check what happens to
+  // their data without signing out to find it.
+  var legal =
+    '<div class="cc-card"><div class="cc-card-h">Terms and privacy</div>'+
+    '<div class="cc-card-b">'+
+      '<div style="font-size:13px;line-height:1.7;color:var(--ink);">'+
+        '<a href="terms.html" target="_blank" rel="noopener">Terms of Use</a> '+
+        '&middot; '+
+        '<a href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a>'+
+      '</div>'+
+      '<div class="calc-sub" style="margin-top:8px;">The privacy policy lists '+
+        'every third party this product contacts and what reaches each of them '+
+        '&mdash; including what leaves India when you use an AI feature, and '+
+        'what never leaves your browser at all.</div>'+
+    '</div></div>';
+
   root.innerHTML =
     '<div class="cc-pagehead"><div>'+
       '<div class="cc-crumb">Administration &rsaquo; Settings</div>'+
@@ -14495,7 +14515,8 @@ function renderSettings(){
             (s.connected?'Connected':'Not connected')+'</span></div>';
         }).join('')+
       '</div>'+
-    '</div>';
+    '</div>'+
+    legal;
 }
 
 function setToggle(id){

@@ -2480,6 +2480,79 @@ boundary as §3b. What is asserted is everything up to the write.
 
 ---
 
+## 3s. TERMS AND A PRIVACY POLICY (v181)
+
+`terms.html` and `privacy.html`, linked from the login card and from
+Administration &rarr; Settings.
+
+**I am not a lawyer and these are drafts.** Both carry an amber banner saying
+so, and neither should go live until somebody qualified has read the liability,
+indemnity and grievance clauses. What they are is a draft grounded in **what the
+software actually does**, because that is the half I could establish and the
+half boilerplate always gets wrong.
+
+### Every factual claim was checked against the code first
+| claim | how it was established |
+|---|---|
+| no analytics, no trackers, no pixels | grep across the file &mdash; **zero** matches for GA, GTM, Mixpanel, Segment, PostHog, Hotjar, Facebook |
+| the database is in India | Supabase project, Mumbai region (&sect;4) |
+| documents are private | private bucket, 300-second signed URLs (&sect;2e), asserted by `backend.test.js` |
+| **board minutes never leave the browser** | `impRunMinutes` calls only `impSplitMinutes`, `impAssess`, `mgt14Assess` &mdash; all local |
+| what leaves India | the complete list of external hosts, and what reaches each |
+| browser storage holds no client data | the live `localStorage` keys are view preferences only |
+
+The third-party table names **five** recipients and what each one gets. Google
+Fonts and jsDelivr see an IP address on every page load; rss2json and AllOrigins
+see one only on the Regulatory Radar, plus the public feed URL. And OpenRouter
+receives whatever is typed into an AI feature.
+
+### The distinction the whole document turns on
+**Two kinds of personal data, two different roles.** For the user's own account
+details LawGovern is the **Data Fiduciary**. For everything about the user's
+*clients* &mdash; directors and their DINs, designated persons, trading
+declarations &mdash; **the practice is the Fiduciary and LawGovern is a
+Processor**. Boilerplate collapses these into one, and collapsing them here
+would misstate who answers to a director whose DIN sits in somebody's register.
+
+### The AI disclosure is the one that matters
+Text typed into an AI feature **leaves India**. So the policy says which five
+screens use AI, that **nothing fires automatically**, and &mdash; the useful
+half &mdash; **which screens never use it**: the register, the calculators, the
+checklists, every entity register, Event Impact, the applicability engine, the
+exceptions list, the board report and the back-test.
+
+### And it states what is NOT in place
+No SLA. No point-in-time recovery. Free tier. *"Do not make it the only copy of
+your compliance record."* The terms say the same about availability, and section
+2 repeats on the page what the app already says on screen: **nothing is verified
+against MCA21 or the exchanges**, and the Companies Act text held is amended
+only to 01.04.2021.
+
+### The check that would have punished the right action
+A smoke check asserting *"the draft banner is present"* would fail the moment
+the owner correctly removes it after review. §2x's rule: a check that punishes
+the right action is worse than no check. So the invariant asserted is
+**placeholders OR no banner, never both** &mdash; a policy with blanks in it
+must always say it is a draft.
+
+### Two of my own, both the same shape as before
+- **The window was 9,000 characters and the links sit 19,120 past the overlay**,
+  so the check failed against a page that was correct &mdash; and the "same card
+  as sign-up" test matched the `lgSignUp` **function definition**, which is
+  *earlier* in the file than the overlay. Both are §3q's guessed-distance bug.
+- **I wrote "four placeholders" and there are six.** §2z's "all 99 divisions"
+  exactly: the list was right, the sentence counting it was not.
+
+Smoke **30 &rarr; 45 checks**.
+
+### What is still needed from the owner
+Six placeholders in each document, a named grievance officer (the DPDP Act
+requires a means of contact), and a lawyer. The terms also assume the service is
+**free** &mdash; the moment it is charged for, section 6 needs fees, renewal,
+refunds and taxes.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -2548,7 +2621,7 @@ boundary as §3b. What is asserted is everything up to the write.
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (30 structural checks), `node tests/compliance.test.js` (548 assertions, run against `index.html` itself), `node tests/mutation.js` (135 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (45 structural checks), `node tests/compliance.test.js` (548 assertions, run against `index.html` itself), `node tests/mutation.js` (135 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **No AI model auto-updates to current law.** Staying current = fetch fresh sources (RSS via rss2json/allorigins for SEBI/MCA/IBBI/RBI/IncomeTax) + human curation + (optionally) paid web-search. Vetted human templates + AI drafting is the right model.
 - **Drafting quality:** resolution/notice prompts (`RES_SYS`, `DOC_SYS`) were tuned to a senior-CS standard (exact sub-section citations with read-with clauses, SEBI LODR cross-refs, full RESOLVED THAT/FURTHER THAT cascade, standard severally-authorised CS clause, Certified True Copy headers, Section 102 explanatory statements, MCA form+deadline line). There's an anti-reasoning guard telling the model to output ONLY the final document (some free models leaked their chain-of-thought). Keep these standards.
 - **Child/again:** all AI legal output must carry a "verify on MCA/SEBI portal before filing" caveat — the CS signs and carries professional responsibility.
@@ -2557,7 +2630,7 @@ boundary as §3b. What is asserted is everything up to the write.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v180.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v181.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**
