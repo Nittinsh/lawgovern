@@ -2389,6 +2389,97 @@ the modals are unmeasured. What was fixed is what §3n measured.
 
 ---
 
+## 3r. THE IMPORTER READ &ldquo;250 LAKH&rdquo; AS 250 CRORE (v180)
+
+**First, a correction to §3n.** That audit said the product had no import and
+that a new customer would hand-key thirty companies. **Wrong.**
+`bulkOpen` / `bulkParse` / `bulkCommit` have been here all along, reached from
+Entities &rarr; *Import from spreadsheet*. The grep was for `csvImport` and
+`lgImport`; the feature is called `bulk*`. **A search that finds nothing is not
+a finding.**
+
+And it is good: quoted CSV, Excel TSV paste, header aliases, CIN validation that
+fills in the entity type, a preview that classifies each row **new** or
+**update**, and a commit that will not null a stored column just because the
+sheet omitted it.
+
+What it had was **zero test coverage** &mdash; 494 assertions, 121 mutations,
+none touching the path by which *every figure in the product arrives* &mdash;
+and three defects that only a test would have found.
+
+### The one that matters
+
+| typed | stored as | |
+|---|---|---|
+| `250 lakh` | **250 crore** | a hundredfold error, **silent** |
+| `250 million` | **250 crore** | ~400x, **silent** |
+| `2,50,00,000` unquoted | **2 crore** | truncated to the first comma group, **silent** |
+
+The first two are one bug: **`parseFloat("250lakh")` returns `250`.** It reads
+the leading digits and discards the rest, so a figure naming any unit but crore
+was stored as though it said crore. This is §2c&rsquo;s units trap &mdash; *two
+conventions in one app* &mdash; arriving somewhere new, and here it decides law:
+**Rs 250 lakh is Rs 2.5 crore; read as 250 crore it crosses the s.204 MR-3
+turnover limb and tells a client it owes a secretarial audit it does not.**
+
+The third is the splitter: an unquoted Indian-grouped number makes more cells
+than there are headers, and the surplus was dropped without a word.
+
+### The fix is a strict test, not a longer list of suffixes
+`bulkMoney` matches the **whole** string or refuses it, so the failure mode
+becomes *&ldquo;that is not a number&rdquo;* rather than a plausible wrong
+figure. Units with one unambiguous meaning are **converted** &mdash; lakh, crore,
+million, billion, thousand; anything else is refused. `Rs.`, `INR` and `₹` are
+accepted, and `(12.5)` is read as a loss.
+
+### A wrong unit can still be a valid number, so size is asked about separately
+Pasting rupees into a crore column produces a figure the parser cannot fault. Past
+**Rs 1 lakh crore** &mdash; larger than all but a handful of companies in India
+and no SME on a practice&rsquo;s book &mdash; the preview **asks**:
+*&ldquo;is that figure in rupees rather than crore?&rdquo;* Flagged, never
+refused. The reader decides; the product does not guess.
+
+### Two more, from §2e&rsquo;s rule
+A row with more cells than headers now says so, and **two rows naming one
+company** are flagged by CIN and by normalised name. §2e makes duplicate
+detection the strongest free control on filing evidence; the same mistake here
+silently creates two records for one entity.
+
+### Verified end to end, not just the parser
+One paste, four rows, against a book that already held the first:
+
+```
+update  Acme Industries Pvt Ltd   250 lakh  ->  Rs 2.5 cr        (was 250 cr)
+new     Beta Textiles Limited     L-prefix CIN -> Listed (BSE/NSE)
+new     Gamma Foods Pvt Ltd       bad CIN + "250 furlongs" both refused, row kept
+new     Delta Traders             2500000000 -> "rupees rather than crore?"
+```
+
+Modal fits 375px, no console errors, no horizontal overflow.
+
+### Coverage
+Suite **494 &rarr; 548**, mutations **121 &rarr; 135 caught, 0 missed, 0
+skipped**. The importer went from **zero** assertions to 54.
+
+### Two of my own mistakes worth recording
+- **A mutation that changed nothing.** *&ldquo;the unit is read after the spaces
+  are stripped&rdquo;* only appended a comment, so it was correctly reported
+  MISSED. It now actually moves the strip above the unit loop, where `\blakh\b`
+  stops matching because there is no word boundary between `0` and `l`.
+- **A comment about a trap fell into it.** The patch script is a Python
+  triple-quoted string, and a comment explaining *&ldquo;never write three
+  quotes in a row&rdquo;* wrote three quotes in a row and closed the string.
+  Fourth time in four sessions that prose has broken a mechanism &mdash; §3n and
+  §3o were assertions matching their own comments, §3p a comment matching code,
+  this one a comment matching its own delimiter.
+
+### What is still not covered
+`bulkCommit` writes to Supabase and needs a signed-in session, so the insert and
+update paths are **exercised by hand, not by the suite** &mdash; the same
+boundary as §3b. What is asserted is everything up to the write.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -2457,7 +2548,7 @@ the modals are unmeasured. What was fixed is what §3n measured.
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (30 structural checks), `node tests/compliance.test.js` (494 assertions, run against `index.html` itself), `node tests/mutation.js` (121 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (30 structural checks), `node tests/compliance.test.js` (548 assertions, run against `index.html` itself), `node tests/mutation.js` (135 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **No AI model auto-updates to current law.** Staying current = fetch fresh sources (RSS via rss2json/allorigins for SEBI/MCA/IBBI/RBI/IncomeTax) + human curation + (optionally) paid web-search. Vetted human templates + AI drafting is the right model.
 - **Drafting quality:** resolution/notice prompts (`RES_SYS`, `DOC_SYS`) were tuned to a senior-CS standard (exact sub-section citations with read-with clauses, SEBI LODR cross-refs, full RESOLVED THAT/FURTHER THAT cascade, standard severally-authorised CS clause, Certified True Copy headers, Section 102 explanatory statements, MCA form+deadline line). There's an anti-reasoning guard telling the model to output ONLY the final document (some free models leaked their chain-of-thought). Keep these standards.
 - **Child/again:** all AI legal output must carry a "verify on MCA/SEBI portal before filing" caveat — the CS signs and carries professional responsibility.
@@ -2466,7 +2557,7 @@ the modals are unmeasured. What was fixed is what §3n measured.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v179.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v180.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

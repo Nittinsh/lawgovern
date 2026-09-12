@@ -1524,7 +1524,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v179">
+      <meta id="build-version" content="v180">
     </div>
   </div>
   <div class="cc-search">
@@ -16105,6 +16105,62 @@ var BULK_FIELDS = {
   borrowings:['borrowings','loans','borrowing','outstandingloans','bankborrowings']
 };
 function bulkNorm(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,''); }
+
+// ── money, and the unit it was written in ───────────────────────
+// Every money column on this screen is CRORE. The first cut cleaned the string
+// and handed it to parseFloat, which reads leading digits and discards the
+// rest — so "250 lakh" came back as 250 and was stored as 250 CRORE. A
+// hundredfold error, with no warning, on a figure that decides whether s.204
+// MR-3 applies. §2c calls this the units trap; this is it in a new place.
+//
+// These five are the only units with one unambiguous meaning in Indian usage,
+// so they are CONVERTED. Anything else is refused, because the useful failure
+// is "that is not a number", never a plausible wrong figure.
+var BULK_UNITS = [
+  [/\bcr(?:ore)?s?\b/i,            1],
+  [/\blakh?s?\b|\blac?s?\b/i,      0.01],
+  [/\bmn\b|\bmillions?\b/i,        0.1],
+  [/\bbn\b|\bbillions?\b/i,        100],
+  [/\bthousands?\b|\bk\b/i,        0.0001]
+];
+
+// Past this, a figure is almost certainly rupees pasted into a crore column.
+// Rs 1 lakh crore is bigger than all but a handful of companies in India and no
+// SME on a practice's book. Flagged, never refused — the reader decides.
+var BULK_IMPLAUSIBLE_CR = 100000;
+
+function bulkMoney(raw){
+  var s0 = String(raw == null ? '' : raw).trim();
+  if(s0 === '') return {empty:true};
+
+  // Accounting convention: a loss is written in brackets.
+  var neg = /^\(.*\)$/.test(s0);
+  var s = neg ? s0.slice(1, -1) : s0;
+
+  // The unit is read BEFORE spaces are stripped — "250 lakh" loses its word
+  // boundary the moment the space goes, and \blakh\b stops matching.
+  var mult = 1;
+  for(var i = 0; i < BULK_UNITS.length; i++){
+    if(BULK_UNITS[i][0].test(s)){
+      mult = BULK_UNITS[i][1];
+      s = s.replace(BULK_UNITS[i][0], ' ');
+      break;
+    }
+  }
+
+  s = s.replace(/(₹|rs\.?|inr)/ig, '').replace(/[,\s]/g, '');
+
+  // Strict, and that is the whole fix: anything with characters left over is
+  // refused rather than partly read.
+  if(!/^[+-]?(\d+\.?\d*|\.\d+)(e[+-]?\d+)?$/i.test(s))
+    return {issue:'"' + s0 + '" is not a number this can read'};
+
+  var n = parseFloat(s);
+  if(isNaN(n) || !isFinite(n)) return {issue:'"' + s0 + '" is not a number this can read'};
+  n = n * mult;
+  if(neg) n = -n;
+  return {value:n, converted: mult !== 1 && mult !== undefined && /[a-z]/i.test(s0)};
+}
 function bulkMatchHeader(h){
   var n = bulkNorm(h);
   for(var f in BULK_FIELDS){
@@ -16167,17 +16223,45 @@ function bulkParse(text){
 
     ['capital','turnover','networth','netprofit','borrowings'].forEach(function(f){
       if(rec[f]===undefined) return;
-      var cleaned = String(rec[f]).replace(/[₹,\s]/g,'').replace(/cr(ore)?s?$/i,'');
-      var n = parseFloat(cleaned);
-      if(isNaN(n)){ issues.push(f+': "'+rec[f]+'" is not a number'); delete rec[f]; }
-      else rec[f] = n;   // still in crore at this stage
+      var m = bulkMoney(rec[f]);
+      if(m.empty){ delete rec[f]; return; }
+      if(m.issue){ issues.push(f+': '+m.issue); delete rec[f]; return; }
+      // A wrong unit can still be a perfectly valid number, so the size is
+      // questioned separately. Not refused: the reader decides.
+      if(Math.abs(m.value) >= BULK_IMPLAUSIBLE_CR)
+        issues.push(f+': '+m.value+' crore — is that figure in rupees rather than crore?');
+      rec[f] = m.value;   // still in crore at this stage
     });
+
+    // More cells than headers means a comma inside an unquoted field, and the
+    // surplus was being dropped in silence — "2,50,00,000" arrived as "2".
+    if(cells.length > map.length)
+      issues.push('this row has '+cells.length+' values for '+map.length+' columns — '+
+        'a number with commas in it needs quotes, or the row is out of step');
 
     rec._issues = issues;
     rec._line = i+1;
     rows.push(rec);
   }
   if(!rows.length) return {error:'No usable data rows found.'};
+
+  // Two rows naming one company is a mistake in the sheet, and importing both
+  // silently creates two records for one entity. §2e makes exactly this check
+  // the strongest free control on filing evidence; it belongs here too.
+  var seenCin = {}, seenName = {};
+  rows.forEach(function(r){
+    if(r.cin){
+      var k = String(r.cin).toUpperCase();
+      if(seenCin[k]) r._issues.push('same CIN as the row on line '+seenCin[k]);
+      else seenCin[k] = r._line;
+    }
+    if(r.name){
+      var n = bulkNorm(r.name);
+      if(n && seenName[n]) r._issues.push('same name as the row on line '+seenName[n]);
+      else if(n) seenName[n] = r._line;
+    }
+  });
+
   return {rows:rows, headers:raw, map:map};
 }
 

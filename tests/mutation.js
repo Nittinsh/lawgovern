@@ -288,6 +288,71 @@ const MUTATIONS = [
     from: "        if(gap > 120 || gap < 0)",
     to:   "        if(gap > 1200 || gap < 0)" },
 
+  // -- the spreadsheet importer (SS3r) ------------------------
+  // Every figure in the product arrives through this path and none of it was
+  // covered. The first mutation is the bug that was actually shipping.
+
+  { name: 'the strict numeric test goes, so "250 lakh" is 250 crore again (SS3r)',
+    from: "  if(!/^[+-]?(\\d+\\.?\\d*|\\.\\d+)(e[+-]?\\d+)?$/i.test(s))\n    return {issue:'\"' + s0 + '\" is not a number this can read'};",
+    to:   "  if(false)\n    return {issue:'\"' + s0 + '\" is not a number this can read'};" },
+
+  { name: 'lakh converts as though it were crore (SS3r - a hundredfold)',
+    from: "  [/\\blakh?s?\\b|\\blac?s?\\b/i,      0.01],",
+    to:   "  [/\\blakh?s?\\b|\\blac?s?\\b/i,      1]," },
+
+  { name: 'million and crore are treated alike (SS3r)',
+    from: "  [/\\bmn\\b|\\bmillions?\\b/i,        0.1],",
+    to:   "  [/\\bmn\\b|\\bmillions?\\b/i,        1]," },
+
+  // The order matters and is easy to get wrong: strip the spaces first and
+  // "250 lakh" becomes "250lakh", where \blakh\b no longer matches because
+  // there is no word boundary between "0" and "l". The unit is then missed
+  // entirely. (The first attempt at this mutation only appended a comment,
+  // which changed nothing and was reported as MISSED — correctly.)
+  { name: 'spaces are stripped before the unit is read (SS3r - \\b stops matching)',
+    from: "  var mult = 1;\n  for(var i = 0; i < BULK_UNITS.length; i++){",
+    to:   "  s = s.replace(/[,\\s]/g, '');\n  var mult = 1;\n  for(var i = 0; i < BULK_UNITS.length; i++){" },
+
+  { name: 'a loss in brackets loses its sign (SS3r)',
+    from: "  if(neg) n = -n;\n  return {value:n,",
+    to:   "  return {value:n," },
+
+  { name: 'rupees pasted into a crore column stop being questioned (SS3r)',
+    from: "      if(Math.abs(m.value) >= BULK_IMPLAUSIBLE_CR)",
+    to:   "      if(false)" },
+
+  { name: 'the implausible threshold is raised past any real sheet (SS3r)',
+    from: "var BULK_IMPLAUSIBLE_CR = 100000;",
+    to:   "var BULK_IMPLAUSIBLE_CR = 1e18;" },
+
+  { name: 'a row wider than its header is dropped in silence again (SS3r)',
+    from: "    if(cells.length > map.length)",
+    to:   "    if(false)" },
+
+  { name: 'two rows for one company stop being flagged (SS3r)',
+    from: "      if(seenCin[k]) r._issues.push('same CIN as the row on line '+seenCin[k]);",
+    to:   "      if(false) r._issues.push('same CIN as the row on line '+seenCin[k]);" },
+
+  { name: 'a repeated company name stops being flagged (SS3r)',
+    from: "      if(n && seenName[n]) r._issues.push('same name as the row on line '+seenName[n]);",
+    to:   "      if(false) r._issues.push('same name as the row on line '+seenName[n]);" },
+
+  { name: 'the quoted-field splitter forgets its quotes (SS3r)',
+    from: "    if(ch === '\"'){ if(q && line[i+1]==='\"'){ cur+='\"'; i++; } else q=!q; }",
+    to:   "    if(ch === '\"'){ cur+='\"'; }" },
+
+  { name: 'an Excel tab paste is split on commas instead (SS3r)',
+    from: "  if(line.indexOf('\\t') >= 0) return line.split('\\t');",
+    to:   "  if(false) return line.split('\\t');" },
+
+  { name: 'an unrecognised entity type is accepted in silence (SS3r)',
+    from: "      else { issues.push('Unrecognised type \"'+rec.type+'\" — defaulting to Private Limited'); rec.type='private'; }",
+    to:   "      else { rec.type='private'; }" },
+
+  { name: 'a sheet with neither name nor CIN is accepted (SS3r)',
+    from: "  if(map.indexOf('name') < 0 && map.indexOf('cin') < 0)",
+    to:   "  if(false)" },
+
   // ── landmarks and control names (§3q) ───────────────────────
   // Facts about the markup, so they are caught by smoke.test.js — which the
   // runner only started exercising when these were written.

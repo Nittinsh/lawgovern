@@ -744,6 +744,129 @@ describe('section 403 — the due date comes from the register');
   check('no register section resolves to two forms', ambiguous.join(' | '), '');
 }
 
+describe('the spreadsheet importer — every figure arrives through here');
+{
+  const money = (s) => app.bulkMoney(s);
+  const val   = (s) => money(s).value;
+
+  // ── the bug this had for as long as it existed ────────────────
+  // parseFloat("250lakh") is 250. It reads the leading digits and throws the
+  // rest away, so a figure naming any unit but crore was stored as crore.
+  // Rs 250 lakh is Rs 2.5 crore; read as 250 crore it crosses the s.204 MR-3
+  // turnover limb and tells a client it owes a secretarial audit it does not.
+  check('lakh is converted, not read as crore', val('250 lakh'), 2.5);
+  check('and is nowhere near the figure it used to store', val('250 lakh') === 250, false);
+  check('lac spelling too', val('250 lac'), 2.5);
+  check('million', val('250 million'), 25);
+  check('mn', val('250 mn'), 25);
+  check('billion', val('2.5 bn'), 250);
+  check('thousand', val('50 thousand'), 0.005);
+  check('crore stays crore', val('250 crore'), 250);
+  check('cr abbreviated', val('250 cr'), 250);
+  check('a bare number is already crore', val('250'), 250);
+
+  // ── refused, not partly read ──────────────────────────────────
+  // The strict full-string test is the whole fix: the useful failure is "that
+  // is not a number", never a plausible wrong figure.
+  check('an unknown unit is refused', !!money('250 furlongs').issue, true);
+  check('and yields no value at all', val('250 furlongs'), undefined);
+  check('NIL is refused', !!money('NIL').issue, true);
+  check('a dash is refused', !!money('-').issue, true);
+  check('letters alone are refused', !!money('n/a').issue, true);
+  check('the message names what was typed', /250 furlongs/.test(money('250 furlongs').issue), true);
+  check('an empty cell is empty, not an error', money('').empty, true);
+  check('and carries no issue', money('   ').issue, undefined);
+
+  // ── what people actually type in Indian sheets ────────────────
+  check('a rupee sign', val('₹250'), 250);
+  check('Rs. with a stop', val('Rs. 250 crore'), 250);
+  check('INR', val('INR 250'), 250);
+  check('comma grouping', val('1,25,000'), 125000);
+  check('a loss in brackets is negative', val('(12.5)'), -12.5);
+  check('a signed negative', val('-12.5'), -12.5);
+  check('decimals survive', val('2.75'), 2.75);
+
+  // ── a wrong unit can still be a valid number ──────────────────
+  // Pasting rupees into a crore column produces a figure the parser cannot
+  // fault, so the size is questioned separately — and questioned, not refused.
+  const big = app.bulkParse('Name,Turnover\nAcme,2500000000');
+  check('rupees in a crore column are questioned',
+        /rupees rather than crore/.test(big.rows[0]._issues.join(' ')), true);
+  check('but the row is still imported', big.rows[0].turnover, 2500000000);
+  const ok = app.bulkParse('Name,Turnover\nAcme,250');
+  check('an ordinary figure is not questioned', ok.rows[0]._issues.length, 0);
+
+  // ── the splitter ──────────────────────────────────────────────
+  check('a quoted comma stays inside the field',
+        app.bulkSplit('"Acme, Bharat & Co",250')[0], 'Acme, Bharat & Co');
+  check('and the next field is intact', app.bulkSplit('"Acme, Bharat & Co",250')[1], '250');
+  // Assembled from a constant so this file never holds three double-quotes in
+  // a row. The patch script that produced it is a Python triple-quoted string,
+  // and writing the sequence out — even inside a comment — closed it early.
+  const dq = String.fromCharCode(34);
+  check('a doubled quote is one quote',
+        app.bulkSplit(dq + 'He said ' + dq + dq + 'yes' + dq + dq + dq + ',1')[0],
+        'He said ' + dq + 'yes' + dq);
+  check('a tab wins over commas — Excel pastes tabs',
+        app.bulkSplit('A,B\tC,D').length, 2);
+
+  // An unquoted grouped number makes more cells than headers, and the surplus
+  // was dropped in silence: "2,50,00,000" arrived as "2".
+  const wide = app.bulkParse('Name,Turnover\nAcme,2,50,00,000');
+  check('a row wider than its header says so',
+        /out of step|needs quotes/.test(wide.rows[0]._issues.join(' ')), true);
+  const quoted = app.bulkParse('Name,Turnover\nAcme,"2,50,00,000"');
+  check('quoted, the same figure reads whole', quoted.rows[0].turnover, 25000000);
+
+  // ── headers, type and CIN ─────────────────────────────────────
+  const al = app.bulkParse('Company Name,CIN No,Paid-up Capital,FY End\n' +
+                           'Acme,U74999MH2015PTC123456,50,2026-03-31');
+  check('header aliases resolve', al.rows[0].name, 'Acme');
+  check('capital by alias', al.rows[0].capital, 50);
+  check('the financial year end comes across', al.rows[0].fyend, '2026-03-31');
+  check('the CIN fills in the type', al.rows[0].type, 'private');
+
+  const bad = app.bulkParse('Name,CIN\nAcme,NOTACIN');
+  check('a malformed CIN is flagged', /CIN:/.test(bad.rows[0]._issues.join(' ')), true);
+  check('and the row survives to be corrected', bad.rows[0].name, 'Acme');
+
+  const ut = app.bulkParse('Name,Type\nAcme,Partnership Firm');
+  check('an unrecognised type defaults and says so',
+        /Unrecognised type/.test(ut.rows[0]._issues.join(' ')), true);
+  check('to private', ut.rows[0].type, 'private');
+  check('a missing type defaults to private',
+        app.bulkParse('Name\nAcme').rows[0].type, 'private');
+
+  // ── two rows for one company ──────────────────────────────────
+  // §2e makes duplicate detection the strongest free control on evidence. The
+  // same mistake here creates two records for one entity.
+  const dup = app.bulkParse('Name,CIN\nA,U74999MH2015PTC123456\nB,U74999MH2015PTC123456');
+  check('a repeated CIN is flagged', /same CIN/.test(dup.rows[1]._issues.join(' ')), true);
+  check('and names the line it clashes with', /line 2/.test(dup.rows[1]._issues.join(' ')), true);
+  check('the first occurrence is left clean', dup.rows[0]._issues.length, 0);
+  const dn = app.bulkParse('Name\nAcme Pvt Ltd\nACME PVT LTD');
+  check('a repeated name is flagged whatever its case',
+        /same name/.test(dn.rows[1]._issues.join(' ')), true);
+
+  // ── refusing the whole paste ──────────────────────────────────
+  check('a header with no data is refused',
+        !!app.bulkParse('Name,CIN').error, true);
+  check('a sheet with neither name nor CIN is refused',
+        /Name.*CIN/.test(app.bulkParse('Foo,Bar\n1,2').error), true);
+  check('and the refusal shows how the header was read',
+        /Foo \| Bar/.test(app.bulkParse('Foo,Bar\n1,2').error), true);
+  check('blank lines between rows are skipped',
+        app.bulkParse('Name\nAcme\n\n\nBeta').rows.length, 2);
+  check('nothing at all is refused', !!app.bulkParse('').error, true);
+
+  // ── the unit the register actually stores ─────────────────────
+  // §2c: storage is RUPEES, the UI is CRORE, and mixing them meant no
+  // threshold ever fired. The importer reads crore, so the commit multiplies.
+  check('the crore constant is a crore', app.ENT_CR, 10000000);
+  check('so 250 crore is the s.204 turnover limb in rupees',
+        val('250 crore') * app.ENT_CR, 2500000000);
+}
+
 describe('one render, one chart per company');
 {
   const co = { id: 'PASS-1', name: 'Pass Test Ltd', type: 'listed', fyend: '2026-03-31',
