@@ -746,6 +746,49 @@ const MUTATIONS = [
     from: '.gov-am{font-size:11px;color:var(--ink-soft);margin-top:3px;}',
     to:   '.gov-am{font-size:11px;color:var(--ink-4);margin-top:3px;}' },
 
+  // ── SS3u: the demo, the landing, and what they exposed ──────
+  // The gauge divided by stats.verified, which counts FILED / FILED_LATE /
+  // PUBLISHED -- states that are structurally unreachable because nothing
+  // verifies against MCA21 (SS7). So the first number on the dashboard read 0%
+  // for every user on every book, forever, and nothing asserted it.
+  { name: 'the coverage gauge divides by a counter that is always zero (SS3u)',
+    from: 'Math.round(100 * stats.evidenceOnRecord / t)',
+    to:   'Math.round(100 * stats.verified / t)' },
+
+  // SS2l gives a rule with no offset a date from a meeting the practice
+  // recorded. Without the exemption the back-test calls that the 31 March
+  // defect -- which it did, the first time an entity had a results meeting.
+  { name: 'the back-test calls an anchored date the 31 March defect (SS3u)',
+    from: "r.dueConfidence === 'derived' && !r.anchoredTo",
+    to:   "r.dueConfidence === 'derived'" },
+
+  // One misspelled field name made a listed company with two women on its
+  // board fail the woman-director proviso to s.149(1). Silent and plausible.
+  { name: 'a demo register field name drifts from the schema (SS3u)',
+    from: "cessation_on:null,\n      din_kyc_on:'2026-06-12'",
+    to:   "resigned_on:null,\n      kyc_done_on:'2026-06-12'" },
+
+  // SS2z: an LLP has no Board and no s.173. If the sample LLP stops being an
+  // LLP the demo stops demonstrating the thing worth demonstrating.
+  { name: 'the sample LLP is treated as a company (SS3u r/w SS2z)',
+    from: "name:'Sundaram Logistics LLP', type:'llp'",
+    to:   "name:'Sundaram Logistics LLP', type:'private'" },
+
+  // Sample data that stops announcing itself is worse than no demo: somebody
+  // will screenshot it and it will be read as a real book.
+  { name: 'the demo stops saying it is a demo (SS3u)',
+    from: '  main.insertBefore(b, main.firstChild);',
+    to:   '  if(false) main.insertBefore(b, main.firstChild);' },
+
+  { name: 'the landing drops the link to the demo (SS3u)',
+    from: 'class="lgland-cta" href="?demo=1"',
+    to:   'class="lgland-cta" href="#"' },
+
+  // The limitations box is the credibility, not a disclaimer to trim.
+  { name: 'the landing stops saying nothing is verified against MCA21 (SS3u)',
+    from: 'Nothing is verified against MCA21 or the stock exchanges',
+    to:   'Everything is checked for you' },
+
 ];
 
 const src = fs.readFileSync(INDEX, 'utf8');

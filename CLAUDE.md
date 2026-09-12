@@ -2719,6 +2719,137 @@ a 700 KB PDF and a list of 327 items with no reason to begin anywhere.
 
 ---
 
+## 3u. A DEMO ANYBODY CAN OPEN (v183)
+
+The product could not be shown to anyone. The URL opened a password box and
+nothing else &mdash; no explanation, no way to look. Screenshots are the usual
+answer and a poor one here, because what is worth showing is not how the screens
+look: it is that the register is computed from each entity's own figures and
+says what it cannot establish.
+
+### Sample data, real engines &mdash; and that is not a dummy item
+`?demo=1` loads three companies and runs **the real engines** against them.
+Every one is local: `getComplianceChart`, the calculators, the checklists, Event
+Impact, MGT-14 from minutes, the applicability engine, the PIT window, the
+back-test. None needs Supabase.
+
+The owner's standing constraint is *"if anything is not working it should not be
+there, i dont want any dummy items"*. The distinction is sharp and it is the
+whole design: **the data is sample, the engines are real.** Every number still
+traces to one of these records. What would breach the constraint is a fake
+screen, a mocked answer, or a figure from nowhere &mdash; there are none.
+`lgGuardWrite` refuses every write with a sentence about the product rather than
+an authentication error, and a banner on every screen says nothing is saved.
+
+### The three entities are chosen to make the engine decide differently
+| | what it has to do |
+|---|---|
+| **Meridian Textiles Ltd** (listed) | the whole corpus: LODR, PIT, s.204 secretarial audit, CSR on the net-profit limb. 252 obligations |
+| **Kavery Foods Pvt Ltd** (private) | **rule things out** &mdash; under every threshold, 45 obligations excluded. 62 remain |
+| **Sundaram Logistics LLP** | **3 obligations**, Form 11 and Form 8, and *no* s.173 board meetings and *no* s.96 AGM. §2z's defect, refused |
+
+Registers are seeded too, because that is what shows the engines that run off
+the practice's own records: a results board meeting drives Reg 47(1) and the PIT
+trading window, a charge drives CHG-1, an allotment drives PAS-3, the directors
+drive the s.149 composition tests.
+
+### The landing page went on the sign-in screen, deliberately
+Not a separate `landing.html` with the app moved to `app.html`. That changes the
+app's URL, breaks every existing bookmark, and splits one deploy into two things
+that can disagree. The overlay already appears exactly when there is no session,
+which is exactly when a landing page is wanted. The login card is untouched
+beside it.
+
+It carries a **"What it does not do"** box naming MCA21. A Company Secretary's
+first question is whether this talks to MCA21, and answering it before they ask
+is worth more than a feature list.
+
+### THE COVERAGE GAUGE COULD NEVER LEAVE ZERO
+The find that matters most, and it had nothing to do with the demo except that
+realistic data is what exposed it.
+
+```js
+stats.health = Math.round(100 * stats.verified / t)
+```
+
+`stats.verified` counts `FILED`, `FILED_LATE` and `PUBLISHED`. **§7 records that
+those states are structurally unreachable** &mdash; nothing here verifies against
+MCA21 or the exchanges, so every recorded filing resolves to `FILED_PENDING`.
+
+So **the first number on the dashboard read 0% for every user, on every book,
+however many filings they recorded**, and the gauge label sat permanently on
+"No Evidence Recorded". Three sample companies with **37 filings on record**
+produced a gauge reading zero.
+
+§2d defines the metric in terms: *"share of applicable obligations with evidence
+on record"*. `stats.evidenceOnRecord` was being computed **three lines above**
+and never used. Now it is, and the gauge reads 12%.
+
+It survived because **nothing had ever asserted it**. A metric nobody has
+watched move is a metric nobody should trust, and this one could not move at
+all. The assertion now records a filing against every past-due row and requires
+the number to change &mdash; and asserts that `verified` stays 0 while it does,
+so it cannot regress to a dead counter.
+
+### The back-test called a correctly-anchored date the 31 March defect
+§2k: a rule with no offset must not carry a date. §2l then added the one
+legitimate way it does &mdash; from a meeting the practice recorded. Reg 47(1)
+is *"within 48 hours of conclusion of the board meeting at which the financial
+results were approved"*, and the row names that meeting in `anchoredTo`.
+
+The check never allowed for it, so the first entity with a results board meeting
+had its correct date reported as the defect the check exists to prevent. **No
+test entity in this project had ever had one** &mdash; every fixture was built
+to exercise the rule corpus, not the registers. §3j again.
+
+The exemption is narrow on purpose: not *"derived rules may have dates"* but
+*"a row that names the recorded event its deadline ran from may have one"*.
+
+### And the FLA row exists twice
+§3i fixed the FLA date to carry its source &mdash; on the **company** path. LLPs
+emit their own copy, which still had none, so the first LLP with a real shape was
+correctly reported as carrying a date with nothing behind it. Two copies of one
+row is §3n's defect; the second is stamped now.
+
+### Four of my own
+- **The demo's director rows used field names the engine does not read.**
+  `resigned_on` where the schema says `cessation_on`, `kyc_done_on` for
+  `din_kyc_on`, and no `is_woman` at all &mdash; so a listed company with two
+  women on its board **failed the woman-director proviso to s.149(1)**, and
+  every director looked as though they had never filed DIR-3 KYC. Silent,
+  plausible and wrong: §3r's "250 lakh" exactly. Sample data that does not match
+  the schema does not look broken, **it looks non-compliant** &mdash; and the
+  demo exists to show the opposite. A test now checks every demo field name
+  against `LG_REG`.
+- **The demo went into the wrong `<script>` block.** `harness.js` loads the
+  **last** one, so `DEMO_REGS` was undefined and none of the assertions could
+  run. §2x found this from the other side &mdash; the smoke test read only the
+  last block and reported the login button missing. The boundary cuts both ways.
+- **A patch aborted mid-way and I hand-applied its tail.** The landing script
+  validated every anchor, failed on one, and exited before writing &mdash;
+  correct behaviour. I then applied two follow-up edits by hand, one of which
+  added the `</div>` the unwritten wrapper was supposed to need, leaving the
+  overlay unbalanced. The re-run **counts `<div>` against `</div>` before
+  writing**: an unclosed div does not throw, it silently swallows what follows.
+- **A mutation went MISSED.** "The demo stops saying it is a demo" passed,
+  because the check asserted the banner's wording existed in the source rather
+  than that it reached the screen &mdash; §2j/§3n's shape. The assertion now
+  stubs the document, calls `lgDemoBanner()`, and requires an element to be
+  inserted; and requires it *not* to be, outside the demo.
+
+### Coverage
+Smoke **57 &rarr; 65**, suite **592 &rarr; 614**, mutations **147 &rarr; 154
+caught, 0 missed, 0 skipped**. All 40 panels drive clean in demo mode with no
+console errors, no overflow at 375px, and the back-test reports **0 failures**
+across the three sample entities.
+
+### What this does NOT fix
+The corpus is still unverified &mdash; that is §3t's worklist and only the owner
+can do it. The demo makes the product visible; it does not make it current, and
+the landing page says so rather than implying otherwise.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -2787,7 +2918,7 @@ a 700 KB PDF and a list of 327 items with no reason to begin anywhere.
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (57 structural checks), `node tests/compliance.test.js` (592 assertions, run against `index.html` itself), `node tests/mutation.js` (147 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (65 structural checks), `node tests/compliance.test.js` (614 assertions, run against `index.html` itself), `node tests/mutation.js` (154 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **`python tools/amendments.py` regenerates the amendment evidence AND re-embeds
   it into `index.html`.** It reads the compilations in `reference/`, which is
   gitignored — so `rules/amendments.json` and `rules/amendments_embed.json` are
@@ -2804,7 +2935,7 @@ a 700 KB PDF and a list of 327 items with no reason to begin anywhere.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v182.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v183.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

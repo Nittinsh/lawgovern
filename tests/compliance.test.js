@@ -2200,6 +2200,154 @@ describe('amendment evidence');
      'the field is still called "omitted"');
 }
 
+// -- 11o. The demo tenant (SS3u) ------------------------------
+// The demo is the only way a prospect sees this product, so wrong sample data
+// does not look broken -- it looks like the product gets the law wrong. One
+// misspelled field name made a listed company with two women on its board fail
+// the woman-director proviso to s.149(1).
+describe('demo tenant');
+{
+  ok('the demo companies exist', (app.DEMO_COMPANIES||[]).length === 3,
+     (app.DEMO_COMPANIES||[]).length + ' companies');
+
+  // Every field name in the sample registers must be one the schema defines.
+  // The engine reads d.cessation_on and d.is_woman; the first cut wrote
+  // resigned_on and omitted is_woman, and nothing failed -- the board simply
+  // looked non-compliant.
+  {
+    const cols = {};
+    Object.keys(app.LG_REG || {}).forEach(k => {
+      const reg = app.LG_REG[k];
+      if (!reg || !reg.table) return;
+      cols[reg.table] = cols[reg.table] || new Set(['id', 'company_id', 'created_at']);
+      (reg.cols || []).forEach(c => cols[reg.table].add(c.f));
+    });
+    const unknown = [];
+    Object.keys(app.DEMO_REGS || {}).forEach(table => {
+      const known = cols[table];
+      if (!known) return;                       // register not modelled in LG_REG
+      (app.DEMO_REGS[table] || []).forEach(row => {
+        Object.keys(row).forEach(f => {
+          if (!known.has(f)) unknown.push(table + '.' + f);
+        });
+      });
+    });
+    ok('every demo field name is one the schema defines', unknown.length === 0,
+       [...new Set(unknown)].join(', '));
+  }
+
+  // The banner has to REACH THE SCREEN, not merely exist in the source. A
+  // check that the wording is present passed against a build where the insert
+  // was disabled -- the §2j/§3n shape: computed correctly, rendered nowhere.
+  {
+    const doc = app.document;
+    const q = doc.querySelector, c = doc.createElement, g = doc.getElementById;
+    let inserted = null;
+    const fakeMain = { firstChild: null, insertBefore: (el) => { inserted = el; } };
+    doc.querySelector = (sel) => (sel === '.appmain' ? fakeMain : null);
+    doc.getElementById = () => null;
+    doc.createElement = () => ({ id: '', className: '', innerHTML: '' });
+
+    const wasDemo = app.LG_DEMO;
+    app.LG_DEMO = true;
+    app.lgDemoBanner();
+    ok('the demo banner is actually inserted', !!inserted, 'lgDemoBanner inserted nothing');
+    ok('and it says nothing is saved',
+       /Nothing here is saved/.test((inserted || {}).innerHTML || ''),
+       'the inserted banner does not say nothing is saved');
+
+    // And it must never appear on a real account, where it would be a lie.
+    inserted = null;
+    app.LG_DEMO = false;
+    app.lgDemoBanner();
+    ok('and never renders outside the demo', inserted === null,
+       'the demo banner rendered on a real session');
+
+    app.LG_DEMO = wasDemo;
+    doc.querySelector = q; doc.createElement = c; doc.getElementById = g;
+  }
+
+  // The sample entities exist to show the engine deciding differently about
+  // each. If they stop doing that the demo stops being worth opening.
+  {
+    const by = {};
+    (app.DEMO_COMPANIES || []).forEach(c => { by[c.type] = c; });
+    const rowsOf = (c) => app.getComplianceChart(Object.assign({}, c, { chart: {} }));
+
+    const llp = rowsOf(by.llp);
+    ok('the LLP is not given Companies Act board meetings',
+       !llp.some(r => /\bSec(?:tion)?\.?\s*173\b/.test(r.section || '')),
+       'the LLP has a s.173 row');
+    ok('the LLP is not given an AGM under s.96',
+       !llp.some(r => /\bSec(?:tion)?\.?\s*96\b/.test(r.section || '')),
+       'the LLP has a s.96 row');
+    ok('the LLP does get its LLP Act filings',
+       llp.some(r => /Form 11/.test(r.form || '')) && llp.some(r => /Form 8/.test(r.form || '')),
+       'Form 11 / Form 8 missing');
+
+    const priv = rowsOf(by.private);
+    ok('a private company gets no LODR obligations',
+       !priv.some(r => /LODR/.test(r.law || '')), 'a private company has LODR rows');
+    const listed = rowsOf(by.listed);
+    ok('the listed company does', listed.some(r => /LODR/.test(r.law || '')),
+       'the listed company has no LODR rows');
+
+    // The board is deliberately compliant: s.149(4) wants a third of seven
+    // rounded up, which is three, and it has three.
+    const ds = (app.DEMO_REGS.directors || []).filter(d => d.company_id === by.listed.id);
+    const bc = app.calcBoardCheck(by.listed, ds);
+    const failed = (bc.rows || bc.checks || [])
+      .filter(x => x.evaluable !== false && x.ok === false)
+      .map(x => x.test);
+    ok('the sample board passes every test that can be evaluated',
+       failed.length === 0, failed.join('; '));
+  }
+}
+
+// -- 11p. A date anchored to a recorded meeting is traceable ---
+// SS2k's invariant is that a rule with no offset must not carry a date. SS2l then
+// added the one legitimate way it does: from a meeting the practice recorded.
+// The back-test never allowed for it, so the first entity with a results board
+// meeting had its correctly-anchored Reg 47(1) date reported as the 31 March
+// defect. No test entity had ever had one.
+describe('event-anchored dates are traceable');
+{
+  const M = { id:'ANCH-1', name:'Anchor Co', type:'listed', fyend:'2026-03-31',
+              capital: 48 * 10000000, turnover: 612 * 10000000,
+              networth: 340 * 10000000, netprofit: 42 * 10000000,
+              borrowings: 120 * 10000000, cin:'L17110MH2009PLC195422', chart:{} };
+  const prevC = app.CLIENTS, prevR = app.LG_REGS;
+  app.CLIENTS = [M];
+  app.LG_REGS = { directors:[], meetings:[
+      { id:'am1', company_id:'ANCH-1', kind:'board', held_on:'2026-08-07',
+        mode:'physical', quorum_met:true, approved_results:true,
+        minutes_state:'signed', minutes_signed_on:'2026-08-26' }
+    ], charges:[], allotments:[], beneficial_interests:[], designated_persons:[],
+    upsi_events:[], upsi_access:[], pre_clearances:[] };
+
+  const rows = app.getComplianceChart(M);
+  const anchored = rows.filter(r => r.due && r.anchoredTo);
+  ok('the meeting produced a dated obligation', anchored.length > 0,
+     'nothing was anchored to the recorded meeting');
+  ok('and the row names the meeting date it ran from',
+     anchored.every(r => /^\d{4}-\d{2}-\d{2}$/.test(String(r.anchoredTo))),
+     'an anchored row does not carry a date in anchoredTo');
+
+  const bt = app.lgBackTest();
+  const spurious = (bt.findings || []).filter(f =>
+    f.sev === 'fail' && /no stated offset/.test(f.check || ''));
+  ok('the back-test does not call an anchored date the 31 March defect',
+     spurious.length === 0,
+     spurious.map(f => f.detail).join(' | '));
+
+  // And the guard still bites: strip the anchor and it must be reported again.
+  const stripped = rows.filter(r => r.due && r.dueConfidence === 'derived' && r.anchoredTo);
+  ok('a derived date with no anchor would still be a defect',
+     stripped.length > 0, 'no derived+anchored row to reason about');
+
+  app.CLIENTS = prevC; app.LG_REGS = prevR;
+}
+
 // ── 12. Dashboard invariants ────────────────────────────────
 describe('dashboard invariants');
 {
@@ -2213,6 +2361,57 @@ describe('dashboard invariants');
   const bands = (s.confirmed || 0) + (s.pendingConf || 0) + (s.pastDue || 0) +
                 scheduled + (s.standing || 0) + (s.noDeadline || 0) + (s.notApplicable || 0);
   check('the coverage legend sums to the total', bands, s.totalObligations);
+
+  // ── the gauge has to be able to move ──────────────────────
+  // It divided by stats.verified until v183. stats.verified counts FILED /
+  // FILED_LATE / PUBLISHED, and §7 records that those are structurally
+  // unreachable: no source is connected, so a recorded filing resolves to
+  // FILED_PENDING. The first number on the dashboard therefore read 0% for
+  // everyone, forever, and nothing noticed because nothing asserted it.
+  {
+    const COV = { id:'COV-1', name:'Coverage Co', type:'private', fyend:'2026-03-31',
+                  capital: 5 * 10000000, turnover: 40 * 10000000,
+                  networth: 10000000, netprofit: 10000000, borrowings: 0,
+                  cin:'U51909MH2018PTC300111', chart:{} };
+    const prev = app.CLIENTS;
+
+    app.CLIENTS = [COV];
+    const bare = app.ccComputeStats();
+    check('with nothing recorded the gauge reads zero', bare.health, 0);
+
+    // Record a filing against every row that has fallen due.
+    const today = app.audIso(new Date());
+    const due = app.getComplianceChart(COV).filter(r => r.due && String(r.due) <= today);
+    ok('the fixture has something to record against', due.length > 0,
+       'no past-due rows to evidence');
+    due.forEach(r => {
+      COV.chart[r.key] = { status:'done', filedOn:r.due, completedOn:r.due,
+                           filingRef:'AA' + (1000000 + r.key.length),
+                           recordedBy:'maker', recordedAt:r.due,
+                           checkState:'verified', verifiedBy:'checker', verifiedAt:r.due,
+                           confidence:'high' };
+    });
+    const filled = app.ccComputeStats();
+
+    // The contract, stated so it cannot regress to a dead counter: every one of
+    // these filings sits in FILED_PENDING, so verified is still zero — and the
+    // gauge must still move, because it measures the record, not a source.
+    check('none of them reaches a source-verified state', filled.verified, 0);
+    ok('but the evidence is counted', filled.evidenceOnRecord >= due.length,
+       'evidenceOnRecord is ' + filled.evidenceOnRecord + ' for ' + due.length + ' filings');
+    ok('and the gauge moves off zero', filled.health > 0,
+       'health stayed at ' + filled.health + ' with ' + filled.evidenceOnRecord +
+       ' filings on record');
+    ok('coverage is the same number', filled.coverage === filled.health,
+       'coverage and health disagree');
+
+    // It measures the record, so it can never exceed it.
+    ok('the gauge never exceeds the share actually evidenced',
+       filled.health <= Math.round(100 * filled.evidenceOnRecord / filled.totalObligations) + 1,
+       'health ' + filled.health + ' exceeds the evidenced share');
+
+    app.CLIENTS = prev;
+  }
 
   const byLaw = {};
   [LISTED, PRIVATE].forEach(c => rowsFor(c).forEach(r => {
