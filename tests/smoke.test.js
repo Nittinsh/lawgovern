@@ -22,6 +22,8 @@ const fs = require('fs');
 const path = require('path');
 
 const INDEX = process.env.LG_INDEX || path.join(__dirname, '..', 'index.html');
+// The project root, independent of which index.html is under test.
+const REPO = path.join(__dirname, '..');
 const html = fs.readFileSync(INDEX, 'utf8');
 
 // There is more than one <script> block: the auth functions live in an earlier
@@ -250,7 +252,12 @@ function eq(name, a, b) { ok(name, a === b, `${a} !== ${b}`); }
 // Act wants it at or before the point of collection, and the point of
 // collection is the sign-up button.
 {
-  const legalDir = path.dirname(INDEX);
+  // Resolved from the repository, NOT from dirname(INDEX): mutation.js writes
+  // each mutant to a temp directory, where terms.html does not exist. Reading
+  // these relative to the mutant made every mutation fail the legal-page
+  // checks, so any bug only smoke could catch was being "caught" for the wrong
+  // reason -- the SS3q finding again, one layer down.
+  const legalDir = REPO;
   const pages = ['terms.html', 'privacy.html'];
   const read = {};
 
@@ -296,6 +303,96 @@ function eq(name, a, b) { ok(name, a === b, `${a} !== ${b}`); }
        blanks.length === 0 || banner,
        blanks.length + ' placeholder(s) and no draft banner: ' + blanks.join(' '));
   });
+}
+
+// -- 4b. every CSS variable used is defined ---------------------
+// Section 4 does this for class names and has caught four inventions. It
+// cannot see a variable: var(--ice) and var(--border) shipped in v182 against
+// a stylesheet that defines neither, so the new panel had no background and no
+// borders and simply looked like unstyled text. A wrong colour is visible; a
+// missing one often is not.
+{
+  const styleBlocks = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map(m => m[1]).join('\n');
+  const defined = new Set();
+  for (const m of styleBlocks.matchAll(/(--[A-Za-z][\w-]*)\s*:/g)) defined.add(m[1]);
+  // A variable can also be set from script.
+  for (const m of html.matchAll(/setProperty\(\s*\\?['"](--[A-Za-z][\w-]*)/g)) defined.add(m[1]);
+
+  // Comments name variables in order to say they do not exist -- there is a
+  // /* var(--card) does not exist ... */ note in the stylesheet doing exactly
+  // that. Reading it as a use reports the comment as the bug it warns about.
+  const live = html.replace(/\/\*[\s\S]*?\*\//g, ' ');
+
+  const used = new Map();
+  // var(--x, fallback) renders correctly whether or not --x is defined, so it
+  // is not a defect. Only a bare var(--x) is.
+  for (const m of live.matchAll(/var\(\s*(--[A-Za-z][\w-]*)\s*\)/g)) {
+    if (!used.has(m[1])) used.set(m[1], m.index);
+  }
+  const undef = [...used.keys()].filter(v => !defined.has(v));
+  ok('every CSS variable used is defined', undef.length === 0,
+     undef.map(v => {
+       const at = used.get(v);
+       return v + ' near: ' + html.slice(Math.max(0, at - 70), at + 30).replace(/\s+/g, ' ');
+     }).join(' | '));
+}
+
+// -- 8. the amendment evidence -----------------------------------
+{
+  ok('the amendment evidence is embedded', /var LG_AMEND = \{/.test(js), 'LG_AMEND missing');
+
+  // The evidence is keyed by provision number, and two independent parsers
+  // produce that number -- cited() in tools/amendments.py when the file is
+  // built, lgAmendCited() in the app when it is read. If they drift, evidence
+  // silently stops reaching rules and nothing looks broken.
+  const py = fs.readFileSync(path.join(REPO, 'tools', 'amendments.py'), 'utf8');
+  ok('the Python side parses regulation citations the same way',
+     py.indexOf('Reg(?:ulation)?s?') >= 0, 'regulation pattern changed in Python');
+  ok('the app side parses regulation citations the same way',
+     js.indexOf('Reg(?:ulation)?s?') >= 0, 'regulation pattern changed in the app');
+  ok('the Python side parses section citations the same way',
+     py.indexOf('Sec(?:tion)?s?') >= 0, 'section pattern changed in Python');
+  ok('the app side parses section citations the same way',
+     js.indexOf('Sec(?:tion)?s?') >= 0, 'section pattern changed in the app');
+
+  // The invariant. An unknown commencement date must abstain, never hide.
+  const f = js.slice(js.indexOf('function lgRuleInForce('));
+  const body = f.slice(0, f.indexOf('\n}'));
+  ok('an unknown commencement date leaves the row in force',
+     /if\(!c\) return \{ inForce:true/.test(body.replace(/\s+/g, ' ')),
+     'an unknown commencement does not return inForce:true first');
+  ok('a continuous obligation is not ruled out by commencement',
+     /if\(!periodEnd\) return \{ inForce:true/.test(body.replace(/\s+/g, ' ')),
+     'a null periodEnd is not handled before the comparison');
+
+  // The screen must not present evidence as a verdict.
+  //
+  // Sentences built by concatenation are broken by the seams -- the source
+  // reads '...an amendment does not ' + 'tell you when the obligation began'
+  // and the phrase never appears contiguously in the file even though it does
+  // on screen. Joining adjacent string literals first is what makes an
+  // assertion about prose testable at all.
+  const seams = (s) => s.replace(/['"]\s*\+\s*['"]/g, '');
+  const ev = seams(js.slice(js.indexOf('function govEvidenceBlock('),
+                            js.indexOf('function govUseEvidence(')));
+  // The caveat is computed per law now -- SEBI evidence follows the footnote
+  // marker, the Act's can only be placed by position -- so what has to exist
+  // is both wordings, and the executable check is in compliance.test.js.
+  const basis = seams(js.slice(js.indexOf('function govBasisWords(')));
+  const basisBody = basis.slice(0, basis.indexOf('\n}'));
+  ok('the panel can describe marker attribution',
+     basisBody.indexOf('following the footnote marker') >= 0, 'no marker wording');
+  ok('the panel can describe positional attribution',
+     basisBody.indexOf('where the footnote sits') >= 0, 'no positional wording');
+  ok('the evidence panel refuses to read an amendment as a start date',
+     ev.indexOf('does not tell you when the obligation began') >= 0,
+     'no caveat that an amendment is not a commencement');
+
+  // Prefilling must not become signing off.
+  const use = js.slice(js.indexOf('function govUseEvidence('));
+  const useBody = use.slice(0, use.indexOf('\n}'));
+  ok('using the evidence fills the fields and does not save',
+     useBody.indexOf('govSave') < 0, 'govUseEvidence calls govSave');
 }
 
 // ── report ────────────────────────────────────────────────────

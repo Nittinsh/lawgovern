@@ -674,6 +674,78 @@ const MUTATIONS = [
   // NOT a mutation any more: the agmPlus2 branch was removed. Reg 34(1)(b) runs
   // from the AGM actually held, which §2l takes from the meetings register, so
   // it is not a companion at all. The suite asserts it stays undated instead.
+  // ── SS3t: amendment evidence and the in-force guard ─────────
+  // The first is the one that matters. Every other bug here shows a wrong
+  // answer; this one shows NO answer, and an obligation that silently stops
+  // appearing is the only failure in this product a CS cannot notice.
+  { name: 'an unknown commencement date hides the row (SS3t — the one that must never happen)',
+    from: 'if(!c) return { inForce:true, assumed:true, from:null,',
+    to:   'if(!c) return { inForce:false, assumed:true, from:null,' },
+
+  { name: 'a continuous obligation is tested against commencement (SS3t)',
+    from: 'if(!periodEnd) return { inForce:true, from:c,',
+    to:   'if(false) return { inForce:true, from:c,' },
+
+  { name: 'the commencement boundary excludes its own date (SS3t — off by one day)',
+    from: 'if(String(periodEnd) < String(c)) return { inForce:false, from:c,',
+    to:   'if(String(periodEnd) <= String(c)) return { inForce:false, from:c,' },
+
+  { name: 'LODR commencement off by a day (SS3t — 90th day miscounted)',
+    from: '"commenced":"2015-12-01"',
+    to:   '"commenced":"2015-11-30"' },
+
+  // The Act's commencement footnote mixes the principal Act with later
+  // amending Acts, so no single date is establishable. Inventing one is the
+  // SS3j defect: a missing year end that assumed 31 March produced 79 wrong
+  // dates, and every one looked computed.
+  { name: 'the Act is given a commencement date the text does not establish (SS3t)',
+    from: '"commenced":null',
+    to:   '"commenced":"2014-04-01"' },
+
+  // SS2h, arriving in a second parser. "Regulation 30 of LODR" once parsed as
+  // reg 30O because [A-Z] matches lowercase under /i and \s* crossed the space.
+  { name: 'the evidence citation parser swallows a following word (SS3t r/w SS2h)',
+    from: "var re2 = /\\bReg(?:ulation)?s?\\.?\\s*(\\d{1,3}[A-Z]{0,2})(?![A-Za-z0-9])/ig;",
+    to:   "var re2 = /\\bReg(?:ulation)?s?\\.?\\s*(\\d{1,3}\\s*[A-Z]{0,2})/ig;" },
+
+  { name: 'evidence is returned for a provision that has none (SS3t)',
+    from: 'if(rec) return { provision: ps[i], law: law, rec: rec, corpus: L };',
+    to:   'return { provision: ps[i], law: law, rec: rec, corpus: L };' },
+
+  // Prefilling the instrument is a convenience. Saving is an assertion that a
+  // person checked the provision. govSave already refuses an empty instrument
+  // because "a verification with no instrument behind it records nothing more
+  // than a date" (SS2s) — filling it from a machine and then saving defeats
+  // exactly that guard.
+  { name: 'using the evidence also records the verification (SS3t)',
+    from: '  if(a) a.focus();',
+    to:   '  if(a) a.focus();\n  govSave(0);' },
+
+  // The dangerous direction. Positional attribution claiming the marker was
+  // followed invites a reviewer to trust a footnote that may belong to the
+  // previous page -- and the Act, the one corpus that can only be placed by
+  // position, is also the stale one where care matters most.
+  { name: 'positional evidence claims the footnote marker was followed (SS3t)',
+    from: "  return 'Attributed by where the footnote sits in the text, not by reading it, because this '+",
+    to:   "  return 'Tied to this provision by following the footnote marker in the text. '+" },
+
+  // The ordering IS the feature. Reversed, the queue looks just as busy and
+  // starts with the rule least likely to have gone stale.
+  { name: 'the review queue is ordered oldest-amendment first (SS3t)',
+    from: 'return a.last < b.last ? 1 : -1;',
+    to:   'return a.last < b.last ? -1 : 1;' },
+
+  { name: 'the review queue includes rules already checked (SS3t)',
+    from: "if(st !== 'unverified' && st !== 'flagged') continue;",
+    to:   "if(false) continue;" },
+
+  // Proves the new CSS-variable check earns its place: two undefined variables
+  // shipped in v182 and the class check could not see them, because they are
+  // not classes.
+  { name: 'a style points at a CSS variable that does not exist (SS3t r/w SS2x)',
+    from: '.gov-am{font-size:11px;color:var(--ink-soft);margin-top:3px;}',
+    to:   '.gov-am{font-size:11px;color:var(--ink-4);margin-top:3px;}' },
+
 ];
 
 const src = fs.readFileSync(INDEX, 'utf8');

@@ -2553,6 +2553,172 @@ refunds and taxes.
 
 ---
 
+## 3t. THE 327-RULE WORKLIST GETS AN ORDER (v182)
+
+The owner, comparing this to **TeamLease RegTech**: *"i am not satisfied with
+this what we have built, is this ready to sell"*.
+
+Measured rather than argued. TeamLease publish **1,536 Acts and 69,233
+compliances**, maintained by **35+ legal experts in Pune** who watch **2,000
+government websites** across 28 states and 9 union territories and capture
+~2,500 changes a year. This holds **327 rules across 3 laws, maintained by
+nobody, with no effective date on any of them** &mdash; and 53 flagged doubtful
+by the owner's own spreadsheet.
+
+**212x the content, kept current by 35 lawyers.** No amount of engineering
+closes that, and their corpus is overwhelmingly *state labour and establishment*
+law sold to a multi-state employer's CHRO &mdash; not a Company Secretary's
+secretarial practice. So the answer to "is it ready to sell" is no, and the
+blocker is not features: **not one rule has been checked by a person, and
+Rule Governance has said so since v157 without anything changing.**
+
+### The insight this release rests on
+**The evidence is extractable. The determination is not.**
+
+`tools/amendments.py` reads the compilations in `reference/` and pulls out, per
+provision, every dated amendment footnote &mdash; instrument, date, verb and the
+footnote verbatim. **220 of 299 citing rules now arrive with their amendment
+history attached**, so verifying a rule is *review* rather than *research*. What
+it never does is decide: the reviewer gets the reading, and the judgement stays
+where it belongs.
+
+### The date belongs to the PROVISION, never to the instrument
+The finding that set the data model. The **LODR Third Amendment 2024** commenced
+**58 provisions on 13.12.2024 and 11 more on 31.12.2024**.
+
+A first census found 138 occurrences of 13.12.2024 and none of 31.12.2024, and
+I nearly "corrected" CLAUDE.md §3e's Reg 13(3) date as a digit transposition.
+Two reasons that was wrong: the extraction writes `31 .12.2024` with a space
+inside the date, so `[0-9.]+` could not see it (the `se ven days` defect of
+§2v), and the date genuinely differs per provision. **Keying an in-force date on
+the instrument name would have dated eleven provisions eleven days early.**
+
+### Four extraction bugs, each found by checking rather than trusting
+| symptom | cause |
+|---|---|
+| Reg 17 and Reg 18 reported as *inserted in 2023* | they were **paragraphs 17 and 18 of Schedule III**. Numbering restarts in a schedule. Acting on it would have hidden board composition and the audit committee from every earlier year |
+| PIT yielded **2** dated footnotes from 135 | PIT writes `(w.e.f. April 01, 2019)` &mdash; **month names**. A numeric-only pattern read the corpus as unamended |
+| **s.470 with 267 amendments** | the Act opens with an `ARRANGEMENT OF SECTIONS` table of contents, so every first-occurrence landed in the TOC and the last entry's span ran to the end of the file |
+| Reg 27 and Reg 91C with **no evidence at all** | see below |
+
+The Schedule III one is the §3f trap exactly: **the text contains numbers that
+are real, current, and about something else.**
+
+### Marker beats position, and it was the document's own linkage
+Footnotes were first attributed to whichever provision's span contained them.
+But a footnote *definition* prints at the foot of a page, and which page is
+decided by typesetting &mdash; so Reg 27 and Reg 91C, both plainly amended, came
+back empty because their footnotes print under a neighbour.
+
+The document already carries the answer: a marker `72[` in the body and a
+footnote numbered 72. In these SEBI compilations **those numbers are unique
+document-wide (659 footnotes, 659 distinct numbers)**, so following them is
+exact. The tool **checks that uniqueness rather than assuming it** and falls
+back to position if a future compilation restarts numbering.
+
+**197 -> 220 rules covered, 104 unreachable footnotes -> 0.** The Act keeps
+positional attribution because its footnotes restart at 1 on every page, and
+**the screen says which basis it used**: claiming the marker was followed when
+it was not would invite trust in a note that may belong to the previous page.
+
+### The Companies Act commencement footnote: found, and deliberately not used
+Footnote 1 to s.1(3) lists commencement **section by section, in 22 dated blocks
+each naming its notification** &mdash; exactly the in-force floor this needed.
+It is captured as evidence and **not parsed into dates**, because the last block
+reads:
+
+> "21st December, 2020 - S. 1, 3, 6 to 10 (both inclusive), s. 12 to 17 ..."
+
+Sections 3 and 6 to 10 are incorporation provisions that commenced **1 April
+2014**. Those are sections of the **Companies (Amendment) Act 2020**: the
+footnote mixes commencement of the principal Act with commencement of later
+amending Acts and never says which is which. Reading all 22 blocks would have
+recorded that incorporation came into force in December 2020 and hidden it from
+every earlier year. **Reported, not silently repaired (§3j)** &mdash; the
+hazard travels with the data and onto the screen.
+
+LODR and PIT commencement *are* established, and **computed, not remembered**:
+gazette 2 Sep 2015 + the ninetieth day the regulation states = **1 Dec 2015**;
+gazette 15 Jan 2015 + the hundred-and-twentieth = **15 May 2015**. Both quoted.
+The proviso to Reg 1(2) puts Reg 23(4) and Reg 31A on the notification date
+instead &mdash; per-provision again, in the commencement clause itself.
+
+### `lgRuleInForce` &mdash; the invariant is that it never hides anything
+An unknown commencement date **abstains**. A missing net worth skips a s.135
+limb (§2c); a missing year end once **assumed 31 March and produced 79 dates
+that looked computed** (§3j). This is that fork, and **hiding an obligation is
+the worse branch** &mdash; it is the one failure in this product a CS cannot
+notice. The boundary is asserted from both sides: a period ending the day before
+commencement is out, a period ending *on* it is in.
+
+### The ordering is the feature
+`govAmendedQueue` is pure and separate from the screen, because reversed it
+would look just as busy and be exactly backwards. A flat alphabetical list of
+327 unchecked rules gives nobody a reason to start anywhere, which is why it sat
+untouched for twenty-five releases. **Most recently amended first**: the top of
+the queue is Reg 40(1), amended **14 July 2026**. A rule whose provision moved
+last month is a different prospect from one untouched since 2015, and that is
+knowable from the held texts without reading a single rule.
+
+### Three claims the exercise independently confirmed
+- **s.137(3)** in the held text reads *"ten thousand rupees ... one hundred
+  rupees for each day during which such failure continues, subject to a maximum
+  of two lakh rupees"* &mdash; §3m/§3n's AOC-4 figures are right, and the
+  one-day trap (company *"during which"*, officers *"after the first"*) is
+  visible in the same sentence.
+- **s.92** substituted by **Act 29 of 2020**, the basis for §3m's s.92(5) penalty.
+- **Reg 91C** substituted **8 September 2025**, exactly as §3e read it.
+
+### Two pre-existing CSS bugs, and a check that now catches them
+Section 4 of the smoke test has caught invented *class* names four times and
+could not see a *variable*. v182 shipped `var(--ice)` and `var(--border)`,
+neither defined, so the evidence panel had no background and no borders and
+looked like unstyled text. The new check found **two more that were already
+there**: `.mw-dot{color:var(--ink-4)}` and `.cd-ev-del{color:var(--ink-4)}`
+&mdash; an invalid custom property with no fallback voids the whole
+declaration, so both inherited instead. It also cried wolf twice and was
+taught: a variable named inside a CSS *comment* (there is a note in the
+stylesheet saying `var(--card)` does not exist), and `var(--x, fallback)`,
+which renders correctly by design.
+
+### The mutation runner was passing for the wrong reason since v181
+The worst finding here, and it is §3q one layer down. v181's legal-page checks
+resolved `terms.html` from `path.dirname(INDEX)`. `mutation.js` writes each
+mutant to a **temp directory**, so those files were never there &mdash; smoke
+failed for every mutant regardless of the mutation, and my new check made it
+*crash* outright. Any bug only smoke could catch was being "caught" by a
+spurious failure. Repo files now resolve from `REPO`, and verifying it took one
+command: **run smoke against an unmutated copy outside the repo.** Three
+mutations that reported *"the mutant crashed"* now report a named assertion.
+
+### Four of my own, all the same shape
+- **I asserted values I had not read.** Reg 13's latest amendment is 2025-05-01,
+  not the 2024-12-31 I assumed; Reg 27 and 91C were absent for a reason I had
+  not yet found; PIT has 7 provisions and I wrote >= 8. §2z's "all 99
+  divisions" &mdash; four times in one sitting.
+- **A mutation anchor with four backslashes** where a JS string literal needs
+  two, so it silently SKIPPED. The anchor is now proved against `index.html`
+  before being trusted.
+- **A shell heredoc ate a backslash again** &mdash; fifth time in this project.
+  Written with the Write tool, per §6.
+- **The caveat named the wrong basis.** It said "attributed by position" for
+  every law after SEBI attribution had become marker-based. Understating is
+  safer than overstating and is still a screen stating something untrue.
+
+### Coverage
+Smoke **45 -> 57**, suite **548 -> 592**, mutations **135 -> 147 caught, 0
+missed, 0 skipped**. `python tools/amendments.py` regenerates the evidence
+**and re-embeds it into `index.html`** &mdash; a generated file that has to be
+pasted by hand goes stale the first time somebody forgets.
+
+### What this does NOT do
+It does not make one rule current. Only reading the provision does that, and
+Rule Governance is still where it gets recorded. What changed is that the
+reading now starts from prepared evidence in a sensible order, instead of from
+a 700 KB PDF and a list of 327 items with no reason to begin anywhere.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -2621,7 +2787,15 @@ refunds and taxes.
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (45 structural checks), `node tests/compliance.test.js` (548 assertions, run against `index.html` itself), `node tests/mutation.js` (135 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (57 structural checks), `node tests/compliance.test.js` (592 assertions, run against `index.html` itself), `node tests/mutation.js` (147 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **`python tools/amendments.py` regenerates the amendment evidence AND re-embeds
+  it into `index.html`.** It reads the compilations in `reference/`, which is
+  gitignored — so `rules/amendments.json` and `rules/amendments_embed.json` are
+  committed, because a fresh clone cannot rebuild them. Run it whenever a text in
+  `reference/` is replaced. The quotes it carries are footnotes from **official**
+  government publications (SEBI's own consolidated regulations, the India Code
+  Act), not a commercial compilation — checked before committing, because GitHub
+  Pages serves this repo publicly.
 - **No AI model auto-updates to current law.** Staying current = fetch fresh sources (RSS via rss2json/allorigins for SEBI/MCA/IBBI/RBI/IncomeTax) + human curation + (optionally) paid web-search. Vetted human templates + AI drafting is the right model.
 - **Drafting quality:** resolution/notice prompts (`RES_SYS`, `DOC_SYS`) were tuned to a senior-CS standard (exact sub-section citations with read-with clauses, SEBI LODR cross-refs, full RESOLVED THAT/FURTHER THAT cascade, standard severally-authorised CS clause, Certified True Copy headers, Section 102 explanatory statements, MCA form+deadline line). There's an anti-reasoning guard telling the model to output ONLY the final document (some free models leaked their chain-of-thought). Keep these standards.
 - **Child/again:** all AI legal output must carry a "verify on MCA/SEBI portal before filing" caveat — the CS signs and carries professional responsibility.
@@ -2630,7 +2804,7 @@ refunds and taxes.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v181.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v182.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**
