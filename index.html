@@ -530,11 +530,6 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 .lgland-h1{font-size:36px;line-height:1.18;font-weight:800;color:#15294C;
   letter-spacing:-.02em;margin:0 0 16px;}
 .lgland-sub{font-size:14.5px;line-height:1.68;color:#48566B;margin:0 0 24px;max-width:520px;}
-.lgland-cta{display:inline-block;background:#2563EB;color:#fff;font-size:14px;font-weight:700;
-  padding:13px 22px;border-radius:10px;text-decoration:none;
-  box-shadow:0 6px 18px rgba(37,99,235,.26);}
-.lgland-cta:hover{background:#1D4FD7;}
-.lgland-cta-sub{font-size:11.5px;color:#6B7A90;margin:9px 0 26px;}
 .lgland-pts{display:flex;flex-direction:column;gap:13px;margin-bottom:22px;}
 .lgland-pt{font-size:13px;line-height:1.62;color:#48566B;padding-left:14px;
   border-left:2px solid #D7DEE8;}
@@ -548,18 +543,6 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
   .lgland-h1{font-size:27px;}
   .lgland-l{flex:1 1 100%;max-width:100%;}
 }
-.demo-bar{display:flex;align-items:flex-start;gap:14px;justify-content:space-between;
-  background:#FFF8E6;border:1px solid #F5E3B8;border-radius:10px;
-  padding:11px 14px;margin:0 0 16px;font-size:12px;line-height:1.6;color:#8A5A00;}
-.demo-bar b{font-weight:700;}
-.demo-bar-main{flex:1;min-width:0;}
-.demo-tour{margin-top:7px;font-size:11.5px;color:#8A5A00;}
-.demo-tour a{color:#8A5A00;font-weight:700;text-decoration:underline;cursor:pointer;}
-.demo-tour a:hover{color:#6B4400;}
-.demo-tour-dot{opacity:.5;margin:0 6px;}
-.demo-bar-x{flex-shrink:0;font-size:11.5px;font-weight:600;color:#8A5A00;
-  text-decoration:underline;white-space:nowrap;}
-@media(max-width:640px){.demo-bar{flex-direction:column;gap:8px;}}
 .gov-ev{margin:14px 0;padding:12px 13px;border:1px solid var(--line-soft);
   border-radius:8px;background:var(--bg);}
 .gov-ev-h{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
@@ -1378,21 +1361,6 @@ function enterApp(){
   catch(err){ console.error('updateMode() failed (non-fatal):', err); }
   // Render the Command Center dashboard immediately
   if(typeof renderCommandCenter === 'function') renderCommandCenter();
-  // In the demo the companies and registers are already in memory, and there
-  // is no session to query with. Returning here rather than letting the chain
-  // run keeps the one entry point for both paths.
-  if(LG_DEMO){
-    // "Signed in as —" reads as a broken header. Nobody is signed in and the
-    // header should say so rather than leave a blank where a name goes.
-    try{
-      var du = document.getElementById('header-username');
-      if(du) du.textContent = 'Demo · not signed in';
-    }catch(e){}
-    try{ if(typeof lgFyHeader === 'function') lgFyHeader(); }catch(e){}
-    if(typeof renderCommandCenter === 'function') renderCommandCenter();
-    lgDemoBanner();
-    return;
-  }
   // Load cloud data, then re-render dashboard with real numbers
   if(typeof loadCloudClients === 'function'){
     // Membership decides what the queries below return, so it is loaded first.
@@ -1416,12 +1384,6 @@ function enterApp(){
 // Check existing session on load
 var LG_BOOT_TRIES = 0;
 async function checkSession(){
-  // ?demo=1 so the demo can be linked rather than explained. Checked before
-  // Supabase is even reached: the demo must work if the CDN is slow, the
-  // project is paused, or the free tier is asleep.
-  try{
-    if(/[?&]demo=1\b/.test(location.search)){ lgDemoStart(); return; }
-  }catch(e){}
   if(!initSupabase()){
     // Give the CDN a bounded number of chances, then fail visibly rather than hang.
     if(++LG_BOOT_TRIES > 20){
@@ -1451,9 +1413,6 @@ document.addEventListener('DOMContentLoaded', checkSession);
       <p class="lgland-sub">Built by a practising Company Secretary for a book of thirty client
         companies. Companies Act 2013, SEBI LODR, SEBI PIT &mdash; worked out for each entity
         from its own figures, not from a generic checklist.</p>
-
-      <a class="lgland-cta" href="?demo=1">Open the demo &mdash; three sample companies &rarr;</a>
-      <div class="lgland-cta-sub">No account, no email. Nothing is saved.</div>
 
       <div class="lgland-pts">
         <div class="lgland-pt"><b>It rules things out, not just in.</b> A private company under
@@ -1641,7 +1600,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v183">
+      <meta id="build-version" content="v184">
     </div>
   </div>
   <div class="cc-search">
@@ -9256,264 +9215,6 @@ function renderPIT(){
 // rule against a named instrument, this system cannot say the rule is current —
 // only that nobody has looked.
 
-// ═══════════════════════════════════════════════════
-// DEMO MODE
-// ═══════════════════════════════════════════════════
-// Sample companies, real engines, nothing saved.
-var LG_DEMO = false;
-
-// Figures are in RUPEES, because that is how this app stores them and how the
-// statute states its thresholds (SS2c). The UI converts to crore at the edge.
-var DEMO_CR = 10000000;
-
-// Three entities, chosen so that the register has to make different decisions
-// about each rather than to make the screen look full:
-//
-//   Meridian  listed, profitable, borrowed -- picks up LODR, PIT, secretarial
-//             audit under s.204 r/w Rule 9, and CSR under s.135 on the net
-//             profit limb. The whole corpus applies to it.
-//   Kavery    private and under every threshold -- so the applicability engine
-//             has to RULE THINGS OUT, which is the harder half and the half a
-//             screenshot cannot show.
-//   Sundaram  an LLP. Gets Form 11 and Form 8 and NOT s.173 board meetings.
-//             This is SS2z: an LLP was once told to hold four board meetings
-//             under a section that does not apply to it, and refusing to do
-//             that is worth more than any chart.
-var DEMO_COMPANIES = [
-  { id:'demo-1', name:'Meridian Textiles Limited', type:'listed',
-    cin:'L17110MH2009PLC195422', fyend:'2026-03-31',
-    capital:48*DEMO_CR, turnover:612*DEMO_CR, networth:340*DEMO_CR,
-    netprofit:42*DEMO_CR, borrowings:120*DEMO_CR, chart:{} },
-  { id:'demo-2', name:'Kavery Foods Private Limited', type:'private',
-    cin:'U15122TN2015PTC101884', fyend:'2026-03-31',
-    capital:5*DEMO_CR, turnover:86*DEMO_CR, networth:22*DEMO_CR,
-    netprofit:3.2*DEMO_CR, borrowings:18*DEMO_CR, chart:{} },
-  { id:'demo-3', name:'Sundaram Logistics LLP', type:'llp',
-    cin:'AAE-4521', fyend:'2026-03-31',
-    capital:2*DEMO_CR, turnover:31*DEMO_CR, networth:9*DEMO_CR,
-    netprofit:1.1*DEMO_CR, borrowings:0, chart:{} }
-];
-
-// Registers. These are what make the demo show the engines that run off the
-// practice's own records rather than off a rule table: Reg 47(1) and the PIT
-// trading window come from the results board meeting (SS2l, SS2w), the s.118
-// minutes row comes per meeting, CHG-1 from the charge, PAS-3 from the
-// allotment, and the s.149 composition tests from the directors.
-var DEMO_REGS = {
-  // Field names are the schema's own: cessation_on, din_kyc_on, is_woman,
-  // is_kmp. A demo that spells them differently does not look broken, it looks
-  // non-compliant -- one wrong name made a listed company fail the woman
-  // director proviso to s.149(1) with two women on its board.
-  //
-  // Meridian's board is deliberately compliant and interesting: six directors,
-  // three independent (s.149(4) needs a third, rounded up, so two -- it has
-  // three), two women, and a Company Secretary as KMP under s.203. One
-  // independent director has NOT filed DIR-3 KYC, which is what a real book
-  // looks like in September and gives the register something true to report.
-  directors: [
-    { id:'d1', company_id:'demo-1', name:'R. Venkataraman', din:'00234517',
-      designation:'managing_director', appointed_on:'2019-04-01', cessation_on:null,
-      din_kyc_on:'2026-06-12', is_woman:false, is_kmp:true },
-    { id:'d2', company_id:'demo-1', name:'Lalitha Krishnan', din:'01887342',
-      designation:'whole_time', appointed_on:'2021-08-14', cessation_on:null,
-      din_kyc_on:'2026-05-30', is_woman:true, is_kmp:true },
-    { id:'d3', company_id:'demo-1', name:'S. Bhaskar Rao', din:'02445190',
-      designation:'independent', appointed_on:'2022-09-20', cessation_on:null,
-      din_kyc_on:'2026-07-02', is_woman:false, is_kmp:false },
-    { id:'d4', company_id:'demo-1', name:'Nandita Sen', din:'03119284',
-      designation:'independent', appointed_on:'2022-09-20', cessation_on:null,
-      din_kyc_on:null, is_woman:true, is_kmp:false },
-    { id:'d5', company_id:'demo-1', name:'Arvind Mehrotra', din:'05672103',
-      designation:'independent', appointed_on:'2024-02-11', cessation_on:null,
-      din_kyc_on:'2026-06-28', is_woman:false, is_kmp:false },
-    { id:'d6', company_id:'demo-1', name:'P. Sundaresan', din:'06783421',
-      designation:'director', appointed_on:'2018-06-05', cessation_on:null,
-      din_kyc_on:'2026-06-14', is_woman:false, is_kmp:false },
-    { id:'d10', company_id:'demo-1', name:'Priya Raghunathan', din:'',
-      designation:'cs', appointed_on:'2020-07-01', cessation_on:null,
-      din_kyc_on:null, is_woman:true, is_kmp:true },
-    { id:'d7', company_id:'demo-2', name:'K. Meenakshi', din:'07219845',
-      designation:'managing_director', appointed_on:'2015-11-02', cessation_on:null,
-      din_kyc_on:'2026-07-19', is_woman:true, is_kmp:true },
-    { id:'d8', company_id:'demo-2', name:'Ganesh Iyer', din:'07445612',
-      designation:'director', appointed_on:'2015-11-02', cessation_on:null,
-      din_kyc_on:null, is_woman:false, is_kmp:false },
-    { id:'d9', company_id:'demo-2', name:'Shalini Raghavan', din:'08120934',
-      designation:'director', appointed_on:'2023-04-18', cessation_on:null,
-      din_kyc_on:'2026-05-21', is_woman:true, is_kmp:false }
-  ],
-  meetings: [
-    // The AGM for the year ended 31 March 2026 has NOT been held. That is the
-    // honest position in September and it is what makes the dashboard useful:
-    // s.96 is coming due, and AOC-4 and MGT-7 follow it.
-    { id:'m0', company_id:'demo-1', kind:'agm', held_on:'2025-09-26',
-      scheduled_for:null, mode:'oavm', notice_sent_on:'2025-09-02',
-      attendees:214, total_eligible:1180, quorum_met:true,
-      approved_results:false, auditor_appointed:true,
-      minutes_state:'signed', minutes_signed_on:'2025-10-18' },
-    { id:'m1', company_id:'demo-1', kind:'board', held_on:'2026-05-28',
-      scheduled_for:null, mode:'hybrid', notice_sent_on:'2026-05-21',
-      attendees:6, total_eligible:6, quorum_met:true,
-      approved_results:true, auditor_appointed:false,
-      minutes_state:'signed', minutes_signed_on:'2026-06-18' },
-    { id:'m2', company_id:'demo-1', kind:'audit_committee', held_on:'2026-07-10',
-      scheduled_for:null, mode:'vc', notice_sent_on:'2026-07-03',
-      attendees:3, total_eligible:3, quorum_met:true,
-      approved_results:false, auditor_appointed:false,
-      minutes_state:'drafted', minutes_signed_on:null },
-    { id:'m3', company_id:'demo-1', kind:'board', held_on:'2026-08-07',
-      scheduled_for:null, mode:'physical', notice_sent_on:'2026-07-31',
-      attendees:5, total_eligible:6, quorum_met:true,
-      approved_results:true, auditor_appointed:false,
-      minutes_state:'entered', minutes_signed_on:'2026-08-26' },
-    { id:'m4', company_id:'demo-2', kind:'board', held_on:'2026-06-11',
-      scheduled_for:null, mode:'physical', notice_sent_on:'2026-06-04',
-      attendees:3, total_eligible:3, quorum_met:true,
-      approved_results:false, auditor_appointed:false,
-      minutes_state:'signed', minutes_signed_on:'2026-07-02' },
-    { id:'m5', company_id:'demo-2', kind:'board', held_on:'2026-08-20',
-      scheduled_for:null, mode:'vc', notice_sent_on:'2026-08-13',
-      attendees:3, total_eligible:3, quorum_met:true,
-      approved_results:false, auditor_appointed:false,
-      minutes_state:'pending', minutes_signed_on:null }
-  ],
-  charges: [
-    { id:'c1', company_id:'demo-1', holder:'State Bank of India',
-      nature:'hypothecation', amount:85*DEMO_CR,
-      property:'Plant and machinery at Bhiwandi unit', created_on:'2026-07-24',
-      modified_on:null, satisfied_on:null, charge_id:'100482771',
-      chg1_filed_on:'2026-08-11', chg1_srn:'AA7841562',
-      chg4_filed_on:null, chg4_srn:null,
-      notes:'Working capital facility, sanctioned 24 July 2026.' },
-    // Satisfied but CHG-4 not yet filed: a live thirty-day clock under s.82(1).
-    { id:'c2', company_id:'demo-2', holder:'HDFC Bank Limited',
-      nature:'mortgage', amount:12*DEMO_CR,
-      property:'Factory land, Survey No. 118/2, Tiruppur', created_on:'2021-03-15',
-      modified_on:null, satisfied_on:'2026-08-30', charge_id:'100291044',
-      chg1_filed_on:'2021-04-02', chg1_srn:'AA4419087',
-      chg4_filed_on:null, chg4_srn:null,
-      notes:'Term loan repaid in full on 30 August 2026.' }
-  ],
-  allotments: [
-    { id:'a1', company_id:'demo-1', route:'preferential', security:'equity',
-      allotted_on:'2026-06-18', number:1250000, amount:31.25*DEMO_CR,
-      allottees:4, pas3_filed_on:'2026-07-09', pas3_srn:'AA7612349',
-      certificates_on:'2026-08-05',
-      notes:'Preferential allotment to promoter group, approved by members 12 June 2026.' },
-    { id:'a2', company_id:'demo-2', route:'private_placement', security:'equity',
-      allotted_on:'2026-08-28', number:200000, amount:4*DEMO_CR,
-      allottees:2, pas3_filed_on:null, pas3_srn:null, certificates_on:null,
-      notes:'Private placement under s.42. PAS-3 falls due fifteen days from allotment.' }
-  ],
-  beneficial_interests: [], designated_persons: [], upsi_events: [],
-  upsi_access: [], pre_clearances: []
-};
-
-// Filing evidence, derived from each company's OWN register rather than typed
-// against hardcoded keys. Two reasons: the keys come out of getComplianceChart
-// and would drift the moment a rule changed, and a demo where every row is
-// closed shows nothing -- the point of the evidence engine is that a row with
-// nothing recorded says so instead of claiming compliance (SS2d).
-//
-// Deterministic, so a pitch looks the same every time it is opened.
-function lgDemoEvidence(c){
-  var rows = [];
-  try{ rows = getComplianceChart(c, {includeNA:true}) || []; }catch(e){ return; }
-  var today = audIso(new Date());
-  var n = 0;
-  for(var i = 0; i < rows.length; i++){
-    var r = rows[i];
-    if(!r.due || String(r.due) > today) continue;   // only what has fallen due
-    n++;
-    if(n % 5 === 0) continue;     // roughly one in five left with nothing on it
-    // A stable pseudo-reference from the key, so it does not change per load.
-    var h = 0, k = String(r.key);
-    for(var j = 0; j < k.length; j++) h = (h * 31 + k.charCodeAt(j)) % 8999999;
-    c.chart[r.key] = {
-      status:'done', owner:(n % 3 === 0 ? 'Priya Raghunathan' : 'Nittin Sharma'),
-      notes:null, completedOn:r.due, filedOn:r.due,
-      filingRef:'AA' + (1000000 + h),
-      evidenceNote:null, evidenceSource:'manual',
-      recordedBy:'demo-maker', recordedAt:r.due,
-      // Every fifth is recorded but NOT yet confirmed, so the maker-checker
-      // state is visible: AWAITING_CHECK asserts nothing and is not "Filed".
-      checkState:(n % 4 === 0 ? 'unchecked' : 'verified'),
-      verifiedBy:(n % 4 === 0 ? null : 'demo-checker'),
-      verifiedAt:(n % 4 === 0 ? null : r.due),
-      confidence:(n % 3 === 0 ? 'medium' : 'high'),
-      checkNote:null, evidenceFile:null,
-      notApplicable:false, appliesConfirmed:false
-    };
-  }
-}
-
-// Entering the demo. Deliberately goes through enterApp() like any other
-// session: CLAUDE.md SS2 records that stubbing around enterApp() is exactly what
-// hid the v7 bug for weeks, because the isolated tests never ran it.
-function lgDemoStart(){
-  LG_DEMO = true;
-  CURRENT_USER = null;
-  CLIENTS = DEMO_COMPANIES.map(function(c){
-    var copy = {}; for(var k in c) copy[k] = c[k];
-    copy.chart = {};
-    return copy;
-  });
-  try{
-    for(var t in DEMO_REGS) LG_REGS[t] = DEMO_REGS[t];
-  }catch(e){}
-  CLIENTS.forEach(lgDemoEvidence);
-  enterApp();
-  lgDemoBanner();
-  return CLIENTS.length;
-}
-
-// Where to start, for somebody who has just arrived in front of forty nav
-// items. Each of these shows the engine doing something that cannot be
-// screenshotted: deciding, showing its working, reading a document, or saying
-// what it has not checked.
-var LG_DEMO_TOUR = [
-  ['universe',   'The register',
-   'Every obligation across all three companies, filtered and paged'],
-  ['applies',    'What applies',
-   'The conditions the engine cannot decide alone, and what it has ruled out'],
-  ['calc',       'Calculators',
-   'Late filing: the s.403 fee and the penalty, with its statutory maximum'],
-  ['impact',     'Board minutes',
-   'Paste minutes and it says which resolutions need MGT-14, clause by clause'],
-  ['board',      'Board report',
-   'One entity, one period, written for the people who answer for it'],
-  ['governance', 'Rule governance',
-   'What each rule rests on, and which of them nobody has checked yet']
-];
-
-// Said on every screen, not once on the way in. A sample register that stops
-// announcing itself is indistinguishable from a real one, and somebody will
-// screenshot it.
-function lgDemoBanner(){
-  if(!LG_DEMO) return;
-  var main = document.querySelector('.appmain');
-  if(!main || document.getElementById('demo-bar')) return;
-  var b = document.createElement('div');
-  b.id = 'demo-bar';
-  b.className = 'demo-bar';
-  b.innerHTML =
-    '<div class="demo-bar-main">'+
-      '<div><b>Demo.</b> Three sample companies &mdash; a listed textile company, a '+
-        'private food company and an LLP. The register, the deadlines, the '+
-        'calculators and the applicability engine are the real ones; only the '+
-        'companies are invented. <b>Nothing here is saved</b>, and anything that '+
-        'would write says so.</div>'+
-      '<div class="demo-tour">Worth a look: '+
-        LG_DEMO_TOUR.map(function(t){
-          return '<a onclick="sw('+lgArg(t[0])+')" title="'+entEsc(t[2])+'">'+
-                 entEsc(t[1])+'</a>';
-        }).join('<span class="demo-tour-dot">&middot;</span>')+
-      '</div>'+
-    '</div>'+
-    '<a class="demo-bar-x" href="./">Leave the demo</a>';
-  main.insertBefore(b, main.firstChild);
-}
-
 // ── AMENDMENT EVIDENCE ──────────────────────────────────────────
 // Generated by tools/amendments.py from the texts in reference/. Per provision:
 // how many dated amendments the held compilation carries, when, by which
@@ -11829,16 +11530,6 @@ function lgCanAdmin(){ return CURRENT_ROLE === 'owner' || CURRENT_ROLE === 'admi
 
 // Called at the top of every save path. Returns true when the action may go on.
 function lgGuardWrite(what){
-  // Refused here rather than at the database, because in the demo there is no
-  // session and every write would otherwise fail with a message about
-  // authentication, which tells a prospect nothing about the product.
-  if(LG_DEMO){
-    alert('This is the demo, so nothing is saved.\n\n' +
-          'Everything you can read here is computed live from the three sample '+
-          'companies. Recording a filing, confirming it, or signing off a rule ' +
-          'needs an account, because those are records about a real client.');
-    return false;
-  }
   if(lgCanWrite()) return true;
   alert('You are a viewer in ' + ((lgCurrentOrg()||{}).name || 'this practice') +
         ', so you cannot ' + (what || 'change this') + '.\n\n' +

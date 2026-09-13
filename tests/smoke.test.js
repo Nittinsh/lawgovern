@@ -395,20 +395,18 @@ function eq(name, a, b) { ok(name, a === b, `${a} !== ${b}`); }
      useBody.indexOf('govSave') < 0, 'govUseEvidence calls govSave');
 }
 
-// -- 9. the landing page and the demo ----------------------------
-// Until v183 this URL opened a password box and nothing else, so the product
-// could not be shown to anybody. What is checked here is not that the marketing
-// is present -- it is that the two honesty controls are, because a demo whose
-// sample data stops announcing itself is worse than no demo.
+// -- 9. the landing page -----------------------------------------
+// Until v183 this URL opened a password box and nothing else, so a prospect
+// could not find out what the product was. The demo that shipped beside it was
+// removed in v184 at the owner's instruction; the page explaining the product
+// stays, because it only ever shows when nobody is signed in.
 {
   ok('the landing page is on the sign-in screen',
      html.indexOf('class="lgland"') >= 0, 'no landing markup');
 
   const i = html.indexOf('id="auth-overlay"');
   const card = i >= 0 ? html.slice(i, i + 26000) : '';
-  ok('it offers the demo without an account',
-     card.indexOf('href="?demo=1"') >= 0, 'no demo link on the landing');
-  ok('and the sign-in form is still on the same screen',
+  ok('the sign-in form is on the same screen',
      card.indexOf('lgSignIn()') >= 0, 'sign-in is not on the landing');
 
   // A Company Secretary's first question is whether this talks to MCA21.
@@ -418,22 +416,11 @@ function eq(name, a, b) { ok(name, a === b, `${a} !== ${b}`); }
   ok('and names MCA21 specifically',
      card.indexOf('MCA21') >= 0, 'the limitations box does not mention MCA21');
 
-  // The demo must keep saying it is a demo, on every screen.
-  ok('the demo renders a standing banner',
-     /function lgDemoBanner\(/.test(js), 'no lgDemoBanner');
-  const ban = js.slice(js.indexOf('function lgDemoBanner('));
-  const banBody = ban.slice(0, ban.indexOf('\n}')).replace(/['"]\s*\+\s*['"]/g, '');
-  ok('and the banner says nothing is saved',
-     /Nothing here is saved/.test(banBody), 'the banner does not say nothing is saved');
-
-  // Writes are refused before anything reaches the database, so a prospect
-  // gets a sentence about the product rather than an authentication error.
-  const g = js.slice(js.indexOf('function lgGuardWrite('));
-  const gBody = g.slice(0, g.indexOf('\n}'));
-  ok('a write in the demo is refused',
-     gBody.indexOf('LG_DEMO') >= 0 &&
-     gBody.indexOf('LG_DEMO') < gBody.indexOf('lgCanWrite()'),
-     'lgGuardWrite does not check LG_DEMO first');
+  // Nothing may offer a demo that no longer exists. A button to nowhere is
+  // worse than no button, and this is the check that keeps it gone.
+  ok('nothing on the page offers a demo',
+     html.indexOf('demo=1') < 0 && html.indexOf('lgDemoStart') < 0,
+     'a demo entry point is still present');
 }
 
 // ── report ────────────────────────────────────────────────────

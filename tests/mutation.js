@@ -762,28 +762,6 @@ const MUTATIONS = [
     from: "r.dueConfidence === 'derived' && !r.anchoredTo",
     to:   "r.dueConfidence === 'derived'" },
 
-  // One misspelled field name made a listed company with two women on its
-  // board fail the woman-director proviso to s.149(1). Silent and plausible.
-  { name: 'a demo register field name drifts from the schema (SS3u)',
-    from: "cessation_on:null,\n      din_kyc_on:'2026-06-12'",
-    to:   "resigned_on:null,\n      kyc_done_on:'2026-06-12'" },
-
-  // SS2z: an LLP has no Board and no s.173. If the sample LLP stops being an
-  // LLP the demo stops demonstrating the thing worth demonstrating.
-  { name: 'the sample LLP is treated as a company (SS3u r/w SS2z)',
-    from: "name:'Sundaram Logistics LLP', type:'llp'",
-    to:   "name:'Sundaram Logistics LLP', type:'private'" },
-
-  // Sample data that stops announcing itself is worse than no demo: somebody
-  // will screenshot it and it will be read as a real book.
-  { name: 'the demo stops saying it is a demo (SS3u)',
-    from: '  main.insertBefore(b, main.firstChild);',
-    to:   '  if(false) main.insertBefore(b, main.firstChild);' },
-
-  { name: 'the landing drops the link to the demo (SS3u)',
-    from: 'class="lgland-cta" href="?demo=1"',
-    to:   'class="lgland-cta" href="#"' },
-
   // The limitations box is the credibility, not a disclaimer to trim.
   { name: 'the landing stops saying nothing is verified against MCA21 (SS3u)',
     from: 'Nothing is verified against MCA21 or the stock exchanges',
