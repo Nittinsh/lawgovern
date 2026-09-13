@@ -2915,6 +2915,89 @@ Smoke **60 &rarr; 65**.
 
 ---
 
+## 3w. THE 304 THAT COULD NOT BE CHECKED (v187)
+
+*"now do the remaining 304"*. They were three groups, and lumping them together
+is what made the number look hopeless.
+
+**122 of 327 rules now have their stated period confirmed against the held
+text, up from 6.** No rule contradicts its provision.
+
+### The biggest group was skipped on a premise that was wrong
+96 rules were excluded by this comment in the audit:
+
+> *"A Schedule entry cites the regulation that ENABLES it, while its own period
+> lives in the Schedule &mdash; Schedule III Part E items all cite Reg 87B(1)
+> and take their 24 hours from the Schedule, not from 87B."*
+
+**That is not where it lives.** Schedule III Part A is a list of *events*
+&mdash; *"1. Acquisition(s)...", "2. Issuance or forfeiture of securities..."*
+&mdash; with no timing in it at all. The timing is in **Reg 30(6)**, the
+provision those rules already cite:
+
+> *"...as soon as reasonably possible and in any case not later than the
+> following: (i) thirty minutes from the closure of the meeting of the board of
+> directors ... (ii) twelve hours ... (iii) twenty four hours..."*
+
+So the skip sent the reader to the wrong document **and** excluded 96 rules from
+the one check that could confirm them. Removed: **122 of 127 confirm against the
+citing regulation.**
+
+Twenty-one needed one more thing &mdash; a roman-numeral list item counts as its
+own lead-in, because the governing words sit *before* the list and each item has
+none of its own.
+
+### Four parser defects, every one hiding a period printed on the page
+| what the text says | why it read as no period |
+|---|---|
+| `within 2 working days` | the spelled-number branch was greedy, capturing **"2 working"** as the number; `int()` threw and the match was dropped |
+| `within 436[two working days]` | a **footnote marker between the lead-in and the number** |
+| `within forty -five days` (Reg 32(6)) | the extraction splits the number |
+| `w ithin forty eight hours` (Reg 47(1)) | the extraction splits *within* &mdash; **23 times** across the three texts |
+
+The first was mine, introduced two hours earlier in the same session by the
+widening that was supposed to help. **Digits-first fixed the digit case and left
+every spelled one broken**, which is worse than the bug it replaced because it
+looked like progress. The branch is lazy now, and &sect;2v's original *"within se
+ven days"* parses too.
+
+### What the five non-confirmations actually are
+- **Four Schedule III entries** (Part A 7B, 7C, 15(b)(ii), 15(b)(iii)) whose
+  period really is in the Schedule item rather than Reg 30. Named as their own
+  worklist.
+- **s.90**, whose thirty days is in the SBO Rules 2018, not held (&sect;2o).
+
+They were briefly *all* reported as "the provision delegates", because Reg 30
+contains the words *"as may be specified by the Board"* somewhere in its
+seventeen thousand characters &mdash; for a different sub-provision.
+**Whether a rule is a Schedule entry is a fact about its id; whether a provision
+delegates is a phrase match in a long text.** The definite test runs first now.
+
+### A schedule locator was built and NOT shipped
+It parses `LODR-SCH3-Part A-A-15` into Schedule III, Part A, section A, item 15.
+It placed **42 of 140** paragraphs and produced a **false disagreement** on Part
+A item 7 by running past it into 7B. Half-working is worse than absent
+(&sect;2x), and it turned out to be unnecessary: the period was in the
+regulation all along.
+
+### The honest remainder: 205
+- **172 state no period at all** &mdash; *"promptly"* (19), *"ongoing"* (16),
+  *"continuous"* (10), *"annually"*, *"as specified by SEBI"*. &sect;3d
+  classified these correctly as continuous duties, applicability tests and
+  delegated timings. **They are not deadlines and cannot be checked as ones.**
+- **28 cite no numbered provision** &mdash; PIT Schedule A/B, the SDD framework,
+  the SEBI circular framework.
+- **5** as above.
+
+### And what 122 confirmations do NOT mean
+The number the rule states **appears in the provision it cites**. It does not
+mean it appears in the *clause* the rule cites &mdash; the comparison is against
+the whole provision, a limit the audit prints in its own output and which
+&sect;3v measured at 4 of 23 before this run. It is not a professional's
+sign-off, and Rule Governance still reads "Never checked" for all 327.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -2983,7 +3066,7 @@ Smoke **60 &rarr; 65**.
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (65 structural checks), `node tests/compliance.test.js` (603 assertions, run against `index.html` itself), `node tests/mutation.js` (151 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 327 rules; it reports how many periods it actually compared, currently 23), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (65 structural checks), `node tests/compliance.test.js` (603 assertions, run against `index.html` itself), `node tests/mutation.js` (151 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 327 rules; it reports how many periods it actually compared, currently 122), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **`python tools/amendments.py` regenerates the amendment evidence AND re-embeds
   it into `index.html`.** It reads the compilations in `reference/`, which is
   gitignored — so `rules/amendments.json` and `rules/amendments_embed.json` are
@@ -3000,7 +3083,7 @@ Smoke **60 &rarr; 65**.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v186.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v187.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

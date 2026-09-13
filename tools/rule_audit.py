@@ -128,8 +128,12 @@ def cited_sections(s):
 # "with in" -- 23 times across the three texts. A space may fall between any
 # two letters, so every gap is optional.
 _WITHIN = r'w\s?i\s?t\s?h\s?i\s?n'
+# A roman-numeral list item counts as its own lead-in. Reg 30(6) reads "not
+# later than the following: (i) thirty minutes ... (ii) twelve hours ...", so
+# the governing words sit before the list and each item has none. Without this
+# the twelve-hour limb -- which most Schedule III rules turn on -- is invisible.
 LEAD = (r'(?:' + _WITHIN + r'|not\s+later\s+than|no\s+later\s+than|at\s+least'
-        r'|before\s+the\s+expiry\s+of)')
+        r'|before\s+the\s+expiry\s+of|\((?:i{1,3}|iv|v)\))')
 # "a period of", "a further period of" etc. sit between the lead-in and the number.
 FILLER = r'(?:\s+(?:a|an|the|further|maximum|minimum|period|of|such)){0,4}'
 UNITS = (r'calendar\s+days?|working\s+days?|business\s+days?|trading\s+days?|'
@@ -137,7 +141,10 @@ UNITS = (r'calendar\s+days?|working\s+days?|business\s+days?|trading\s+days?|'
 # Up to three word-tokens, so "forty -five" and "one hundred and twenty" are
 # captured whole. Anything that does not resolve to a number is dropped below
 # rather than guessed at.
-PERIOD = re.compile(LEAD + FILLER + r'\s+((?:\w+[\s-]+){0,2}\w+|\d+)\s+(' + UNITS + r')', re.I)
+# Digits FIRST. With the word-branch first, "within 2 working days" captured
+# "2 working" as the number and "days" as the unit, int() threw, and the match
+# was silently dropped -- so a plainly readable period parsed as none at all.
+PERIOD = re.compile(LEAD + FILLER + r'\s+(\d+|(?:\w+[\s-]+){0,2}?\w+)\s+(' + UNITS + r')', re.I)
 
 # The regulations spell numbers, and not always with a hyphen — "twenty one
 # days" is two words in the LODR text. Reading only "twenty-one" made Reg 31's
@@ -153,9 +160,18 @@ _WORDS = {'one':1,'two':2,'three':3,'four':4,'five':5,'six':6,'seven':7,'eight':
 WORDNUM = dict((re.sub(r'[\s-]+', '', k), v) for k, v in _WORDS.items())
 
 
+# A substitution marker sits wherever the amendment fell, including between
+# the lead-in and the number: Reg 44(3) reads "within 436[two working days] of
+# conclusion of its General Meeting". The marker is typography, not meaning, so
+# it is removed before the period is read -- otherwise a period printed in full
+# on the page parses as none at all.
+FOOTMARK = re.compile(r'\d{1,4}\[')
+
+
 def periods_in(s):
+    s = FOOTMARK.sub(' ', s or '').replace(']', ' ')
     out = set()
-    for m in PERIOD.finditer(s or ''):
+    for m in PERIOD.finditer(s):
         n, unit = m.group(1).lower().strip(), re.sub(r'\s+',' ',m.group(2).lower())
         # "within a period of thirty days" can also match with n='of'; the
         # WORDNUM lookup below drops anything that is not a number, so a
@@ -323,20 +339,24 @@ for path, key, law in CORPORA:
         if not want:
             counts['rule states no period'] += 1
             continue
-        # A Schedule entry cites the regulation that ENABLES it, while its own
-        # period lives in the Schedule — Schedule III Part E items all cite
-        # Reg 87B(1) and take their 24 hours from the Schedule, not from 87B.
-        # Comparing the two produces two dozen mismatches that are all artefacts
-        # of where the period is written, so they are counted separately rather
-        # than presented as questions about the law.
-        if re.search(r'SCH|SCHEDULE', str(rid), re.I):
-            counts['schedule-derived (period lives in the Schedule)'] += 1
-            continue
-
         ctx = context_of(text, regs[0], law)
         if not ctx:
             continue
         have = periods_in(ctx)
+
+        # A Schedule entry cites the regulation that ENABLES it. Where that
+        # regulation carries periods but not this one, the Schedule item itself
+        # carries it -- Part A items 7B, 7C and 15(b) are exactly this. Checked
+        # BEFORE delegation, because the id is a fact and the delegation test is
+        # a phrase that may belong to a different sub-provision entirely.
+        if have and not (want & have) and re.search(r'SCH|SCHEDULE', str(rid), re.I):
+            counts['schedule entry: period not in the citing regulation'] += 1
+            findings['schedule entry — period is in the Schedule item, '
+                     'not the regulation it cites'].append(
+                (rid, cite, 'rule says %s; %s carries %s' % (
+                    sorted(want), regs[0], sorted(have)[:4])))
+            continue
+
         if DELEGATES.search(ctx) and not (want & have):
             # The provision delegates. The number the register shows comes from
             # a rule or circular, and whether that is the right number cannot be
@@ -365,7 +385,7 @@ for path, key, law in CORPORA:
 print('─' * 70)
 for k in ['checked', 'citation found', 'citation not found', 'not in the 2021 Act text',
           'no citation', 'rule states no period',
-          'schedule-derived (period lives in the Schedule)',
+          'schedule entry: period not in the citing regulation',
           'period delegated by the provision',
           'period not stated in the provision',
           'period compared', 'period mismatch']:
