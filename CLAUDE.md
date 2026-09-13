@@ -2835,6 +2835,86 @@ neither the app nor the suites carry a demo or landing symbol.
 
 ---
 
+## 3v. THE AUDIT HAD NEVER READ THE LAW (v186)
+
+*"now do the rule verification"*. Measured before building: of 327 rules, the
+release gate compared a stated period against the held text for **six**.
+`period mismatch: 0` was nought out of six, and had read as a clean bill of
+health for the whole corpus since v159.
+
+Four reasons it never arrived, and **not one was a disagreement about the law**:
+
+| | what the audit was actually reading |
+|---|---|
+| **Companies Act** | the **ARRANGEMENT OF SECTIONS contents page**. "96." matched *"96. Annual general meeting. 97. Power of Tribunal..."* Every Act period check read the contents. &sect;3t fixed this in `amendments.py`; nobody fixed it here |
+| **Reg 52** | item 52 of a list of **2002-03 circulars** printed after the schedules |
+| **Reg 33, 24A, 46** | a fixed **2,600-character window** that stopped before the cited sub-regulation |
+| **Reg 39(2), 6(1B)** | the pattern required the literal word `within` plus at most two words, so *"within a period of thirty days"* &mdash; printed verbatim in the audit's own output &mdash; was invisible |
+
+**Six compared &rarr; 23.** Headings are located once per text and each
+provision runs to the next heading; the Act skips its contents; SEBI stops at
+the schedules; the lead-in accepts *not later than*, *at least*, and
+*a period of*.
+
+### "forty -five", and "w ithin"
+&sect;2v recorded *"within se ven days"* &mdash; the extraction dropping a space
+inside a word. It is not one bad line. **Reg 32(6) states "within forty -five
+days from the end of each quarter"** and parsed as no period at all; **Reg 47(1)
+states "w ithin forty eight hours"**. Across the three texts the word *within*
+is split **23 times**. Numbers are now keyed with spaces and hyphens stripped,
+and every gap inside *within* is optional.
+
+### A delegating provision is not a contradiction
+The one mismatch that appeared was **s.90; SBO Rules**, rule says 30 days.
+s.90(4) says the return is filed *"within such time ... as may be prescribed"*
+&mdash; no period at all. The thirty days is in the SBO Rules 2018, **not held**
+&mdash; which &sect;2o recorded two years ago. Blocking a release on that would
+fail the gate over a documented gap, so delegation is its own category and never
+blocks.
+
+**And note what nearly happened instead.** s.90 *does* contain "thirty days"
+&mdash; in **sub-section (6)**, about a person's reply to a notice under s.90(5).
+Had the parser matched it, the rule would have been reported **confirmed by a
+sub-section it has nothing to do with**. &sect;3f's trap exactly: the text
+contains a period that is real, current, and about something else.
+
+### The false-agreement check, and why it was withdrawn
+That risk was measured: **4 of 23 agreements were not inside the sub-provision
+the rule cites.** Reading all four, **two were my detector's fault** &mdash; Reg
+47(1) is confirmed in its own text once "w ithin" is readable, and Reg 7(5)'s
+segment was cut at the cross-reference *"sub-regulation (4)"*, which reads as
+the next sub-provision. Reg 33(3)(d)'s sixty days needs a wider read and Reg
+46(2)(s)'s twenty-one days is genuinely not in Reg 46.
+
+A narrowing that is wrong half the time is worse than none (&sect;2x), so it was
+**withdrawn and the limitation stated instead**: an agreement means the number
+appears **in the provision**, not in the clause the rule cites. That sentence is
+now printed by the audit itself.
+
+### The screen was claiming more than the audit did
+Rule Governance said 231 LODR rules were *"cross-checked ... and no stated
+period contradicts the words around it"*. The citations were checked; the
+periods reached six rules. It now states both numbers, and a smoke check refuses
+the old wording.
+
+### The gate reports its own reach
+`period compared` and **`periods actually compared: 23 of 327 rules (7%)`** print
+beside `period mismatch`. **A count of failures means nothing without the count
+of checks behind it** &mdash; that is the whole lesson, and it is the same shape
+as &sect;3u's coverage gauge, which divided by a counter that was structurally
+always zero.
+
+### What this does NOT do
+It does not verify 327 rules. **304 still state no period the held text can be
+compared against** &mdash; 181 say "Ongoing" or "As specified by SEBI", 94 take
+their period from a Schedule, 28 cite no numbered provision. Those need a person
+reading them, which is &sect;3t's queue. What changed is that the audit now says
+so instead of implying otherwise.
+
+Smoke **60 &rarr; 65**.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -2903,7 +2983,7 @@ neither the app nor the suites carry a demo or landing symbol.
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (60 structural checks), `node tests/compliance.test.js` (603 assertions, run against `index.html` itself), `node tests/mutation.js` (151 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (65 structural checks), `node tests/compliance.test.js` (603 assertions, run against `index.html` itself), `node tests/mutation.js` (151 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 327 rules; it reports how many periods it actually compared, currently 23), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **`python tools/amendments.py` regenerates the amendment evidence AND re-embeds
   it into `index.html`.** It reads the compilations in `reference/`, which is
   gitignored — so `rules/amendments.json` and `rules/amendments_embed.json` are
@@ -2920,7 +3000,7 @@ neither the app nor the suites carry a demo or landing symbol.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v185.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v186.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

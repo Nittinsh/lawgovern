@@ -119,44 +119,148 @@ def cited_sections(s):
     return out
 
 
-PERIOD = re.compile(
-    r'within\s+((?:\w+[\s-])?\w+|\d+)\s+(working\s+days?|days?|hours?|months?)', re.I)
+# The lead-in the statute actually uses, not just "within": provisions say
+# "within a period of thirty days" (Reg 39(2)), "not later than three months"
+# (Reg 6(1A)), "not later than 21 calendar days" (Reg 13(1)), "at least 21 days"
+# (Reg 46(2)). Requiring "within" plus at most two words made every one of those
+# invisible -- including ones printed verbatim in this audit's own output.
+# "within" arrives from the PDF as "w ithin", "wit hin", "wi thin" and
+# "with in" -- 23 times across the three texts. A space may fall between any
+# two letters, so every gap is optional.
+_WITHIN = r'w\s?i\s?t\s?h\s?i\s?n'
+LEAD = (r'(?:' + _WITHIN + r'|not\s+later\s+than|no\s+later\s+than|at\s+least'
+        r'|before\s+the\s+expiry\s+of)')
+# "a period of", "a further period of" etc. sit between the lead-in and the number.
+FILLER = r'(?:\s+(?:a|an|the|further|maximum|minimum|period|of|such)){0,4}'
+UNITS = (r'calendar\s+days?|working\s+days?|business\s+days?|trading\s+days?|'
+         r'clear\s+days?|days?|hours?|months?|weeks?|years?')
+# Up to three word-tokens, so "forty -five" and "one hundred and twenty" are
+# captured whole. Anything that does not resolve to a number is dropped below
+# rather than guessed at.
+PERIOD = re.compile(LEAD + FILLER + r'\s+((?:\w+[\s-]+){0,2}\w+|\d+)\s+(' + UNITS + r')', re.I)
 
 # The regulations spell numbers, and not always with a hyphen — "twenty one
 # days" is two words in the LODR text. Reading only "twenty-one" made Reg 31's
 # own period invisible to this audit and produced a mismatch against itself.
-WORDNUM = {'one':1,'two':2,'three':3,'four':4,'five':5,'six':6,'seven':7,'eight':8,
-           'nine':9,'ten':10,'eleven':11,'twelve':12,'fourteen':14,'fifteen':15,
-           'twenty':20,'thirty':30,'forty':40,'forty five':45,'forty-five':45,
-           'forty eight':48,'forty-eight':48,'sixty':60,'ninety':90,
-           'twenty one':21,'twenty-one':21,'twenty four':24,'twenty-four':24,
-           'one hundred':100,'hundred':100,'seven':7}
+_WORDS = {'one':1,'two':2,'three':3,'four':4,'five':5,'six':6,'seven':7,'eight':8,
+          'nine':9,'ten':10,'eleven':11,'twelve':12,'thirteen':13,'fourteen':14,
+          'fifteen':15,'sixteen':16,'eighteen':18,'twenty':20,'twentyone':21,
+          'twentyfour':24,'thirty':30,'thirtyone':31,'forty':40,'fortyfive':45,
+          'fortyeight':48,'sixty':60,'seventy':70,'ninety':90,'onehundred':100,
+          'hundred':100,'onehundredandtwenty':120,'hundredandtwenty':120}
+# Keyed with spaces and hyphens stripped, so every way the texts write a number
+# collapses to one entry.
+WORDNUM = dict((re.sub(r'[\s-]+', '', k), v) for k, v in _WORDS.items())
 
 
 def periods_in(s):
     out = set()
     for m in PERIOD.finditer(s or ''):
         n, unit = m.group(1).lower().strip(), re.sub(r'\s+',' ',m.group(2).lower())
+        # "within a period of thirty days" can also match with n='of'; the
+        # WORDNUM lookup below drops anything that is not a number, so a
+        # non-numeric capture simply falls through rather than being invented.
         # The PDF extraction splits words across spaces — the LODR text contains
         # "within se ven days". Reading that as an unknown token made Reg 61A(2)
         # look like it contradicted itself when it says exactly what the rule says.
-        n = WORDNUM.get(n,
-            WORDNUM.get(n.replace('-', ' '),
-            WORDNUM.get(n.replace(' ', '').replace('-', ''), n)))
+        # One canonical key: lowercase with every space and hyphen removed. The
+        # extraction writes "forty -five", the regulation writes "forty-five"
+        # and the corpus writes "forty five"; all three are the same number and
+        # were three different misses.
+        key = re.sub(r'[\s-]+', '', n)
+        n = WORDNUM.get(key, WORDNUM.get(n, n))
         try: n = int(n)
         except Exception: continue
-        out.add((n, 'working day' if 'working' in unit else unit.rstrip('s')))
+        # calendar/clear/trading days are all "day" for comparison: the corpus
+        # and the regulation frequently differ on the adjective while stating
+        # the same number, and flagging that as a mismatch is noise.
+        u = ('working day' if 'working' in unit or 'business' in unit
+             else unit.replace('calendar ', '').replace('clear ', '')
+                      .replace('trading ', '').rstrip('s'))
+        out.add((n, u))
     return out
 
 
-def context_of(text, reg, span=2600):
-    """Text around the numbered heading for a regulation, if it can be located."""
-    for pat in [r'(?<![\d.])' + re.escape(reg) + r'\s*\.\s*\(1\)',
-                r'(?<![\d.])' + re.escape(reg) + r'\s*\.\s*[A-Z]']:
-        m = re.search(pat, text)
-        if m:
-            return text[m.start():m.start() + span]
-    return None
+# A provision that hands the period to rules or to the Board states no period
+# itself, and saying so is a different finding from contradicting the rule.
+DELEGATES = re.compile(
+    r'as\s+may\s+be\s+(?:prescribed|specified)|as\s+(?:may\s+be\s+)?specified\s+by\s+the\s+Board'
+    r'|in\s+such\s+(?:time|form|manner)[^.]{0,60}as\s+may\s+be\s+prescribed', re.I)
+
+
+def body_start(text, law):
+    """Where the numbered provisions begin.
+
+    The Act opens with an ARRANGEMENT OF SECTIONS listing every section in
+    order, so searching from character zero matches the contents line rather
+    than the section. Section 96 resolved to "96. Annual general meeting. 97.
+    Power of Tribunal..." -- the contents -- and every Companies Act period
+    check was reading it.
+    """
+    if law != CA_STALE:
+        return 0
+    m = re.search(r'An Act to consolidate', text, re.I)
+    return m.start() if m else 0
+
+
+def body_end(text, law):
+    """Where the numbered provisions stop.
+
+    After the schedules, the LODR compilation prints a numbered list of
+    superseded circulars. Reg 52 matched item 52 of that list -- a table of
+    2002-03 circulars -- instead of Regulation 52. Numbering restarts there,
+    the same trap as the Schedule III paragraphs in SS3t.
+    """
+    if law == CA_STALE:
+        return len(text)
+    m = re.search(r'SCHEDULE\s+I\b', text)
+    return m.start() if m else len(text)
+
+
+_SPANS = {}
+
+
+def provision_spans(text, law):
+    """First position of every numbered provision, and where each one ends.
+
+    Located once per text and cached. Each provision runs to the NEXT heading,
+    so a long one is not truncated -- Regulation 33 runs several times past the
+    2600-character window that used to cut it off before sub-regulation (3)(a),
+    which is the part its rules cite.
+    """
+    key = (id(text), law)
+    if key in _SPANS:
+        return _SPANS[key]
+    a, b = body_start(text, law), body_end(text, law)
+    body = text[a:b]
+    pats = ([r'(?<![\d.])(\d{1,3}[A-Z]{0,2})\s*\.\s*(?:\d{1,4}\[)?\(1\)']
+            if law != CA_STALE else
+            [r'(?:^|\s|\[)(\d{1,3}[A-Z]{0,2})\s*\.\s*[A-Z]'])
+    first = {}
+    for pat in pats:
+        for m in re.finditer(pat, body):
+            p = m.group(1).upper()
+            if p not in first:
+                first[p] = m.start()
+    order = sorted(first.items(), key=lambda x: x[1])
+    spans = {}
+    for i, (p, pos) in enumerate(order):
+        end = order[i + 1][1] if i + 1 < len(order) else len(body)
+        spans[p] = (a + pos, a + end)
+    _SPANS[key] = spans
+    return spans
+
+
+def context_of(text, reg, law=None, span=2600):
+    """The cited provision's own text, heading to next heading."""
+    spans = provision_spans(text, law)
+    hit = spans.get(str(reg).upper())
+    if not hit:
+        return None
+    s, e = hit
+    # A provision shorter than the old window keeps the window, so nothing that
+    # used to be reachable stops being so.
+    return text[s:max(e, min(len(text), s + span))]
 
 
 findings = collections.defaultdict(list)
@@ -217,6 +321,7 @@ for path, key, law in CORPORA:
         tl = r.get('timelineText') or r.get('disclosureTimelineText') or ''
         want = periods_in(tl)
         if not want:
+            counts['rule states no period'] += 1
             continue
         # A Schedule entry cites the regulation that ENABLES it, while its own
         # period lives in the Schedule — Schedule III Part E items all cite
@@ -228,10 +333,29 @@ for path, key, law in CORPORA:
             counts['schedule-derived (period lives in the Schedule)'] += 1
             continue
 
-        ctx = context_of(text, regs[0])
+        ctx = context_of(text, regs[0], law)
         if not ctx:
             continue
         have = periods_in(ctx)
+        if DELEGATES.search(ctx) and not (want & have):
+            # The provision delegates. The number the register shows comes from
+            # a rule or circular, and whether that is the right number cannot be
+            # settled from the text held here.
+            counts['period delegated by the provision'] += 1
+            findings['provision delegates the period to rules or the Board'].append(
+                (rid, cite, 'rule says %s; the provision says "as may be prescribed"'
+                 % sorted(want)))
+            continue
+        if not have:
+            # The rule states a period and the provision states none. Not a
+            # contradiction -- the period may live in a Schedule, a circular or
+            # a rule not held here -- but it is the worklist, because nothing
+            # in the held text confirms the number the register shows.
+            counts['period not stated in the provision'] += 1
+            findings['rule states a period the provision does not'].append(
+                (rid, cite, 'rule says %s; nothing timed near %s' % (sorted(want), regs[0])))
+            continue
+        counts['period compared'] += 1
         if have and not (want & have):
             counts['period mismatch'] += 1
             findings['stated period not found near the provision'].append(
@@ -240,9 +364,18 @@ for path, key, law in CORPORA:
 
 print('─' * 70)
 for k in ['checked', 'citation found', 'citation not found', 'not in the 2021 Act text',
-          'no citation',
-          'schedule-derived (period lives in the Schedule)', 'period mismatch']:
-    print('  %-24s %d' % (k, counts[k]))
+          'no citation', 'rule states no period',
+          'schedule-derived (period lives in the Schedule)',
+          'period delegated by the provision',
+          'period not stated in the provision',
+          'period compared', 'period mismatch']:
+    print('  %-38s %d' % (k, counts[k]))
+# A count of mismatches means nothing without the count of comparisons behind
+# it. This audit compared SIX of 327 rules until v186 and said only "period
+# mismatch: 0", which reads as a clean bill of health for the whole corpus.
+print('  %-38s %s' % ('periods actually compared',
+      ('%d of %d rules (%.0f%%)' % (counts['period compared'], counts['checked'],
+       100.0 * counts['period compared'] / max(1, counts['checked'])))))
 print('─' * 70)
 
 for group, rows in findings.items():
@@ -264,6 +397,15 @@ if counts['not in the 2021 Act text']:
 print('\nEvery line above is a question for the CS, not a finding. A citation the')
 print('parser cannot locate may be a heading this extraction mangled; a period')
 print('mismatch may be a proviso the context window missed.')
+print()
+print('KNOWN LIMIT: a period is compared against the WHOLE cited provision, not')
+print('against the sub-provision the rule names. So an agreement may be with a')
+print('neighbouring sub-section — s.90 states "thirty days" in sub-section (6),')
+print('about a different duty entirely, while s.90(4) states no period at all.')
+print('Narrowing to the sub-provision was tried and withdrawn: a cross-reference')
+print('such as "sub-regulation (4)" reads as the next sub-provision and cut Reg')
+print('7(5) off before its own period. An agreement here means the number appears')
+print('in the provision, NOT that it appears in the clause the rule cites.')
 
 # ── release gate ────────────────────────────────────────────────
 # Only two categories block. A rule citing a provision that is not in the

@@ -412,6 +412,35 @@ function eq(name, a, b) { ok(name, a === b, `${a} !== ${b}`); }
      html.indexOf('lgland') < 0, 'landing markup is present');
 }
 
+// -- 10. the rule audit must report its own reach -----------------
+// "period mismatch: 0" was nought out of SIX comparisons across 327 rules, and
+// read as a clean bill of health for the corpus. A count of failures means
+// nothing without the count of checks behind it.
+{
+  const audit = fs.readFileSync(path.join(REPO, 'tools', 'rule_audit.py'), 'utf8');
+  ok('the audit counts how many periods it actually compared',
+     audit.indexOf("counts['period compared']") >= 0, 'no comparison counter');
+  ok('and prints that count beside the mismatches',
+     audit.indexOf('periods actually compared') >= 0, 'coverage is not reported');
+
+  // A provision that hands its period to rules not held here is a gap, not a
+  // contradiction, and must not block a release over it (s.90 r/w SBO Rules).
+  ok('a delegating provision is its own category',
+     audit.indexOf("counts['period delegated by the provision']") >= 0,
+     'delegation is not distinguished from a mismatch');
+
+  // The comparison is against the whole provision, so an agreement can be with
+  // a neighbouring sub-section. That limit has to stay on screen.
+  ok('the audit states that it compares the whole provision',
+     audit.indexOf('KNOWN LIMIT') >= 0, 'the sub-provision limit is not stated');
+
+  // And the screen must not claim more than the audit did.
+  const gov = js.slice(js.indexOf('var LG_CORPUS'), js.indexOf('var GOV_STATUS'));
+  ok('the governance screen does not claim the periods were checked',
+     gov.indexOf('no stated period contradicts') < 0,
+     'LG_CORPUS still claims every period was checked');
+}
+
 // ── report ────────────────────────────────────────────────────
 const total = pass + failures.length;
 console.log('\n' + '─'.repeat(64));
