@@ -762,11 +762,17 @@ const MUTATIONS = [
     from: "r.dueConfidence === 'derived' && !r.anchoredTo",
     to:   "r.dueConfidence === 'derived'" },
 
-  // The limitations box is the credibility, not a disclaimer to trim.
-  { name: 'the landing stops saying nothing is verified against MCA21 (SS3u)',
-    from: 'Nothing is verified against MCA21 or the stock exchanges',
-    to:   'Everything is checked for you' },
+  // ── SS3u/SS3v: the sign-in screen stays the login card ──────
+  // Neither the demo nor the landing page was removed because it was broken,
+  // so neither would look wrong if it crept back in. These two prove the
+  // guards that keep them out actually fire.
+  { name: 'a demo entry point creeps back onto the login card (SS3v)',
+    from: 'Forgot your password?</a></div>',
+    to:   'Forgot your password?</a> <a href="?demo=1">Try the demo</a></div>' },
 
+  { name: 'a marketing page creeps back in front of the login card (SS3v)',
+    from: '<div id="auth-overlay" style="display:none;',
+    to:   '<div id="auth-overlay" class="lgland" style="display:none;' },
 ];
 
 const src = fs.readFileSync(INDEX, 'utf8');

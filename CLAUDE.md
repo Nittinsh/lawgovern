@@ -2719,7 +2719,7 @@ a 700 KB PDF and a list of 327 items with no reason to begin anywhere.
 
 ---
 
-## 3u. THE DEFECTS A DEMO FOUND, AND WHY THE DEMO IS GONE (v183, removed v184)
+## 3u. THE DEFECTS A DEMO FOUND, AND WHY IT IS GONE (v183, removed v184-v185)
 
 A demo tenant shipped in v183 &mdash; three sample companies driving the real
 engines, reachable at `?demo=1`, with a landing page beside the login card.
@@ -2809,17 +2809,29 @@ inherited their parent's colour.
   existed in the source rather than that it reached the screen &mdash;
   &sect;2j/&sect;3n's shape.
 
-### The landing page stayed
-It is the pitch, not the demo, and it only ever renders when nobody is signed
-in, so it costs the owner nothing in daily use. Its demo button went, because a
-button to nowhere is worse than no button. It still carries the **"What it does
-not do"** box naming MCA21 &mdash; a Company Secretary's first question,
-answered before they ask.
+### The landing page went too (v185)
+I kept it in v184 on the reasoning that it is the pitch rather than the demo,
+and that it costs nothing because it only renders when nobody is signed in.
+The owner: *"remove the landing page too"*. The sign-in screen is the login
+card again, byte-for-byte its pre-v183 form.
+
+**That is twice in two releases that I kept something the owner had not asked
+for, on my own judgement about its value.** The first was building it; the
+second was arguing to keep half of it. When an owner removes a thing, the
+default is that the thing goes &mdash; not that a smaller version survives
+because I still like it.
+
+### Two guards, and mutations that prove they fire
+Neither the demo nor the landing was removed because it was **broken**, so
+neither would look wrong if it crept back. `smoke.test.js` &sect;9 now asserts
+the sign-in screen carries a login form, **no `demo=1` or `lgDemoStart`
+anywhere**, and **no `lgland` markup**. Two mutations put each back and are
+caught &mdash; a check nobody has watched fail is a check nobody should trust.
 
 ### Coverage
-Smoke **57 &rarr; 62**, suite **592 &rarr; 603**, mutations **147 &rarr; 150
-caught, 0 missed, 0 skipped**. Every gate green after the removal, and the
-suites carry no demo symbol.
+Smoke **57 &rarr; 60**, suite **592 &rarr; 603**, mutations **147 &rarr; 151
+caught, 0 missed, 0 skipped**. Every gate green after both removals, and
+neither the app nor the suites carry a demo or landing symbol.
 
 ---
 
@@ -2891,7 +2903,7 @@ suites carry no demo symbol.
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (62 structural checks), `node tests/compliance.test.js` (603 assertions, run against `index.html` itself), `node tests/mutation.js` (150 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (60 structural checks), `node tests/compliance.test.js` (603 assertions, run against `index.html` itself), `node tests/mutation.js` (151 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 327 rules, Companies Act included), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **`python tools/amendments.py` regenerates the amendment evidence AND re-embeds
   it into `index.html`.** It reads the compilations in `reference/`, which is
   gitignored — so `rules/amendments.json` and `rules/amendments_embed.json` are
@@ -2908,7 +2920,7 @@ suites carry no demo symbol.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v184.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v185.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**
