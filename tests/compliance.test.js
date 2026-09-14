@@ -2244,6 +2244,84 @@ describe('event-anchored dates are traceable');
   app.CLIENTS = prevC; app.LG_REGS = prevR;
 }
 
+// -- 11q. SEBI Depositories & Participants 2018 (SS3x) ---------
+// The first corpus in this project read out of a held text rather than
+// generated from the owner's spreadsheet. Two things have to hold: it binds
+// only the ISSUER, and no undated row hides a period that the regulation
+// actually states.
+describe('depositories corpus');
+{
+  const D = app.DEPOS_DATA;
+  ok('the corpus is loaded', !!(D && D.rules && D.rules.length), 'DEPOS_DATA missing');
+  check('eleven issuer obligations', (D.rules || []).length, 11);
+
+  // Every rule carries the words it came from. This corpus was hand-authored,
+  // so the quote is the only thing standing between it and an assertion.
+  //
+  // Length alone is too weak -- a quote truncated past its opening words stays
+  // long and stops being evidence. What has to survive is the part that makes
+  // it an obligation at all: the duty-holder and the verb that binds them.
+  const unquoted = (D.rules || []).filter(r =>
+    !r.quote || r.quote.length < 60 ||
+    !/shall/i.test(r.quote) || !/issuer/i.test(r.quote));
+  ok('every rule quotes its provision, with the duty-holder and "shall" intact',
+     unquoted.length === 0,
+     unquoted.map(r => r.id + ': ' + String(r.quote || '').slice(0, 50)).join(' | '));
+
+  // The regulation also binds depositories (41-57, 73, 82), participants
+  // (58-69, 81) and beneficial owners. Handing a listed company NSDL's duties
+  // is SS2z's defect: wrong law against the wrong entity.
+  const ISSUER = ['70', '71', '72', '74', '75', '76', '77', '78'];
+  const strayed = (D.rules || []).filter(r => {
+    const m = /Reg (\d{1,3})/.exec(r.regulation || '');
+    return !m || ISSUER.indexOf(m[1]) < 0;
+  });
+  ok('no rule reaches outside the issuer provisions',
+     strayed.length === 0,
+     strayed.map(r => r.id + ' -> ' + r.regulation).join(', '));
+
+  const CRd = 10000000;
+  const L = { id:'DEP-L', name:'Listed', type:'listed', fyend:'2026-03-31',
+              capital: 48*CRd, turnover: 612*CRd, networth: 340*CRd,
+              netprofit: 42*CRd, borrowings: 120*CRd,
+              cin:'L17110MH2009PLC195422', chart:{} };
+  const P = { id:'DEP-P', name:'Private', type:'private', fyend:'2026-03-31',
+              capital: 5*CRd, turnover: 40*CRd, networth: CRd, netprofit: CRd,
+              borrowings: 0, cin:'U51909MH2018PTC300111', chart:{} };
+  const depRows = (c) => app.getComplianceChart(c)
+                            .filter(r => /Depositories/.test(r.law || ''));
+
+  ok('a listed issuer receives them', depRows(L).length > 0, 'none on a listed entity');
+  check('an unlisted private company receives none', depRows(P).length, 0);
+
+  // Reg 76(1) recurs quarterly and states NO period. It must produce one row
+  // per quarter -- evidence is recorded per row -- and NOT invent a date.
+  // SS2k: a rule with no offset must not carry one.
+  const rsca = depRows(L).filter(r => /76\(1\)/.test(r.section || ''));
+  check('the share capital audit produces four quarterly rows', rsca.length, 4);
+  ok('and none of them carries an invented date',
+     rsca.every(r => !r.due), rsca.map(r => r.due).join(','));
+
+  // THE INVARIANT THAT MATTERS. A row whose own timelineText states a number of
+  // days must, if it has no date, explain why -- or a CS reads "deadline not
+  // established" against Reg 72 and concludes there is no thirty-day rule.
+  const silent = depRows(L).filter(r =>
+    !r.due && /\b(thirty|fifteen|twenty one|twenty-one|\d+)\s+days?\b/i.test(r.timelineText || '')
+          && !app.lgNoDeadlineWhy(r));
+  ok('an undated row never hides a period the regulation states',
+     silent.length === 0,
+     silent.map(r => r.section + ' says "' + r.timelineText + '"').join(' | '));
+
+  // The three certainties, so a later edit cannot quietly soften them.
+  const says = (reg, word) => {
+    const r = (D.rules || []).filter(x => x.regulation === reg)[0];
+    return r && new RegExp(word, 'i').test(r.quote || '');
+  };
+  ok('Reg 72 quotes thirty days', says('Reg 72', 'within thirty days'), 'quote changed');
+  ok('Reg 74(5) quotes fifteen days', says('Reg 74(5)', 'within fifteen days'), 'quote changed');
+  ok('Reg 76(2) quotes twenty one days', says('Reg 76(2)', 'twenty one days'), 'quote changed');
+}
+
 // ── 12. Dashboard invariants ────────────────────────────────
 describe('dashboard invariants');
 {

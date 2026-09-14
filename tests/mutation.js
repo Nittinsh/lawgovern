@@ -773,6 +773,33 @@ const MUTATIONS = [
   { name: 'a marketing page creeps back in front of the login card (SS3v)',
     from: '<div id="auth-overlay" style="display:none;',
     to:   '<div id="auth-overlay" class="lgland" style="display:none;' },
+  // ── SS3x: SEBI (Depositories and Participants) 2018 ─────────
+  // The regulation binds depositories, participants and beneficial owners as
+  // well as issuers. Giving a listed company a depository's duties, or an
+  // unlisted company an obligation that files with an exchange it is not on,
+  // is SS2z's defect: wrong law against the wrong entity.
+  { name: 'depositories obligations reach an unlisted company (SS3x r/w SS2z)',
+    from: "rows = rows.concat(cmRows(DEPOS_DATA, c, agm, 'depos'));",
+    to:   "rows = rows.concat(cmRows(DEPOS_DATA, c, agm, 'depos'));\n    }\n    {" },
+
+  // Reg 76(1) states the cadence and NOT the deadline. Marking it exact lets
+  // the engine emit the quarter end as the due date -- SS2k's 31 March defect,
+  // on a filing a practising CS signs.
+  { name: 'the share capital audit is given a date the regulation never states (SS3x r/w SS2k)',
+    from: '"dueConfidence":"derived","appliesTo":{"entityType":["listed"]},"appliesToText":"Listed issuer - the report goes to the stock exchanges"',
+    to:   '"dueConfidence":"exact","appliesTo":{"entityType":["listed"]},"appliesToText":"Listed issuer - the report goes to the stock exchanges"' },
+
+  // This corpus was hand-authored rather than generated, so the verbatim quote
+  // is the only thing between a rule and an assertion nobody can check.
+  { name: 'a hand-authored rule loses the words it came from (SS3x)',
+    from: '"quote":"Every issuer shall submit audit report on a quarterly basis',
+    to:   '"quote":"quarterly basis' },
+
+  // "Deadline not established" against Reg 72 would read as "there is no
+  // thirty-day rule". There is one, and it is in the regulation's own words.
+  { name: 'an undated row stops explaining the period it hides (SS3x r/w SS3e)',
+    from: "'DEPOS-REG-72': '<b>Thirty days is certain</b>",
+    to:   "'DEPOS-REG-72-DISABLED': '<b>Thirty days is certain</b>" },
 ];
 
 const src = fs.readFileSync(INDEX, 'utf8');
