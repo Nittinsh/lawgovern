@@ -800,6 +800,33 @@ const MUTATIONS = [
   { name: 'an undated row stops explaining the period it hides (SS3x r/w SS3e)',
     from: "'DEPOS-REG-72': '<b>Thirty days is certain</b>",
     to:   "'DEPOS-REG-72-DISABLED': '<b>Thirty days is certain</b>" },
+  // ── SS3y: Companies Act obligations the corpus did not carry ─
+  // s.121 says "Every listed public company" in terms. Widening it puts an
+  // MGT-15 on the register of every private company in the book -- a filing
+  // that is not owed, which SS2n records as the same defect as inventing a date
+  // for one that is.
+  { name: 'the AGM report reaches companies that are not listed (SS3y r/w SS2z)',
+    from: '"appliesTo":{"entityType":["listed"]},"appliesToText":"Every listed public company"',
+    to:   '"appliesTo":{"entityType":["listed","private","public"]},"appliesToText":"Every listed public company"' },
+
+  // s.193 is a One Person Company provision. Every other class would get an
+  // intimation duty for contracts with a sole member it does not have.
+  { name: 'the OPC contract intimation reaches every company (SS3y r/w SS2z)',
+    from: '"appliesTo":{"entityType":["opc"]},"appliesToText":"One Person Company contracting',
+    to:   '"appliesTo":{"entityType":["opc","private","public","listed"]},"appliesToText":"One Person Company contracting' },
+
+  // s.124 is COMPOUND: thirty days from declaration, THEN seven to transfer.
+  // Stating one leg is wrong by a month or by a week on money that belongs to
+  // shareholders.
+  { name: 'the unpaid dividend period loses one of its two legs (SS3y)',
+    from: '"timelineText":"Within seven days of the expiry of thirty days from declaration - i.e. by day 37"',
+    to:   '"timelineText":"Within thirty days of declaration"' },
+
+  // A hand-authored corpus is held to its text by one thing: the period it
+  // claims must appear in the words it quotes.
+  { name: 'a rule claims a period its own quote does not support (SS3y)',
+    from: '"timelineText":"Within one hundred and eighty days of the date of incorporation"',
+    to:   '"timelineText":"Within ninety days of the date of incorporation"' },
 ];
 
 const src = fs.readFileSync(INDEX, 'utf8');

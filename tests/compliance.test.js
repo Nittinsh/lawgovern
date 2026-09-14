@@ -2322,6 +2322,83 @@ describe('depositories corpus');
   ok('Reg 76(2) quotes twenty one days', says('Reg 76(2)', 'twenty one days'), 'quote changed');
 }
 
+// -- 11r. Companies Act supplement (SS3y) ----------------------
+// Eleven obligations the generated corpus did not carry, read from the held
+// Act. Hand-authored, so the quote is the only thing between a rule and an
+// assertion nobody can check.
+describe('companies act supplement');
+{
+  const CS = app.CA_SUP_DATA;
+  ok('the supplement is loaded', !!(CS && CS.rules && CS.rules.length), 'CA_SUP_DATA missing');
+  check('eleven obligations', (CS.rules || []).length, 11);
+
+  // THE INVARIANT. Where a rule states a period, that period must appear in
+  // the quote. Otherwise the register asserts a number the evidence beside it
+  // does not support -- and a hand-authored corpus has nothing else holding it
+  // to the text.
+  const WORDS = /(one hundred and eighty|forty-five|twenty-one|fifteen|thirty|seven|sixty|ninety|three|two|one)\s+(working\s+)?(days?|months?|years?)/gi;
+  const unsupported = [];
+  (CS.rules || []).forEach(r => {
+    const q = (r.quote || '').toLowerCase().replace(/[^a-z0-9 ]/g, ' ');
+    const said = (r.timelineText || '').match(WORDS) || [];
+    said.forEach(s => {
+      const norm = s.toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+      if (q.replace(/\s+/g, ' ').indexOf(norm) < 0) unsupported.push(r.id + ' claims "' + s + '"');
+    });
+  });
+  ok('every period a rule states appears in the words it quotes',
+     unsupported.length === 0, unsupported.join(' | '));
+
+  const unquoted = (CS.rules || []).filter(r => !r.quote || r.quote.length < 60);
+  ok('every rule carries a substantial quote', unquoted.length === 0,
+     unquoted.map(r => r.id).join(', '));
+
+  // Entity scoping -- three of the eleven bind one class only, and getting
+  // that wrong is SS2z's defect.
+  const CRs = 10000000;
+  const mk = (t, cin) => ({ id:'SUP-'+t, name:t, type:t, fyend:'2026-03-31',
+    capital: 5*CRs, turnover: 40*CRs, networth: CRs, netprofit: CRs,
+    borrowings: 0, cin: cin, chart: {} });
+  const supOf = (c) => app.getComplianceChart(c)
+    .filter(r => /CA-SUP/.test(r.key || ''));
+  const has = (c, sec) => supOf(c).some(r => (r.section || '').indexOf(sec) >= 0);
+
+  const listed = mk('listed', 'L17110MH2009PLC195422');
+  const priv   = mk('private', 'U51909MH2018PTC300111');
+  const opc    = mk('opc', 'U74999MH2020OPC300222');
+
+  // s.121 says "Every listed public company" in terms.
+  ok('the AGM report binds a listed company', has(listed, 'Section 121'), 'missing on listed');
+  ok('and no one else', !has(priv, 'Section 121') && !has(opc, 'Section 121'),
+     'Section 121 reached an unlisted company');
+
+  // s.193 is a One Person Company provision.
+  ok('the OPC contract intimation binds an OPC', has(opc, 'Section 193'), 'missing on OPC');
+  ok('and no one else', !has(listed, 'Section 193') && !has(priv, 'Section 193'),
+     'Section 193 reached a company that is not an OPC');
+
+  // s.129A applies to a prescribed class of UNLISTED companies.
+  ok('periodical financial results do not reach a listed company',
+     !has(listed, 'Section 129A'), 'Section 129A reached a listed company');
+
+  // An OPC holds no general meeting, so a requisition for one cannot arise.
+  ok('the EGM requisition does not reach an OPC',
+     !has(opc, 'Section 100'), 'Section 100 reached a One Person Company');
+
+  // s.121 is AGM-anchored and therefore gets a real date, unlike the rest.
+  const rep121 = supOf(listed).filter(r => (r.section||'').indexOf('Section 121') >= 0)[0];
+  ok('the AGM report carries a computed date', !!(rep121 && rep121.due),
+     'Section 121 has no due date');
+
+  // s.124 is a COMPOUND period and the shape is the trap: thirty days from
+  // declaration, THEN seven to transfer. A rule that states only one of them
+  // would be wrong by a month or by a week.
+  const s124 = (CS.rules || []).filter(r => r.regulation === 'Section 124(1)')[0];
+  ok('the unpaid dividend rule states both legs of its period',
+     /thirty days/i.test(s124.timelineText) && /seven days/i.test(s124.timelineText),
+     s124.timelineText);
+}
+
 // ── 12. Dashboard invariants ────────────────────────────────
 describe('dashboard invariants');
 {

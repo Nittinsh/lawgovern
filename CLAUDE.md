@@ -3124,6 +3124,121 @@ somebody does, the answer is unknown rather than zero.
 
 ---
 
+## 3y. THE COMPANIES ACT COMPLETENESS PASS (v189)
+
+&sect;3x measured it and left it: **49 sections cited of 497.** This is the
+pass. **Eleven obligations the generated corpus did not carry**, read from the
+held Act, and the register now carries 349 rules rather than 327.
+
+### The Act's own chapters did the triage
+Dumping 448 uncited section numbers on a Company Secretary is not a worklist,
+it is noise. Chapters **II to XIII** run from incorporation to managerial
+remuneration and are where a company's registrable duties live; Chapter XIV
+onward is inspection, compromises, oppression, winding up, Tribunal and
+offences &mdash; event-driven, or about somebody other than the company.
+
+| | |
+|---|---|
+| sections in chapters II&ndash;XIII imposing a duty | **193** |
+| already cited by a rule | 51 |
+| **not cited** | **142** |
+| of those, stating a period or naming a return | **96** |
+| read, and found to be obligations on the COMPANY with a stated period | **11** |
+
+### What was missing
+**INC-20A. SH-7. MGT-15. The Unpaid Dividend Account. DIR-3C.** None of them
+was among the 49.
+
+| | |
+|---|---|
+| **s.10A(1)(a)** | declaration of commencement of business, **180 days** from incorporation |
+| **s.14(2)** | altered articles filed with the Registrar, **15 days** |
+| **s.17(1)** | copies of memorandum and articles to a member, **7 days** of the request |
+| **s.64(1)** | notice of alteration of share capital, **30 days** |
+| **s.100(2), (4)** | EGM on requisition &mdash; Board proceeds in **21 days**, meeting within **45** |
+| **s.119(2)** | minutes of a general meeting to a member, **7 working days** |
+| **s.121** | report on the AGM &mdash; **30 days**, listed public companies |
+| **s.124(1)** | unpaid dividend to the Unpaid Dividend Account, **7 days after 30** |
+| **s.129A** | periodical financial results, **30 days** |
+| **s.157(1)** | directors' DINs to the Registrar, **15 days** |
+| **s.193(2)** | OPC contracts with the sole member, **15 days** |
+
+**s.121 is the only one that gets a computed date** &mdash; it is AGM-anchored,
+so `agm_offset: 30` dates it exactly as AOC-4 and MGT-7 are dated. Verified: AGM
+30 September 2026 &rarr; **30 October 2026**. It falls on the same day as AOC-4
+and is routinely missed because AOC-4 draws the attention.
+
+The rest are event-driven and correctly undated: this app holds no register of
+member requests, requisitions, DIN intimations or dividend declarations, so
+there is nothing for those periods to run from. The period is stated on every
+row regardless &mdash; **a period this app cannot compute is not a period that
+does not exist** (&sect;3x).
+
+### Three excluded for reasons worth keeping
+- **s.84** states thirty days and the duty is on **the person who obtains the
+  receiver's appointment**, not on the company &mdash; the company is the
+  *recipient* of the notice. Reading the period without reading the subject
+  would have put a filing on the register that the company does not owe.
+- **s.13** &mdash; the held text shows a footnote, *"Subs. by Act 1 of 2018,
+  s. 6, for 'within fifteen days'"*. The period was substituted away and the
+  current one is not plain in this text, so nothing is asserted.
+- **s.58, 59, 62, 66, 68, 74** run through the Tribunal or through multi-stage
+  offers rather than a filing deadline; the punishment sections are
+  consequences, not obligations.
+
+### The compound period, which is the trap
+**s.124(1) is thirty days from declaration and THEN seven days to transfer.**
+Thirty-seven days in all &mdash; not thirty, and not seven. A rule stating
+either leg alone is wrong by a month or by a week, on money that belongs to
+shareholders. The mutation that flattens it is in the suite.
+
+### The invariant that holds a hand-authored corpus to its text
+Both new corpora are read from `reference/` rather than generated from the
+owner's spreadsheet, so nothing upstream constrains them. The assertion that
+does:
+
+> **Where a rule states a period, that period must appear in the words it
+> quotes.**
+
+Eleven rules, every stated period found in its own quote. A rule claiming ninety
+days where its quote says one hundred and eighty fails immediately.
+
+### The two new corpora were outside the release gate
+v188 added 11 rules and v189 added 11 more, and `rule_audit.py`'s `CORPORA` list
+named neither &mdash; so the gate kept reporting **327** and checked the
+citations of none of the 22. **A corpus outside the audit is a corpus with no
+citation check at all**, which is the state the Companies Act itself was in
+until &sect;3g.
+
+Both are in it now, and the gate read them against the held texts:
+
+```
+checked                    349      (was 327)
+citation found             321      citation not found  0
+periods actually compared  134 of 349 rules (38%)
+period mismatch              0
+```
+
+**Zero mismatches across 22 hand-authored rules** &mdash; an independent check
+that the periods written here match the provisions they came from.
+
+### Coverage
+Suite **615 &rarr; 627**, mutations **155 &rarr; 159**. Verified per class: a
+listed company gains 9 supplement rows, a private company 9, an OPC 9 &mdash;
+overlapping but not identical, because s.121 is listed-only, s.193 OPC-only,
+s.129A unlisted-only, and **s.100 is correctly absent for an OPC, which holds no
+general meeting.**
+
+### What is still not measured
+The 96 candidates were read; **46 of the 142 uncited duty-bearing sections in
+chapters II&ndash;XIII were not** &mdash; they state no period and name no
+return, so they are unlikely to be calendar obligations, but "unlikely" is not
+"checked". And chapters XIV onward were excluded wholesale on the reasoning that
+they are event-driven; that reasoning is sound and it is still a reasoning, not
+a reading.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -3192,7 +3307,7 @@ somebody does, the answer is unknown rather than zero.
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (65 structural checks), `node tests/compliance.test.js` (615 assertions, run against `index.html` itself), `node tests/mutation.js` (155 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 327 rules; it reports how many periods it actually compared, currently 122), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (65 structural checks), `node tests/compliance.test.js` (627 assertions, run against `index.html` itself), `node tests/mutation.js` (159 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 349 rules across four corpora; it reports how many periods it actually compared, currently 134), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **`python tools/amendments.py` regenerates the amendment evidence AND re-embeds
   it into `index.html`.** It reads the compilations in `reference/`, which is
   gitignored — so `rules/amendments.json` and `rules/amendments_embed.json` are
@@ -3209,7 +3324,7 @@ somebody does, the answer is unknown rather than zero.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v188.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v189.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

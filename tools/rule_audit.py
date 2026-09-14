@@ -39,6 +39,9 @@ SOURCES = {
     'Companies Act 2013': ('reference/companies-act-2013/'
                            'Companies Act 2013 as amended upto 01.04.2021_.txt',
                            'As amended upto 01.04.2021 — STALE'),
+    'SEBI Depositories & Participants 2018': (
+        'reference/sebi-depositories/sebi dp reg.txt',
+        'Gazetted 3 October 2018'),
 }
 
 CORPORA = [
@@ -46,6 +49,12 @@ CORPORA = [
     ('rules/lodr_events.json',   'events', 'SEBI LODR 2015'),
     ('rules/pit_master.json',    'rules', 'SEBI PIT Regulations 2015'),
     ('rules/ca_master.json',     'rules', 'Companies Act 2013'),
+    # Hand-authored from the held texts rather than generated from the owner's
+    # spreadsheet (SS3x, SS3y). They go through the same gate as everything else:
+    # a corpus outside the audit is a corpus with no citation check.
+    ('rules/ca_supplement.json', 'rules', 'Companies Act 2013'),
+    ('rules/depositories_master.json', 'rules',
+     'SEBI Depositories & Participants 2018'),
 ]
 
 # The Act text predates every amendment since April 2021, so a section it does
