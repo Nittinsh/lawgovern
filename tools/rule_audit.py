@@ -56,6 +56,7 @@ CORPORA = [
     ('rules/depositories_master.json', 'rules',
      'SEBI Depositories & Participants 2018'),
     ('rules/lodr_supplement.json', 'rules', 'SEBI LODR 2015'),
+    ('rules/pit_supplement.json', 'rules', 'SEBI PIT Regulations 2015'),
 ]
 
 # The Act text predates every amendment since April 2021, so a section it does

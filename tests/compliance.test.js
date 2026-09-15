@@ -2576,7 +2576,121 @@ describe('a missing date is not a date');
      epoch.length === 0, epoch.length + ' of ' + undated.length + ' undated rows');
 }
 
-// ── 12. Dashboard invariants ──────────────────────────────────────────
+// -- 11u. PIT supplement (SS4a) -------------------------------
+// Eleven obligations of a listed company that the generated corpus did not
+// carry. Two different gaps: whole provisions absent (Reg 6, 7I, 7J) and
+// SUB-PROVISIONS of provisions already cited (Reg 3 has six sub-regulations
+// and the corpus cites two; Reg 9A has seven and the corpus cites three limbs
+// of one).
+describe('pit supplement');
+{
+  const PS = app.PIT_SUP_DATA;
+  ok('the supplement is loaded', !!(PS && PS.rules && PS.rules.length), 'PIT_SUP_DATA missing');
+  check('eleven obligations', (PS.rules || []).length, 11);
+
+  // THE INVARIANT (SS3y/SS3z).
+  const WORDS = /\b(two|three|four|five|six|seven|eight|nine|ten|fifteen|thirty|sixty|ninety)\s+(working\s+|trading\s+|calendar\s+)?(days?|months?|years?)\b/gi;
+  const unsupported = [];
+  (PS.rules || []).forEach(r => {
+    const q = (r.quote || '').toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ');
+    const said = (r.timelineText || '').match(WORDS) || [];
+    said.forEach(s => {
+      const norm = s.toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+      if (q.indexOf(norm) < 0) unsupported.push(r.id + ' claims "' + s + '"');
+    });
+  });
+  ok('every period a rule states appears in the words it quotes',
+     unsupported.length === 0, unsupported.join(' | '));
+
+  // PIT uses three binding forms, not one: a duty ("shall"), a nullity
+  // ("is void", Reg 7J) and a permissive gateway ("is of informed opinion",
+  // Reg 3(3)). A quote that shows none of them cannot show who is bound.
+  const unbound = (PS.rules || []).filter(r =>
+    !r.quote || r.quote.length < 60 ||
+    !/\bshall\b|\bis void\b|\bis of informed opinion\b/i.test(r.quote));
+  ok('every quote carries a binding form', unbound.length === 0,
+     unbound.map(r => r.id).join(', '));
+
+  // THE TRAP THIS CORPUS HAD TO AVOID. Reg 5A-5H is the MUTUAL FUND UNITS
+  // chapter -- it binds asset management companies and trustees. Reg 5C is the
+  // mirror of Reg 3 and Reg 5H the mirror of Reg 9A, and Reg 5D alone states
+  // five periods. Every one of them belongs to an AMC. Citing that chapter
+  // here would hand a listed issuer somebody else's obligations (SS2z).
+  const mf = (PS.rules || []).filter(r => /^Reg 5[A-H]\b/.test(r.regulation || ''));
+  ok('no rule cites the mutual fund units chapter', mf.length === 0,
+     mf.map(r => r.regulation).join(', '));
+  // Nor the informant provisions that bind the Board rather than the company.
+  const board = (PS.rules || []).filter(r =>
+    /^Reg 7(?:A|B|C|D|E|F|G|H|K|L|M)\b/.test(r.regulation || ''));
+  ok('no rule cites the provisions that bind the Board or the informant',
+     board.length === 0, board.map(r => r.regulation).join(', '));
+
+  const CRp = 10000000;
+  const mkp = (t, cin) => ({ id:'SUP-P-'+t, name:t, type:t, fyend:'2026-03-31',
+    capital: 5*CRp, turnover: 40*CRp, networth: CRp, netprofit: CRp,
+    borrowings: 0, cin: cin, chart: {} });
+  const supP = (c) => app.getComplianceChart(c).filter(r => /^PIT-SUP/.test(r.key || ''));
+  const listedP = mkp('listed', 'L17110MH2009PLC195422');
+
+  check('a listed company receives all eleven', supP(listedP).length, 11);
+  check('a private company receives none', supP(mkp('private','U51909MH2018PTC300111')).length, 0);
+  check('a public unlisted company receives none', supP(mkp('public','U51909MH2015PLC300444')).length, 0);
+  check('an LLP receives none', supP(mkp('llp','AAB-1234')).length, 0);
+
+  const datedP = supP(listedP).filter(r => r.due);
+  ok('no supplement row carries a date', datedP.length === 0,
+     datedP.map(r => r.section + '=' + r.due).join(', '));
+
+  // SS3i: an unlisted company must be told these do not apply, and why.
+  const excP = app.lgExcludedFor(mkp('private','U51909MH2018PTC300111'))
+    .filter(e => (PS.rules || []).some(r => r.regulation === e.section));
+  check('a private company is told all eleven do not apply', excP.length, 11);
+  ok('and is given a reason for every one',
+     excP.every(e => e.reasons && e.reasons.length), 'a reason is missing');
+
+  const byRegP = {};
+  (PS.rules || []).forEach(r => { byRegP[r.regulation] = r; });
+
+  // TWO DIFFERENT RETENTION PERIODS IN ONE REGULATION. Reg 3(6) preserves the
+  // structured digital database for eight years; Reg 6(4) keeps the Chapter III
+  // disclosures for five. Using one for the other loses three years of records
+  // -- and unlike a missed filing, a destroyed record cannot be put back.
+  ok('the structured digital database is kept eight years',
+     /eight years/i.test(byRegP['Reg 3(6)'].timelineText), byRegP['Reg 3(6)'].timelineText);
+  ok('the insider disclosures are kept five years',
+     /five years/i.test(byRegP['Reg 6(4)'].timelineText), byRegP['Reg 6(4)'].timelineText);
+  ok('and the two are not the same period',
+     byRegP['Reg 3(6)'].timelineText !== byRegP['Reg 6(4)'].timelineText, 'they match');
+
+  // Reg 3(5)'s two calendar days is for information from OUTSIDE only.
+  ok('the database entry window is two calendar days',
+     /2 calendar days|two calendar days/i.test(byRegP['Reg 3(5)'].timelineText),
+     byRegP['Reg 3(5)'].timelineText);
+
+  // Reg 3(3) counts TRADING days, backward from the transaction.
+  ok('the pre-transaction disclosure counts trading days',
+     /two trading days/i.test(byRegP['Reg 3(3)'].timelineText), byRegP['Reg 3(3)'].timelineText);
+
+  // Reg 9A(4) is the annual Audit Committee review -- the one most likely to be
+  // missed outright, because nothing files anywhere when it happens.
+  ok('the Audit Committee review is annual',
+     /once in a financial year/i.test(byRegP['Reg 9A(4)'].timelineText),
+     byRegP['Reg 9A(4)'].timelineText);
+  ok('and its quote requires BOTH review and verification',
+     /review compliance/i.test(byRegP['Reg 9A(4)'].quote) &&
+     /verify/i.test(byRegP['Reg 9A(4)'].quote), byRegP['Reg 9A(4)'].quote.slice(0, 80));
+
+  // SS3e: a blank is not an explanation.
+  const statesP = (PS.rules || []).filter(r => { WORDS.lastIndex = 0; return WORDS.test(r.timelineText || ''); });
+  const unexplainedP = statesP.filter(r => !app.lgNoDeadlineWhy({ key: r.id, due: null }));
+  ok('every undated rule that states a period explains why it has no date',
+     unexplainedP.length === 0, unexplainedP.map(r => r.id).join(', '));
+  const why36 = app.lgNoDeadlineWhy({ key: 'PIT-SUP-REG-3-6', due: null }) || '';
+  ok('the eight-year explanation says it is retention, not a deadline',
+     /retention/i.test(why36), why36.slice(0, 90));
+}
+
+// ── 12. Dashboard invariants ────────────────────────────────────────────────────
 describe('dashboard invariants');
 {
   app.CLIENTS = [LISTED, PRIVATE];

@@ -3448,6 +3448,176 @@ list, but because"*).
 
 ---
 
+## 4a. THE PIT COMPLETENESS PASS (v191) &mdash; the fourth law
+
+&sect;3x measured it and left it: **PIT cites 8 provisions of 38.** This is the
+pass, and it completes the four laws the owner named. Counted against the
+regulation body the denominator is **33**, and **11 obligations of a listed
+company were absent**. The register now carries 378 rules.
+
+### Counting provisions understates the gap in a regulation this small
+The other three passes asked *which provisions are not cited*. That question is
+nearly useless here, because PIT holds only 33 numbered provisions and
+concentrates its duties inside a few of them. Both questions had to be asked:
+
+| | |
+|---|---|
+| provisions **not cited at all**, that bind the company | **Reg 6, 7I, 7J** |
+| **sub-provisions** of provisions the corpus already cites | **Reg 3(3), 3(4), 3(5), 3(6), 9A(3), 9A(4), 9A(5), 9A(6)** |
+
+**Reg 3 has six sub-regulations and the corpus cited two. Reg 9A has seven and
+the corpus cited three limbs of one.** A completeness check that stops at the
+provision number would have reported PIT as almost done.
+
+### What was missing
+| | |
+|---|---|
+| **Reg 3(3)** | UPSI for a transaction &mdash; generally available **two trading days** ahead where no open offer follows |
+| **Reg 3(4)** | the board **shall require** the parties to execute confidentiality and non-disclosure agreements |
+| **Reg 3(5)** | the structured digital database &mdash; PAN, **not outsourced**, time stamping, audit trails, **2 calendar days** for outside information |
+| **Reg 3(6)** | the database preserved **not less than eight years** |
+| **Reg 6(4)** | the Chapter III disclosures kept by the company **five years** |
+| **Reg 7I** | the Code of Conduct must protect an informant from retaliation |
+| **Reg 7J** | no term of any agreement or Code may preclude reporting to SEBI |
+| **Reg 9A(3)** | the **board** must ensure the CEO or MD ensures compliance |
+| **Reg 9A(4)** | the **Audit Committee** must review compliance **at least once in a financial year** |
+| **Reg 9A(5)** | board-approved leak-inquiry procedures; **inform SEBI promptly** |
+| **Reg 9A(6)** | a whistle-blower policy, and employees made aware of it |
+
+### The mutual fund chapter is the trap, and it is laid out to be one
+**Reg 5A to 5H is the units-of-mutual-funds regime.** Every provision in it
+opens with *"asset management company"*, *"trustees"* or *"units of a mutual
+fund"*. **Reg 5D alone states five periods** &mdash; two working days, two
+trading days, sixty days, six months, two months &mdash; and **not one of them
+is a listed company's**.
+
+What makes it dangerous is the parallel numbering: **Reg 5C is the mirror of
+Reg 3 and Reg 5H the mirror of Reg 9A**, same subject matter, same shape,
+different duty-holder. A period lifted from there lands on a listed issuer's
+register looking entirely plausible. &sect;2z's defect, pre-assembled.
+
+Same reading excluded **Reg 7A to 7H and 7K to 7M** (the Board and the
+informant) and kept **Reg 7I and 7J**, which bind the **employer** &mdash;
+Reg 7I because a listed company is required to have a Code of Conduct by
+Reg 9(1), and Reg 7I(3) makes an employer who violates the Chapter liable to
+penalty, debarment, suspension or criminal prosecution.
+
+### Two retention periods in one regulation, and they are three years apart
+**Reg 3(6) preserves the structured digital database for eight years. Reg 6(4)
+keeps the Chapter III disclosures for five.** Both are on the company, both are
+in the same regulation, and they are not interchangeable.
+
+This is a different kind of obligation from everything the earlier passes
+carried, and the explanation had to say so: **a retention period is not a
+deadline.** Nothing falls due; nothing may be destroyed. A Company Secretary
+reading a blank against Reg 3(6) could delete the record that proves who held
+UPSI &mdash; and unlike a missed filing, a destroyed record cannot be put back.
+There is a mutation for each direction of the swap.
+
+### The obligation most likely to be missed outright
+**Reg 9A(4) &mdash; the Audit Committee must review compliance at least once in
+a financial year and verify that the internal controls are adequate and
+operating effectively.**
+
+It files nothing. No form, no exchange, no Registrar &mdash; the only evidence
+it happened is the minute. An Audit Committee that met four times has still not
+met it unless one of those meetings did **both** things the sub-regulation
+names, and the minutes show both. The regulation fixes the cadence and not the
+date, so no date is computed.
+
+### What the existing uncited SDD row could not tell anyone
+The generated corpus already carries *"Structured Digital Database &mdash;
+maintain an auditable digital database showing UPSI sharing/access information
+and preserve integrity of the information trail"*. It cites **no provision** and
+states **no period**.
+
+Read against Reg 3(5) and 3(6) it is missing the **Permanent Account Number** of
+every person, the **bar on outsourcing** &mdash; the database may not sit with a
+vendor &mdash; the **two calendar days** for information received from outside,
+and the **eight years**. `pit_master.json` is generated from the owner's
+spreadsheet and must not be hand-edited (&sect;2k), so the supplement carries the
+cited, quoted version and its `meta.overlaps` block names the row it overlaps
+and says which one carries the authority. &sect;3n's treatment of the Penalties
+screen, applied to a corpus that cannot be edited in place.
+
+### A check of mine was wrong about a real provision
+The quote check asserts that every quote shows who is bound &mdash; &sect;3x's
+rule, because a quote that cannot show that is not evidence of anything. It read
+only for **"shall"**, and reported **Reg 3(3) as unbound**.
+
+Reg 3(3) is not a duty. It is a **permissive gateway**: UPSI *"may be
+communicated ... where the board of directors ... is of informed opinion"*. Its
+binding force is the **condition attached to the permission**, not a "shall".
+PIT uses three forms and the check now knows all three &mdash; a duty
+(*shall*), a nullity (*is void*, Reg 7J) and a gateway (*is of informed
+opinion*). Narrowing a check until it is wrong about a real provision is
+&sect;2x from the other direction.
+
+### The corpus is held to its text
+Both text invariants were clean on the first run &mdash; the binding-form check
+above was the only thing that fired, and it was the check that was wrong, not
+the rule. **11 of 11 quotes verify verbatim** against the held compilation under
+letters-only normalisation, and every period a rule states appears in the words
+it quotes. No provision number appears twice in this compilation, so
+&sect;3z's repealed-span trap was checked for and does not arise.
+
+### The gate
+```
+checked                    378      (was 367)
+citation found             350      citation not found  0
+periods actually compared  146 of 378 rules (39%)
+period mismatch              0
+```
+
+### A mutation that changed nothing, for the second time
+One of the six went **MISSED**, and it was mine. *"PIT obligations reach an
+unlisted company"* mutated **`appliesToText`**, which is only a label. The field
+`cmApplies` actually reads is **`appliesTo.entityType`**. So the mutation
+changed a description and nothing else, and the suite was right to pass it.
+&sect;3r recorded this exact shape &mdash; a mutation whose text changes while
+its behaviour does not.
+
+Repointed at `appliesTo`, it is caught. Note what still holds from &sect;3z:
+widening `entityType` does **not** put PIT rows on a private company's
+register, because the `cmRows` call sits behind `if(isListed)` &mdash;
+&sect;2x's defence in depth. What it does change is **`lgExcludedFor`**, which
+sweeps every corpus for every entity and asks `cmApplies` &mdash; so the rule
+stops being reported to an unlisted company as one that does not apply, and the
+reason goes with it. That is the assertion that catches it, and it is the same
+one that rescued the equivalent LODR mutation in &sect;3z.
+
+### Coverage
+Smoke **65**, suite **664 &rarr; 686**, mutations **166 &rarr; 172 caught, 0
+missed, 0 skipped**. Verified
+live: a listed company gains 11 rows, and a public, private, OPC or LLP entity
+gains **0** &mdash; with all eleven reported to an unlisted company through
+`lgExcludedFor` with a reason for each.
+
+### The four laws are now done, and here is what that does and does not mean
+| law | rules | pass |
+|---|---|---|
+| Companies Act 2013 | 65 | &sect;3y |
+| SEBI LODR 2015 | 249 | &sect;3z |
+| SEBI PIT 2015 | 53 | &sect;4a |
+| SEBI Depositories 2018 | 11 | &sect;3x |
+
+Each was read against the held text and each says what it left out. **It does
+not mean one rule has been verified by a person** &mdash; Rule Governance still
+reads "Never checked" for all 378, and only the owner can change that.
+
+### What is still not read
+- **LODR Chapter V (19 provisions) and Chapter VI (21)** bind debt-listed
+  entities. The app models `ncs` and `hvdle`, so they can be scoped.
+- **LODR Chapters VII&ndash;IX (33)** and **PIT Chapter IIA (8)** bind issuers
+  of IDRs, securitised debt, mutual fund units, and asset management companies.
+  Excluded on the reasoning that none is this product's user.
+- **46 of the 142 uncited duty-bearing sections** in Companies Act chapters
+  II&ndash;XIII, and **chapters XIV onward**, from &sect;3y.
+- **PIT Schedules A, B and C** are carried by the generated corpus as 9 rules
+  that cite no numbered provision. They have not been read clause by clause.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -3515,8 +3685,16 @@ list, but because"*).
 
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
+- **Write patch scripts with the Write tool — this has now failed EIGHT times, in
+  three different ways.** A shell heredoc turned `\b` into a literal 0x08 and ate
+  backslashes (§2x, §3c, §3t, §3w, §3x). CRLF in a patch script would not match
+  an LF target (§3c). And in §4a, prose passed through `python -c` inside a bash
+  double-quoted string had **every backtick-quoted identifier removed by command
+  substitution** — `appliesToText`, `cmApplies` and `lgExcludedFor` silently
+  vanished from a paragraph *about* them, and the script still printed OK.
+  Backticks are markdown in this file and shell everywhere else.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (65 structural checks), `node tests/compliance.test.js` (664 assertions, run against `index.html` itself), `node tests/mutation.js` (166 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 367 rules across five corpora; it reports how many periods it actually compared, currently 144), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (65 structural checks), `node tests/compliance.test.js` (686 assertions, run against `index.html` itself), `node tests/mutation.js` (172 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 378 rules across six corpora; it reports how many periods it actually compared, currently 146), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **`python tools/amendments.py` regenerates the amendment evidence AND re-embeds
   it into `index.html`.** It reads the compilations in `reference/`, which is
   gitignored — so `rules/amendments.json` and `rules/amendments_embed.json` are
@@ -3533,7 +3711,7 @@ list, but because"*).
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v190.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v191.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

@@ -875,6 +875,52 @@ const MUTATIONS = [
   { name: 'a missing date renders as the epoch again (SS3z r/w SS2k)',
     from: "  if(d === null || d === undefined || d === '') return",
     to:   "  if(false) return" },
+  // ── SS4a: PIT obligations of a listed company the corpus did not carry ─
+  // TWO RETENTION PERIODS IN ONE REGULATION: the structured digital database
+  // is kept eight years (Reg 3(6)), the Chapter III disclosures five
+  // (Reg 6(4)). Swapping them loses three years of the record that proves who
+  // held UPSI -- and unlike a missed filing, a destroyed record cannot be put
+  // back.
+  { name: 'the database retention drops to the disclosure period (SS4a)',
+    from: '"timelineText":"Not less than eight years after completion of the relevant transactions',
+    to:   '"timelineText":"Not less than five years after completion of the relevant transactions' },
+
+  { name: 'the disclosure retention rises to the database period (SS4a)',
+    from: '"timelineText":"A minimum period of five years"',
+    to:   '"timelineText":"A minimum period of eight years"' },
+
+  // Reg 9A(4) is the annual Audit Committee review, and it is the obligation
+  // in this corpus most likely to be missed outright: nothing files anywhere
+  // when it happens, so only the minutes show it was done.
+  { name: 'the Audit Committee review loses its annual cadence (SS4a)',
+    from: '"timelineText":"At least once in a financial year"',
+    to:   '"timelineText":"Periodically"' },
+
+  // Reg 3(3) counts TRADING days and runs backward from the transaction.
+  // Calendar days would place the disclosure later than the regulation allows.
+  { name: 'the pre-transaction disclosure counts calendar days (SS4a)',
+    from: '"timelineText":"Generally available at least two trading days prior to the transaction being effected',
+    to:   '"timelineText":"Generally available at least two calendar days prior to the transaction being effected' },
+
+  // Reg 5A-5H is the MUTUAL FUND UNITS chapter -- Reg 5C is the mirror of
+  // Reg 3 and Reg 5H the mirror of Reg 9A. Citing it here would put an asset
+  // management company's obligations on a listed issuer's register (SS2z).
+  { name: 'a rule is re-cited to the mutual fund chapter (SS4a r/w SS2z)',
+    from: '"regulation":"Reg 3(5)"',
+    to:   '"regulation":"Reg 5C"' },
+
+  // PIT does not bite on an unlisted company at all. Mutate appliesTo, NOT
+  // appliesToText: the first is what cmApplies reads, the second is a label.
+  // Written against the label first, this changed nothing and was correctly
+  // reported MISSED -- SS3r'''s mutation-that-changed-nothing, again.
+  // Widening it does not put rows on a private register either, because the
+  // cmRows call sits behind if(isListed) (SS2x, defence in depth). What it DOES
+  // change is lgExcludedFor, which sweeps every corpus for every entity and
+  // asks cmApplies -- so the rule stops being reported to an unlisted company
+  // as one that does not apply, and the reason for it disappears with it.
+  { name: 'PIT obligations stop being ruled out for an unlisted company (SS4a r/w SS2z)',
+    from: '"appliesTo":{"entityType":["listed"]},"appliesToText":"Every listed company required to have a Code of Conduct under Reg 9"',
+    to:   '"appliesTo":{"entityType":["listed","private","public"]},"appliesToText":"Every listed company required to have a Code of Conduct under Reg 9"' },
 ];
 
 const src = fs.readFileSync(INDEX, 'utf8');
