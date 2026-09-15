@@ -3239,6 +3239,215 @@ a reading.
 
 ---
 
+## 3z. THE LODR COMPLETENESS PASS (v190)
+
+&sect;3x measured it and left it: **LODR cites 56 provisions of 192.** This is
+the pass. Counted properly against the regulation body the denominator is
+**151** &mdash; &sect;3x's 192 counted headings the schedules also produce
+&mdash; and **18 obligations of an equity-listed entity were absent
+altogether**. The register now carries 367 rules.
+
+### The regulation's own chapters did the triage, and they divide by WHO is bound
+Unlike the Act, LODR chapters are not subject matter. They are
+*what the entity has listed*:
+
+| ch | binds | cited | not |
+|---|---|---|---|
+| III | every listed entity &mdash; common obligations | 10 | **0** |
+| **IV** | **listed SPECIFIED SECURITIES &mdash; the customer** | **26** | **15** |
+| V | listed non-convertible securities (debt only) | 14 | 19 |
+| VI | both, and the delisting of debt | 1 | 21 |
+| VII&ndash;IX | issuers of IDRs, securitised debt, mutual fund units | 5 | 33 |
+| X | **the recognised stock exchanges** | 0 | 7 |
+| XI&ndash;XII | default procedure, machinery | 0 | 7 |
+
+Chapter III is **complete**. The gap is Chapter IV, which is exactly the
+chapter an Indian company with listed equity lives on. Chapters VII to X bind
+somebody else entirely, and loading them would hand a listed company an
+exchange's obligations &mdash; &sect;2z's defect.
+
+### What was missing
+**Prior intimation of a board meeting. The record date notice. The KMP vacancy
+clock. The promoter reclassification sequence.** None of them was among the 56.
+
+| | |
+|---|---|
+| **Reg 15(1A)** | high value debt trigger &mdash; comply within **six months** |
+| **Reg 15(2B)** | post-resolution-plan compliance with Reg 17, and 18&ndash;21, in **three months** |
+| **Reg 26A(1)** | CEO / MD / WTD / Manager vacancy &mdash; **three months**, six with regulatory approval |
+| **Reg 26A(2)** | CFO vacancy &mdash; **three months** |
+| **Reg 26A(3)** | post-resolution-plan KMP vacancy &mdash; **three months** |
+| **Reg 28(1)** | in-principle approval **before** issuing securities |
+| **Reg 29(1)** | prior intimation of a board meeting &mdash; **two working days** |
+| **Reg 30A** | shareholder and promoter agreements &mdash; timing specified by the Board |
+| **Reg 31A(3)(a)** | promoter reclassification &mdash; **two months / five days / sixty days / five days** |
+| **Reg 31A(9)** | reclassification under a resolution plan &mdash; **one day** |
+| **Reg 31B(1)** | special rights &mdash; special resolution **once every five years** |
+| **Reg 35** | Annual Information Memorandum |
+| **Reg 37** | draft scheme to the exchange; the NOC is valid **six months** |
+| **Reg 37A** | disposal of an undertaking &mdash; prior special resolution |
+| **Reg 41** | lien, calls in advance, no differential rights |
+| **Reg 42** | record date &mdash; **three working days**, seven for a scheme, five between two |
+| **Reg 43(1)** | dividend on a per share basis only |
+| **Reg 45** | change of name &mdash; **six months** where the activities changed |
+
+**Every one is undated on purpose.** Each runs from an event no register here
+holds, or counts working days with no exchange holiday calendar. Sixteen of the
+eighteen carry a `LG_NO_DEADLINE_WHY` explanation saying which &mdash; &sect;3x's
+rule, because *"deadline not established"* reads identically for a period that
+is certain but unanchored, one the Board specifies, and a rule that fixes an
+order rather than a period.
+
+### A period that runs BACKWARD inverts the safe direction
+&sect;2w counts Reg 7(2)'s *"two trading days"* as calendar days and says so,
+because that **errs early** &mdash; the safe direction for a deadline.
+
+Reg 29(1) and Reg 42 run the other way: *at least* two working days **before**
+the meeting, *at least* three **before** the record date. Treating working days
+as calendar days there produces a **later** deadline than the regulation allows.
+Same approximation, opposite consequence. So neither is computed, and both say
+why on the row.
+
+### My own parser read a repealed regulation
+The finding that would have done the most damage, and it was in my tooling.
+
+**Reg 31A appears twice in the document.** The first occurrence is a footnote
+reproducing the pre-2021 text; the operative regulation is the second. The span
+parser took first-occurrence-wins, so **everything I read for Reg 31A was the
+repealed version** &mdash; and it scanned as *"states no period"*, which would
+have excluded it from this pass entirely.
+
+Read properly, Reg 31A(3)(a) is a **four-deadline sequence** and the held text
+prints **three successive versions of it**, each with different numbers:
+
+| | board's views | board &rarr; shareholders | application |
+|---|---|---|---|
+| pre-2021 | &mdash; | 3 to 6 months | 30 days from approval |
+| 2021&ndash;2024 | next meeting or 3 months | 1 to 3 months | &mdash; |
+| **current, 13.12.2024** | **next meeting or two months** | **sixty days from the NOC** | **five days** |
+
+Two of those three are printed in footnotes and read exactly like law.
+
+**The check that found it cried wolf first.** Counting curly quotes from the top
+of the file drifts over 500K characters of PDF extraction and never recovers: it
+reported **135 of 151 provisions as repealed**, including Reg 17 and Reg 18.
+&sect;2x &mdash; a check that cries wolf is worse than no check. The signal that
+works is *local*: only a number appearing more than once can have the problem at
+all, and the introducing words sit a few hundred characters back. Rerun that
+way: **3 duplicates, 1 genuinely wrong**, which is a finding rather than noise.
+
+### Three periods that look current and are not
+&sect;3e's trap, three more times. All omitted or superseded, all still printed:
+
+- **Reg 41(9) and 41(10)** &mdash; the annual **practising company secretary
+  certificate** that share certificates issued within thirty days of lodgement,
+  and its filing with the exchanges. **OMITTED w.e.f. 13.12.2024.** A CS still
+  reaches for it. The corpus was checked and correctly does not carry it.
+- **Reg 43(3) and 43(5)** &mdash; five working days before a dividend
+  recommendation, and the thirty-day gap between transfer-book closures.
+  **OMITTED the same day.**
+- **The twenty-one days printed under Reg 28** is the old **Reg 27(2)(a)**
+  corporate governance report &mdash; &sect;3e again, a period real, current
+  once, and about something else.
+
+### Reg 42's two periods were SWAPPED, on the same day
+The Third Amendment 2024, 13 December 2024:
+
+```
+Reg 42(2)  general record-date notice     seven working days  ->  THREE
+Reg 42     proviso, scheme of arrangement  three working days  ->  SEVEN
+Reg 42(4)  gap between two record dates     thirty days        ->  five working
+```
+
+Both figures are entirely plausible in either position, so having them the
+wrong way round does not look wrong &mdash; it looks like a rule. A Company
+Secretary working from memory will have them inverted. The mutation swaps them
+back, and the assertion had to be made order-sensitive to catch it: `/three
+working days/` passes happily on a swapped pair.
+
+### Reading the period without reading the subject, again
+**Reg 30A(1)'s two working days is not the company's.** It binds the
+shareholders, promoters, related parties, directors, key managerial personnel
+and employees who are parties to the agreement, and it runs **to** the listed
+entity. The entity's own disclosure is *"within the timelines as specified by
+the Board"*. &sect;3y's s.84 exactly &mdash; claiming the two days would have put
+a deadline on the register that the company does not owe.
+
+Same discipline excluded **Reg 31A(3)(a)(iv)**: the thirty days to decide an
+application binds the **recognised stock exchange**.
+
+### THE REGISTER WAS SHOWING 1 JANUARY 1970 ON TWO THIRDS OF ITS ROWS
+Found by driving the real screen, which is the only thing that could have found
+it. `ccFmtDate` had no null guard, and `new Date(null)` is the epoch:
+
+```
+DUE DATE ▲          STATUS
+1 Jan 1970          Scheduled        <- 212 of 278 rows on a listed entity
+```
+
+**And the register sorts by due date ascending**, so every undated row climbed
+**above every real deadline**. 66 call sites pass optional values &mdash;
+`r.due`, `filed`, `held`, `signed`, `certOn` &mdash; so this was never one
+screen.
+
+&sect;2k removed 63 invented dates on the principle that a wrong date does not
+look wrong, it looks like a date. This one *does* look wrong and shipped anyway,
+on two thirds of the register, because **nothing had ever asserted it**: the
+suite passed at 657 assertions with the bug in place. Guarded at the source,
+with the assertion and the mutation that puts it back.
+
+### Reported, not repaired: the Universe flattens two states into a third word
+`cuStatusPill` maps the register's own vocabulary, which predates &sect;2k, and
+it labels **141 STANDING and 71 NO_DEADLINE rows alike as "Scheduled"** &mdash;
+the two states &sect;2k created precisely because they are different facts, and
+a word that means neither. Fixing it changes the status filter's vocabulary and
+the `ccGo` deep links that pass a status value, so it is its own job with its
+own blast radius. &sect;3j's treatment: named, not silently changed.
+
+### The corpus is held to its text
+Both invariants, and the second is what makes the first worth having:
+
+> **Where a rule states a period, that period must appear in the words it
+> quotes** &mdash; and **the quote is present in the held regulation**.
+
+The second is checked by normalising to **letters only**. That is what defeats
+this extraction in one move: it writes `w ithin`, `forty -five` and
+`atleast 423[three ] working days`, and dropping digits removes the footnote
+markers while dropping spaces removes the split words. Sixteen quotes verify
+end-to-end; two stitch limbs across sub-clauses and every limb verifies on its
+own. It caught two quotes where my own paraphrase had crept into a field that
+must be verbatim.
+
+### The gate read the new corpus against the held text
+```
+checked                    367      (was 349)
+citation found             339      citation not found  0
+periods actually compared  144 of 367 rules (39%)
+period mismatch              0
+```
+
+### Coverage
+Smoke **65**, suite **627 &rarr; 664**, mutations **159 &rarr; 166 caught, 0
+missed, 0 skipped**. One mutation was MISSED first time &mdash; widening
+`appliesTo` to reach a private company changed nothing, because the register
+call sits behind `if(isListed)` and never runs for one. That is &sect;2x's
+defence in depth. Rather than retire it, the assertion that makes the field
+load-bearing was added: **an unlisted company must be told all eighteen do not
+apply, and given a reason for each** (`lgExcludedFor`, &sect;3i's *"not on the
+list, but because"*).
+
+### What is still not measured
+- **Chapter V (19 uncited) and Chapter VI (21)** bind debt-listed entities and
+  the delisting of debt. The app models `ncs` and `hvdle`, so they *can* be
+  scoped &mdash; they have not been read.
+- **Chapters VII to IX (33 uncited)** bind the issuers of Indian depository
+  receipts, securitised debt instruments and mutual fund units. Excluded on the
+  reasoning that none is this product's user; that reasoning is sound and it is
+  still a reasoning, not a reading.
+- **PIT cites 8 provisions of 38** and has had no completeness pass at all.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -3307,7 +3516,7 @@ a reading.
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (65 structural checks), `node tests/compliance.test.js` (627 assertions, run against `index.html` itself), `node tests/mutation.js` (159 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 349 rules across four corpora; it reports how many periods it actually compared, currently 134), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (65 structural checks), `node tests/compliance.test.js` (664 assertions, run against `index.html` itself), `node tests/mutation.js` (166 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 367 rules across five corpora; it reports how many periods it actually compared, currently 144), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **`python tools/amendments.py` regenerates the amendment evidence AND re-embeds
   it into `index.html`.** It reads the compilations in `reference/`, which is
   gitignored — so `rules/amendments.json` and `rules/amendments_embed.json` are
@@ -3324,7 +3533,7 @@ a reading.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v189.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v190.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

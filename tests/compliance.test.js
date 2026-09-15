@@ -2399,7 +2399,184 @@ describe('companies act supplement');
      s124.timelineText);
 }
 
-// ── 12. Dashboard invariants ────────────────────────────────
+// -- 11s. LODR Chapter IV supplement (SS3z) --------------------
+// Eighteen obligations of an equity-listed entity that the generated corpus
+// did not carry, read from the held regulation. Hand-authored, so the quote is
+// the only thing standing between a rule and an assertion nobody can check.
+describe('lodr chapter IV supplement');
+{
+  const LS = app.LODR_SUP_DATA;
+  ok('the supplement is loaded', !!(LS && LS.rules && LS.rules.length), 'LODR_SUP_DATA missing');
+  check('eighteen obligations', (LS.rules || []).length, 18);
+
+  // THE INVARIANT (SS3y). Where a rule states a period, that period must appear
+  // in the quote. Nothing upstream constrains a hand-authored corpus; without
+  // this the register could assert a number the evidence beside it contradicts.
+  const WORDS = /\b(one hundred and eighty|twenty[- ]?one|forty[- ]?five|one|two|three|four|five|six|seven|ten|fifteen|twenty|thirty|sixty|ninety)\s+(working\s+)?(days?|months?|years?)\b/gi;
+  const unsupported = [];
+  (LS.rules || []).forEach(r => {
+    const q = (r.quote || '').toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ');
+    const said = (r.timelineText || '').match(WORDS) || [];
+    said.forEach(s => {
+      const norm = s.toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+      if (q.indexOf(norm) < 0) unsupported.push(r.id + ' claims "' + s + '"');
+    });
+  });
+  ok('every period a rule states appears in the words it quotes',
+     unsupported.length === 0, unsupported.join(' | '));
+
+  // A quote that cannot show who is bound is not evidence of anything (SS3x).
+  const unbound = (LS.rules || []).filter(r =>
+    !r.quote || r.quote.length < 60 || !/shall/i.test(r.quote));
+  ok('every quote carries the binding verb', unbound.length === 0,
+     unbound.map(r => r.id).join(', '));
+
+  // Chapter IV binds a listed entity. Chapters VII-IX bind the issuers of IDRs,
+  // securitised debt and mutual fund units; Chapter X binds the exchanges.
+  // Handing any of those to a company is SS2z's defect.
+  const CRs = 10000000;
+  const mk = (t, cin) => ({ id:'SUP-L-'+t, name:t, type:t, fyend:'2026-03-31',
+    capital: 5*CRs, turnover: 40*CRs, networth: CRs, netprofit: CRs,
+    borrowings: 0, cin: cin, chart: {} });
+  const supOf = (c) => app.getComplianceChart(c).filter(r => /^LODR-SUP/.test(r.key || ''));
+
+  const listed = mk('listed', 'L17110MH2009PLC195422');
+  check('a listed entity receives all eighteen', supOf(listed).length, 18);
+  check('a private company receives none', supOf(mk('private','U51909MH2018PTC300111')).length, 0);
+  check('a public unlisted company receives none', supOf(mk('public','U51909MH2015PLC300444')).length, 0);
+  check('an OPC receives none', supOf(mk('opc','U74999MH2020OPC300222')).length, 0);
+  check('an LLP receives none', supOf(mk('llp','AAB-1234')).length, 0);
+
+  // SS2k. Every rule here runs from an event this app holds no register of, or
+  // counts in working days with no exchange holiday calendar to count against.
+  // A date on any of them would be invented.
+  const dated = supOf(listed).filter(r => r.due);
+  ok('no supplement row carries a date', dated.length === 0,
+     dated.map(r => r.section + '=' + r.due).join(', '));
+
+  const byReg = {};
+  (LS.rules || []).forEach(r => { byReg[r.regulation] = r; });
+
+  // Reg 42's two periods were SWAPPED by the Third Amendment 2024 w.e.f.
+  // 13.12.2024 -- the general record-date notice went seven working days down
+  // to three, and the scheme-of-arrangement notice three up to seven. Both
+  // figures are entirely plausible in either position, which is exactly what
+  // makes having them the wrong way round so hard to see.
+  const r42 = byReg['Reg 42'];
+  ok('the record-date notice is three working days', /at least three working days in advance/i.test(r42.timelineText), r42.timelineText);
+  ok('and seven for a scheme of arrangement', /at least seven working days for corporate actions/i.test(r42.timelineText), r42.timelineText);
+  ok('with five working days between two record dates', /at least five working days between two record dates/i.test(r42.timelineText), r42.timelineText);
+
+  // Reg 31A(3)(a) is FOUR deadlines in one sequence, each from a different
+  // event. The thirty days in limb (iv) is the EXCHANGE's and is not here.
+  const r31a = byReg['Reg 31A(3)(a)'];
+  ['two months', 'five days', 'sixty days'].forEach(p => {
+    ok('the reclassification sequence states ' + p,
+       r31a.timelineText.toLowerCase().indexOf(p) >= 0, r31a.timelineText);
+  });
+  ok('and does not claim the exchange’s thirty days as the company’s',
+     !/thirty days/i.test(r31a.timelineText), r31a.timelineText);
+
+  // SS3y's s.84 lesson. Reg 30A(1)'s two working days binds the SHAREHOLDERS,
+  // PROMOTERS, DIRECTORS, KMP and EMPLOYEES who are parties to the agreement --
+  // it runs TO the listed entity, not from it. The entity's own period is
+  // whatever the Board specifies. Claiming the two days would put a deadline on
+  // this register that the company does not owe.
+  const r30a = byReg['Reg 30A'];
+  ok('the agreements disclosure does not claim the parties’ two working days',
+     !/two working days/i.test(r30a.timelineText), r30a.timelineText);
+  ok('and says the Board specifies its timing',
+     /specified by the Board/i.test(r30a.timelineText), r30a.timelineText);
+
+  // Reg 41(9)/(10) and Reg 43(3)/(5) were OMITTED w.e.f. 13.12.2024 and the
+  // compilation still prints their wording, in footnotes. Carrying either would
+  // reinstate an obligation SEBI deleted -- SS3e's trap.
+  ['Reg 41', 'Reg 43(1)'].forEach(k => {
+    const r = byReg[k];
+    check(k + ' is a standing duty, not a dated one', (r.due || {}).type, 'continuous');
+    ok(k + ' states no period', !WORDS.test(r.timelineText || ''), r.timelineText);
+    WORDS.lastIndex = 0;
+  });
+
+  // SS3i: the audit answer is not "it is not on the list" but "it is not on the
+  // list BECAUSE". For an unlisted company every one of these must appear as
+  // excluded WITH a reason -- which is also what makes appliesTo load-bearing
+  // here, since the register call itself sits behind an isListed guard.
+  const exc = app.lgExcludedFor(mk('private','U51909MH2018PTC300111'))
+    .filter(e => /^Reg /.test(e.section || '') &&
+                 (LS.rules || []).some(r => r.regulation === e.section));
+  check('a private company is told all eighteen do not apply', exc.length, 18);
+  const noReason = exc.filter(e => !e.reasons || !e.reasons.length);
+  ok('and is given a reason for every one', noReason.length === 0,
+     noReason.map(e => e.section).join(', '));
+
+  // SS3e/SS3x: a blank is not an explanation. "Ongoing / event-driven" reads the
+  // same for a period that is CERTAIN whose anchor this app does not hold, for
+  // one the Board specifies, and for a rule that fixes an order rather than a
+  // period. A CS reading a blank against Reg 26A could conclude there is no
+  // three-month rule -- there is.
+  const statesPeriod = (LS.rules || []).filter(r => {
+    WORDS.lastIndex = 0; return WORDS.test(r.timelineText || '');
+  });
+  const unexplained = statesPeriod.filter(r => !app.lgNoDeadlineWhy({ key: r.id, due: null }));
+  ok('every undated rule that states a period explains why it has no date',
+     unexplained.length === 0, unexplained.map(r => r.id).join(', '));
+
+  // And the explanation must carry the REASON, not just words. Reg 29 counts
+  // backward in working days with no exchange holiday calendar here.
+  const why29 = app.lgNoDeadlineWhy({ key: 'LODR-SUP-REG-29-1', due: null }) || '';
+  ok('the prior-intimation explanation gives the working-day reason',
+     /working day/i.test(why29) && /calendar/i.test(why29), why29.slice(0, 90));
+  const why30a = app.lgNoDeadlineWhy({ key: 'LODR-SUP-REG-30A', due: null }) || '';
+  ok('the agreements explanation says whose the two working days is',
+     /two working days/i.test(why30a) && /not yours|binds the shareholders/i.test(why30a),
+     why30a.slice(0, 90));
+
+  // SS3e's contract test: an explanation must never attach to a row that HAS a
+  // date. Sweeping the real rows cannot see this, because none of them is dated.
+  ok('a dated row is offered no explanation',
+     app.lgNoDeadlineWhy({ key: 'LODR-SUP-REG-29-1', due: '2026-10-30' }) === null,
+     'an explanation was offered for a row that already has a date');
+
+  // Two offices, two sub-regulations, two separate rules. Filling the Managing
+  // Director's chair does not answer for the Chief Financial Officer's.
+  ok('the CEO/MD and the CFO vacancies are separate rules',
+     !!byReg['Reg 26A(1)'] && !!byReg['Reg 26A(2)'] &&
+     byReg['Reg 26A(1)'].id !== byReg['Reg 26A(2)'].id, 'one of them is missing');
+}
+
+// -- 11t. A missing date is not a date (SS3z) -----------------
+// Found by driving the real register, not by any suite: ccFmtDate had no null
+// guard, so new Date(null) gave the epoch and every undated row rendered
+// '1 Jan 1970'. With the Universe sorted by due date ascending that put 212 of
+// 278 rows ABOVE every real deadline. 66 call sites pass optional values
+// (r.due, filed, held, signed, certOn), so this was never one screen.
+describe('a missing date is not a date');
+{
+  const EM = '—';
+  [null, undefined, ''].forEach((v, i) => {
+    ok('a missing date (' + ['null','undefined','empty'][i] + ') is not formatted as one',
+       app.ccFmtDate(v) === EM, String(app.ccFmtDate(v)));
+  });
+  ok('an unparseable date is not formatted as one',
+     app.ccFmtDate('not a date') === EM, String(app.ccFmtDate('not a date')));
+  ok('nothing renders as the epoch', !/1970/.test(String(app.ccFmtDate(null))),
+     String(app.ccFmtDate(null)));
+  // and the happy path is untouched
+  check('a real date still formats', app.ccFmtDate('2026-10-30'), '30 Oct 2026');
+
+  // The property at the register level, which is where it was seen.
+  const CRt = 10000000;
+  const lc = { id:'FMT-1', name:'fmt', type:'listed', fyend:'2026-03-31',
+    capital: 5*CRt, turnover: 40*CRt, networth: CRt, netprofit: CRt,
+    borrowings: 0, cin:'L17110MH2009PLC195422', chart:{} };
+  const undated = app.getComplianceChart(lc).filter(r => !r.due);
+  const epoch = undated.filter(r => /19[0-9]{2}/.test(String(app.ccFmtDate(r.due))));
+  ok('no undated row on the register formats to a 20th-century date',
+     epoch.length === 0, epoch.length + ' of ' + undated.length + ' undated rows');
+}
+
+// ── 12. Dashboard invariants ──────────────────────────────────────────
 describe('dashboard invariants');
 {
   app.CLIENTS = [LISTED, PRIVATE];

@@ -827,6 +827,54 @@ const MUTATIONS = [
   { name: 'a rule claims a period its own quote does not support (SS3y)',
     from: '"timelineText":"Within one hundred and eighty days of the date of incorporation"',
     to:   '"timelineText":"Within ninety days of the date of incorporation"' },
+  // ── SS3z: LODR Chapter IV obligations the corpus did not carry ─
+  // The Third Amendment 2024 SWAPPED these on 13.12.2024: the general
+  // record-date notice went from seven working days to three, and the
+  // scheme-of-arrangement notice from three to seven. Both figures are
+  // entirely plausible in either position, so having them the wrong way round
+  // does not look wrong -- it looks like a rule.
+  { name: 'the record-date periods are swapped back (SS3z)',
+    from: '"timelineText":"At least three working days in advance, excluding the date of intimation and the record date; at least seven working days for corporate actions through a scheme of arrangement under Reg 37;',
+    to:   '"timelineText":"At least seven working days in advance, excluding the date of intimation and the record date; at least three working days for corporate actions through a scheme of arrangement under Reg 37;' },
+
+  // Reg 30A(1)'s two working days binds the SHAREHOLDERS, PROMOTERS, DIRECTORS,
+  // KMP and EMPLOYEES who are parties to the agreement -- it runs TO the listed
+  // entity, not from it. Reading the period without reading the subject is how
+  // a deadline the company does not owe reaches its register (SS3y, s.84).
+  { name: 'the agreements disclosure claims the parties’ deadline as the company’s (SS3z)',
+    from: '"timelineText":"Within the timelines as specified by the Board"',
+    to:   '"timelineText":"Within two working days of entering into the agreement"' },
+
+  // SS2k. Every rule in this corpus runs from an event no register here holds,
+  // or counts working days with no exchange holiday calendar. A date on any of
+  // them is invented -- the 31 March defect arriving in a new law.
+  { name: 'a supplement rule starts producing a computed date (SS3z r/w SS2k)',
+    from: '"due":{"type":"at_trigger","when":"Before every record date"}',
+    to:   '"due":{"type":"annual"}' },
+
+  // The invariant that holds a hand-authored corpus to its text: the period a
+  // rule states must appear in the words it quotes.
+  { name: 'a rule states a period its own quote no longer supports (SS3z)',
+    from: 'Manager shall be filled by the listed entity at the earliest and in any case not later than three months',
+    to:   'Manager shall be filled by the listed entity at the earliest and in any case not later than six months' },
+
+  // Chapter IV binds a listed entity. Giving its obligations to a private
+  // company is SS2z's defect -- wrong law against the wrong entity class.
+  { name: 'Chapter IV obligations reach an unlisted company (SS3z r/w SS2z)',
+    from: '"appliesTo":{"entityType":["listed"]},"appliesToText":"Every listed entity convening a board meeting on a listed proposal"',
+    to:   '"appliesTo":{"entityType":["listed","private","public"]},"appliesToText":"Every listed entity convening a board meeting on a listed proposal"' },
+  // SS3e: a blank is not an explanation. Losing the reason leaves 'Ongoing /
+  // event-driven' standing alone against a rule whose three months is certain,
+  // and a CS could read that as there being no deadline at all.
+  { name: 'an undated rule stops saying why it has no date (SS3z r/w SS3e)',
+    from: "'LODR-SUP-REG-26A-1': '<b>Three months is certain</b>",
+    to:   "'LODR-SUP-REG-26A-1-disabled': '<b>Three months is certain</b>" },
+  // The guard that stops a missing date rendering as the epoch. Without it
+  // new Date(null) is 1 Jan 1970, and the register sorts by due date ascending
+  // so every undated row climbs above every real deadline.
+  { name: 'a missing date renders as the epoch again (SS3z r/w SS2k)',
+    from: "  if(d === null || d === undefined || d === '') return",
+    to:   "  if(false) return" },
 ];
 
 const src = fs.readFileSync(INDEX, 'utf8');
