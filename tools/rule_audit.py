@@ -295,6 +295,41 @@ def context_of(text, reg, law=None, span=2600):
 findings = collections.defaultdict(list)
 counts = collections.Counter()
 
+# ── per-rule verdicts, for the app ──────────────────────────────────
+# Everything below is already computed to print a total. A reviewer opening a
+# rule in Rule Governance sees its title and nothing this gate established, so
+# they re-do by hand the reading it already did. SS3t set out to make verifying
+# a rule REVIEW rather than research and delivered half of it: the amendment
+# footnotes reach the screen, the period comparison does not.
+verdicts = {}
+
+
+def excerpt(s, limit=340):
+    """The provision's own opening words, readable.
+
+    This extraction writes `w ithin`, `forty -five` and inline footnote markers
+    (SS2v, SS3z). Those are left ALONE - repairing them here would show the
+    reviewer a text that differs from the one they are checking against, which
+    is worse than an awkward one. Only whitespace is collapsed."""
+    s = re.sub(r'\s+', ' ', (s or '')).strip()
+    if len(s) <= limit:
+        return s
+    cut_at = s.rfind(' ', 0, limit)
+    return s[:cut_at if cut_at > limit - 60 else limit].rstrip() + '\u2026'
+
+
+def verdict(rid, code, cite, states=None, carries=None, text=None):
+    if not rid:
+        return
+    v = {'v': code, 'c': cite or ''}
+    if states:
+        v['w'] = sorted('%d %s' % (n, u) for n, u in states)
+    if carries:
+        v['h'] = sorted('%d %s' % (n, u) for n, u in carries)[:6]
+    if text:
+        v['x'] = excerpt(text)
+    verdicts[str(rid)] = v
+
 texts = {}
 for law, (path, asof) in SOURCES.items():
     try:
@@ -327,6 +362,7 @@ for path, key, law in CORPORA:
         if not regs:
             counts['no citation'] += 1
             findings['no citation to check'].append((rid, cite, ''))
+            verdict(rid, 'nocite', cite)
             continue
 
         missing = [g for g in regs if g not in present[law]]
@@ -339,21 +375,29 @@ for path, key, law in CORPORA:
                 findings['Companies Act — not in the 01.04.2021 text '
                          '(wrong citation, or newer than the text)'].append(
                     (rid, cite, 'missing: ' + ', '.join(missing)))
+                verdict(rid, 'stale', cite)
             else:
                 counts['citation not found'] += 1
                 findings['cites a provision not found in the current text'].append(
                     (rid, cite, 'missing: ' + ', '.join(missing)))
+                verdict(rid, 'missing', cite)
             continue
         counts['citation found'] += 1
 
         # Does the stated period appear near the provision?
         tl = r.get('timelineText') or r.get('disclosureTimelineText') or ''
         want = periods_in(tl)
+        ctx0 = context_of(text, regs[0], law)
         if not want:
             counts['rule states no period'] += 1
+            # Still worth carrying the provision's own words: "states no period"
+            # is the commonest verdict by far (212 of 419) and it is exactly the
+            # rule a person has to read for themselves.
+            verdict(rid, 'noperiod', cite, text=ctx0)
             continue
-        ctx = context_of(text, regs[0], law)
+        ctx = ctx0
         if not ctx:
+            verdict(rid, 'noctx', cite, states=want)
             continue
         have = periods_in(ctx)
 
@@ -368,6 +412,7 @@ for path, key, law in CORPORA:
                      'not the regulation it cites'].append(
                 (rid, cite, 'rule says %s; %s carries %s' % (
                     sorted(want), regs[0], sorted(have)[:4])))
+            verdict(rid, 'sched', cite, states=want, carries=have, text=ctx)
             continue
 
         if DELEGATES.search(ctx) and not (want & have):
@@ -378,6 +423,7 @@ for path, key, law in CORPORA:
             findings['provision delegates the period to rules or the Board'].append(
                 (rid, cite, 'rule says %s; the provision says "as may be prescribed"'
                  % sorted(want)))
+            verdict(rid, 'deleg', cite, states=want, text=ctx)
             continue
         if not have:
             # The rule states a period and the provision states none. Not a
@@ -387,6 +433,7 @@ for path, key, law in CORPORA:
             counts['period not stated in the provision'] += 1
             findings['rule states a period the provision does not'].append(
                 (rid, cite, 'rule says %s; nothing timed near %s' % (sorted(want), regs[0])))
+            verdict(rid, 'nostate', cite, states=want, text=ctx)
             continue
         counts['period compared'] += 1
         if have and not (want & have):
@@ -394,6 +441,9 @@ for path, key, law in CORPORA:
             findings['stated period not found near the provision'].append(
                 (rid, cite, 'rule says %s; text near %s says %s' % (
                     sorted(want), regs[0], sorted(have))))
+            verdict(rid, 'mismatch', cite, states=want, carries=have, text=ctx)
+        else:
+            verdict(rid, 'ok', cite, states=want, carries=have, text=ctx)
 
 print('─' * 70)
 for k in ['checked', 'citation found', 'citation not found', 'not in the 2021 Act text',
@@ -449,6 +499,69 @@ print('in the provision, NOT that it appears in the clause the rule cites.')
 # "No citation to check" and "schedule-derived" are observations, not defects.
 # Failing a release over those would teach everyone to skip the gate, which
 # costs more than it saves.
+# What the reviewer gets.
+#
+# Written EVERY run, not behind a flag. A generated file that has to be
+# regenerated by hand goes stale the first time somebody forgets -- SS3t
+# recorded that about amendments.py and SS4b about the corpus blobs. The gate
+# already runs before every deploy, so the embed cannot drift behind it.
+OUT = 'rules/audit_findings.json'
+EMBED_KEY = 'var LG_GATE = '
+APP = 'index.html'
+
+payload = {
+    'generatedBy': 'tools/rule_audit.py',
+    'asOf': {law: asof for law, (path, asof) in SOURCES.items()},
+    # Printed on screen beside the verdict, because SS3v measured this at 4 of
+    # 23 and withdrew the narrowing rather than ship one that is wrong half the
+    # time. A reviewer who does not know it will read more into an agreement
+    # than the check can support.
+    'limit': ('A period is compared against the WHOLE cited provision, not '
+              'against the sub-clause the rule names. An agreement means the '
+              'number appears in the provision, not that it appears in the '
+              'clause cited.'),
+    'codes': {
+        'ok':       'the period this rule states appears in the provision it cites',
+        'mismatch': 'the provision carries periods and none of them is this one',
+        'noperiod': 'this rule states no period, so there is nothing to compare',
+        'nostate':  'the rule states a period and the provision states none',
+        'deleg':    'the provision delegates the period to rules or to the Board',
+        'sched':    'a Schedule entry: the period is in the Schedule item, not in '
+                    'the regulation it cites',
+        'nocite':   'this rule cites no numbered provision',
+        'missing':  'the cited provision was not found in the held text',
+        'stale':    'not in the 01.04.2021 Act text \u2014 a wrong citation, or newer '
+                    'than the text held here',
+        'noctx':    'the provision was located but no readable span came back',
+    },
+    'rules': verdicts,
+}
+
+blob = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
+io.open(OUT, 'w', encoding='utf-8', newline='\n').write(blob)
+print('\nwrote %s (%d rules, %d KB)' % (OUT, len(verdicts), len(blob) // 1024))
+
+try:
+    html = io.open(APP, encoding='utf-8', newline='').read()
+except Exception as e:
+    print('could not read %s (%s) -- embed not updated' % (APP, e))
+else:
+    i = html.find(EMBED_KEY)
+    if i < 0:
+        print('%s does not contain "%s" -- embed not updated' % (APP, EMBED_KEY))
+    else:
+        j = html.find(';\n', i)
+        if j < 0:
+            print('could not find the end of the LG_GATE statement -- not updated')
+        else:
+            new = html[:i] + EMBED_KEY + blob + html[j:]
+            if new == html:
+                print('embed in %s already current' % APP)
+            else:
+                io.open(APP, 'w', encoding='utf-8', newline='').write(new)
+                print('updated the embed in %s (%d -> %d chars)'
+                      % (APP, len(html), len(new)))
+
 BLOCKING = counts['citation not found'] + counts['period mismatch']
 print()
 if BLOCKING:

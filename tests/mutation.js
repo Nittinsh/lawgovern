@@ -1097,6 +1097,38 @@ const MUTATIONS = [
   { name: 'the SME half-yearly period drifts to thirty days (SS4f r/w SS2v)',
     from: "    due:{days:21},\n    from:'Within 21 days from the end of each half year'},",
     to:   "    due:{days:30},\n    from:'Within 21 days from the end of each half year'}," },
+  // -- SS4g: the gate's reading reaches the reviewer -----------
+  // The whole defect this release fixes: the gate established something and no
+  // screen showed it. Computing it and not rendering it is SS2j/SS3n's shape,
+  // and it is the state the product shipped in for 38 releases.
+  { name: 'the gate verdict is computed and never rendered (SS4g r/w SS3n)',
+    from: "var head = govClaimBlock(rule) + govGateBlock(rule) +",
+    to:   "var head = govClaimBlock(rule) + '' +" },
+
+  // SS3v measured 4 of 23 agreements falling OUTSIDE the sub-clause the rule
+  // cites and withdrew the narrowing rather than ship one wrong half the time.
+  // An agreement with no limit attached reads as a sign-off.
+  { name: 'an agreement stops carrying the limit it was measured at (SS4g r/w SS3v)',
+    from: "  if(g.v === 'ok' || g.v === 'mismatch'){",
+    to:   "  if(false){" },
+
+  // A reviewer cannot check a rule against a provision without knowing what the
+  // rule asserts. The modal showed the title alone for 38 releases.
+  { name: 'the rule reaches the reviewer as a title again (SS4g)',
+    from: "      r.timelineText  = src.timelineText || src.disclosureTimelineText || '';",
+    to:   "      r.timelineText  = '';" },
+
+  // The hand-authored corpora carry the words they were read from (SS3x) -
+  // the strongest evidence on the screen, and it reached nothing until now.
+  { name: 'the verbatim quote stops reaching the reviewer (SS4g r/w SS3x)',
+    from: "      r.quote         = src.quote || '';",
+    to:   "      r.quote         = '';" },
+
+  // A mechanical check is not a professional's sign-off and the screen must
+  // not let one pass for the other (SS2v).
+  { name: 'the screen stops saying the reading is not the decision (SS4g r/w SS2v)',
+    from: "'<div class=\"gov-ev-warn\">This is the reading, not the decision. A citation '+",
+    to:   "'<div class=\"gov-ev-warn\">A citation '+" },
 ];
 
 const src = fs.readFileSync(INDEX, 'utf8');
@@ -1113,16 +1145,61 @@ for (const s of ['compliance.test.js', 'smoke.test.js']) {
 }
 console.log('baseline: both suites pass against the current build\n');
 
+// THE EMBEDDED GATE BLOB IS INVISIBLE TO AN ANCHOR.
+//
+// v197 embedded 149 KB of statutory excerpts as `var LG_GATE = {...};` -- the
+// provisions the release gate read, so a reviewer sees them (SS4g). Three of
+// those excerpts quote Reg 26A's filling-a-vacancy words, because Reg 26A(1),
+// (2) and (3) share one provision span.
+//
+// A SS3z mutation had anchored on exactly that sentence in the corpus, where it
+// was unique. It matched 4 times the moment the blob landed and was silently
+// SKIPPED -- SS3p's trap arriving by a road nobody had walked: not a comment
+// quoting code, but generated evidence quoting the law.
+//
+// The blob is DERIVED from the corpus and rewritten on every gate run, so
+// mutating it proves nothing and its presence must never shadow a real anchor.
+// Anchors are counted against the source with it removed, and the mutation is
+// applied to whichever side actually holds the anchor -- so the file written is
+// always the whole app, blob included.
+const GATE_KEY = 'var LG_GATE = ';
+let gateHead = src, gateBlob = '', gateTail = '';
+{
+  const gi = src.indexOf(GATE_KEY);
+  const gj = gi >= 0 ? src.indexOf(';\n', gi) : -1;
+  if (gj > gi && gi >= 0) {
+    gateHead = src.slice(0, gi);
+    gateBlob = src.slice(gi, gj);
+    gateTail = src.slice(gj);
+  }
+}
+const anchorSrc = gateBlob ? (gateHead + gateTail) : src;
+
 let caught = 0, missed = 0, skipped = 0;
 for (const m of MUTATIONS) {
-  const n = src.split(m.from).length - 1;
+  const n = anchorSrc.split(m.from).length - 1;
   if (n !== 1) {
     console.log(`  SKIPPED  ${m.name}\n           anchor matched ${n} times — the code moved`);
     skipped++;
     continue;
   }
+  let mutated;
+  if (!gateBlob) {
+    mutated = src.replace(m.from, m.to);
+  } else if (gateHead.indexOf(m.from) >= 0) {
+    mutated = gateHead.replace(m.from, m.to) + gateBlob + gateTail;
+  } else if (gateTail.indexOf(m.from) >= 0) {
+    mutated = gateHead + gateBlob + gateTail.replace(m.from, m.to);
+  } else {
+    // Unique across head+tail but in neither: it straddles the seam. Say so
+    // rather than writing an unmutated file, which would read as MISSED and
+    // send somebody hunting for a blind spot that is not there.
+    console.log(`  SKIPPED  ${m.name}\n           anchor straddles the LG_GATE boundary`);
+    skipped++;
+    continue;
+  }
   const mutant = path.join(TMP, 'index.html');
-  fs.writeFileSync(mutant, src.replace(m.from, m.to));
+  fs.writeFileSync(mutant, mutated);
   // BOTH suites. compliance.test.js knows the law; smoke.test.js knows the
   // markup — landmarks, control names, class definitions, handler targets.
   // Running only the first left every structural check unproven: a mutation

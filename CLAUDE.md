@@ -4322,6 +4322,144 @@ exclusion reason, and a flag away from being right.
 
 ---
 
+## 4g. THE GATE HAD READ THE LAW AND TOLD NOBODY (v197)
+
+*"now do the rule verification"*. Measured first, and the finding is not about
+the rules.
+
+**`rule_audit.py` has compared a stated period against the held text for 151 of
+419 rules since v159, and printed the result to a terminal.** A reviewer opening
+a rule in Rule Governance saw its **title** and nothing the gate established. So
+they re-did by hand the reading the tooling had already finished.
+
+&sect;2j, &sect;3n and &sect;3o all found their worst defects in the same place:
+a value computed correctly that reaches no screen. This is the largest one yet
+&mdash; it is the whole reason &sect;3t's aim, *"verifying a rule is review
+rather than research"*, was still only half true.
+
+### What the modal actually showed
+| | |
+|---|---|
+| the rule's title | yes |
+| what period the rule claims | **no** |
+| what triggers it, and what class it binds | **no** |
+| the verbatim words a hand-authored rule was read from | **no** |
+| whether the gate confirmed the period, and against what | **no** |
+| amendment footnotes (&sect;3t) | yes |
+
+`lgAllRules` was the cause: it projects five fields and drops the rest, so the
+screen showed what an obligation is **called** and nothing it **asserts**.
+
+### Three blocks now, in the order a reviewer needs them
+1. **What this rule claims** &mdash; period, trigger, applies-to, and for the
+   **92 hand-authored rules** the verbatim quote they were read from
+   (&sect;3x). That quote is the strongest thing on the screen and it was
+   reaching nothing.
+2. **What the release gate checked** &mdash; the verdict in words, what the rule
+   states, what the provision carries, **and the provision's own text**.
+3. **What the text held here says** &mdash; the amendment footnotes, unchanged.
+
+Section 96 now reads: *the period this rule states appears in the provision it
+cites &middot; the rule states 6 month, 9 month &middot; the provision carries 6
+month, 9 month*, with s.96(1) printed beneath it.
+
+### Two honesty controls, because an agreement is not a sign-off
+- **&sect;3v's limit travels with every agreement.** That section measured **4
+  of 23** agreements falling outside the sub-clause the rule cites and
+  **withdrew** the narrowing rather than ship one wrong half the time. A reader
+  who does not know that will read more into a green line than the check can
+  support, so the sentence prints beside it.
+- *"This is the reading, not the decision."* &sect;2v's rule, on the screen
+  rather than only in this file. `govSave` still refuses a verification with no
+  instrument named.
+
+**Nothing here verifies a rule.** Rule Governance still reads "Never checked"
+for all 419. What changed is that each one is now a few minutes of reading
+instead of an afternoon in a 700 KB PDF.
+
+### `LG_GATE` is regenerated on every gate run, never by hand
+`rules/audit_findings.json` and the embed in `index.html` are both written by
+`python tools/rule_audit.py` &mdash; **not behind a flag**, because the gate
+already runs before every deploy and a generated file that must be refreshed by
+hand goes stale the first time somebody forgets. &sect;3t recorded that about
+`amendments.py`; &sect;4b recorded it about the corpus blobs. The suite asserts
+corpus and gate cannot drift apart in either direction.
+
+### The excerpts are left broken on purpose
+This extraction writes `w ithin`, `forty -five` and inline footnote markers
+(&sect;2v, &sect;3z). Repairing them for display would show the reviewer a text
+that differs from the one they are checking against, which is worse than an
+awkward one. Only whitespace is collapsed.
+
+### 149 KB OF QUOTED LAW MADE A MUTATION ANCHOR AMBIGUOUS
+The finding worth carrying, and it arrived by a road nobody had walked.
+
+A &sect;3z mutation anchored on Reg 26A's *"shall be filled by the listed entity
+at the earliest and in any case not later than three months"*, which was
+**unique in the corpus**. The moment the gate blob landed it matched **four
+times** &mdash; Reg 26A(1), (2) and (3) share one provision span, so the excerpt
+repeats &mdash; and the mutation was **silently SKIPPED**.
+
+&sect;3p's trap, three times over now: a comment quoting code, a comment
+matching its own delimiter, and now **generated evidence quoting the law**.
+
+Fixed in the runner rather than by repointing the anchor, because every future
+mutation anchoring on statutory wording has the same exposure. The blob is
+**derived** &mdash; mutating it proves nothing &mdash; so anchors are counted
+against the source with it removed and the mutation is applied to whichever side
+holds the anchor. An anchor straddling the seam **says so** instead of writing
+an unmutated file, which would read as MISSED and send somebody hunting a blind
+spot that is not there.
+
+**The previously-skipped mutation now runs and is caught.**
+
+### Three weaknesses in my own assertions, all found by the runner
+- **Testing the leaf, not the assembly.** Every new assertion called
+  `govGateBlock` **directly**, so deleting it from the modal changed nothing
+  they could see &mdash; MISSED. &sect;3n's shape for the **third** time in this
+  project. They test `govEvidenceBlock`, what the modal renders, now.
+- **A threshold too loose to see a field go dark.** *"rules carry
+  `timelineText` OR `trigger` OR `appliesToText`"* over a count of 250 survived
+  blanking `timelineText` outright. Counted per field now.
+- **A lookup that threw instead of failing by name.** `RULES.find(r =>
+  r.quote)` returns undefined when the mutation empties every quote, so the
+  mutant **crashed**. &sect;4d recorded exactly this one release ago. Total now.
+
+### And the tenth heredoc, one release after the ninth
+&sect;6 records this at nine. I wrote every patch in this release with the Write
+tool, then reached for a bash heredoc to make one small edit **to a patch
+script** &mdash; and `\u2500` in the heredoc did not match the file. Same
+reflex, same release cycle, one section after writing *"the quick edit is the
+one that gets done with a heredoc."*
+
+A second one in the same sitting: a patch anchored on a **decorative box-drawing
+comment**, counting 32 dashes where the file has 48. **Anchor on code, never on
+a rule made of repeated characters.**
+
+### What is now measurable, and was not
+With the gate's verdict per rule embedded, a question nobody could ask before:
+**how many rules state no period while the provision they cite does?** Sixteen
+on a mainboard book &mdash; and reading two of them settled that this must
+**not** become a screen. Reg 13(2), 13(3) and 13(4) all matched *"not later than
+twenty-one calendar days"*, which belongs to **Reg 13(1)** &mdash; and the
+corpus already carries Reg 13(1) with that period, correctly. Pure false
+positives from the whole-provision span, which is &sect;3v's measured limit
+doing exactly what it was documented to do.
+
+**Reg 23(1) is genuine**: *"such policy shall be reviewed by the board of
+directors at least once every three years"* is current operative text and the
+rule states no period. That is a worklist item for the owner, not a check &mdash;
+a screen that is wrong half the time is worse than none (&sect;2x).
+
+### Coverage
+Suite **769 &rarr; 788**, mutations **199 &rarr; 204 caught, 0 missed, 0
+skipped**. Smoke 105, gate clear at 419 rules, backend 96. `index.html` 2.87
+&rarr; 2.89 MB. Verified live: the modal renders three sections in **7 ms**,
+both honesty controls print, and a hand-authored rule shows the words it was
+read from. Zero console errors.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -4389,12 +4527,15 @@ exclusion reason, and a flag away from being right.
 
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
-- **Write patch scripts with the Write tool — this has now failed NINE times, in
-  three different ways**, most recently in &sect;4f, where every patch in the
-  session was written correctly and then one *"quick"* heredoc edit to a patch
-  script turned `\n` inside a JavaScript string into a real newline. **The quick
-  edit is the one that gets done with a heredoc.** There is no size below which
-  it is safe. A shell heredoc turned `\b` into a literal 0x08 and ate
+- **Write patch scripts with the Write tool — this has now failed TEN times, in
+  three different ways.** &sect;4f was the ninth and &sect;4g the tenth, **one
+  release apart, same reflex**: every patch written correctly with the Write
+  tool, then a bash heredoc reached for to make one small edit *to a patch
+  script*. **The quick edit is the one that gets done with a heredoc.** There is
+  no size below which it is safe.
+- **Anchor a patch on code, never on a decorative comment.** &sect;4g counted 32
+  box-drawing dashes where the file has 48. A rule made of repeated characters
+  is not a landmark. A shell heredoc turned `\b` into a literal 0x08 and ate
   backslashes (§2x, §3c, §3t, §3w, §3x). CRLF in a patch script would not match
   an LF target (§3c). And in §4a, prose passed through `python -c` inside a bash
   double-quoted string had **every backtick-quoted identifier removed by command
@@ -4407,7 +4548,13 @@ exclusion reason, and a flag away from being right.
   names the fix, because the only symptom of the drift was a mutation anchor
   that started matching twice (§4b).
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (769 assertions, run against `index.html` itself), `node tests/mutation.js` (199 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 419 rules across eight corpora; it reports how many periods it actually compared, currently 151), and `node tests/backend.test.js` (96 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (788 assertions, run against `index.html` itself), `node tests/mutation.js` (204 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 419 rules across eight corpora; it reports how many periods it actually compared, currently 151), and `node tests/backend.test.js` (96 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **`python tools/rule_audit.py` regenerates `rules/audit_findings.json` AND
+  re-embeds it into `index.html` as `var LG_GATE`** — on every run, not behind
+  a flag, so the reviewer's evidence cannot drift behind the gate that produced
+  it. `tests/mutation.js` counts anchors with that blob REMOVED: it carries 149
+  KB of quoted statute and made a previously-unique anchor match four times
+  (&sect;4g).
 - **`python tools/amendments.py` regenerates the amendment evidence AND re-embeds
   it into `index.html`.** It reads the compilations in `reference/`, which is
   gitignored — so `rules/amendments.json` and `rules/amendments_embed.json` are
@@ -4424,7 +4571,7 @@ exclusion reason, and a flag away from being right.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v196.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v197.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/026` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**
