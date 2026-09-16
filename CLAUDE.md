@@ -4652,6 +4652,93 @@ the other.
 
 ---
 
+## 4j. AN OBLIGATION THAT NO LONGER EXISTS (v200)
+
+*"remove that repealed reg 7(1)(a) row"*.
+
+**This is the one direction &sect;3t names as the worse branch:** *"hiding an
+obligation is the one failure in this product a CS cannot notice."* Every other
+defect in this file shows itself &mdash; a wrong date looks like a date, a wrong
+law looks like a law. A row that is simply gone looks like nothing at all.
+
+So it was verified twice more before a line was written.
+
+### The fact, checked again
+```
+7. (1) Initial Disclosures.
+(a). 63[***]
+```
+Footnote 63: *"Omitted by ... (Amendment) Regulations, 2021 (w.e.f. April 26,
+2021). Prior to omission, clause (a) read as under: 'Every promoter, member of
+the promoter group, key managerial personnel and director of every company
+whose securities are listed ... shall disclose his holding of securities of the
+company as on the date of these regulations taking effect, to the company
+within thirty days of these regulations taking effect'"*
+
+It was a **one-time transitional** disclosure owed when the 2015 regulations
+took effect &mdash; spent years before it was omitted.
+
+**And nothing is lost.** Reg 7(1) contains only (a) and (b). (b) is live and
+carried **twice**: by the generated `PIT-REG-7-1-B-15` and by &sect;4i's cited,
+quoted `PIT-SUP-REG-7-1-B`. Measured before and after: both still on the
+register.
+
+### Struck in code, because the corpus is generated
+`pit_master.json` is generated from the owner's spreadsheet and must not be
+hand-edited (&sect;2k) &mdash; an edit there is lost the day the sheet comes
+back. `LG_REPEALED` sits beside `LG_SCOPE_PATCH` (&sect;4f), the same place and
+the same shape, and is consulted by **both** applicability engines so one law
+cannot drift away from the other.
+
+### Removed from the register, REPORTED on the screen
+Not deleted. `cmApplies` refuses it, so it leaves the register &mdash; and
+`lgExcludedFor` reports it under *Never applied to this entity*, with the
+omitting instrument, its effective date and **the words the provision used to
+carry**. &sect;3i: not on the list, but **because**.
+
+Verified on the running app: register **303 &rarr; 302**, the row absent, and
+the reason on screen in full.
+
+### AN ENTRY WITH NO EVIDENCE HIDES NOTHING
+The control that makes this table safe to have at all.
+
+The mutation that blanked the prior wording was caught by a **crash** rather
+than by name &mdash; &sect;4d, one release old. Fixing only the assertion would
+have left the real hole: **a table entry missing its evidence still struck a
+rule off the register.**
+
+`lgRepealed` now requires the provision, the omitting instrument, its effective
+date **and** the prior wording. Missing any one, the entry is **ignored and the
+obligation stays**. That is &sect;3t's safe branch made structural rather than
+promised: this table cannot make an obligation disappear on somebody's say-so,
+because an entry without a citation does nothing at all.
+
+Both mutations now fail **seven** assertions each, by name, because stripping
+the evidence puts the rule back on the register *and* removes the explanation
+&mdash; which is exactly what should happen.
+
+### And an assertion that would have passed vacuously
+`reasons.join(' ').indexOf(e.was.slice(0, 40))` throws when `was` is undefined,
+and `indexOf('')` returns **0** when it is empty &mdash; so the obvious repair
+(guard the undefined) would have produced a check that passes on an entry with
+no prior wording at all. It requires the slice to be a full forty characters
+before it looks for it.
+
+### Coverage
+Suite **812 &rarr; 827**, mutations **209 &rarr; 214 caught, 0 missed, 0
+skipped**. Smoke 105, backend 96, gate 421 rules / 379 citations / 155 compared
+/ 0 mismatches. Live: register 302, the repealed row reported with its full
+reason, zero console errors.
+
+### What this does NOT license
+`LG_REPEALED` holds **one** entry and the bar for a second is the same: the
+instrument, the date and the words. Nothing goes in on a reading of silence, on
+a provision merely renumbered, or on an obligation that looks spent. The
+register is allowed to carry something the owner no longer owes; it is not
+allowed to drop something they do.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -4740,7 +4827,7 @@ the other.
   names the fix, because the only symptom of the drift was a mutation anchor
   that started matching twice (§4b).
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (812 assertions, run against `index.html` itself), `node tests/mutation.js` (209 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 421 rules across eight corpora; it reports how many periods it actually compared, currently 155, and self-checks its own period parser before it reads a line of law), and `node tests/backend.test.js` (96 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (827 assertions, run against `index.html` itself), `node tests/mutation.js` (214 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 421 rules across eight corpora; it reports how many periods it actually compared, currently 155, and self-checks its own period parser before it reads a line of law), and `node tests/backend.test.js` (96 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **`python tools/rule_audit.py` regenerates `rules/audit_findings.json` AND
   re-embeds it into `index.html` as `var LG_GATE`** — on every run, not behind
   a flag, so the reviewer's evidence cannot drift behind the gate that produced
@@ -4763,7 +4850,7 @@ the other.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v199.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v200.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/026` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

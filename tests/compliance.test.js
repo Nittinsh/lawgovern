@@ -3336,7 +3336,93 @@ describe('the sixteen, read');
      'one of them reached an LLP');
 }
 
-// ── 12. Dashboard invariants ──────────────────────────────────────────────────────────────────────────────────────────────────────────
+// -- 11ab. An obligation that no longer exists (SS4j) ----------
+// Reg 7(1)(a) reads `63[***]` in the held compilation, omitted w.e.f. 26 April
+// 2021. It was a ONE-TIME transitional disclosure owed when the 2015
+// regulations took effect, so it was spent years before it was omitted.
+//
+// SS3t governs the size of this table: an unknown commencement date ABSTAINS,
+// because hiding an obligation is the one failure in this product a CS cannot
+// notice. So removal is allowed only with the instrument, its date and the
+// words the provision used to carry -- and the rule is REPORTED, not dropped.
+describe('repealed provisions');
+{
+  const R = app.LG_REPEALED || {};
+  const ids = Object.keys(R);
+  ok('the repealed table is not empty', ids.length > 0, 'nothing in LG_REPEALED');
+
+  // THE EVIDENCE BAR. Every entry must carry all three, or this table becomes a
+  // way to make an obligation disappear on somebody's say-so.
+  ids.forEach(id => {
+    const e = R[id];
+    ok(id + ' names the provision omitted', !!e.provision, JSON.stringify(e).slice(0, 80));
+    ok(id + ' names the instrument that omitted it', !!e.omittedBy && e.omittedBy.length > 12,
+       e.omittedBy || '(none)');
+    ok(id + ' names the date it took effect', !!e.wef && /\d{4}/.test(e.wef), e.wef || '(none)');
+    ok(id + ' carries the words the provision used to hold',
+       !!e.was && e.was.length > 60, (e.was || '').slice(0, 50));
+  });
+
+  const CRr = 10000000;
+  const mkR = (t, cin) => ({ id: 'R-' + t, name: t, type: t, fyend: '2026-03-31',
+    capital: 5 * CRr, turnover: 40 * CRr, networth: CRr, netprofit: CRr,
+    borrowings: 0, cin: cin, chart: {} });
+  const listedR = mkR('listed', 'L17110MH2009PLC195422');
+  const chart = app.getComplianceChart(listedR);
+
+  // OFF the register ...
+  ids.forEach(id => {
+    ok(id + ' is not on the register', chart.every(r => r.key !== id),
+       'still emitted as an obligation');
+  });
+
+  // ... and ON the "does not apply" list, with the reason. A rule that vanishes
+  // silently is exactly what SS3i exists to prevent.
+  const exc = app.lgExcludedFor(listedR);
+  ids.forEach(id => {
+    const e = R[id];
+    const told = exc.filter(x => (x.reasons || []).join(' ').indexOf(e.omittedBy) >= 0);
+    check(id + ' is reported as not applying', told.length, 1);
+    ok('and the reason says the obligation no longer exists',
+       told.length === 1 && /no longer exists/i.test(told[0].reasons.join(' ')),
+       told.length ? told[0].reasons.join(' ').slice(0, 90) : 'not reported');
+    // Total, and NOT vacuous: indexOf('') returns 0, so an entry whose prior
+    // wording had been emptied would otherwise pass this. SS4d -- a mutation
+    // caught by a crash tells you nothing about the assertion meant to catch it.
+    const was40 = String(e.was || '').slice(0, 40);
+    ok('and quotes the words it used to carry',
+       was40.length === 40 && told.length === 1 &&
+       told[0].reasons.join(' ').indexOf(was40) >= 0,
+       was40 ? 'the prior wording did not reach the reader' : 'no prior wording recorded');
+  });
+
+  // Reg 7(1) holds only (a) and (b). (b) is live and carried TWICE -- by the
+  // generated row and by SS4i's supplement -- so striking (a) loses nothing.
+  const b = chart.filter(r => /7\(1\)\(b\)/.test(r.section || ''));
+  check('the live limb of Reg 7(1) is still carried, twice', b.length, 2);
+  ok('and one of them is the cited, quoted supplement rule',
+     b.some(r => r.key === 'PIT-SUP-REG-7-1-B'), b.map(r => r.key).join(', '));
+
+  // And the guard itself: an entry missing any of the three pieces of evidence
+  // is ignored, so the obligation STAYS on the register (SS3t's safe branch).
+  check('an entry with no instrument hides nothing',
+        app.lgRepealed({ id: 'X', }) , null);
+  ok('a table entry stripped of its evidence is ignored',
+     app.lgRepealed({ id: ids[0] }) === null ||
+     (!!R[ids[0]].omittedBy && !!R[ids[0]].wef && !!R[ids[0]].was),
+     'an entry without full evidence was honoured');
+
+  // The table is consulted by BOTH applicability engines, so one law cannot
+  // drift away from the other.
+  const pitRule = (app.PIT_DATA.rules || []).find(r => R[r.id]);
+  ok('cmApplies refuses a repealed rule', !!pitRule && app.cmApplies(pitRule, listedR) === false,
+     'cmApplies still returns true');
+  ok('and lodrApplies refuses one too',
+     !!pitRule && app.lodrApplies(pitRule, listedR) === false,
+     'lodrApplies does not consult the table');
+}
+
+// ── 12. Dashboard invariants ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 describe('dashboard invariants');
 {
   app.CLIENTS = [LISTED, PRIVATE];

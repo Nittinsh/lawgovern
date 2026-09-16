@@ -1160,6 +1160,32 @@ const MUTATIONS = [
   { name: 'the notice period stops explaining why it has no date (SS4i r/w SS3e)',
     from: "  'CA-SUP-SEC-101-1':\n",
     to:   "  'CA-SUP-SEC-101-1-X':\n" },
+  // -- SS4j: an obligation that no longer exists ---------------
+  // The repealed provision comes back onto the register as a live obligation.
+  { name: 'a repealed provision is a live obligation again (SS4j)',
+    from: "  if(lgRepealed(rule)) return false;   // the same table, so one law cannot drift",
+    to:   "  // no repeal test" },
+
+  { name: 'cmApplies stops consulting the repealed table (SS4j)',
+    from: "function cmApplies(rule, c){\n  if(lgRepealed(rule)) return false;",
+    to:   "function cmApplies(rule, c){" },
+
+  // SS3i: not on the list, but BECAUSE. A rule that vanishes with no reason is
+  // the one failure that report exists to prevent.
+  { name: 'the repealed rule vanishes with no reason given (SS4j r/w SS3i)',
+    from: "  var rep = lgRepealed(rule);\n  if(rep){",
+    to:   "  var rep = null;\n  if(rep){" },
+
+  // The evidence bar. Without the instrument, its date and the prior wording,
+  // this table is a way to make an obligation disappear on somebody's say-so,
+  // and SS3t is explicit that hiding one is the branch a CS cannot notice.
+  { name: 'a repeal stops naming the instrument that did it (SS4j r/w SS3t)',
+    from: "    omittedBy: 'SEBI (Prohibition of Insider Trading) (Amendment) Regulations, 2021',",
+    to:   "    omittedBy: ''," },
+
+  { name: 'a repeal stops quoting what the provision used to say (SS4j r/w SS3t)',
+    from: "    was: 'Every promoter, member of the promoter group, key managerial personnel ' +",
+    to:   "    wasNotRecorded: 'Every promoter, member of the promoter group, key managerial personnel ' +" },
 ];
 
 const src = fs.readFileSync(INDEX, 'utf8');
