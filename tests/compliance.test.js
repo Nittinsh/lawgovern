@@ -2866,7 +2866,115 @@ describe('verification queue scoping');
      'scoping did not change the worklist size');
 }
 
-// ── 12. Dashboard invariants ────────────────────────────────────────────────────────────────────────
+// -- 11x. PIT Schedules A and B, clause by clause (SS4d) -------
+// The last unread part of PIT. The generated corpus carries 11 rules citing a
+// schedule, covering A.1-A.5 and B.3, B.4, B.4(2) and the contra-trade
+// restriction. Schedule A has 8 clauses and Schedule B has 15.
+describe('pit schedules A and B');
+{
+  const PS = app.PIT_SCH_DATA;
+  ok('the schedules corpus is loaded', !!(PS && PS.rules && PS.rules.length), 'PIT_SCH_DATA missing');
+  check('fourteen clauses', (PS.rules || []).length, 14);
+
+  const WORDS = /\b(one|two|three|five|six|seven|eight|ten|fifteen|thirty|forty[- ]?eight|sixty)\s+(working\s+|trading\s+|calendar\s+)?(days?|months?|years?|hours?)\b/gi;
+  const unsupported = [];
+  (PS.rules || []).forEach(r => {
+    const q = (r.quote || '').toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ');
+    const said = (r.timelineText || '').match(WORDS) || [];
+    said.forEach(s => {
+      const norm = s.toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+      if (q.indexOf(norm) < 0) unsupported.push(r.id + ' claims "' + s + '"');
+    });
+  });
+  ok('every period a rule states appears in the words it quotes',
+     unsupported.length === 0, unsupported.join(' | '));
+
+  // THE TRAP. SCHEDULE B1 sits INSIDE what reads as Schedule B and is the
+  // MUTUAL FUND code under Reg 5F -- its clauses restart at 1 and read almost
+  // identically against a different duty-holder. Schedule C is the same code
+  // for intermediaries and fiduciaries; D and E are the informant's own forms.
+  // Citing any of them here is SS2z: wrong law, wrong entity class.
+  const wrongSch = (PS.rules || []).filter(r =>
+    /Schedule\s*(?:B\s*1|C|D|E)\b/i.test(r.regulation || ''));
+  ok('no rule cites Schedule B1, C, D or E', wrongSch.length === 0,
+     wrongSch.map(r => r.regulation).join(', '));
+  ok('every rule cites Schedule A or Schedule B',
+     (PS.rules || []).every(r => /^Schedule [AB] cl\. \d+$/.test(r.regulation || '')),
+     'a citation is not a Schedule A or B clause');
+
+  // Clause 7 of Schedule B is omitted -- "7. [***]" -- and carries no duty.
+  ok('the omitted clause is not carried',
+     !(PS.rules || []).some(r => r.regulation === 'Schedule B cl. 7'),
+     'Schedule B cl. 7 is omitted and must not be an obligation');
+
+  const CRs = 10000000;
+  const mks = (t, cin) => ({ id:'SCH-'+t, name:t, type:t, fyend:'2026-03-31',
+    capital:5*CRs, turnover:40*CRs, networth:CRs, netprofit:CRs, borrowings:0,
+    cin: cin, chart:{} });
+  const schOf = (c) => app.getComplianceChart(c).filter(r => /^PIT-SCH-/.test(r.key || ''));
+  const listedS = mks('listed', 'L17110MH2009PLC195422');
+
+  check('a listed company receives all fourteen', schOf(listedS).length, 14);
+  check('a private company receives none', schOf(mks('private','U51909MH2018PTC300111')).length, 0);
+  check('a public unlisted company receives none', schOf(mks('public','U51909MH2015PLC300444')).length, 0);
+  check('an LLP receives none', schOf(mks('llp','AAB-1234')).length, 0);
+
+  const datedS = schOf(listedS).filter(r => r.due);
+  ok('no schedule row carries a date', datedS.length === 0,
+     datedS.map(r => r.section).join(', '));
+
+  const excS = app.lgExcludedFor(mks('private','U51909MH2018PTC300111'))
+    .filter(e => (PS.rules || []).some(r => r.regulation === e.section));
+  check('a private company is told all fourteen do not apply', excS.length, 14);
+  ok('and is given a reason for every one',
+     excS.every(e => e.reasons && e.reasons.length), 'a reason is missing');
+
+  const byC = {};
+  (PS.rules || []).forEach(r => { byC[r.regulation] = r; });
+  // A missing clause must FAIL an assertion, not throw. Re-citing a clause to
+  // Schedule C made byC[...] undefined and the block crashed - which the runner
+  // does report as caught, but as "the mutant crashed" rather than by name.
+  // SS3t: a mutation caught for the wrong reason tells you nothing about the
+  // assertion that was supposed to catch it.
+  const cl = (k) => byC[k] || { quote: '', timelineText: '', regulation: '(missing) ' + k };
+
+  // PRE-CLEARANCE IS CLAUSE 6. The generated corpus cites it as clause 3, and
+  // clause 3 is designated persons and their immediate relatives -- so
+  // following that citation to the regulation finds nothing about
+  // pre-clearance. Schedule B's numbering is stable: clause 7 reads "7. [***]",
+  // the content omitted and the slot kept.
+  ok('pre-clearance is carried at clause 6',
+     /pre-\s?clearance/i.test(cl('Schedule B cl. 6').quote), 'clause 6 is not pre-clearance');
+  ok('and clause 6 names the board-stipulated threshold',
+     /thresholds as the board of directors may stipulate/i.test(cl('Schedule B cl. 6').quote),
+     cl('Schedule B cl. 6').quote.slice(0, 80));
+
+  // The three periods Schedule B states, each a bound on the CODE rather than
+  // a deadline: a floor, a ceiling and a cadence.
+  ok('the reopening floor is forty-eight hours',
+     /forty-eight hours/i.test(cl('Schedule B cl. 5').timelineText),
+     cl('Schedule B cl. 5').timelineText);
+  ok('the pre-cleared execution window is seven TRADING days',
+     /seven trading days/i.test(cl('Schedule B cl. 9').timelineText),
+     cl('Schedule B cl. 9').timelineText);
+  ok('the compliance officer reports at least once a year',
+     /once in a year/i.test(cl('Schedule B cl. 1').timelineText),
+     cl('Schedule B cl. 1').timelineText);
+
+  // Clause 13 was SUBSTITUTED in 2019: the intimation goes to the STOCK
+  // EXCHANGES now, where the earlier wording said the Board. A code carrying
+  // the old words sends it to the wrong regulator.
+  ok('a violation is reported to the stock exchanges',
+     /stock exchange/i.test(cl('Schedule B cl. 13').quote), cl('Schedule B cl. 13').quote.slice(0,70));
+
+  // Clause 14 has TWO triggers and an annual collection alone fails it.
+  ok('the designated-person disclosure is annual AND on change',
+     /annual/i.test(cl('Schedule B cl. 14').timelineText) &&
+     /change/i.test(cl('Schedule B cl. 14').timelineText),
+     cl('Schedule B cl. 14').timelineText);
+}
+
+// ── 12. Dashboard invariants ──────────────────────────────────────────────────────────────────────────────────
 describe('dashboard invariants');
 {
   app.CLIENTS = [LISTED, PRIVATE];

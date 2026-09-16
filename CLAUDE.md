@@ -3615,8 +3615,9 @@ reads "Never checked" for all 378, and only the owner can change that.
   Excluded on the reasoning that none is this product's user.
 - **46 of the 142 uncited duty-bearing sections** in Companies Act chapters
   II&ndash;XIII, and **chapters XIV onward**, from &sect;3y.
-- **PIT Schedules A, B and C** are carried by the generated corpus as 9 rules
-  that cite no numbered provision. They have not been read clause by clause.
+- ~~PIT Schedules A, B and C~~ &mdash; **read in &sect;4d.** A and B carry 14
+  clauses nothing held; C binds intermediaries and fiduciaries, not the
+  company.
 
 ---
 
@@ -3936,6 +3937,126 @@ Smoke **96 &rarr; 100**, suite **709 &rarr; 721**, mutations **179 &rarr; 184**.
 
 ---
 
+## 4d. THE PIT SCHEDULES, CLAUSE BY CLAUSE (v194)
+
+&sect;4a left these as the last unread part of PIT: *"carried by the generated
+corpus as 9 rules that cite no numbered provision. They have not been read
+clause by clause."* Read, and **14 clauses nothing carried**. The register now
+holds 419 rules.
+
+### Five schedules, and only two of them are the customer's
+Checked against the headings rather than assumed:
+
+| | cites | binds | |
+|---|---|---|---|
+| **Schedule A** | Reg 8(1) | Principles of Fair Disclosure | **the company** |
+| **Schedule B** | Reg 9(1) | Code of Conduct **"for Listed Companies"** | **the company** |
+| Schedule B1 | Reg 5F | Code of Conduct for **Mutual Funds** | an AMC |
+| Schedule C | Reg 9(1),(2) | the same code for **Intermediaries and Fiduciaries** | not ours |
+| Schedule D, E | Reg 7B, 7D, 7E | the **informant's** own forms | not ours |
+
+Schedule B says *"for Listed Companies"* only because the 2019 amendment
+inserted those words when Schedule C was split out of it. One schedule used to
+serve both.
+
+### SCHEDULE B1 SITS INSIDE SCHEDULE B
+The trap, and it is &sect;3t's Schedule III one exactly. Read Schedule B to the
+next `SCHEDULE` heading and you take in **B1 as well** &mdash; 8,461 characters
+of the **mutual fund** code, whose clauses **restart at 1** and read almost
+identically: compliance officer reporting, trading window, pre-clearance,
+against an asset management company instead of a listed issuer.
+
+The first measurement did exactly that: Schedule B read as 22,760 characters and
+clause B.15's text ran on into B1. Bounded properly it is **14,299 characters
+and 15 clauses**. The validator compares every quote against **Schedule A and B
+only**, so a clause lifted from B1, C, D or E fails rather than shipping.
+
+### The corpus cites the wrong clause for pre-clearance
+`PIT-SCHEDULE-B-CL-3-28` is titled **"Pre-clearance"** and cites **Schedule B
+cl. 3**. Clause 3 is *designated persons and their immediate relatives being
+governed by an internal code*. **Pre-clearance is clause 6.**
+
+The substance of that rule is right and its citation is wrong, so a Company
+Secretary who followed it to the regulation would read clause 3 and find nothing
+about pre-clearance. And this is **not** a version difference: Schedule B's
+numbering is stable across the 2018 and 2019 amendments, because clause 7 reads
+**`7. [***]`** &mdash; the content omitted and the slot kept.
+
+`pit_master.json` is generated and must not be hand-edited (&sect;2k), so
+`PIT-SCH-B-6` carries the correctly cited version and quotes it, and
+`meta.miscitation` names the row it corrects. &sect;4a's treatment of the SDD
+overlap, applied to a citation rather than a period.
+
+### Fourteen clauses, and three of them state a period
+**Schedule A** &mdash; cl. 6 (information shared with analysts is not UPSI),
+cl. 7 (transcripts of analyst meetings on the website), cl. 8 (need-to-know).
+
+**Schedule B** &mdash; cl. 1, 2, 5, 6, 8, 9, 11, 12, 13, 14, 15.
+
+The three periods are each a bound on the **code**, not a deadline, and they
+point in three different directions:
+
+| | |
+|---|---|
+| **cl. 1** | the compliance officer reports to the board **not less than once in a year** &mdash; a **floor** |
+| **cl. 5** | the trading window reopens **not earlier than forty-eight hours** after the information is generally available &mdash; a **floor** |
+| **cl. 9** | a pre-cleared trade is executed within **not more than seven trading days** &mdash; a **ceiling on what the code may allow** |
+
+Cl. 9 is the one that reads backwards if skimmed: seven trading days is the
+most the code may permit, so a code stating three days binds at three.
+
+### Three clauses worth a Company Secretary's attention
+- **cl. 13 was substituted in 2019 and changed the recipient.** A violation is
+  now reported to the **stock exchanges**; the earlier wording said the Board. A
+  code carrying the old words sends the intimation to the wrong regulator. It is
+  also distinct from Reg 9A(5), which informs **SEBI** of a **leak** &mdash; a
+  company can owe both at once, to two different places.
+- **cl. 14 has two triggers and three cadences.** Names and PAN of immediate
+  relatives, of persons sharing a material financial relationship, and phone
+  numbers, **annually AND as and when the information changes** &mdash; plus
+  educational institutions and past employers **one-time**. An annual collection
+  alone leaves the register wrong for up to a year.
+- **cl. 15 was inserted in 2025**, so a code written before March 2025 does not
+  carry it: a process for how and when people are brought *inside*, and making
+  them aware of the duties and the liability. The second limb is what a
+  structured digital database alone does not evidence.
+
+### A mutation caught for the wrong reason
+Re-citing a clause to Schedule C was reported **MISSED** by my own ad-hoc
+checker &mdash; which was looking for a `FAILED` line and the mutant had
+**crashed**: `byC['Schedule B cl. 6']` became undefined and `.quote` threw. The
+real runner does count a crash as caught, but &sect;3t's rule applies: a
+mutation caught by a crash tells you nothing about the assertion meant to catch
+it.
+
+The clause lookups are total now, so a missing clause **fails an assertion**
+rather than throwing. The same mutation reports *"no rule cites Schedule B1, C,
+D or E"* and *"every rule cites Schedule A or Schedule B"* &mdash; by name.
+
+### The gate
+```
+checked                    419      (was 405)
+citation found             377      citation not found  0
+no citation                 42      (was 28 - a schedule clause is not a numbered provision)
+period mismatch              0
+```
+
+### Coverage
+Smoke **100 &rarr; 105**, suite **721 &rarr; 741**, mutations **184 &rarr; 189**.
+Verified live: a listed company gains 14 rows; public, private, OPC and LLP gain
+**0**, with all fourteen reported to an unlisted company through
+`lgExcludedFor` with a reason for each.
+
+### What is still not read
+- **Schedule B1, C, D and E** &mdash; excluded on a reading of their own
+  headings, not on reasoning.
+- **46 of the 142 uncited duty-bearing Companies Act sections**, and chapters
+  XIV onward (&sect;3y).
+- **LODR Chapters VII&ndash;IX** and **PIT Chapter IIA** &mdash; IDRs,
+  securitised debt, mutual fund units.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -4017,7 +4138,7 @@ Smoke **96 &rarr; 100**, suite **709 &rarr; 721**, mutations **179 &rarr; 184**.
   names the fix, because the only symptom of the drift was a mutation anchor
   that started matching twice (§4b).
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (100 structural checks), `node tests/compliance.test.js` (721 assertions, run against `index.html` itself), `node tests/mutation.js` (184 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 405 rules across seven corpora; it reports how many periods it actually compared, currently 151), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (741 assertions, run against `index.html` itself), `node tests/mutation.js` (189 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 419 rules across eight corpora; it reports how many periods it actually compared, currently 151), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **`python tools/amendments.py` regenerates the amendment evidence AND re-embeds
   it into `index.html`.** It reads the compilations in `reference/`, which is
   gitignored — so `rules/amendments.json` and `rules/amendments_embed.json` are
@@ -4034,7 +4155,7 @@ Smoke **96 &rarr; 100**, suite **709 &rarr; 721**, mutations **179 &rarr; 184**.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v193.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v194.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

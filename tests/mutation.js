@@ -996,6 +996,39 @@ const MUTATIONS = [
   { name: 'the screen counts the corpus while showing the book (SS4c)',
     from: '  if(GOV_ONBOOK) rules = govOnBook(rules);',
     to:   '  if(false) rules = govOnBook(rules);' },
+  // ── SS4d: PIT Schedules A and B, clause by clause ────────────
+  // SCHEDULE B1 sits inside what reads as Schedule B and is the MUTUAL FUND
+  // code under Reg 5F; Schedule C is the same code for intermediaries and
+  // fiduciaries. Both restart at clause 1 and read almost identically against a
+  // different duty-holder, so a clause lifted from either lands on a listed
+  // company looking entirely plausible (SS2z).
+  { name: 'a clause is re-cited to the intermediaries schedule (SS4d r/w SS2z)',
+    from: '"regulation":"Schedule B cl. 6"',
+    to:   '"regulation":"Schedule C cl. 6"' },
+
+  // Seven TRADING days, and there is no exchange trading calendar here. Calendar
+  // days would let a pre-clearance run past the window the code may allow.
+  { name: 'the pre-cleared execution window counts calendar days (SS4d)',
+    from: '"timelineText":"Not more than seven trading days from pre-clearance"',
+    to:   '"timelineText":"Not more than seven calendar days from pre-clearance"' },
+
+  // Forty-eight hours is the FLOOR on reopening the trading window. Halving it
+  // reopens trading before the market can assimilate the information.
+  { name: 'the trading window reopens a day early (SS4d r/w SS2w)',
+    from: '"timelineText":"Not earlier than forty-eight hours after the information becomes generally available"',
+    to:   '"timelineText":"Not earlier than twenty-four hours after the information becomes generally available"' },
+
+  // Clause 14 has TWO triggers - annually AND as and when the information
+  // changes. An annual collection alone leaves the register wrong for a year.
+  { name: 'the designated-person disclosure loses its on-change trigger (SS4d)',
+    from: '"timelineText":"On an annual basis and as and when the information changes"',
+    to:   '"timelineText":"On an annual basis"' },
+
+  // Schedule A is Reg 8(1) and Schedule B is "for Listed Companies" under
+  // Reg 9(1). Neither reaches an unlisted company.
+  { name: 'schedule clauses stop being ruled out for an unlisted company (SS4d r/w SS2z)',
+    from: '"appliesTo":{"entityType":["listed"]},"appliesToText":"Every listed company","owner":"CS / Compliance officer","evidence":"The fair disclosure code clause;',
+    to:   '"appliesTo":{"entityType":["listed","private"]},"appliesToText":"Every listed company","owner":"CS / Compliance officer","evidence":"The fair disclosure code clause;' },
 ];
 
 const src = fs.readFileSync(INDEX, 'utf8');

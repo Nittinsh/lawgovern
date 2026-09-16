@@ -322,6 +322,7 @@ function eq(name, a, b) { ok(name, a === b, `${a} !== ${b}`); }
     ['LODR_DEBT_DATA', 'rules/lodr_debt.json'],
     ['LODR_SUP_DATA',  'rules/lodr_supplement.json'],
     ['PIT_SUP_DATA',   'rules/pit_supplement.json'],
+    ['PIT_SCH_DATA',   'rules/pit_schedules.json'],
     ['CA_SUP_DATA',    'rules/ca_supplement.json'],
     ['DEPOS_DATA',     'rules/depositories_master.json'],
   ];
