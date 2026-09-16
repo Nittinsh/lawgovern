@@ -181,9 +181,54 @@ WORDNUM = dict((re.sub(r'[\s-]+', '', k), v) for k, v in _WORDS.items())
 FOOTMARK = re.compile(r'\d{1,4}\[')
 
 
+# A CADENCE IS NOT A DEADLINE, and it is written in a shape the deadline
+# pattern cannot see. PERIOD wants the number just after the lead-in, so
+# "at least three working days" parses and "at least once every three years"
+# does not -- the number sits behind "once every".
+#
+# Five rules state one: Reg 23(1) (RPT policy reviewed once every three years),
+# Reg 55, Reg 31B(1), PIT Reg 9A(4) and Schedule B cl. 1. Every one was filed as
+# "rule states no period" and its number was never compared against the held
+# text -- including three written by hand in SS4a and SS4d.
+#
+# Two shapes, kept apart deliberately rather than folded into FILLER: loosening
+# FILLER to reach across "once every" would also let it reach across anything
+# else, and a parser that matches more than it understands is SS2x's check that
+# cries wolf.
+CADENCE_N = re.compile(
+    r'once\s+(?:in\s+)?every\s+(\d+|(?:\w+[\s-]+){0,2}?\w+)\s+(' + UNITS + r')', re.I)
+# No number means one: "once a year", "once in a financial year".
+CADENCE_1 = re.compile(
+    r'once\s+(?:in\s+)?(?:a|an|each|per)\s+(?:financial\s+|calendar\s+)?('
+    + UNITS + r')', re.I)
+
+
+def _norm(n, unit):
+    """One number and one unit, however the three texts happen to write them."""
+    n, unit = str(n).lower().strip(), re.sub(r'\s+', ' ', unit.lower())
+    key = re.sub(r'[\s-]+', '', n)
+    n = WORDNUM.get(key, WORDNUM.get(n, n))
+    try:
+        n = int(n)
+    except Exception:
+        return None
+    u = ('working day' if 'working' in unit or 'business' in unit
+         else unit.replace('calendar ', '').replace('clear ', '')
+                  .replace('trading ', '').rstrip('s'))
+    return (n, u)
+
+
 def periods_in(s):
     s = FOOTMARK.sub(' ', s or '').replace(']', ' ')
     out = set()
+    for m in CADENCE_N.finditer(s):
+        got = _norm(m.group(1), m.group(2))
+        if got:
+            out.add(got)
+    for m in CADENCE_1.finditer(s):
+        got = _norm(1, m.group(1))
+        if got:
+            out.add(got)
     for m in PERIOD.finditer(s):
         n, unit = m.group(1).lower().strip(), re.sub(r'\s+',' ',m.group(2).lower())
         # "within a period of thirty days" can also match with n='of'; the
@@ -291,6 +336,40 @@ def context_of(text, reg, law=None, span=2600):
     # used to be reachable stops being so.
     return text[s:max(e, min(len(text), s + span))]
 
+
+# ── the parser checks itself before it checks the law ─────
+# Every "finding" on this audit's first three runs was its own bug (SS2v), and
+# SS3w added a fourth: a widening that fixed the digit case and left every
+# spelled one broken, "which is worse than the bug it replaced because it looked
+# like progress". Both shapes of every form are pinned here, so a parser change
+# that silently narrows the audit fails the gate instead of quietly comparing
+# fewer rules.
+PARSER_CASES = [
+    # cadences -- the shape SS4h added. Digit AND spelled.
+    ('Review at least once every 3 years',           {(3, 'year')}),
+    ('at least once every three years',              {(3, 'year')}),
+    ('Once in every five years starting from grant', {(5, 'year')}),
+    ('once in every 5 years',                        {(5, 'year')}),
+    ('At least once a year',                         {(1, 'year')}),
+    ('At least once in a financial year',            {(1, 'year')}),
+    ('not less than once in a year',                 {(1, 'year')}),
+    # deadlines -- every one of these is a bug this audit actually had.
+    ('within 30 days',                  {(30, 'day')}),          # the plain case
+    ('not later than twenty one days',  {(21, 'day')}),          # SS2v, two words
+    ('within se ven days',              {(7, 'day')}),           # SS2v, split word
+    ('within forty -five days',         {(45, 'day')}),          # SS3v, split number
+    ('w ithin forty eight hours',       {(48, 'hour')}),         # SS3v, split "within"
+    ('within 2 working days',           {(2, 'working day')}),   # SS3w, greedy branch
+    ('within a period of thirty days',  {(30, 'day')}),          # SS3v, filler
+    ('at least three working days',     {(3, 'working day')}),
+]
+_bad = [(s, exp, periods_in(s)) for s, exp in PARSER_CASES if periods_in(s) != exp]
+if _bad:
+    print('PARSER SELF-CHECK FAILED — the audit cannot be trusted this run.')
+    for s, exp, got in _bad:
+        print('   %-46r expected %s, got %s' % (s, sorted(exp), sorted(got)))
+    print('\nEvery case above is a shape one of these texts actually uses.')
+    sys.exit(2)
 
 findings = collections.defaultdict(list)
 counts = collections.Counter()

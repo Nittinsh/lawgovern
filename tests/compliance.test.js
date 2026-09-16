@@ -3231,6 +3231,40 @@ describe('rule verification evidence');
      !!quoted && cb.indexOf(String(quoted.quote).slice(0, 40)) >= 0,
      cb.slice(0, 160));
 
+  // ── cadences (SS4h) ───────────────────────────────────────
+  // "at least three working days" parsed; "at least once every three years"
+  // did not, because the number sits behind "once every". So every rule stating
+  // a CADENCE was filed as "states no period" and its number was never compared
+  // against the held text -- including three written by hand in SS4a and SS4d.
+  //
+  // Asserted on the EMBEDDED RESULT, because the parser is Python and the only
+  // app-side artefact is derived. tools/rule_audit.py carries the matching
+  // self-check over both digit and spelled shapes.
+  const CADENCE = [
+    ['LODR-REG-23-1',  '3 year', 'the RPT policy is reviewed once every three years'],
+    ['LODR-SUP-REG-31B', '5 year', 'special rights are re-approved once every five years'],
+    ['PIT-SUP-REG-9A-4', '1 year', 'the Audit Committee reviews once a financial year']
+  ];
+  CADENCE.forEach(([id, period, what]) => {
+    const g = G.rules[id];
+    ok('the gate reads the cadence: ' + what, !!g && (g.w || []).indexOf(period) >= 0,
+       g ? ('verdict ' + g.v + ', states ' + JSON.stringify(g.w || null)) : 'no gate entry');
+    ok('and confirms it against the provision: ' + what,
+       !!g && g.v === 'ok' && (g.h || []).indexOf(period) >= 0,
+       g ? ('verdict ' + g.v + ', provision carries ' + JSON.stringify(g.h || null)) : 'missing');
+  });
+
+  // The count the gate reports about its own reach. SS3v: a count of failures
+  // means nothing without the count of checks behind it, and this one moved
+  // because the parser got better, not because the corpus changed.
+  const compared = Object.keys(G.rules)
+    .filter(id => ['ok', 'mismatch'].indexOf(G.rules[id].v) >= 0);
+  ok('the gate compares more than 150 rules against the held text',
+     compared.length >= 154, compared.length + ' compared');
+  const wrong = compared.filter(id => G.rules[id].v === 'mismatch');
+  ok('and no rule contradicts the provision it cites', wrong.length === 0,
+     wrong.join(', '));
+
   // A rule with nothing to show must render nothing rather than an empty box.
   check('a rule with no claim and no quote renders nothing',
         app.govClaimBlock({ id: 'X', section: 'X', title: 'X' }), '');

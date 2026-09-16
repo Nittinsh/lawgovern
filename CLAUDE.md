@@ -4460,6 +4460,106 @@ read from. Zero console errors.
 
 ---
 
+## 4h. A CADENCE IS NOT A DEADLINE, AND THE GATE COULD NOT READ ONE (v198)
+
+*"yes add reg 23(1)"* &mdash; and the honest answer is that it was already
+there, stated correctly, and **my &sect;4g report was wrong**.
+
+`LODR-REG-23-1` carries `timelineText: "Review at least once every 3 years"`.
+I had reported it as stating no period, on the strength of the gate's own
+`noperiod` verdict. The gate was wrong, and so was I for repeating it without
+opening the rule.
+
+**Every "finding" on this audit's first three runs was its own bug (&sect;2v).
+&sect;3w made it four. This is five.**
+
+### The number sits behind "once every"
+```
+at least three working days        -> (3, 'working day')
+at least once every three years    -> []
+```
+`PERIOD` expects the number just after the lead-in. A **cadence** puts it behind
+*once every*, so the pattern never reaches it &mdash; and every rule stating one
+was filed as *"rule states no period"* and its number **never compared against
+the held text**.
+
+Five rules state a cadence, and **three of them I wrote by hand**:
+
+| | states | |
+|---|---|---|
+| **Reg 23(1)** | review the RPT policy once every three years | the one asked about |
+| **Reg 31B(1)** | special rights re-approved once every five years | &sect;3z |
+| **PIT Reg 9A(4)** | Audit Committee reviews once a financial year | &sect;4a |
+| Schedule B cl. 1 | compliance officer reports not less than once in a year | &sect;4d |
+| Reg 55 | credit rating reviewed at least once a year | debt |
+
+So three hand-authored rules had been carrying periods that nothing had ever
+checked, in a corpus whose whole claim is that its periods are held to the text.
+
+### Two shapes, kept apart from the deadline pattern deliberately
+`CADENCE_N` reads *once every N &lt;unit&gt;*; `CADENCE_1` reads *once a / once
+in a &lt;unit&gt;*, where no number means one. **Loosening `FILLER` to reach
+across "once every" would let it reach across anything else** &mdash; a parser
+that matches more than it understands is &sect;2x's check that cries wolf,
+pointed at the law.
+
+### And they all confirm
+```
+period compared            151 -> 154
+period mismatch                     0
+```
+
+| | rule says | provision carries | |
+|---|---|---|---|
+| **Reg 23(1)** | 3 year | 3 year | &ldquo;such policy shall be reviewed by the board of directors **at least once every three years**&rdquo; |
+| **Reg 31B(1)** | 5 year | 5 year | clean, single match |
+| **PIT Reg 9A(4)** | 1 year | 1 year | clean, single match |
+
+Reg 23(1)'s words are **current operative text**: footnote 204 reads *"Inserted
+by ... w.e.f. 1.4.2019"*, so the bracket is an insertion and not a
+&sect;3e-style quotation of wording since removed. Checked before trusting it,
+because that trap has cost this project three sections.
+
+**Reg 55 comes back `noctx`** &mdash; the provision was located and no readable
+span returned. Reported as itself rather than folded into "no period", which is
+the whole point of having ten verdict codes.
+
+### The parser now checks itself before it checks the law
+`mutation.js` mutates `index.html`, and the only app-side artefact of this
+parser is the **derived** blob the runner is deliberately blind to (&sect;4g).
+So &sect;2t's rule &mdash; add the assertion that would have caught it &mdash;
+had to land where the code lives.
+
+`PARSER_CASES` pins **both** shapes of every form: digit and spelled cadences,
+and the seven deadline shapes that were each a real bug here &mdash; `se ven`,
+`forty -five`, `w ithin`, `twenty one`, `2 working days`, `a period of`. The
+gate **exits 2 and names the failing cases** if any stops parsing.
+
+&sect;3w is why both shapes are pinned: *"Digits-first fixed the digit case and
+left every spelled one broken, which is worse than the bug it replaced because
+it looked like progress."*
+
+**Watched failing before being trusted** (&sect;3c): breaking the cadence branch
+produces exit 2 and the four cases by name.
+
+### One of my own, again
+I asserted `LODR-REG-31B-1` without reading it; the id is `LODR-SUP-REG-31B`.
+&sect;3t's *"I asserted values I had not read"* &mdash; and the suite caught it
+in the same minute, which is what it is for.
+
+### Coverage
+Suite **788 &rarr; 796**, mutations **204 caught, 0 missed, 0 skipped**, smoke
+105, backend 96. Gate **151 &rarr; 154 periods compared of 419 (37%)**, 0
+mismatches.
+
+### What this does and does not mean
+Three more rules are now held to the text they cite. **It still verifies
+nothing** &mdash; Rule Governance reads "Never checked" for all 419, and the
+number that matters is unchanged. What moved is that the audit stopped being
+quietly wrong about 5 rules, and says so about Reg 55 rather than guessing.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -4548,7 +4648,7 @@ read from. Zero console errors.
   names the fix, because the only symptom of the drift was a mutation anchor
   that started matching twice (§4b).
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (788 assertions, run against `index.html` itself), `node tests/mutation.js` (204 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 419 rules across eight corpora; it reports how many periods it actually compared, currently 151), and `node tests/backend.test.js` (96 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (796 assertions, run against `index.html` itself), `node tests/mutation.js` (204 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 419 rules across eight corpora; it reports how many periods it actually compared, currently 154, and self-checks its own period parser before it reads a line of law), and `node tests/backend.test.js` (96 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **`python tools/rule_audit.py` regenerates `rules/audit_findings.json` AND
   re-embeds it into `index.html` as `var LG_GATE`** — on every run, not behind
   a flag, so the reviewer's evidence cannot drift behind the gate that produced
@@ -4571,7 +4671,7 @@ read from. Zero console errors.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v197.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v198.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/026` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**
