@@ -4560,6 +4560,98 @@ quietly wrong about 5 rules, and says so about Reg 55 rather than guessing.
 
 ---
 
+## 4i. THE SIXTEEN, READ ONE BY ONE (v199)
+
+*"now do the remaining ones from that list of 16"*. All sixteen read against
+the held texts. **Thirteen were the audit's own reading limits. Two were real.**
+
+| | verdict |
+|---|---|
+| Reg 13(2), 13(3), 13(4) | the twenty-one days belongs to **Reg 13(1)**, which the corpus carries **correctly**. Whole-provision false positives |
+| Reg 23(1) | a **parser** gap, not a rule gap &mdash; fixed and confirmed in &sect;4h |
+| Reg 23(2), 23(3), 23(9), 31(2) | all four state their period correctly (*"Prior to the transaction"*, *"Valid 1 year; quarterly review"*, *"Every six months, ON THE DATE of publication"*, *"Continuous"*). The detector matched a neighbour's number |
+| Reg 31(1)(a) | states **"1 day prior to listing"** &mdash; correct. The parser needs a lead-in word and this has none |
+| Sections 173, 174, 118 | the thirty days is **s.118 minutes**, already modelled **per meeting** from the meetings register (&sect;2l) |
+| Section 82 | the thirty days is **s.82(1)**, already modelled as **CHG-4** from the charges register (&sect;2m) |
+| Sections 12, 15 | s.12(1)'s thirty days is the **one-time establishment** deadline at incorporation; the rule is the **continuous maintenance** duty. A different obligation |
+| PIT Reg 7(3) | **discretionary** &mdash; *"at such frequency as may be determined by the company"*. No period is missing |
+| **Sections 101, 102** | **REAL** &mdash; s.101(1) fixes twenty-one clear days and the rule stated none |
+| **PIT Reg 7(1)(b)** | **REAL** &mdash; the provision fixes seven days and the rule said *"Within prescribed timeline"* |
+
+**Thirteen of sixteen.** &sect;2x's rule, measured: the automated version of this
+check would be wrong four times in five, and shipping it as a screen would have
+been worse than not having it.
+
+### And a third thing, which is not a missing period
+**`PIT-REG-7-1-14` cites a provision that no longer exists.** Reg 7(1)(a) reads
+`63[***]` in the held text &mdash; **omitted with effect from 26 April 2021**.
+The footnote records what it used to say: the one-time disclosure of holdings
+*"as on the date of these regulations taking effect ... within thirty days"*.
+
+The row is titled *"Initial holding disclosure"*, which is that clause's subject
+exactly. It carries `needsReview: true` and states *"Within prescribed
+timeline"*, so it asserts nothing false &mdash; but it is an obligation on a
+listed company's register that **was repealed five years ago**, and a spent
+transitional duty besides.
+
+`pit_master.json` is generated and must not be hand-edited (&sect;2k), so this is
+**reported, not silently repaired** (&sect;3j). The supplement names it in the
+detail of the rule that replaces it, and it is the owner's call.
+
+### The seven days is the PERSON'S, and saying so is the whole point
+Reg 7(1)(b) binds *"every person on appointment as a key managerial personnel or
+a director of the company or upon becoming a promoter"*, and the disclosure runs
+**to** the listed entity.
+
+So the company's duty is to **collect and hold** it &mdash; Reg 6(4) keeps these
+five years (&sect;4a) &mdash; and the exchange intimation is a **separate**
+obligation under Reg 7(2)(b) with its own two trading days. Claiming the seven
+days as the entity's own deadline would put a filing on the register the company
+does not owe: &sect;3y's s.84 and &sect;3z's Reg 30A, for the third time.
+
+### "Clear" days, and a period that runs backward
+s.101(1): *"A general meeting of a company may be called by giving not less than
+clear twenty-one days' notice."*
+
+**Clear days exclude both the day of service and the day of the meeting**, so
+twenty-one clear days is longer than twenty-one days. And the period runs
+**backward** from a meeting the company fixes &mdash; so dropping the word
+*clear* gives a **later** last date than the Act allows. &sect;3z's inversion:
+the same approximation that errs early on a forward deadline errs **late** on a
+backward one.
+
+The app has computed with this period since &sect;3d &mdash; the annual report is
+anchored to the AGM less twenty-one clear days, because Reg 36(1) sends the
+report with the notice. **The register itself had never stated it.**
+
+Neither rule carries a date, and both say which kind of silence that is: the
+period is certain and the **anchor is not held** (&sect;3x's third kind). The app
+holds no register of appointments and no planned meeting date.
+
+### The suite caught the thing I forgot
+Adding both rules failed `[pit supplement] every undated rule that states a
+period explains why it has no date` &mdash; &sect;4a's own invariant, enforcing
+&sect;3e's *a blank is not an explanation*. I had written the rules and not the
+explanations. Four corpus counts also had to move from eleven to twelve.
+
+**That is the machinery working**: an invariant written three sections ago
+refused a rule that did not meet it.
+
+### Coverage
+Suite **796 &rarr; 812**, mutations **204 &rarr; 209 caught, 0 missed, 0
+skipped**. Smoke 105, backend 96. Gate **419 &rarr; 421 rules, 379 citations, 0
+unresolved, 155 periods compared, 0 mismatches**. Verified live: both rows reach
+a listed company's register undated with their explanation, register 301 &rarr;
+303, zero console errors.
+
+### The count that has not moved
+**Rule Governance still reads "Never checked" for all 421.** Reading sixteen
+provisions to settle sixteen questions about the audit is not the same as a
+Company Secretary signing off a rule, and this file must not let one pass for
+the other.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -4648,7 +4740,7 @@ quietly wrong about 5 rules, and says so about Reg 55 rather than guessing.
   names the fix, because the only symptom of the drift was a mutation anchor
   that started matching twice (§4b).
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (796 assertions, run against `index.html` itself), `node tests/mutation.js` (204 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 419 rules across eight corpora; it reports how many periods it actually compared, currently 154, and self-checks its own period parser before it reads a line of law), and `node tests/backend.test.js` (96 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (812 assertions, run against `index.html` itself), `node tests/mutation.js` (209 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 421 rules across eight corpora; it reports how many periods it actually compared, currently 155, and self-checks its own period parser before it reads a line of law), and `node tests/backend.test.js` (96 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **`python tools/rule_audit.py` regenerates `rules/audit_findings.json` AND
   re-embeds it into `index.html` as `var LG_GATE`** — on every run, not behind
   a flag, so the reviewer's evidence cannot drift behind the gate that produced
@@ -4671,7 +4763,7 @@ quietly wrong about 5 rules, and says so about Reg 55 rather than guessing.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v198.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v199.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/026` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

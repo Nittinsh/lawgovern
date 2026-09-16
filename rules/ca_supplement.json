@@ -6,7 +6,8 @@
   "method": "The Act's own chapters did the first cut. Chapters II to XIII run from incorporation to managerial remuneration and are where a company's recurring and registrable duties live; Chapter XIV onward is inspection, compromises, oppression, winding up, Tribunal and offences - event-driven, or about someone other than the company. Within those chapters: 193 sections impose a duty, 51 were already cited, 142 were not, and 96 of those state a period or name a return. Those 96 were read and eleven are obligations on the COMPANY with a period the Act itself states.",
   "excluded": "s.84 states thirty days but the duty is on the person who obtains the receiver's appointment, not on the company - the company is the recipient of the notice. s.13's fifteen days was substituted away by Act 1 of 2018 and the held text does not make the current period plain. s.58, s.59, s.62, s.66, s.68 and s.74 run through the Tribunal or through multi-stage offers rather than a filing deadline. Punishment and liability sections (s.34-38, s.86, s.127, s.147) are consequences, not obligations.",
   "stale": "The Act held here is amended only to 01.04.2021 - over five years old. Any period below must be re-checked against a current compilation before it is relied on. This is SS2c's standing warning and it applies to every rule in this file.",
-  "count": 11
+  "count": 11,
+  "overlaps": []
  },
  "rules": [
   {
@@ -20,9 +21,19 @@
    "quote": "A company incorporated after the commencement of the Companies (Amendment) Act, 2019 and having a share capital shall not commence any business or exercise any borrowing powers unless - (a) a declaration is filed by a director within a period of one hundred and eighty days of the date of incorporation of the company ... with the Registrar that every subscriber to the memorandum has paid the value of the shares agreed to be taken by him",
    "frequency": "Once, on incorporation",
    "timelineText": "Within one hundred and eighty days of the date of incorporation",
-   "due": { "type": "at_trigger", "when": "Within 180 days of incorporation" },
+   "due": {
+    "type": "at_trigger",
+    "when": "Within 180 days of incorporation"
+   },
    "dueConfidence": "trigger",
-   "appliesTo": { "entityType": ["private", "public", "listed", "opc"] },
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
    "appliesToText": "Company having a share capital, incorporated after the Companies (Amendment) Act 2019",
    "owner": "CS / Director",
    "evidence": "Filed declaration with SRN; bank statement evidencing subscription money; registered office verification",
@@ -44,9 +55,20 @@
    "quote": "Every alteration of the articles under this section and a copy of the order of the Central Government approving the alteration as per sub-section (1) shall be filed with the Registrar, together with a printed copy of the altered articles, within a period of fifteen days in such manner as may be prescribed",
    "frequency": "On every alteration of articles",
    "timelineText": "Within a period of fifteen days",
-   "due": { "type": "at_trigger", "when": "Within fifteen days of the alteration" },
+   "due": {
+    "type": "at_trigger",
+    "when": "Within fifteen days of the alteration"
+   },
    "dueConfidence": "trigger",
-   "appliesTo": { "entityType": ["private", "public", "listed", "opc", "sec8"] },
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc",
+     "sec8"
+    ]
+   },
    "appliesToText": "Every company altering its articles",
    "owner": "CS",
    "evidence": "Filed form with SRN; printed copy of altered articles; special resolution",
@@ -67,9 +89,20 @@
    "quote": "A company shall, on being so requested by a member, send to him within seven days of the request and subject to the payment of such fees as may be prescribed, a copy of each of the following documents",
    "frequency": "Per member request",
    "timelineText": "Within seven days of the request",
-   "due": { "type": "at_trigger", "when": "Within seven days of the member's request" },
+   "due": {
+    "type": "at_trigger",
+    "when": "Within seven days of the member's request"
+   },
    "dueConfidence": "trigger",
-   "appliesTo": { "entityType": ["private", "public", "listed", "opc", "sec8"] },
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc",
+     "sec8"
+    ]
+   },
    "appliesToText": "Every company, on a member's request",
    "owner": "CS",
    "evidence": "Request register with date received and date despatched",
@@ -89,9 +122,20 @@
    "quote": "the company shall file a notice in the prescribed form with the Registrar within a period of thirty days of such alteration or increase or redemption, as the case may be, along with an altered memorandum",
    "frequency": "On alteration, increase or redemption",
    "timelineText": "Within a period of thirty days of the alteration, increase or redemption",
-   "due": { "type": "at_trigger", "when": "Within thirty days of the alteration" },
+   "due": {
+    "type": "at_trigger",
+    "when": "Within thirty days of the alteration"
+   },
    "dueConfidence": "trigger",
-   "appliesTo": { "entityType": ["private", "public", "listed", "opc", "sec8"] },
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc",
+     "sec8"
+    ]
+   },
    "appliesToText": "Every company altering, increasing or redeeming share capital",
    "owner": "CS",
    "evidence": "Filed notice with SRN; altered memorandum; board and member resolutions",
@@ -112,9 +156,19 @@
    "quote": "If the Board does not, within twenty-one days from the date of receipt of a valid requisition in regard to any matter, proceed to call a meeting for the consideration of that matter on a day not later than forty-five days from the date of receipt of such requisition, the meeting may be called and held by the requisitionists themselves within a period of three months from the date of the requisition",
    "frequency": "Per valid requisition",
    "timelineText": "Board to proceed within twenty-one days; meeting not later than forty-five days from receipt of the requisition",
-   "due": { "type": "at_trigger", "when": "Board proceeds within 21 days; meeting within 45 days of the requisition" },
+   "due": {
+    "type": "at_trigger",
+    "when": "Board proceeds within 21 days; meeting within 45 days of the requisition"
+   },
    "dueConfidence": "trigger",
-   "appliesTo": { "entityType": ["private", "public", "listed", "sec8"] },
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "sec8"
+    ]
+   },
    "appliesToText": "Every company receiving a valid members' requisition",
    "owner": "CS / Board",
    "evidence": "Requisition with date of receipt; board resolution calling the meeting; notice",
@@ -134,9 +188,20 @@
    "quote": "Any member shall be entitled to be furnished, within seven working days after he has made a request in that behalf to the company, and on payment of such fees as may be prescribed, with a copy of any minutes referred to in sub-section (1)",
    "frequency": "Per member request",
    "timelineText": "Within seven working days after the request",
-   "due": { "type": "at_trigger", "when": "Within seven working days of the member's request" },
+   "due": {
+    "type": "at_trigger",
+    "when": "Within seven working days of the member's request"
+   },
    "dueConfidence": "trigger",
-   "appliesTo": { "entityType": ["private", "public", "listed", "opc", "sec8"] },
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc",
+     "sec8"
+    ]
+   },
    "appliesToText": "Every company, on a member's request",
    "owner": "CS",
    "evidence": "Request register; despatch record",
@@ -156,9 +221,16 @@
    "quote": "Every listed public company shall prepare in the prescribed manner a report on each annual general meeting including the confirmation to the effect that the meeting was convened, held and conducted as per the provisions of this Act and the rules made thereunder. (2) The company shall file with the Registrar a copy of the report referred to in sub-section (1) within thirty days of the conclusion of the annual general meeting",
    "frequency": "Annual",
    "timelineText": "Within thirty days of the conclusion of the annual general meeting",
-   "due": { "type": "agm_offset", "days": 30 },
+   "due": {
+    "type": "agm_offset",
+    "days": 30
+   },
    "dueConfidence": "exact",
-   "appliesTo": { "entityType": ["listed"] },
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
    "appliesToText": "Every listed public company",
    "owner": "CS",
    "evidence": "Signed report; filed form with SRN",
@@ -180,9 +252,20 @@
    "quote": "Where a dividend has been declared by a company but has not been paid or claimed within thirty days from the date of the declaration to any shareholder entitled to the payment of the dividend, the company shall, within seven days from the date of expiry of the said period of thirty days, transfer the total amount of dividend which remains unpaid or unclaimed to a special account to be opened by the company in that behalf in any scheduled bank to be called the Unpaid Dividend Account",
    "frequency": "Per dividend declared",
    "timelineText": "Within seven days of the expiry of thirty days from declaration - i.e. by day 37",
-   "due": { "type": "at_trigger", "when": "Seven days after the thirty days from declaration expire" },
+   "due": {
+    "type": "at_trigger",
+    "when": "Seven days after the thirty days from declaration expire"
+   },
    "dueConfidence": "trigger",
-   "appliesTo": { "entityType": ["private", "public", "listed", "opc", "sec8"] },
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc",
+     "sec8"
+    ]
+   },
    "appliesToText": "Every company that has declared a dividend",
    "owner": "CS / CFO",
    "evidence": "Bank statement for the Unpaid Dividend Account; transfer advice; dividend register",
@@ -202,9 +285,18 @@
    "quote": "file a copy with the Registrar within a period of thirty days of completion of the relevant period with such fees as may be prescribed",
    "frequency": "Periodical, as prescribed",
    "timelineText": "Within a period of thirty days of completion of the relevant period",
-   "due": { "type": "at_trigger", "when": "Within thirty days of the end of the relevant period" },
+   "due": {
+    "type": "at_trigger",
+    "when": "Within thirty days of the end of the relevant period"
+   },
    "dueConfidence": "trigger",
-   "appliesTo": { "entityType": ["private", "public", "opc"] },
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "opc"
+    ]
+   },
    "appliesToText": "Such class of unlisted companies as the Central Government may require",
    "owner": "CS / CFO",
    "evidence": "Board approval; audit or limited review report; filed copy with SRN",
@@ -225,9 +317,20 @@
    "quote": "Every company shall, within fifteen days of the receipt of intimation under section 156, furnish the Director Identification Number of all its directors to the Registrar or any other officer or authority as may be specified by the Central Government with such fees as may be prescribed",
    "frequency": "On receipt of a DIN intimation",
    "timelineText": "Within fifteen days of the receipt of intimation under section 156",
-   "due": { "type": "at_trigger", "when": "Within fifteen days of the director's DIN intimation" },
+   "due": {
+    "type": "at_trigger",
+    "when": "Within fifteen days of the director's DIN intimation"
+   },
    "dueConfidence": "trigger",
-   "appliesTo": { "entityType": ["private", "public", "listed", "opc", "sec8"] },
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc",
+     "sec8"
+    ]
+   },
    "appliesToText": "Every company",
    "owner": "CS",
    "evidence": "Director's s.156 intimation with date received; filed form with SRN",
@@ -248,9 +351,16 @@
    "quote": "The company shall inform the Registrar about every contract entered into by the company and recorded in the minutes of the meeting of its Board of Directors under sub-section (1) within a period of fifteen days of the date of approval by the Board of Directors",
    "frequency": "Per contract with the sole member",
    "timelineText": "Within a period of fifteen days of the date of approval by the Board",
-   "due": { "type": "at_trigger", "when": "Within fifteen days of Board approval" },
+   "due": {
+    "type": "at_trigger",
+    "when": "Within fifteen days of Board approval"
+   },
    "dueConfidence": "trigger",
-   "appliesTo": { "entityType": ["opc"] },
+   "appliesTo": {
+    "entityType": [
+     "opc"
+    ]
+   },
    "appliesToText": "One Person Company contracting with its sole member who is also a director",
    "owner": "CS / Director",
    "evidence": "Board minutes recording the contract; intimation to the Registrar with SRN",
@@ -259,6 +369,36 @@
    "submitTo": "Registrar of Companies",
    "notes": "ONE PERSON COMPANIES ONLY, and only for contracts with the sole member who is also a director. s.193(1) excludes contracts entered into in the ordinary course of business, so not every contract triggers this. The fifteen days runs from BOARD APPROVAL, not from the contract date.",
    "needsReview": false
+  },
+  {
+   "id": "CA-SUP-SEC-101-1",
+   "sourceRow": 12,
+   "law": "Companies Act 2013",
+   "regulation": "Section 101(1)",
+   "area": "General meeting notice",
+   "title": "Call a general meeting on not less than clear twenty-one days' notice, in writing or by electronic mode",
+   "detail": "\"Clear\" days exclude both the day the notice is served and the day of the meeting, so twenty-one clear days is longer than twenty-one days. The proviso allows a shorter notice with the consent of the prescribed majority of members, which is a fact about the meeting and not a period -- so it is named rather than modelled. The app already computes with this period: SS3d anchors the annual report to the AGM less twenty-one clear days, because Reg 36(1) sends the report with the notice. The register itself had never stated it.",
+   "quote": "A general meeting of a company may be called by giving not less than clear twenty -one days",
+   "frequency": "Event-driven",
+   "timelineText": "Not less than clear twenty-one days before the meeting",
+   "due": null,
+   "dueConfidence": "stated",
+   "appliesTo": {
+    "entityType": [
+     "listed",
+     "public",
+     "private",
+     "sec8"
+    ]
+   },
+   "appliesToText": "Every company calling a general meeting",
+   "owner": "CS",
+   "evidence": "The notice, and proof of the date it was issued",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": "Members, directors and auditors",
+   "signedBy": "CS or a director",
+   "notes": "Counted backwards from a meeting the company fixes, so no date is computed -- the register holds no planned meeting date. The period runs BACKWARD from the meeting, so treating clear days as calendar days would produce a LATER last date than the Act allows (SS3z)."
   }
  ]
 }

@@ -2369,7 +2369,7 @@ describe('companies act supplement');
 {
   const CS = app.CA_SUP_DATA;
   ok('the supplement is loaded', !!(CS && CS.rules && CS.rules.length), 'CA_SUP_DATA missing');
-  check('eleven obligations', (CS.rules || []).length, 11);
+  check('twelve obligations', (CS.rules || []).length, 12);   // SS4i added s.101(1)
 
   // THE INVARIANT. Where a rule states a period, that period must appear in
   // the quote. Otherwise the register asserts a number the evidence beside it
@@ -2625,7 +2625,7 @@ describe('pit supplement');
 {
   const PS = app.PIT_SUP_DATA;
   ok('the supplement is loaded', !!(PS && PS.rules && PS.rules.length), 'PIT_SUP_DATA missing');
-  check('eleven obligations', (PS.rules || []).length, 11);
+  check('twelve obligations', (PS.rules || []).length, 12);   // SS4i added Reg 7(1)(b)
 
   // THE INVARIANT (SS3y/SS3z).
   const WORDS = /\b(two|three|four|five|six|seven|eight|nine|ten|fifteen|thirty|sixty|ninety)\s+(working\s+|trading\s+|calendar\s+)?(days?|months?|years?)\b/gi;
@@ -2671,7 +2671,7 @@ describe('pit supplement');
   const supP = (c) => app.getComplianceChart(c).filter(r => /^PIT-SUP/.test(r.key || ''));
   const listedP = mkp('listed', 'L17110MH2009PLC195422');
 
-  check('a listed company receives all eleven', supP(listedP).length, 11);
+  check('a listed company receives all twelve', supP(listedP).length, 12);
   check('a private company receives none', supP(mkp('private','U51909MH2018PTC300111')).length, 0);
   check('a public unlisted company receives none', supP(mkp('public','U51909MH2015PLC300444')).length, 0);
   check('an LLP receives none', supP(mkp('llp','AAB-1234')).length, 0);
@@ -2683,7 +2683,7 @@ describe('pit supplement');
   // SS3i: an unlisted company must be told these do not apply, and why.
   const excP = app.lgExcludedFor(mkp('private','U51909MH2018PTC300111'))
     .filter(e => (PS.rules || []).some(r => r.regulation === e.section));
-  check('a private company is told all eleven do not apply', excP.length, 11);
+  check('a private company is told all twelve do not apply', excP.length, 12);
   ok('and is given a reason for every one',
      excP.every(e => e.reasons && e.reasons.length), 'a reason is missing');
 
@@ -3272,7 +3272,71 @@ describe('rule verification evidence');
         app.govGateBlock({ id: 'NOT-A-RULE-ID', section: 'X', title: 'X' }), '');
 }
 
-// ── 12. Dashboard invariants ──────────────────────────────────────────────────────────────────────────────────────────────────
+// -- 11aa. The two gaps the list of 16 actually yielded (SS4i) --
+// Thirteen of the sixteen were the audit's own reading limits. These two were
+// real, and each is a period stated in the provision and absent from the rule.
+describe('the sixteen, read');
+{
+  const PS = app.PIT_SCH_DATA ? app.PIT_SUP_DATA : app.PIT_SUP_DATA;
+  const pitB = (app.PIT_SUP_DATA.rules || []).find(r => r.id === 'PIT-SUP-REG-7-1-B');
+  const ca101 = (app.CA_SUP_DATA.rules || []).find(r => r.id === 'CA-SUP-SEC-101-1');
+  ok('Reg 7(1)(b) is carried', !!pitB, 'missing');
+  ok('Section 101(1) is carried', !!ca101, 'missing');
+
+  // THE SEVEN DAYS IS THE PERSON'S. Reg 7(1)(b) binds "every person on
+  // appointment as a key managerial personnel or a director", and the
+  // disclosure runs TO the entity. SS3y's s.84 and SS3z's Reg 30A: reading the
+  // period without reading the subject puts a filing on the register that the
+  // company does not owe.
+  ok('the rule says whose seven days it is',
+     !!pitB && /the person|person's|PERSON/i.test(pitB.detail || ''),
+     'the detail does not name the duty-holder');
+  ok('and the quote shows the person being bound',
+     !!pitB && /every person on appointment/i.test(pitB.quote || ''),
+     (pitB && pitB.quote || '').slice(0, 70));
+  ok('and it does not claim the exchange intimation, which is Reg 7(2)(b)',
+     !!pitB && /7\(2\)\(b\)/.test(pitB.detail || ''), 'Reg 7(2)(b) is not named');
+
+  // "Clear" days exclude both ends, so twenty-one clear days is LONGER than
+  // twenty-one days -- and the period runs BACKWARD from the meeting, so the
+  // approximation errs in the unsafe direction (SS3z).
+  ok('s.101(1) states CLEAR days, not days',
+     !!ca101 && /clear twenty-one days/i.test(ca101.timelineText || ''),
+     (ca101 && ca101.timelineText) || '');
+  ok('and the quote carries the word clear',
+     !!ca101 && /clear twenty -?one days/i.test(ca101.quote || ''),
+     (ca101 && ca101.quote || '').slice(0, 80));
+
+  // Both state a period and neither may carry a date: the anchor is not held.
+  [['PIT-SUP-REG-7-1-B', pitB], ['CA-SUP-SEC-101-1', ca101]].forEach(([id, r]) => {
+    ok(id + ' carries no date', !!r && !r.due, 'it has a due object');
+    ok(id + ' explains why it has none',
+       !!app.lgNoDeadlineWhy({ key: id, due: null }), 'no explanation mapped');
+    // SS3e's contract, tested directly: an explanation must never attach to a
+    // row that HAS a date.
+    check(id + ' offers no explanation once it is dated',
+          app.lgNoDeadlineWhy({ key: id, due: '2026-10-01' }) || '', '');
+  });
+
+  // And the register carries them where it should.
+  const CRa = 10000000;
+  const mkA = (t, cin) => ({ id: 'A-' + t, name: t, type: t, fyend: '2026-03-31',
+    capital: 5 * CRa, turnover: 40 * CRa, networth: CRa, netprofit: CRa,
+    borrowings: 0, cin: cin, chart: {} });
+  const listedA = mkA('listed', 'L17110MH2009PLC195422');
+  const secs = app.getComplianceChart(listedA).map(r => r.section);
+  ok('a listed company is told the seven-day disclosure exists',
+     secs.indexOf('Reg 7(1)(b)') >= 0, 'not on the register');
+  ok('and the twenty-one clear days', secs.indexOf('Section 101(1)') >= 0,
+     'not on the register');
+  // An LLP holds no general meeting under the Act and owes no PIT duty.
+  const llpSecs = app.getComplianceChart(mkA('llp', 'AAB-1234')).map(r => r.section);
+  ok('an LLP gets neither',
+     llpSecs.indexOf('Reg 7(1)(b)') < 0 && llpSecs.indexOf('Section 101(1)') < 0,
+     'one of them reached an LLP');
+}
+
+// ── 12. Dashboard invariants ──────────────────────────────────────────────────────────────────────────────────────────────────────────
 describe('dashboard invariants');
 {
   app.CLIENTS = [LISTED, PRIVATE];

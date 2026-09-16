@@ -1129,6 +1129,37 @@ const MUTATIONS = [
   { name: 'the screen stops saying the reading is not the decision (SS4g r/w SS2v)',
     from: "'<div class=\"gov-ev-warn\">This is the reading, not the decision. A citation '+",
     to:   "'<div class=\"gov-ev-warn\">A citation '+" },
+  // -- SS4i: the two gaps the list of 16 actually yielded -------
+  // Reg 7(1)(b)'s seven days binds "every person on appointment as a key
+  // managerial personnel or a director", and the disclosure runs TO the entity.
+  // Claiming it as the company's own deadline puts a filing on the register
+  // that the company does not owe - SS3y's s.84, SS3z's Reg 30A.
+  { name: 'the seven days is claimed as the company\'s own (SS4i r/w SS3z)',
+    from: "THE SEVEN DAYS IS THE PERSON'S, NOT THE COMPANY'S.",
+    to:   "The listed entity shall disclose within seven days." },
+
+  // The exchange intimation is a SEPARATE obligation with its own two trading
+  // days. Folding them together loses one of the two.
+  { name: 'the Reg 7(2)(b) exchange intimation is folded in (SS4i)',
+    from: "the exchange intimation is a separate obligation under Reg 7(2)(b), which carries its own two trading days.",
+    to:   "the exchange intimation is part of the same duty." },
+
+  // "Clear" days exclude BOTH the day of service and the day of the meeting, so
+  // twenty-one clear days is longer than twenty-one days - and the period runs
+  // BACKWARD, so dropping "clear" gives a LATER last date than the Act allows.
+  { name: 'the AGM notice loses its clear days (SS4i r/w SS3z)',
+    from: '"timelineText":"Not less than clear twenty-one days before the meeting"',
+    to:   '"timelineText":"Not less than twenty-one days before the meeting"' },
+
+  // A rule that states a period and carries no date must say WHICH kind of
+  // silence that is (SS3e -- a blank is not an explanation).
+  { name: 'the seven-day rule stops explaining why it has no date (SS4i r/w SS3e)',
+    from: "  'PIT-SUP-REG-7-1-B':\n",
+    to:   "  'PIT-SUP-REG-7-1-B-X':\n" },
+
+  { name: 'the notice period stops explaining why it has no date (SS4i r/w SS3e)',
+    from: "  'CA-SUP-SEC-101-1':\n",
+    to:   "  'CA-SUP-SEC-101-1-X':\n" },
 ];
 
 const src = fs.readFileSync(INDEX, 'utf8');
