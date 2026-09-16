@@ -2690,7 +2690,112 @@ describe('pit supplement');
      /retention/i.test(why36), why36.slice(0, 90));
 }
 
-// ── 12. Dashboard invariants ────────────────────────────────────────────────────
+// -- 11v. LODR debt chapters, and the flag that reaches them (SS4b) ----
+// The corpus was never the blocker. lodrListingTypes reads ncsListed and hvdle;
+// nothing set either, so 20 rules the corpus ALREADY SHIPPED could not apply to
+// any entity - Reg 52 (financial results for debt), Reg 53, Reg 54 (asset
+// cover), Reg 61A, Reg 62A among them. A rule that never applies looks exactly
+// like a rule that correctly does not apply, which is why nothing reported it.
+describe('lodr debt chapters');
+{
+  const LD = app.LODR_DEBT_DATA;
+  ok('the debt corpus is loaded', !!(LD && LD.rules && LD.rules.length), 'LODR_DEBT_DATA missing');
+  check('twenty-seven obligations', (LD.rules || []).length, 27);
+
+  const WORDS = /\b(one|two|three|four|five|six|seven|ten|fifteen|thirty|sixty|ninety)\s+(working\s+|trading\s+|calendar\s+)?(days?|months?|years?)\b/gi;
+  const unsupported = [];
+  (LD.rules || []).forEach(r => {
+    const q = (r.quote || '').toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ');
+    const said = (r.timelineText || '').match(WORDS) || [];
+    said.forEach(s => {
+      const norm = s.toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+      if (q.indexOf(norm) < 0) unsupported.push(r.id + ' claims "' + s + '"');
+    });
+  });
+  ok('every period a rule states appears in the words it quotes',
+     unsupported.length === 0, unsupported.join(' | '));
+
+  const unbound = (LD.rules || []).filter(r =>
+    !r.quote || r.quote.length < 70 || !/\bshall\b/i.test(r.quote));
+  ok('every quote carries a binding verb', unbound.length === 0,
+     unbound.map(r => r.id).join(', '));
+
+  // Reg 64I binds the RECOGNISED STOCK EXCHANGES to monitor compliance, and
+  // Reg 49 / 62B are applicability and definitions. None creates a duty here.
+  const notOurs = (LD.rules || []).filter(r =>
+    /^Reg (?:49|62B|64I)\b/.test(r.regulation || ''));
+  ok('no rule cites an applicability, definition or exchange-facing provision',
+     notOurs.length === 0, notOurs.map(r => r.regulation).join(', '));
+
+  const CRd = 10000000;
+  const mkd = (o) => Object.assign({ id:'DBT', name:'DBT', type:'private',
+    fyend:'2026-03-31', capital:5*CRd, turnover:40*CRd, networth:CRd,
+    netprofit:CRd, borrowings:0, cin:'U51909MH2018PTC300111', chart:{} }, o);
+  const debtRows = (c) => app.getComplianceChart(c).filter(r => /^LODR-DEBT/.test(r.key || ''));
+  const hasReg = (c, s) => debtRows(c).some(r => r.section === s);
+
+  // WHAT IS LISTED, not what class the entity is. A private company with listed
+  // non-convertible debentures owes Chapter V and owes nothing under Chapter IV,
+  // so this cannot be expressed as entityType - and the register call for this
+  // corpus deliberately sits OUTSIDE the if(isListed) guard.
+  check('a private company with no debt listing gets none', debtRows(mkd({})).length, 0);
+  ok('a private company WITH listed NCDs gets Chapter V',
+     debtRows(mkd({ ncsListed: true })).length > 0, 'the debt-only issuer got nothing');
+  check('an equity-listed company with no debt listing gets none',
+     debtRows(mkd({ type:'listed', cin:'L17110MH2009PLC195422' })).length, 0);
+
+  // Chapter V-A is the HVDLE governance regime and is a separate fact from ncs.
+  ok('the HVDLE governance rules reach a HVDLE',
+     hasReg(mkd({ ncsListed:true, hvdle:true }), 'Reg 62P'), 'Reg 62P missing on a HVDLE');
+  ok('and not an ordinary debt-listed issuer',
+     !hasReg(mkd({ ncsListed:true }), 'Reg 62P'), 'Reg 62P reached a non-HVDLE');
+  ok('the HVDLE threshold rule reaches a HVDLE',
+     hasReg(mkd({ ncsListed:true, hvdle:true }), 'Reg 62C'), 'Reg 62C missing on a HVDLE');
+  ok('and not an ordinary debt-listed issuer either',
+     !hasReg(mkd({ ncsListed:true }), 'Reg 62C'), 'Reg 62C reached a non-HVDLE');
+
+  // Reg 63 and Reg 64 bind an entity with BOTH listings. That is an AND.
+  const bothL = mkd({ type:'listed', cin:'L17110MH2009PLC195422', ncsListed:true });
+  ['Reg 63', 'Reg 64'].forEach(s => {
+    ok(s + ' reaches an entity with both listings', hasReg(bothL, s), s + ' missing');
+    ok(s + ' does not reach a debt-only issuer', !hasReg(mkd({ ncsListed:true }), s),
+       s + ' reached an entity with no listed equity');
+    ok(s + ' does not reach an equity-only issuer',
+       !hasReg(mkd({ type:'listed', cin:'L17110MH2009PLC195422' }), s),
+       s + ' reached an entity with no listed debt');
+  });
+
+  // SS3e's rule: test the guard's contract, not only the data.
+  const rule = (a) => ({ appliesTo: a });
+  ok('cmApplies honours listingType as ANY',
+     app.cmApplies(rule({ listingType:['ncs'] }), mkd({ ncsListed:true })) === true &&
+     app.cmApplies(rule({ listingType:['ncs'] }), mkd({})) === false, 'listingType ignored');
+  ok('cmApplies honours listingTypeAll as ALL',
+     app.cmApplies(rule({ listingTypeAll:['equity','ncs'] }), bothL) === true &&
+     app.cmApplies(rule({ listingTypeAll:['equity','ncs'] }), mkd({ ncsListed:true })) === false,
+     'listingTypeAll behaved as ANY');
+
+  const datedD = debtRows(bothL).filter(r => r.due);
+  ok('no debt row carries a date', datedD.length === 0,
+     datedD.map(r => r.section + '=' + r.due).join(', '));
+
+  // THE REVIVAL. These are rules the corpus already shipped, scoped ncs or
+  // hvdle with no equity limb. Before db/026 not one could apply to anybody.
+  // This is the assertion that would have caught the original bug.
+  const secsOf = (c) => new Set(app.getComplianceChart(c).map(r => r.section));
+  const equityOnly = secsOf(mkd({ type:'listed', cin:'L17110MH2009PLC195422' }));
+  const withFlags = secsOf(mkd({ type:'listed', cin:'L17110MH2009PLC195422',
+                                 ncsListed:true, hvdle:true }));
+  const revived = ['Reg 52(1)', 'Reg 53', 'Reg 54(1)', 'Reg 61A(1)', 'Reg 62A'];
+  const stillDead = revived.filter(s => !withFlags.has(s));
+  ok('the debt-scoped rules the corpus already shipped are now reachable',
+     stillDead.length === 0, 'still unreachable: ' + stillDead.join(', '));
+  ok('and they are absent from an entity with no debt listing',
+     revived.every(s => !equityOnly.has(s)),
+     'a debt rule reached an entity with no listed debt');
+}
+
+// ── 12. Dashboard invariants ──────────────────────────────────────────────────────────────
 describe('dashboard invariants');
 {
   app.CLIENTS = [LISTED, PRIVATE];

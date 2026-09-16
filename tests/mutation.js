@@ -921,6 +921,50 @@ const MUTATIONS = [
   { name: 'PIT obligations stop being ruled out for an unlisted company (SS4a r/w SS2z)',
     from: '"appliesTo":{"entityType":["listed"]},"appliesToText":"Every listed company required to have a Code of Conduct under Reg 9"',
     to:   '"appliesTo":{"entityType":["listed","private","public"]},"appliesToText":"Every listed company required to have a Code of Conduct under Reg 9"' },
+  // ── SS4b: the LODR debt chapters, and the flag that reaches them ─
+  // THE ORIGINAL BUG. lodrListingTypes reads ncsListed; nothing set it, so 20
+  // rules the corpus already shipped could never apply to anybody. Killing the
+  // loader mapping puts that back exactly.
+  { name: 'the debt listing flag stops being loaded (SS4b)',
+    from: '        ncsListed: c.ncs_listed === true,',
+    to:   '        ncsListed: false,' },
+
+  // cmApplies ignoring listingType sends every debt obligation to every entity
+  // -- SS2z's defect at scale, wrong law against the wrong entity class.
+  { name: 'cmApplies stops honouring what is listed (SS4b r/w SS2z)',
+    from: '  // ANY of these listings will do.\n  if(a.listingType && a.listingType.length){\n    var hit = a.listingType.some(function(x){ return mine.indexOf(x) >= 0; });',
+    to:   '  // ANY of these listings will do.\n  if(a.listingType && a.listingType.length){\n    var hit = true;' },
+
+  // Reg 63 and Reg 64 bind an entity with BOTH listings. Treating the AND as an
+  // OR puts the Chapter IV mapping rule on a debt-only issuer, which is
+  // governed by Chapter V and Chapter V-A instead.
+  { name: 'the both-listings test degrades to any-listing (SS4b)',
+    from: '      if(mine.indexOf(a.listingTypeAll[i]) < 0) return false;',
+    to:   '      if(mine.indexOf(a.listingTypeAll[i]) >= 0) break;' },
+
+  // Chapter V-A is the HVDLE regime. Widening it to every debt-listed issuer
+  // hands a small NCD issuer a full corporate-governance code it does not owe.
+  { name: 'the HVDLE governance regime widens to every debt issuer (SS4b)',
+    from: '"appliesTo":{"listingType":["hvdle"]},"appliesToText":"High value debt listed entity - debt-only issuer',
+    to:   '"appliesTo":{"listingType":["ncs"]},"appliesToText":"High value debt listed entity - debt-only issuer' },
+
+  // Reg 57 is ONE WORKING DAY of the interest or redemption becoming due, and
+  // the certificate is owed whether or not the money went out.
+  { name: 'the payment certificate period stretches to a month (SS4b)',
+    from: '"timelineText":"Within one working day of it becoming due"',
+    to:   '"timelineText":"Within one month of it becoming due"' },
+
+  // Reg 64B is step one of the debt delisting sequence, fifteen working days
+  // from the board resolution or a later statutory approval.
+  { name: 'the delisting application window shortens to five days (SS4b)',
+    from: '"timelineText":"Not later than fifteen working days from the date of passing the board resolution',
+    to:   '"timelineText":"Not later than five working days from the date of passing the board resolution' },
+  // entCheck is the boolean field builder added in SS4b. Its label sits AFTER
+  // the input, which is why the named-control check needs a direction per
+  // entry - and why widening that window instead let the SS3q mutation through.
+  { name: 'the entity form checkbox caption goes back to a div (SS4b r/w SS3q)',
+    from: "<label for=\"'+id+'\" style=\"font-size:11px;color:var(--ink-soft);font-weight:600;cursor:pointer;\">",
+    to:   "<div style=\"font-size:11px;color:var(--ink-soft);font-weight:600;cursor:pointer;\">" },
 ];
 
 const src = fs.readFileSync(INDEX, 'utf8');

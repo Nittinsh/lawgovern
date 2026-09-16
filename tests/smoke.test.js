@@ -220,17 +220,38 @@ function eq(name, a, b) { ok(name, a === b, `${a} !== ${b}`); }
     // above cannot see it, because the id is built in JavaScript — so the
     // generator is asserted directly. A mutation reverting it to a div passed
     // until this line existed.
-    ['the entity form caption',    "<input id=\"'+id+'\" type=", '<label for="\'+id+\'"', 400],
+    //
+    // The anchor carries the TYPE EXPRESSION, which is unique to entField.
+    // Anchored on the bare <input id="'+id+'" type= it matched entCheck's
+    // checkbox first and the §3q mutation went MISSED — entField's label could
+    // be deleted and entCheck's stood in for it.
+    ['the entity form caption',    "<input id=\"'+id+'\" type=\"'+(type||'text')+'\"",
+     '<label for="\'+id+\'"', 400, 'back'],
+    // A checkbox carries its label AFTER the input, so this one looks forward.
+    ['the entity form checkbox',   "<input id=\"'+id+'\" type=\"checkbox\"",
+     '<label for="\'+id+\'"', 400, 'fwd'],
   ];
   // The window is per entry. entField's label carries a style attribute and an
   // optional hint span, so it sits further back than an aria-label written
   // straight onto the tag — one guessed distance for all of them made a real
   // label read as missing.
-  gen.forEach(([what, near, want, back]) => {
+  //
+  // The DIRECTION is per entry too. A text field carries its label before the
+  // input; a checkbox carries it after. One direction for all of them reported
+  // entCheck's real <label for> as missing (§2x, a check that cries wolf), and
+  // making the window BIDIRECTIONAL instead then let the §3q mutation through:
+  // entField's label could be deleted and entCheck's would satisfy the check.
+  // The runner reported it MISSED. Anchor per generator, direction per
+  // generator — widening a window is not a substitute for aiming it.
+  gen.forEach(([what, near, want, back, dir]) => {
     const i = html.indexOf(near);
+    const w = back || 200;
+    const seg = i < 0 ? ''
+      : dir === 'fwd' ? html.slice(i, i + w)
+      : html.slice(Math.max(0, i - w), i);
     ok(what + ' names itself',
-       i > 0 && html.slice(Math.max(0, i - (back || 200)), i).indexOf(want) >= 0,
-       i > 0 ? 'found the control, no ' + want : 'could not find ' + near);
+       i >= 0 && seg.indexOf(want) >= 0,
+       i >= 0 ? 'found the control, no ' + want : 'could not find ' + near);
   });
 
   // The settings toggles were an empty <button> with a <span> in it: no name,
@@ -245,6 +266,90 @@ function eq(name, a, b) { ok(name, a === b, `${a} !== ${b}`); }
 
   ok('the document declares a language', /<html[^>]*\blang="/i.test(html) ||
      html.indexOf('lang="en"') >= 0, 'no lang');
+
+  // -- the debt listing flag, end to end (SS4b) ------------------
+  // lodrListingTypes reads ncsListed and hvdle. Before db/026 nothing wrote
+  // them, so every LODR rule scoped to non-convertible securities was
+  // unreachable -- 20 rules the corpus already shipped, plus the 27 added with
+  // this section. The compliance suite cannot see this: it builds company
+  // objects directly and never touches the loader, so the mutation that kills
+  // the mapping was correctly reported MISSED there.
+  ok('the loader maps the debt listing columns onto the company',
+     /ncsListed:\s*c\.ncs_listed/.test(html) && /hvdle:\s*c\.hvdle/.test(html),
+     'loadCloudClients does not read ncs_listed / hvdle');
+  ok('the entity form offers both flags',
+     html.indexOf("entCheck('ent-ncs'") >= 0 && html.indexOf("entCheck('ent-hvdle'") >= 0,
+     'the entity form cannot set them');
+  ok('and entSave writes them back',
+     /ncs_listed:\s*!!/.test(html) && /hvdle:\s*!!/.test(html),
+     'entSave does not send the columns');
+  // A missing column must name its migration rather than surfacing a raw
+  // PostgREST error -- the pattern regSave and entSave already use.
+  ok('a missing debt column names its migration',
+     html.indexOf('db/026_debt_listing.sql') >= 0, 'db/026 is not named anywhere');
+  // And the applicability engine must actually consult them.
+  ok('cmApplies consults the listing type',
+     /a\.listingType/.test(html) && /a\.listingTypeAll/.test(html),
+     'cmApplies ignores what is listed');
+}
+
+// -- 6b. the embedded corpora match their JSON files (SS4b) ----
+// Each hand-authored corpus ships TWICE: as rules/<name>.json in the repo and
+// as an inline blob in index.html. Editing the file changes nothing the app
+// reads. Fixing Reg 60's trigger in lodr_debt.json and forgetting to re-embed
+// left the two disagreeing, and the only symptom was a mutation anchor that
+// suddenly matched twice. SS3t: a generated file that has to be pasted by hand
+// goes stale the first time somebody forgets.
+{
+  const CORPORA = [
+    ['LODR_DEBT_DATA', 'rules/lodr_debt.json'],
+    ['LODR_SUP_DATA',  'rules/lodr_supplement.json'],
+    ['PIT_SUP_DATA',   'rules/pit_supplement.json'],
+    ['CA_SUP_DATA',    'rules/ca_supplement.json'],
+    ['DEPOS_DATA',     'rules/depositories_master.json'],
+  ];
+  // Walk the object rather than guessing where it ends: these blobs contain
+  // braces inside quoted strings.
+  const embedded = (name) => {
+    const at = html.indexOf('var ' + name + ' = ');
+    if (at < 0) return null;
+    let i = at + ('var ' + name + ' = ').length;
+    if (html[i] !== '{') return null;
+    const from = i;
+    let depth = 0, instr = false, esc = false;
+    for (; i < html.length; i++) {
+      const ch = html[i];
+      if (instr) {
+        if (esc) esc = false;
+        else if (ch === '\\') esc = true;
+        else if (ch === '"') instr = false;
+      } else if (ch === '"') instr = true;
+      else if (ch === '{') depth++;
+      else if (ch === '}' && --depth === 0) { i++; break; }
+    }
+    try { return JSON.parse(html.slice(from, i)); } catch (e) { return null; }
+  };
+
+  CORPORA.forEach(([name, file]) => {
+    const emb = embedded(name);
+    ok(name + ' is embedded and parses', !!emb, 'not found or malformed');
+    if (!emb) return;
+    let disk = null;
+    try { disk = JSON.parse(fs.readFileSync(path.join(REPO, file), 'utf8')); }
+    catch (e) { /* reported below */ }
+    ok(file + ' is readable', !!disk, 'could not read or parse');
+    if (!disk) return;
+    // Rule count and ids first, because that is the failure that hides best:
+    // a corpus re-embedded from a stale copy loses or renames rules silently.
+    const ids = (d) => (d.rules || []).map(r => r.id).join(',');
+    eq(name + ' has the same rule count as its file',
+       (emb.rules || []).length, (disk.rules || []).length);
+    ok(name + ' has the same rule ids as its file', ids(emb) === ids(disk),
+       'the embedded ids differ from ' + file);
+    ok(name + ' matches its file exactly',
+       JSON.stringify(emb) === JSON.stringify(disk),
+       'the embedded copy has drifted from ' + file + ' — re-embed it');
+  });
 }
 
 // -- 7. the terms and the privacy policy -----------------------

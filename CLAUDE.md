@@ -3256,7 +3256,7 @@ Unlike the Act, LODR chapters are not subject matter. They are
 | III | every listed entity &mdash; common obligations | 10 | **0** |
 | **IV** | **listed SPECIFIED SECURITIES &mdash; the customer** | **26** | **15** |
 | V | listed non-convertible securities (debt only) | 14 | 19 |
-| VI | both, and the delisting of debt | 1 | 21 |
+| VI | both, and the delisting of debt | 0 | 11 |
 | VII&ndash;IX | issuers of IDRs, securitised debt, mutual fund units | 5 | 33 |
 | X | **the recognised stock exchanges** | 0 | 7 |
 | XI&ndash;XII | default procedure, machinery | 0 | 7 |
@@ -3437,9 +3437,11 @@ apply, and given a reason for each** (`lgExcludedFor`, &sect;3i's *"not on the
 list, but because"*).
 
 ### What is still not measured
-- **Chapter V (19 uncited) and Chapter VI (21)** bind debt-listed entities and
-  the delisting of debt. The app models `ncs` and `hvdle`, so they *can* be
-  scoped &mdash; they have not been read.
+- ~~**Chapter V (19 uncited) and Chapter VI (21)**~~ &mdash; **read in
+  &sect;4b**, and the count was wrong: Chapter VI is **11** uncited, not 21.
+  &sect;2z's lesson again. The app *modelled* `ncs` and `hvdle`, but nothing
+  ever set either flag, so those chapters could not have been scoped at all
+  until db/026.
 - **Chapters VII to IX (33 uncited)** bind the issuers of Indian depository
   receipts, securitised debt instruments and mutual fund units. Excluded on the
   reasoning that none is this product's user; that reasoning is sound and it is
@@ -3606,8 +3608,8 @@ not mean one rule has been verified by a person** &mdash; Rule Governance still
 reads "Never checked" for all 378, and only the owner can change that.
 
 ### What is still not read
-- **LODR Chapter V (19 provisions) and Chapter VI (21)** bind debt-listed
-  entities. The app models `ncs` and `hvdle`, so they can be scoped.
+- ~~LODR Chapter V and Chapter VI~~ &mdash; **done in &sect;4b**, together
+  with the db/026 flag that made them reachable and revived 20 shipped rules.
 - **LODR Chapters VII&ndash;IX (33)** and **PIT Chapter IIA (8)** bind issuers
   of IDRs, securitised debt, mutual fund units, and asset management companies.
   Excluded on the reasoning that none is this product's user.
@@ -3615,6 +3617,226 @@ reads "Never checked" for all 378, and only the owner can change that.
   II&ndash;XIII, and **chapters XIV onward**, from &sect;3y.
 - **PIT Schedules A, B and C** are carried by the generated corpus as 9 rules
   that cite no numbered provision. They have not been read clause by clause.
+
+---
+
+## 4b. THE DEBT CHAPTERS, AND TWENTY RULES THAT COULD NEVER FIRE (v192) &mdash; db/026
+
+The ask was LODR Chapters V and VI. **The corpus was never the blocker.**
+
+`lodrListingTypes(c)` reads `c.ncsListed` and `c.hvdle` to decide whether a rule
+scoped to non-convertible securities applies. Both are read in **exactly one
+place** in the app and were set **nowhere** &mdash; no column on `companies`, no
+field on the entity form, no header the bulk importer maps. Always `undefined`.
+
+**So every LODR rule scoped `listingType: ['ncs']` or `['hvdle']` was
+unreachable. Measured against the shipped corpus: 20 rules could never apply to
+any entity.**
+
+| | |
+|---|---|
+| Reg 52(1), 52(4), 52(7)/(7A), 52(8) | financial results for debt |
+| Reg 53 | annual report contents |
+| Reg 54(1), 54(2)/(3) | **asset cover** |
+| Reg 61A(1), 61A(3) | &mdash; |
+| Reg 62(3)/(4), 62A | website and dissemination |
+| Reg 21(3A)/(3C), 62L, 62Q(2)(a) | HVDLE governance |
+
+That is &sect;2k's defect class &mdash; a control that cannot fire &mdash; and it
+is **invisible**, because a rule that never applies looks exactly like a rule
+that correctly does not apply. Nothing in 686 assertions, 172 mutations or the
+release gate could see it.
+
+It is also &sect;2c repeating. `networth`, `netprofit` and `borrowings` were read
+and defaulted to 0 until db/001 added the columns, so the s.135 net-profit limb
+was silently unevaluable. Same shape, five years later.
+
+**Authoring 27 more debt rules on top of that would have added 27 more that
+could never fire** &mdash; the "dummy item" the standing constraints ban. So the
+flag came first.
+
+### db/026_debt_listing.sql &mdash; two booleans, because the regulation draws two lines
+- **`ncs_listed`** &mdash; Chapter V binds an entity that has listed its
+  non-convertible securities. **An UNLISTED company can be one:** a private
+  company with listed NCDs owes Chapter V and owes **nothing** under Chapter IV.
+  That is why it cannot be inferred from `type`, and why the register call for
+  this corpus sits **outside** the `if(isListed)` guard.
+- **`hvdle`** &mdash; Chapter V-A binds a **high value** debt listed entity.
+  Reg 62C sets it at Rs 5,000 crore of outstanding listed NCDs and gives six
+  months from the trigger.
+
+Both default **false**, which is the opposite of &sect;3j's year-end default and
+deliberately so: assuming an entity has listed debt would put Chapter V on every
+company in the book (&sect;2z). Assuming it does not leaves the register where it
+is &mdash; and the entity form now asks.
+
+### Reg 62C was narrowed in 2025 and it changes the model
+> *"...a listed entity which **only** has non-convertible debt securities
+> listed, with an outstanding value of Rupees Five Thousand Crore and above
+> **and does not have any listed specified securities**."*
+
+**An entity cannot be both equity-listed and HVDLE.** Chapter V-A exists to
+reach the governance of debt-only issuers that Chapter IV never touches. Read
+without that clause, every large equity-listed company with listed debt would
+receive the Chapter V-A regime on top of Chapter IV.
+
+### `listingTypeAll` &mdash; because Reg 63 and Reg 64 are an AND
+Reg 63 binds an entity that has listed specified securities **and**
+non-convertible securities, and maps which provisions of each chapter apply.
+`some()` cannot express that: scoping it to `ncs` alone puts the Chapter IV
+mapping rule on a debt-only issuer, which is governed by Chapter V and V-A
+instead. So `cmApplies` grew two clauses &mdash; `listingType` (any) and
+`listingTypeAll` (all) &mdash; and both are asserted against their contract
+directly, not only through the data (&sect;3e's rule).
+
+Verified per listing combination:
+
+| entity | debt rows |
+|---|---|
+| private, no debt listing | **0** |
+| private **with listed NCDs** | **14** |
+| private, **HVDLE** | **25** |
+| equity-listed only | **0** |
+| equity-listed **+ listed NCDs** | **16** (Chapter V + Reg 63 and 64) |
+
+And the revival: an equity-listed entity goes **289 &rarr; 356 rows** once both
+flags are set, with **all 14 of the sampled dead rules reachable where 0 were
+before**.
+
+### Twenty-seven obligations, and the delisting chapter is a sequence
+**Chapter V** &mdash; Reg 50 (prior intimation, **two working days**), Reg 57
+(**one working day** to certify interest, dividend or redemption status),
+Reg 59 (prior approval for a material modification), Reg 59A (scheme of
+arrangement), Reg 60 (record date, **three working days**), Reg 61 (timely
+payment).
+
+**Chapter V-A, HVDLE governance** &mdash; Reg 62C, 62E, 62F (audit committee,
+**two-thirds independent**), 62G, 62H, 62I, 62J (vigil mechanism), 62K (related
+party transactions **except Reg 23(8) and 23(9)**), 62N, 62O (ten committees,
+five chairmanships), 62P (KMP vacancy, **three months**).
+
+**Chapter VI** &mdash; Reg 63, Reg 64.
+
+**Chapter VI-A, voluntary delisting of debt** &mdash; an eight-step sequence
+with a period on nearly every step: Reg 64A (**one working day** on the
+resolution-plan route), 64B (**fifteen working days** from the board
+resolution), 64C (**three working days** to commence, **two** to disclose),
+64D (**three working days** to notice the holders), 64E (**fifteen working
+days** for approval from **all** holders), 64F (**one working day** to report
+failure), 64G (**five working days** for the final application), 64H.
+
+### Reg 57 is owed whether or not the money went out
+*"...a certificate to the stock exchange regarding status of payment of interest
+or dividend or repayment or redemption of principal ... **within one working day
+of it becoming due**"*. The trigger is the **due date**, not the payment. A
+default is reported by the same certificate that reports a payment, which is
+exactly why the period is one day.
+
+### Reg 61's proviso is a bar on the EQUITY dividend, sitting in the debt chapter
+An entity that has defaulted on debt interest, redemption or security creation
+**may not declare or distribute any dividend** while the default subsists. It is
+easy to miss because nobody looks in Chapter V for a dividend restriction.
+
+### Reg 64H is an EXEMPTION, and I had it backwards first
+My first title read *"follow the chapter where the securities are delisted from
+some but not all exchanges"*. Reading Reg 64H(2) properly: keep a listing on one
+exchange with nationwide trading terminals and **"the provisions of regulations
+64B to 64G shall not be applicable"** &mdash; the whole in-principle approval,
+notice, all-holder approval and final application machinery falls away, leaving
+board approval and an application. Read as one more step in the sequence it is
+exactly inverted.
+
+### Six quotes were truncation artefacts, and the check caught every one
+The quotes were lifted from scan output that had been cut at a character limit,
+so Reg 3(3)-style fragments reached a field that must be verbatim: **Reg 59A and
+64H below the length floor, and Reg 62C, 62P, 64B and 64C stating a period their
+own quote no longer contained.** All 27 verify against the held regulation now
+&mdash; and it was fixing 64H's quote that exposed the exemption above.
+
+### Widening a window is not a substitute for aiming it
+`entCheck` is a new field builder for a boolean, and the named-control check
+reported its **real** `<label for>` as missing. A text field conventionally
+carries its label **before** the input; a **checkbox carries it after**, and the
+window looked backward only &mdash; so it would have cried wolf on every
+checkbox anyone added (&sect;2x).
+
+**The first fix made the window bidirectional, and that broke the check.** Both
+entries were anchored on the bare `<input id="'+id+'" type=`, which now matches
+`entCheck`'s checkbox **first** &mdash; so with a window scanning both ways,
+deleting `entField`'s label passed, because `entCheck`'s satisfied it. The
+mutation runner reported *"the entity form caption goes back to a div"* as
+**MISSED**.
+
+**And my verification had missed it too.** I proved the widened check still
+fails when `entCheck` loses its label, and never tested `entField` losing its
+own &mdash; &sect;3p's copy test covering one branch, exactly.
+
+The real fix is per generator, not per window: each entry is anchored on markup
+unique to itself (`entField` on its **type expression**) and each says **which
+way to look**. `entCheck` gets its own entry and its own mutation, so neither
+stands in for the other. Both are now verified to fail independently.
+
+### The corpus ships twice, and the two can disagree
+Fixing Reg 60's trigger in `rules/lodr_debt.json` changed nothing the app reads:
+each hand-authored corpus is also an **inline JSON blob in `index.html`**, and
+editing the file alone leaves the two out of step. The only symptom was a
+mutation anchor that suddenly matched twice &mdash; Reg 60's `due` object had
+been byte-identical to Reg 42's, so a &sect;3z mutation went **SKIPPED**.
+
+&sect;3t recorded this exact shape for `amendments.py`: *"a generated file that
+has to be pasted by hand goes stale the first time somebody forgets."*
+
+Smoke now checks all five hand-authored corpora &mdash; rule count, id list and
+**exact equality** &mdash; against their files, and names the fix in the failure
+message. Safe as a strict check because the mutation runner tries
+`compliance.test.js` **first** and stops at the first suite that notices, so a
+mutation editing an embedded period is still caught by the assertion aimed at
+it rather than shadowed by this one. Verified by drifting a file deliberately and
+watching it fail.
+
+### The mutation that was MISSED, and where it had to be caught instead
+**"The debt listing flag stops being loaded"** passed the compliance suite.
+Every assertion there builds its company object directly with
+`ncsListed: true`, so it never touches the loader &mdash; &sect;2j's shape, a
+value the engine handles correctly that nothing puts there. And it is the
+**original bug**, so it is the one that most needed catching.
+
+It cannot be caught in the compliance suite without a database. What has to hold
+is the whole chain, and each link is a fact about the shipped file:
+
+```
+column -> loader -> company object -> lodrListingTypes -> cmApplies
+          entity form -> entSave -> column
+```
+
+Five smoke checks now assert it, and all three break-a-link mutations are
+caught. Break any link and 47 rules go quiet without a single test failing.
+
+### A correction to &sect;3z's own table
+That section reported Chapter VI as **1 cited, 21 not**. Re-measured: **0 cited,
+11 not**, and the same error appears in its closing list as "Chapter VI (21)".
+&sect;2z's lesson exactly &mdash; the list was right and the sentence counting it
+was not, for the third time in this project.
+
+### The gate
+```
+checked                    405      (was 378)
+citation found             377      citation not found  0
+periods actually compared  151 of 405 rules (37%)
+period mismatch              0
+```
+
+### Coverage
+Smoke **65 &rarr; 96**, suite **686 &rarr; 709**, mutations **172 &rarr; 179,
+0 missed, 0 skipped**. Twenty-five of the new smoke checks are the corpus drift
+guard, five the debt flag end to end, and one the checkbox caption.
+
+### What db/026 needs from the owner
+**Run `db/026_debt_listing.sql` in the Supabase SQL editor.** Until then both
+columns are absent, `entSave` names the migration in its error, and both flags
+read false &mdash; so the register is exactly what it was, which is the safe
+failure. Nothing is switched on by running it: both default false, and each
+entity has to be marked on the Entities form.
 
 ---
 
@@ -3693,8 +3915,13 @@ reads "Never checked" for all 378, and only the owner can change that.
   substitution** — `appliesToText`, `cmApplies` and `lgExcludedFor` silently
   vanished from a paragraph *about* them, and the script still printed OK.
   Backticks are markdown in this file and shell everywhere else.
+- **A hand-authored corpus ships TWICE.** `rules/<name>.json` in the repo and an
+  inline JSON blob in `index.html`. **Editing the file changes nothing the app
+  reads** — re-embed it. Smoke §6b now compares all five for exact equality and
+  names the fix, because the only symptom of the drift was a mutation anchor
+  that started matching twice (§4b).
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (65 structural checks), `node tests/compliance.test.js` (686 assertions, run against `index.html` itself), `node tests/mutation.js` (172 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 378 rules across six corpora; it reports how many periods it actually compared, currently 146), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (96 structural checks), `node tests/compliance.test.js` (709 assertions, run against `index.html` itself), `node tests/mutation.js` (179 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 405 rules across seven corpora; it reports how many periods it actually compared, currently 151), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **`python tools/amendments.py` regenerates the amendment evidence AND re-embeds
   it into `index.html`.** It reads the compilations in `reference/`, which is
   gitignored — so `rules/amendments.json` and `rules/amendments_embed.json` are
@@ -3711,7 +3938,7 @@ reads "Never checked" for all 378, and only the owner can change that.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v191.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v192.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**
