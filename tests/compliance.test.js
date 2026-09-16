@@ -2974,7 +2974,139 @@ describe('pit schedules A and B');
      cl('Schedule B cl. 14').timelineText);
 }
 
-// ── 12. Dashboard invariants ──────────────────────────────────────────────────────────────────────────────────
+// -- 11y. The calendar labels a row by its OWN law (SS4e) ------
+// calLawTag falls back to 'CA', so every law without a branch was shown to the
+// reader as the Companies Act. The FLA return is an RBI Master Direction and an
+// LLP's Form 11 and Form 8 are the LLP Act 2008 -- seven dated rows across the
+// book, on the calendar under the wrong statute. SS2z: the right law for the
+// entity. 105 smoke checks and 741 assertions all passed with it in place.
+describe('the compliance calendar');
+{
+  // The contract, tested against the law strings the register actually emits
+  // rather than only through the data (SS3e). A branch added for one law must
+  // not swallow another.
+  const TAGS = [
+    ['Companies Act 2013',                       'CA'],
+    ['SEBI LODR 2015',                           'LODR'],
+    ['SEBI PIT Regulations 2015',                'PIT'],
+    ['SEBI Depositories & Participants 2018',    'DEP'],
+    ['FEMA / RBI',                               'FEMA'],
+    ['LLP Act 2008',                             'LLP']
+  ];
+  TAGS.forEach(t => check('"' + t[0] + '" is tagged ' + t[1], app.calLawTag(t[0]), t[1]));
+
+  // Every tag the function can return must have a colour and a display name, or
+  // a new branch renders an unnamed chip in the fallback grey.
+  const RET = TAGS.map(t => t[1]).concat(['IEPF']);
+  const unnamed = RET.filter(k => !app.CLD[k] || !app.CLN[k]);
+  ok('every tag has a colour and a name', unnamed.length === 0, unnamed.join(', '));
+
+  const CRx = 10000000;
+  const mkc = (t, cin) => ({ id:'CAL-'+t, name:'Cal '+t, type:t, fyend:'2026-03-31',
+    capital:5*CRx, turnover:40*CRx, networth:CRx, netprofit:CRx, borrowings:0,
+    cin: cin, chart:{} });
+  const BOOK = [ mkc('listed','L17110MH2009PLC195422'), mkc('public','U51909MH2015PLC300444'),
+    mkc('private','U51909MH2018PTC300111'), mkc('opc','U51909MH2020OPC300222'),
+    mkc('llp','AAB-1234') ];
+
+  // The sweep. Nothing may be labelled the Companies Act unless it IS the
+  // Companies Act -- this is the assertion that was missing.
+  const mislabelled = [];
+  BOOK.forEach(c => {
+    app.getComplianceChart(c).forEach(r => {
+      if (app.calLawTag(r.law) === 'CA' && !/companies act/i.test(r.law || ''))
+        mislabelled.push(c.type + ': ' + r.law + ' / ' + r.section);
+    });
+  });
+  ok('no row is labelled the Companies Act unless it is the Companies Act',
+     mislabelled.length === 0, mislabelled.slice(0, 4).join(' | '));
+
+  // Named individually, because a sweep that finds nothing proves nothing until
+  // you know the rows it was meant to find are on the register at all (SS3r).
+  const all = [];
+  BOOK.forEach(c => app.getComplianceChart(c).forEach(r => all.push(r)));
+  const fla = all.filter(r => /Foreign Liabilities/i.test(r.obligation || ''));
+  ok('the FLA return is on the register', fla.length > 0, 'no FLA row found');
+  ok('and every copy of it is tagged FEMA, not the Companies Act',
+     fla.every(r => app.calLawTag(r.law) === 'FEMA'),
+     fla.map(r => r.law).join(', '));
+  const llp = all.filter(r => /LLP Act/i.test(r.law || ''));
+  ok('an LLP\'s own filings are on the register', llp.length > 0, 'no LLP Act row');
+  ok('and are tagged LLP, not the Companies Act',
+     llp.every(r => app.calLawTag(r.law) === 'LLP'), llp.map(r => r.law).join(', '));
+  const dep = all.filter(r => /Depositor/i.test(r.law || ''));
+  ok('the Depositories rows are tagged DEP',
+     dep.length > 0 && dep.every(r => app.calLawTag(r.law) === 'DEP'),
+     'depositories rows: ' + dep.length);
+
+  // ── and now what actually REACHES the screen ──────────────
+  // A value computed correctly that no screen shows is SS2j/SS3n's defect, and
+  // the chip bar is exactly that shape: it is markup, so only driving rc() can
+  // see it.
+  const cap = {};
+  const stub = (id) => (cap[id] = cap[id] || { innerHTML: '' });
+  const realGet = app.document.getElementById;
+  const realClients = app.CLIENTS;
+  const realF = app.calF;
+  app.document.getElementById = (id) => (id === 'cg' || id === 'cfi') ? stub(id) : null;
+  app.CLIENTS = BOOK;
+
+  app.calF = 'ALL';
+  app.rc();
+  const chips = cap.cfi.innerHTML;
+
+  ok('the calendar renders a chip bar', /class="cfb/.test(chips), chips.slice(0, 60));
+  ok('and a chip for FEMA / RBI', chips.indexOf('FEMA / RBI') >= 0, chips.slice(0, 200));
+  ok('and a chip for the LLP Act', chips.indexOf('LLP Act') >= 0, chips.slice(0, 200));
+  ok('and a chip for SEBI Depositories', chips.indexOf('SEBI Depositories') >= 0,
+     chips.slice(0, 200));
+
+  // No corpus carries IEPF as its law -- s.124/125 are Companies Act sections.
+  // A chip that filters to guaranteed-empty on every book is a control that
+  // cannot fire (SS2k), and a dummy item by the owner's standing constraint.
+  //
+  // Read the names the bar ACTUALLY rendered rather than guessing at a
+  // substring: the first version of this asserted `>IEPF` and `IEPF<`, and a
+  // chip renders as `&#9679; NAME <span>N</span>`, so neither could ever match
+  // and the check could not fail. SS3z -- a control that cannot fire.
+  const held = {};
+  BOOK.forEach(c => app.getComplianceChart(c)
+    .forEach(r => { held[app.calLawTag(r.law)] = true; }));
+  const shownNames = [];
+  chips.replace(/&#9679;\s*([^<]+?)\s*<span/g, (m, nm) => { shownNames.push(nm); return m; });
+  const nameOf = {};
+  Object.keys(app.CLN).forEach(k => { nameOf[app.CLN[k]] = k; });
+  const dead = shownNames.filter(nm => !held[nameOf[nm] || nm]);
+  ok('and NO chip for a law the book does not hold', dead.length === 0,
+     'chips with no rule behind them: ' + dead.join(', '));
+  ok('the chip bar names every law the book does hold, and only those',
+     shownNames.length === Object.keys(held).length,
+     shownNames.length + ' chips vs ' + Object.keys(held).length + ' laws held');
+
+  // Choosing a law must not empty its own chip bar, or it could never be
+  // cleared again -- SS3k's year selector, which lists the union for the same
+  // reason.
+  app.calF = 'PIT';
+  app.rc();
+  ok('choosing a law keeps every chip on screen',
+     cap.cfi.innerHTML.indexOf('Companies Act') >= 0 &&
+     cap.cfi.innerHTML.indexOf('SEBI LODR') >= 0, cap.cfi.innerHTML.slice(0, 120));
+
+  // PIT carries 70 obligations and dates none of them. "Nothing dated" alone
+  // reads as "PIT has nothing for you" on the highest-consequence law in the
+  // product. SS3v: a count means nothing without the count behind it.
+  const empty = cap.cg.innerHTML;
+  ok('an empty month grid says how many obligations that law carries',
+     /\d+ PIT obligations/.test(empty), empty.slice(0, 220));
+  ok('and says why none of them has a date',
+     /continuous/i.test(empty) && /cadence/i.test(empty), empty.slice(0, 220));
+
+  app.document.getElementById = realGet;
+  app.CLIENTS = realClients;
+  app.calF = realF;
+}
+
+// ── 12. Dashboard invariants ──────────────────────────────────────────────────────────────────────────────────────────
 describe('dashboard invariants');
 {
   app.CLIENTS = [LISTED, PRIVATE];

@@ -1544,7 +1544,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v194">
+      <meta id="build-version" content="v195">
     </div>
   </div>
   <div class="cc-search">
@@ -1666,13 +1666,7 @@ input[type="text"], input[type="password"], textarea, select {
     <h1 class="cc-h1">Compliance Calendar</h1>
     <p class="cc-sub">Every dated obligation across your entities, by month of the financial year.</p>
   </div>
-  <div class="cfi">
-    <div class="cfb on" onclick="cf(this,'ALL')">All</div>
-    <div class="cfb" style="color:var(--ca)" onclick="cf(this,'CA')">● Companies Act</div>
-    <div class="cfb" style="color:var(--lodr)" onclick="cf(this,'LODR')">● SEBI LODR</div>
-    <div class="cfb" style="color:var(--pit)" onclick="cf(this,'PIT')">● PIT</div>
-    <div class="cfb" style="color:var(--iepf)" onclick="cf(this,'IEPF')">● IEPF</div>
-  </div>
+  <div class="cfi" id="cfi"></div>
   <div class="cg" id="cg"></div>
 </div>
 
@@ -2712,7 +2706,8 @@ var TST={
   PIT:{h:"background:#8b5cf610;border-color:#8b5cf630",n:"color:#8b5cf6",b:"background:#8b5cf620;color:#8b5cf6"},
   IEPF:{h:"background:#f59e0b10;border-color:#f59e0b30",n:"color:#f59e0b",b:"background:#f59e0b20;color:#f59e0b"},
 };
-var CLD={CA:"#3b82f6",LODR:"#10b981",PIT:"#8b5cf6",IEPF:"#f59e0b"};
+var CLD={CA:"#2563EB",LODR:"#10B981",PIT:"#06B6D4",DEP:"#8B5CF6",FEMA:"#F59E0B",LLP:"#EC4899",IEPF:"#F97316"};
+var CLN={CA:"Companies Act",LODR:"SEBI LODR",PIT:"PIT",DEP:"SEBI Depositories",FEMA:"FEMA / RBI",LLP:"LLP Act",IEPF:"IEPF"};
 
 // ═══════════════════════════════════════════════════
 // CHECKLIST DATA
@@ -2949,7 +2944,7 @@ function sl(el){document.querySelectorAll('.ob').forEach(function(b){b.classList
 // CALENDAR
 // ═══════════════════════════════════════════════════
 var calF='ALL';
-function cf(el,f){calF=f;document.querySelectorAll('.cfb').forEach(function(b){b.classList.remove('on');});el.classList.add('on');rc();}
+function cf(f){calF=f;rc();}
 function rc(){
   var g = document.getElementById('cg');
   if(!g) return;
@@ -2966,18 +2961,25 @@ function rc(){
   }
 
   // Every dated obligation across every entity, grouped by month.
-  var byMonth = {};
+  var byMonth = {}, lawSeen = {}, order2 = [];
   clients.forEach(function(c){
     var rows = [];
     try{ rows = getComplianceChart(c); }catch(e){ return; }
     rows.forEach(function(r){
+      var law = calLawTag(r.law);
+      // Counted BEFORE the filter and before the date test, so a chip states
+      // how much of that law is on the register and the empty state can say
+      // how many of them carry no date.
+      if(!lawSeen[law]){ lawSeen[law] = { rows:0, dated:0 }; order2.push(law); }
+      lawSeen[law].rows++;
+      if(r.due) lawSeen[law].dated++;
       if(!r.due) return;                      // standing duties have no calendar slot
       var p = String(r.due).split('-').map(Number);
       if(p.length !== 3) return;
-      var law = calLawTag(r.law);
       if(calF !== 'ALL' && law !== calF) return;
       (byMonth[p[1]] = byMonth[p[1]] || []).push({
         day: p[2], date: r.due, month: p[1],
+        lawName: r.law,
         title: r.obligation, ref: r.section, law: law,
         entity: c.name, entityId: c.id, key: r.key, days: lgDays(r.due)
       });
@@ -2990,6 +2992,22 @@ function rc(){
                8:'AUGUST',9:'SEPTEMBER',10:'OCTOBER',11:'NOVEMBER',12:'DECEMBER'};
   var mAbbr = {1:'Jan',2:'Feb',3:'Mar',4:'Apr',5:'May',6:'Jun',7:'Jul',
                8:'Aug',9:'Sep',10:'Oct',11:'Nov',12:'Dec'};
+
+  // The chip bar. Only laws the book actually holds get one.
+  var cf_el = document.getElementById('cfi');
+  if(cf_el){
+    var known = ['CA','LODR','PIT','DEP','FEMA','LLP','IEPF'];
+    var listed2 = known.filter(function(k){ return lawSeen[k]; })
+      .concat(order2.filter(function(k){ return known.indexOf(k) < 0; }));
+    var ch = '<div class="cfb'+(calF==='ALL'?' on':'')+
+      '" onclick="cf(\'ALL\')">All</div>';
+    listed2.forEach(function(k){
+      ch += '<div class="cfb'+(calF===k?' on':'')+'" style="color:'+(CLD[k]||'#94A3B8')+
+        '" onclick="cf('+lgArg(k)+')">&#9679; '+entEsc(CLN[k]||k)+
+        ' <span style="opacity:.7">'+lawSeen[k].dated+'</span></div>';
+    });
+    cf_el.innerHTML = ch;
+  }
 
   var html = '', shown = 0;
   order.forEach(function(mn){
@@ -3011,16 +3029,34 @@ function rc(){
     html += '</div>';
   });
 
+  // An empty month grid is not the same as an empty register. Say how many
+  // obligations the chosen law actually carries, or a reader takes silence for
+  // "nothing to do" on the law with the heaviest consequences in the product.
+  var seen2 = (calF !== 'ALL') ? lawSeen[calF] : null;
+  var why = seen2
+    ? '<b>'+seen2.rows+' '+entEsc(CLN[calF]||calF)+' obligation'+(seen2.rows===1?'':'s')+
+      '</b> are on the register for your entities, and none of them carries a date. '+
+      'They are continuous duties, obligations that run from an event no register here '+
+      'records, or ones that fix a cadence rather than a deadline &mdash; so there is no '+
+      'day to put them on.'
+    : 'Continuous and event-driven obligations have no fixed date, so they do not appear here.';
   g.innerHTML = html || '<div class="cc-empty"><h2>Nothing dated in this view</h2>'+
-    '<p>Continuous and event-driven obligations have no fixed date, so they do not appear here. '+
-    'Clear the filter or see the full register in Compliance Universe.</p></div>';
+    '<p>'+why+' See the full register in Compliance Universe.</p></div>';
 }
 
 // Map a law name onto the filter tags the calendar uses.
+// Every branch here exists because a row was being labelled as something it is
+// not. 'CA' is the FALLBACK, so any law without a branch is shown to the reader
+// as the Companies Act - which is how the FLA return (an RBI Master Direction)
+// and an LLP's Form 11 and Form 8 (the LLP Act 2008) reached the calendar under
+// the wrong statute. SS2z: the right law for the entity.
 function calLawTag(law){
   var t = String(law||'').toLowerCase();
   if(t.indexOf('pit') >= 0 || t.indexOf('insider') >= 0) return 'PIT';
   if(t.indexOf('lodr') >= 0) return 'LODR';
+  if(t.indexOf('depositor') >= 0) return 'DEP';
+  if(t.indexOf('fema') >= 0 || t.indexOf('rbi') >= 0) return 'FEMA';
+  if(t.indexOf('llp') >= 0) return 'LLP';
   if(t.indexOf('iepf') >= 0) return 'IEPF';
   return 'CA';
 }

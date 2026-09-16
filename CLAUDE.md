@@ -4057,6 +4057,128 @@ Verified live: a listed company gains 14 rows; public, private, OPC and LLP gain
 
 ---
 
+## 4e. THE CALENDAR WAS CALLING THREE LAWS THE COMPANIES ACT (v195)
+
+The owner sent one screenshot: **Compliance Calendar, PIT selected, "Nothing
+dated in this view."** No words with it. Measured rather than guessed, and the
+screen held four defects &mdash; only one of which was the thing that had been
+clicked.
+
+### `calLawTag` falls through to 'CA', so a law with no branch becomes the Act
+```js
+if(t.indexOf('pit')  >= 0) return 'PIT';
+if(t.indexOf('lodr') >= 0) return 'LODR';
+if(t.indexOf('iepf') >= 0) return 'IEPF';
+return 'CA';                      // <- everything else
+```
+Measured across listed, public, private, OPC and LLP:
+
+| what the "Companies Act" chip was showing | rows | **dated** |
+|---|---|---|
+| Companies Act 2013 | 241 | 51 |
+| **FEMA / RBI** | 5 | **5** |
+| **LLP Act 2008** | 2 | **2** |
+| **SEBI Depositories & Participants 2018** | 14 | 0 |
+
+**Seven dated rows on the calendar under the wrong statute**, coloured
+Companies-Act blue, and swept up by filtering to the Companies Act.
+
+- **The FLA return is an RBI Master Direction under FEMA**, and &sect;3i had
+  already had to fix this row once &mdash; it was carrying a 15 July date with
+  nothing to justify it. It carries its source now and the calendar was still
+  relabelling it.
+- **An LLP's Form 11 and Form 8 are the LLP Act 2008.** &sect;2z exists because
+  an LLP was being told to hold board meetings under s.173. The register learned
+  that; the calendar then put the LLP's own two filings back under the Companies
+  Act. **The same defect running the other way, in a different module.**
+- **Depositories is one of the four laws the owner named as scope** and had no
+  chip at all. Nothing shows today because none of its 14 rows is dated
+  (&sect;3x) &mdash; so the day SEBI specifies a period for the Reconciliation of
+  Share Capital Audit, it would have appeared as the Companies Act.
+
+### The IEPF chip could never match anything
+`calLawTag` returns 'IEPF' only if the law string contains "iepf". **No rule in
+any of the eight corpora carries IEPF as its law** &mdash; s.124 and s.125 are
+Companies Act sections and the register files them correctly there.
+
+So the chip filtered to guaranteed-empty, on every book, for ever. &sect;2k's
+*control that cannot fire*, and a dummy item by the standing constraint: *"if
+anything is not working it should not be there."*
+
+**The chips are built from the register now.** A law with rows gets a chip with
+its dated count; a law with none does not. That removes IEPF and surfaces
+Depositories in the same line of code, and it cannot go stale the next time a
+corpus is added.
+
+The count is taken **before** the filter and before the date test &mdash;
+otherwise choosing a law would empty its own chip bar and it could never be
+cleared again. &sect;3k's year selector lists the union for exactly this reason.
+
+### The thing that was actually clicked was not a bug
+**PIT carries 70 obligations and dates none of them**, and that is correct:
+every PIT duty is continuous, runs from an event no register here records, or
+fixes a cadence rather than a deadline. Reg 9A(4) is *at least once in a
+financial year*; Schedule B cl. 1 is *not less than once in a year*; Reg 3(6) is
+a retention period, which &sect;4a records is not a deadline at all.
+
+**But "Nothing dated in this view" does not say 70.** On the
+highest-consequence law in the product a reader can take that for *"PIT has
+nothing for you"*. &sect;3v's lesson &mdash; a count means nothing without the
+count behind it &mdash; and &sect;3o's paged register. The empty state now
+names the number and the reason:
+
+> **70 PIT obligations** are on the register for your entities, and none of them
+> carries a date. They are continuous duties, obligations that run from an event
+> no register here records, or ones that fix a cadence rather than a deadline
+> &mdash; so there is no day to put them on.
+
+### 105 smoke checks and 741 assertions all passed with it in place
+The same sentence &sect;3z had to write about 1 January 1970 appearing on two
+thirds of the register. **Nothing had ever asserted what the calendar labels a
+row**, so there was nothing to fail. The gates measure the engines; this was in
+the presentation layer, which is where &sect;2j, &sect;3n and &sect;3o all found
+their worst defects.
+
+### My dead-chip assertion could not fail
+And this is the one worth keeping. The first version read:
+
+```js
+ok('and NO chip for a law the book does not hold',
+   chips.indexOf('>IEPF') < 0 && chips.indexOf('IEPF<') < 0, ...);
+```
+
+A chip renders as `&#9679; IEPF <span>0</span>`, so `IEPF` is preceded by a
+space and followed by a space. **Neither substring can ever appear**, and the
+mutation that puts the dead chip back was reported **MISSED**.
+
+I had guessed at the markup instead of reading what the bar rendered. It now
+pulls the names out of the rendered HTML and holds each one to the register, so
+it catches IEPF today and any dead chip added later. &sect;3z's *control that
+cannot fire*, this time in my own test &mdash; and it was the mutation check
+that found it, not me.
+
+### And a Python habit that is a JavaScript error
+The mutation block wrote two adjacent string literals on separate lines. Python
+concatenates those at parse time, so the anchor validation passed; **JavaScript
+does not**, and `mutation.js` would not parse. A `+` between them. The anchors
+themselves were all unique on the first run.
+
+### Verified on the running app
+Three entities &mdash; listed, private, LLP. Chip bar reads
+`All &middot; Companies Act 27 &middot; SEBI LODR 51 &middot; PIT 0 &middot;
+SEBI Depositories 0 &middot; FEMA / RBI 3 &middot; LLP Act 2`, **no IEPF**. The
+FLA return renders under FEMA / RBI in amber and **no longer appears under the
+Companies Act**; Form 11 and Form 8 render under the LLP Act. Zero console
+errors.
+
+### Coverage
+Suite **741 &rarr; 763**, mutations **189 &rarr; 194 caught, 0 missed, 0
+skipped**. Smoke unchanged at 105; the gate is unchanged at 419 rules, because
+**none of this touched a rule** &mdash; every one of these was a correct
+obligation wearing the wrong law's name.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -4138,7 +4260,7 @@ Verified live: a listed company gains 14 rows; public, private, OPC and LLP gain
   names the fix, because the only symptom of the drift was a mutation anchor
   that started matching twice (§4b).
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (741 assertions, run against `index.html` itself), `node tests/mutation.js` (189 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 419 rules across eight corpora; it reports how many periods it actually compared, currently 151), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (763 assertions, run against `index.html` itself), `node tests/mutation.js` (194 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 419 rules across eight corpora; it reports how many periods it actually compared, currently 151), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **`python tools/amendments.py` regenerates the amendment evidence AND re-embeds
   it into `index.html`.** It reads the compilations in `reference/`, which is
   gitignored — so `rules/amendments.json` and `rules/amendments_embed.json` are
@@ -4155,7 +4277,7 @@ Verified live: a listed company gains 14 rows; public, private, OPC and LLP gain
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v194.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v195.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

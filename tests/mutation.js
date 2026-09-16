@@ -1029,6 +1029,40 @@ const MUTATIONS = [
   { name: 'schedule clauses stop being ruled out for an unlisted company (SS4d r/w SS2z)',
     from: '"appliesTo":{"entityType":["listed"]},"appliesToText":"Every listed company","owner":"CS / Compliance officer","evidence":"The fair disclosure code clause;',
     to:   '"appliesTo":{"entityType":["listed","private"]},"appliesToText":"Every listed company","owner":"CS / Compliance officer","evidence":"The fair disclosure code clause;' },
+  // -- SS4e: the calendar labels a row by its OWN law ----------
+  // calLawTag falls back to 'CA'. Delete a branch and that law is silently
+  // shown to the reader as the Companies Act - which is the state the FLA
+  // return and an LLP's Form 11 and Form 8 shipped in. SS2z.
+  { name: 'the FLA return goes back to being the Companies Act (SS4e r/w SS2z)',
+    from: "  if(t.indexOf('fema') >= 0 || t.indexOf('rbi') >= 0) return 'FEMA';\n",
+    to:   '' },
+
+  // An LLP has no Board and no s.173 (SS2z). Labelling its own two filings as
+  // the Companies Act is that same error running the other way.
+  { name: 'an LLP\'s filings go back to being the Companies Act (SS4e r/w SS2z)',
+    from: "  if(t.indexOf('llp') >= 0) return 'LLP';\n",
+    to:   '' },
+
+  // The fourth law the owner named as scope, invisible on this screen.
+  { name: 'the depositories rows go back to being the Companies Act (SS4e r/w SS3x)',
+    from: "  if(t.indexOf('depositor') >= 0) return 'DEP';\n",
+    to:   '' },
+
+  // A chip for a law no corpus carries filters to guaranteed-empty on every
+  // book, for ever - a control that cannot fire (SS2k) and a dummy item by the
+  // owner's own standing constraint.
+  { name: 'a chip appears for a law the book does not hold (SS4e r/w SS2k)',
+    from: "    var known = ['CA','LODR','PIT','DEP','FEMA','LLP','IEPF'];\n" +
+          "    var listed2 = known.filter(function(k){ return lawSeen[k]; })",
+    to:   "    var known = ['CA','LODR','PIT','DEP','FEMA','LLP','IEPF'];\n" +
+          "    known.forEach(function(k){ if(!lawSeen[k]) lawSeen[k]={rows:0,dated:0}; });\n" +
+          "    var listed2 = known.filter(function(k){ return lawSeen[k]; })" },
+
+  // 70 PIT obligations, none dated. "Nothing dated" on its own reads as "PIT
+  // has nothing for you" on the highest-consequence law in the product.
+  { name: 'the empty calendar stops saying how many obligations it holds (SS4e r/w SS3v)',
+    from: "  var seen2 = (calF !== 'ALL') ? lawSeen[calF] : null;",
+    to:   "  var seen2 = null;" },
 ];
 
 const src = fs.readFileSync(INDEX, 'utf8');
