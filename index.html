@@ -1544,7 +1544,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v195">
+      <meta id="build-version" content="v196">
     </div>
   </div>
   <div class="cc-search">
@@ -4659,12 +4659,13 @@ function lodrObligations(c){
   var rules = (LODR_DATA && LODR_DATA.rules) || [];
   var out = [];
   rules.forEach(function(rule){
+    // Patch BEFORE the applicability test, not after. The date patch was
+    // deliberately applied where the ROW is built rather than in the date
+    // builder (SS2k) - and one line earlier is still where the row is built,
+    // while one line later means a scope correction can never take effect.
+    rule = lgPatchRule(rule);
     var ap = lodrApplies(rule, c);
     if(ap === false) return;
-    // Patch here, not in the date builder: the row is what every screen reads,
-    // and a row built from the unpatched rule reports "derived" while carrying
-    // a stated deadline.
-    rule = lgPatchRule(rule);
     var dates = lodrDueDates(rule);
 
     if(!dates.length){
@@ -4930,7 +4931,57 @@ var LG_DUE_PATCH = {
 
 // Applied before the date is computed, so lgHasDeadline sees a real offset and
 // the obligation stops being "deadline not established" on its own merits.
+// SCOPE PATCHES - a generated rule that binds a narrower class than it says.
+//
+// rules/lodr_periodic.json is generated from the owner's spreadsheet and must
+// not be hand-edited (SS2k), so a wrong scope is corrected here and quotes the
+// words it was corrected against.
+//
+// Reg 31(1)(b) proviso carries appliesTo = {note: "SME inclusion/exclusion -
+// check effective date"}. A note is not a scope: lodrApplies reads
+// appliesTo.listingType, finds none, and applies the rule to EVERY equity-listed
+// entity. So a MAINBOARD company was being given two dated obligations that
+// bind only SME Exchange entities - and it already carries the mainboard version
+// of the same duty, four quarterly rows, two of which fall on the same days.
+//
+// The proviso REPLACES the quarterly cadence for an SME; it is a relaxation,
+// not an extra filing. Verbatim from reference/sebi-lodr-2015:
+//
+//   "Provided that in case of listed entities which have listed their specified
+//    securities on SME Exchange, the above statements shall be submitted on a
+//    half yearly basis within twenty one days from the end of each half year."
+//
+// So this is SS2z - wrong law against the wrong entity class - and SS3y's s.84
+// discipline: reading the period without reading the subject.
+//
+// 'sme' is a listing type lodrListingTypes never returns, because SME is not
+// modelled here and the owner's scope is mainboard equity. The rule is
+// therefore reported through lgExcludedFor with its reason rather than deleted
+// (SS3i: not on the list, but because) - so the day an SME client arrives, what
+// is missing is one flag and not a reading of the regulation.
+var LG_SCOPE_PATCH = {
+  'LODR-REG-31-1-B-PROVISO': {
+    appliesTo: { listingType: ['sme'] },
+    from: 'Proviso to Reg 31(1): "in case of listed entities which have listed '
+        + 'their specified securities on SME Exchange, the above statements '
+        + 'shall be submitted on a half yearly basis"',
+    why: 'This is the SME Exchange relaxation - it REPLACES the quarterly '
+       + 'shareholding pattern with a half-yearly one, it is not an extra '
+       + 'filing. This app does not record whether a listing is on the SME '
+       + 'Exchange, so it is treated as not applying and the quarterly Reg '
+       + '31(1)(b) rows stand. If this entity is SME-listed, the quarterly '
+       + 'rows are the ones to review.'
+  }
+};
+
 function lgPatchRule(rule){
+  var sp = rule && LG_SCOPE_PATCH[rule.id];
+  if(sp){
+    rule = Object.assign({}, rule);
+    rule.appliesTo = Object.assign({}, rule.appliesTo || {}, sp.appliesTo);
+    rule.scopePatchedFrom = sp.from;
+    if(sp.why) rule.scopeWhy = sp.why;
+  }
   var p = rule && LG_DUE_PATCH[rule.id];
   if(!p) return rule;
   var out = Object.assign({}, rule);
@@ -4987,8 +5038,8 @@ function cmRows(dataset, c, agmIso, tag){
   var rules = (dataset && dataset.rules) || [];
   var out = [];
   rules.forEach(function(rule){
+    rule = lgPatchRule(rule);            // before the test - see lodrObligations
     if(!cmApplies(rule, c)) return;
-    rule = lgPatchRule(rule);
     var dates = cmDueDates(rule, c, agmIso);
     var base = {
       law: rule.law, section: rule.regulation, form: '-',
@@ -5557,14 +5608,50 @@ function lgWhyApplies(row, c){
 
 // The mirror: what an obligation that is NOT on the register failed. Asked in
 // every review, and the register could not answer it.
+// What a listing type is, in words. These are NOT entity types: an entity is
+// private or public or listed, and separately it has equity, or non-convertible
+// securities, or both, admitted to trading.
+function lgListingTypeLabel(t){
+  return ({
+    equity: 'listed equity shares',
+    sme:    'equity listed on the SME Exchange',
+    ncs:    'listed non-convertible securities',
+    hvdle:  'listed non-convertible debt of Rs 5,000 crore or more'
+  })[t] || t;
+}
+
 function lgWhyNotApplies(rule, c){
   var at = (rule && rule.appliesTo) || {};
-  var types = at.entityType || at.listingType || null;
   var reasons = [];
-  if(types && types.length && c && types.indexOf(c.type) < 0){
-    reasons.push('It applies to ' + types.join(', ') + '. This entity is ' +
-                 lgEntityTypeLabel(c.type) + '.');
+
+  // A scope correction explains itself, because the general wording below
+  // cannot know why a class is unreachable rather than merely different.
+  if(rule && rule.scopeWhy) reasons.push(rule.scopeWhy);
+
+  // entityType and listingType are DIFFERENT VOCABULARIES - 'private' and
+  // 'listed' against 'equity', 'ncs', 'hvdle' and 'sme'. Reading one list and
+  // comparing it to c.type produced "It applies to sme. This entity is a listed
+  // company.", which reads as a contradiction to anyone whose company IS
+  // listed - and mis-worded the reason for every debt rule too (SS4b).
+  var et = at.entityType || null;
+  if(et && et.length && c && et.indexOf(c.type) < 0){
+    reasons.push('It applies to ' + et.map(lgEntityTypeLabel).join(', ') +
+                 '. This entity is ' + lgEntityTypeLabel(c.type) + '.');
   }
+
+  var lt = (at.listingType || []).concat(at.listingTypeAll || []);
+  if(lt.length && c){
+    var mine = (typeof lodrListingTypes === 'function') ? lodrListingTypes(c) : [];
+    var missing = lt.filter(function(x){ return mine.indexOf(x) < 0; });
+    if(missing.length){
+      reasons.push('It applies to an entity with ' +
+        missing.map(lgListingTypeLabel).join(' or ') + '. ' +
+        (mine.length
+          ? 'This entity has ' + mine.map(lgListingTypeLabel).join(' and ') + '.'
+          : 'This entity has nothing admitted to trading.'));
+    }
+  }
+
   if(rule && rule.appliesToText && !reasons.length){
     reasons.push('Stated applicability: ' + rule.appliesToText);
   }
@@ -5581,6 +5668,10 @@ function lgExcludedFor(c){
     var rules = (ds && ds.rules) || [];
     rules.forEach(function(rule){
       var applies = true;
+      // The same patched rule the register asked about. Ask about the unpatched
+      // one and a scope-corrected rule is excluded SILENTLY, with no reason -
+      // SS3i, not on the list but because.
+      try{ rule = lgPatchRule(rule); }catch(e){}
       try{ applies = cmApplies(rule, c); }catch(e){ return; }
       if(applies) return;
       out.push({

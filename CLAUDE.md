@@ -4192,6 +4192,136 @@ obligation wearing the wrong law's name.
 
 ---
 
+## 4f. MAIN BOARD ONLY, AND THE SME RULE THAT WAS REACHING IT (v196)
+
+The owner, narrowing scope again: *"first is only equity listed mainboard thats
+it others as now is not required."*
+
+Measured before touching anything. Of **303 rows** on a main-board equity-listed
+company, 13 carry an `appliesToText` naming some other class &mdash; and twelve
+of those are correct (*"All listed entities (except MF units)"* and
+*"Equity-listed (incl. SME from 01.04.2025)"* both **include** a main-board
+entity; the word SME appearing in a rule is not the same as the rule being an
+SME rule).
+
+**One was genuinely wrong, and it was dated.**
+
+### A main-board company was being told to file the same return twice
+`LODR-REG-31-1-B-PROVISO` carries
+`appliesTo = {note: "SME inclusion/exclusion - check effective date"}`.
+
+**A note is not a scope.** `lodrApplies` reads `appliesTo.listingType`, finds
+none, and applies the rule to every equity-listed entity. So a main-board
+company received:
+
+| | |
+|---|---|
+| Reg 31(1)(b) | shareholding pattern **quarterly** &mdash; 21 Jul, 21 Oct, 21 Jan, 21 Apr |
+| Reg 31(1)(b) proviso | shareholding pattern **half-yearly** &mdash; **21 Oct, 21 Apr** |
+
+Six dated rows for a duty owed four times, with two of them landing on days that
+were already occupied.
+
+**And the proviso is a relaxation, not an extra filing.** Read against the held
+text before changing a line, because &sect;4b's Reg 64H was exactly inverted on a
+guess of this kind:
+
+> *"Provided that in case of listed entities which have listed their specified
+> securities on **SME Exchange**, the above statements shall be submitted on a
+> **half yearly** basis within twenty one days from the end of each half year."*
+
+It **replaces** the quarterly cadence for an SME. Handing it to a main-board
+company adds a filing that entity does not owe, under a concession it does not
+qualify for. &sect;2z, and &sect;3y's s.84 discipline: reading the period
+without reading the subject.
+
+### The patch had to move before the test
+`rules/lodr_periodic.json` is generated and must not be hand-edited (&sect;2k),
+so the scope is corrected in code &mdash; `LG_SCOPE_PATCH`, beside
+`LG_DUE_PATCH`, quoting the words it was corrected against. Two tables because
+they hold different facts: one is *"this rule's deadline, read from its own
+wording"*, the other *"this rule binds a narrower class than the corpus says"*.
+
+But `lgPatchRule` ran **after** `lodrApplies`, so a scope correction could never
+have taken effect. &sect;2k put the date patch where the **row** is built rather
+than in the date builder; one line earlier is still where the row is built, and
+one line later is a patch that silently does nothing. There is a mutation for
+that ordering.
+
+`lgExcludedFor` had to patch too, or a scope-corrected rule vanishes with **no
+reason at all** &mdash; the one failure &sect;3i's *"not on the list, but
+because"* exists to prevent.
+
+### The rule is excluded, not deleted
+`sme` is a listing type `lodrListingTypes` never returns. SME is not modelled
+and the owner says it is not required, so adding a column and a form field would
+be &sect;4b's defect exactly &mdash; `ncsListed` was read in one place and set
+nowhere for as long as the corpus has existed.
+
+So the rule is reported through `lgExcludedFor` with its reason, and the reason
+says what it would take:
+
+> This is the SME Exchange relaxation &mdash; it REPLACES the quarterly
+> shareholding pattern with a half-yearly one, it is not an extra filing. This
+> app does not record whether a listing is on the SME Exchange, so it is treated
+> as not applying and the quarterly Reg 31(1)(b) rows stand.
+
+The day an SME client arrives, what is missing is one flag, not a reading of the
+regulation.
+
+### The reason was mixing two vocabularies, for every debt rule too
+`lgWhyNotApplies` read `at.entityType || at.listingType` and compared the result
+to `c.type`. Those are **different vocabularies** &mdash; `private` and `listed`
+against `equity`, `ncs`, `hvdle` and `sme`. It produced:
+
+> *"It applies to sme. This entity is a listed company."*
+
+which reads as a contradiction to anyone whose company **is** listed, and had
+been mis-wording the reason for all 27 debt rules since &sect;4b. Each is now
+worded in its own terms, with `lgListingTypeLabel` giving a listing type actual
+words.
+
+### An assertion that was asserting the defect
+`check('Reg 31(1)(b) proviso - 21 days after the half year', dueOf(LISTED,
+'Reg 31(1)(b) proviso'), '2026-10-21')` **failed**, correctly: `LISTED` is a
+main-board entity and must not receive the proviso at all. &sect;3l's rule
+&mdash; an assertion written against broken behaviour passes for the wrong
+reason and fails when it is fixed.
+
+The 21-day offset is still worth testing (&sect;2v confirmed it against the
+current text), so it is now tested **on the rule** rather than through an entity
+that must not receive it &mdash; &sect;3e, test the guard's contract, not the
+data.
+
+### The ninth heredoc
+&sect;6 has recorded this eight times. I wrote every patch this session with the
+Write tool, then reached for a bash heredoc for one "quick" edit to a patch
+script &mdash; and it turned `\n` inside a JavaScript string into a **real
+newline**, so `mutation.js` would not parse. That is &sect;3c's failure
+verbatim, which has been in this file since v167.
+
+**The quick edit is the one that gets done with a heredoc, and that is the whole
+mechanism.** There is no size below which it is safe.
+
+### A mutation anchor that matched twice, caught before it shipped
+The fifth mutation first anchored on the bare rule id, which appears in **both**
+patch tables. &sect;3p: an anchor matching twice is silently SKIPPED. The
+validator refused it, and it now anchors on the offset itself.
+
+### Coverage
+Suite **763 &rarr; 769**, mutations **194 &rarr; 199 caught, 0 missed, 0
+skipped**. Smoke 105, gate clear at 419 rules, backend 96. Verified live: a
+main-board entity carries **four** Reg 31(1)(b) rows and no proviso, register
+303 &rarr; 301.
+
+### What this does NOT do
+It does not model the SME Exchange. A genuinely SME-listed client would today be
+given the quarterly cadence rather than the half-yearly one &mdash; the safe
+direction (&sect;2w errs early on a deadline for the same reason), stated in the
+exclusion reason, and a flag away from being right.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -4259,8 +4389,12 @@ obligation wearing the wrong law's name.
 
 - **Editing a 1.5 MB single file blind is error-prone.** Past bugs: a panel injected inside the wrong parent div (0×0 size), double-`await` (`await await fn()`), undefined vars after refactor (`DOC_SYS`/`RES_SYS`), white-on-white text after a theme flip (variables like `--ink` flipped meaning). Claude Code should consider splitting into separate files, or at minimum always view the surrounding context before editing and run the app to verify.
 - **Windows PowerShell copy-paste mangles multi-line code.** The Edge Function got corrupted to a single line twice via paste/here-strings. The reliable method was `Copy-Item` from Downloads, or editing in an editor. Claude Code writing files directly avoids this entirely.
-- **Write patch scripts with the Write tool — this has now failed EIGHT times, in
-  three different ways.** A shell heredoc turned `\b` into a literal 0x08 and ate
+- **Write patch scripts with the Write tool — this has now failed NINE times, in
+  three different ways**, most recently in &sect;4f, where every patch in the
+  session was written correctly and then one *"quick"* heredoc edit to a patch
+  script turned `\n` inside a JavaScript string into a real newline. **The quick
+  edit is the one that gets done with a heredoc.** There is no size below which
+  it is safe. A shell heredoc turned `\b` into a literal 0x08 and ate
   backslashes (§2x, §3c, §3t, §3w, §3x). CRLF in a patch script would not match
   an LF target (§3c). And in §4a, prose passed through `python -c` inside a bash
   double-quoted string had **every backtick-quoted identifier removed by command
@@ -4273,7 +4407,7 @@ obligation wearing the wrong law's name.
   names the fix, because the only symptom of the drift was a mutation anchor
   that started matching twice (§4b).
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (763 assertions, run against `index.html` itself), `node tests/mutation.js` (194 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 419 rules across eight corpora; it reports how many periods it actually compared, currently 151), and `node tests/backend.test.js` (96 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (769 assertions, run against `index.html` itself), `node tests/mutation.js` (199 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 419 rules across eight corpora; it reports how many periods it actually compared, currently 151), and `node tests/backend.test.js` (96 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **`python tools/amendments.py` regenerates the amendment evidence AND re-embeds
   it into `index.html`.** It reads the compilations in `reference/`, which is
   gitignored — so `rules/amendments.json` and `rules/amendments_embed.json` are
@@ -4290,7 +4424,7 @@ obligation wearing the wrong law's name.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v195.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v196.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/026` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

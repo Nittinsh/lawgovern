@@ -1063,6 +1063,40 @@ const MUTATIONS = [
   { name: 'the empty calendar stops saying how many obligations it holds (SS4e r/w SS3v)',
     from: "  var seen2 = (calF !== 'ALL') ? lawSeen[calF] : null;",
     to:   "  var seen2 = null;" },
+  // -- SS4f: a main-board entity was being given the SME proviso -
+  // The proviso is the SME Exchange RELAXATION - half-yearly instead of
+  // quarterly - and it was reaching every equity-listed entity, dated, beside
+  // the four quarterly rows it replaces. SS2z, and SS3y's s.84 discipline:
+  // reading the period without reading the subject.
+  { name: 'the SME proviso reaches a main-board entity again (SS4f r/w SS2z)',
+    from: "  'LODR-REG-31-1-B-PROVISO': {\n    appliesTo: { listingType: ['sme'] },",
+    to:   "  'LODR-REG-31-1-B-PROVISO': {\n    appliesTo: { }," },
+
+  // The scope patch must land BEFORE the applicability test. One line later and
+  // the correction can never take effect, silently.
+  { name: 'the scope patch lands after the applicability test (SS4f)',
+    from: "    rule = lgPatchRule(rule);\n    var ap = lodrApplies(rule, c);\n    if(ap === false) return;",
+    to:   "    var ap = lodrApplies(rule, c);\n    if(ap === false) return;\n    rule = lgPatchRule(rule);" },
+
+  // A rule excluded by a scope patch must still be REPORTED. Ask lgExcludedFor
+  // about the unpatched rule and it vanishes with no reason at all - the one
+  // failure SS3i's "not on the list, but because" exists to prevent.
+  { name: 'a scope-corrected rule is excluded silently (SS4f r/w SS3i)',
+    from: "      try{ rule = lgPatchRule(rule); }catch(e){}\n",
+    to:   '' },
+
+  // 'sme' is a LISTING type and 'listed' is an ENTITY type. Reading one list
+  // and comparing it to c.type produced "It applies to sme. This entity is a
+  // listed company." - a contradiction to anyone whose company IS listed.
+  { name: 'the reason calls a listing type an entity type (SS4f r/w SS3e)',
+    from: "  var et = at.entityType || null;",
+    to:   "  var et = at.entityType || at.listingType || null;" },
+
+  // SS2v confirmed the 21 days against the current text. It is the period the
+  // proviso actually states.
+  { name: 'the SME half-yearly period drifts to thirty days (SS4f r/w SS2v)',
+    from: "    due:{days:21},\n    from:'Within 21 days from the end of each half year'},",
+    to:   "    due:{days:30},\n    from:'Within 21 days from the end of each half year'}," },
 ];
 
 const src = fs.readFileSync(INDEX, 'utf8');

@@ -109,8 +109,47 @@ check('Reg 33(3)(a) — 45 days after Q1',        dueOf(LISTED, 'Reg 33(3)(a)'),
 check('Reg 33(3)(b) — 45 days after Q1',        dueOf(LISTED, 'Reg 33(3)(b)'), '2026-08-14');
 check('Reg 24A(2) — 60 days after the FY end',  dueOf(LISTED, 'Reg 24A(2)'),   '2026-05-30');
 check('Reg 44(5) — 5 months, so 31 August',     dueOf(LISTED, 'Reg 44(5)'),    '2026-08-31');
-check('Reg 31(1)(b) proviso — 21 days after the half year',
-      dueOf(LISTED, 'Reg 31(1)(b) proviso'), '2026-10-21');
+// Reg 31(1)(b) proviso. This assertion USED to read
+//   check(..., dueOf(LISTED, 'Reg 31(1)(b) proviso'), '2026-10-21')
+// and it was asserting the defect: the proviso is the SME Exchange relaxation
+// and LISTED is a main-board entity, which does not get it. SS3l -- an
+// assertion written against broken behaviour passes for the wrong reason and
+// fails when it is fixed.
+//
+// The 21-day offset is still worth testing, and SS2v confirmed it against the
+// current text, so it is tested on the RULE rather than through an entity that
+// must not receive it -- SS3e, test the guard's contract, not the data.
+{
+  const prov = (app.LODR_DATA.rules || [])
+    .find(r => r.id === 'LODR-REG-31-1-B-PROVISO');
+  ok('the SME proviso is in the corpus', !!prov, 'rule not found');
+  const d = app.lodrDueDates(prov).map(x => x.due).filter(Boolean).sort();
+  check('Reg 31(1)(b) proviso — 21 days after each half year',
+        d.slice(0, 2), ['2026-10-21', '2027-04-21']);
+
+  // And the scope correction itself: a main-board entity must not get it, must
+  // keep all four quarterly rows, and must be TOLD why (SS3i).
+  check('a main-board entity does not receive the SME proviso',
+        dueOf(LISTED, 'Reg 31(1)(b) proviso'), null);
+  const quarterly = app.getComplianceChart(LISTED)
+    .filter(r => r.section === 'Reg 31(1)(b)' && r.due);
+  check('and keeps the quarterly shareholding pattern it does owe',
+        quarterly.length, 4);
+  const told = app.lgExcludedFor(LISTED)
+    .filter(e => /31\(1\)\(b\) proviso/.test(e.section || ''));
+  check('and is told the proviso does not apply', told.length, 1);
+  ok('with a reason naming the SME Exchange',
+     told.length === 1 && told[0].reasons.join(' ').indexOf('SME Exchange') >= 0,
+     told.length ? told[0].reasons.join(' | ') : 'not reported at all');
+
+  // The reason must not mix the two vocabularies. 'sme' is a LISTING type;
+  // 'listed' is an ENTITY type. The old wording produced "It applies to sme.
+  // This entity is a listed company." -- a contradiction to anyone whose
+  // company is listed.
+  ok('and not by calling a listing type an entity type',
+     told.length === 1 && told[0].reasons.join(' ').indexOf('is a listed company') < 0,
+     told.length ? told[0].reasons.join(' | ') : '');
+}
 
 // Event-anchored rules must stay undated until their anchor is recorded.
 check('Reg 47(1) has no date without a results meeting', dueOf(LISTED, 'Reg 47(1)'), null);
