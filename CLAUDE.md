@@ -3621,7 +3621,7 @@ reads "Never checked" for all 378, and only the owner can change that.
 
 ---
 
-## 4b. THE DEBT CHAPTERS, AND TWENTY RULES THAT COULD NEVER FIRE (v192) &mdash; db/026
+## 4b. THE DEBT CHAPTERS, AND TWENTY RULES THAT COULD NEVER FIRE (v192) &mdash; db/026 &mdash; APPLIED (confirmed by `node tests/backend.test.js`)
 
 The ask was LODR Chapters V and VI. **The corpus was never the blocker.**
 
@@ -3832,12 +3832,25 @@ Smoke **65 &rarr; 96**, suite **686 &rarr; 709**, mutations **172 &rarr; 179,
 0 missed, 0 skipped**. Twenty-five of the new smoke checks are the corpus drift
 guard, five the debt flag end to end, and one the checkbox caption.
 
-### What db/026 needs from the owner
-**Run `db/026_debt_listing.sql` in the Supabase SQL editor.** Until then both
-columns are absent, `entSave` names the migration in its error, and both flags
-read false &mdash; so the register is exactly what it was, which is the safe
-failure. Nothing is switched on by running it: both default false, and each
-entity has to be marked on the Entities form.
+### db/026 is applied, and it was outside the witness list
+Run by the owner on 16 September 2026. **`companies.ncs_listed` and
+`companies.hvdle` both confirmed present against the live database** &mdash; and
+`backend.test.js` had to be taught to look, because db/026 was not in its
+`MIGRATIONS` table. **A migration outside the witness list is a migration whose
+status is only a note**, which is the exact failure &sect;3b found when eight
+sections of this file claimed db/017 through db/025 were unrun and all eight
+were applied.
+
+**Two witnesses for one migration, deliberately.** db/026 runs two separate
+`ALTER` statements, and a half-applied migration is a real outcome &mdash; paste
+one, miss the other. A single witness would report it applied while every
+Chapter V-A rule stayed unreachable.
+
+**Running it switched nothing on.** Both columns default false, so an
+equity-listed book's register is byte for byte what it was. What changed is that
+the 20 rules &sect;4b found unreachable *can* now fire &mdash; the day an entity
+is marked on the Entities form as having listed non-convertible securities.
+Backend conformance **94 &rarr; 96 checks**.
 
 ---
 
@@ -4260,7 +4273,7 @@ obligation wearing the wrong law's name.
   names the fix, because the only symptom of the drift was a mutation anchor
   that started matching twice (§4b).
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (763 assertions, run against `index.html` itself), `node tests/mutation.js` (194 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 419 rules across eight corpora; it reports how many periods it actually compared, currently 151), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (763 assertions, run against `index.html` itself), `node tests/mutation.js` (194 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 419 rules across eight corpora; it reports how many periods it actually compared, currently 151), and `node tests/backend.test.js` (96 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **`python tools/amendments.py` regenerates the amendment evidence AND re-embeds
   it into `index.html`.** It reads the compilations in `reference/`, which is
   gitignored — so `rules/amendments.json` and `rules/amendments_embed.json` are
@@ -4278,7 +4291,7 @@ obligation wearing the wrong law's name.
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
 **Header is at v195.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
-progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
+progress. **Every migration through `db/026` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**
 - [x] 11. Event -> Compliance Impact Engine (section 2f)

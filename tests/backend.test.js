@@ -207,7 +207,13 @@ async function get(url, opts) {
     ['022 meeting auditor',     'meetings',             'auditor_appointed'],
     ['023 rule governance',     'rule_verifications',   'rule_id'],
     ['024 pit control',         'upsi_events',          'window_closed'],
-    ['025 organisations',       'companies',            'org_id']
+    ['025 organisations',       'companies',            'org_id'],
+    // Two witnesses for one migration, deliberately. db/026 runs two separate
+    // ALTERs, and a half-applied migration is a real outcome -- paste one
+    // statement, miss the other. One witness would report it as applied while
+    // every Chapter V-A rule stayed unreachable (SS4b).
+    ['026 debt listing (ncs)',  'companies',            'ncs_listed'],
+    ['026 debt listing (hvdle)','companies',            'hvdle']
   ];
   for (const [label, table, witness] of MIGRATIONS) {
     const r = await get(REST + '/' + table + '?select=' + witness + '&limit=0');
