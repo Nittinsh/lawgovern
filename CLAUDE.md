@@ -3840,6 +3840,102 @@ entity has to be marked on the Entities form.
 
 ---
 
+## 4c. THE QUEUE WAS FOUR TIMES THE JOB, AND SAID SO NOWHERE (v193)
+
+The owner: *"as of now my focus is on equity listed only."* The debt work of
+&sect;4b stays &mdash; it shows **0 rows** unless a flag is ticked and `db/026`
+is unrun, so it costs an equity-listed book nothing. Their call, asked rather
+than assumed: &sect;3u is twice on record for my keeping something after the
+owner moved past it.
+
+Then the queue, which is the thing Rule Governance has said since v157 without
+anything changing: **not one of 405 rules has been checked by a person.**
+&sect;3t gave it an order and it still sat untouched. This is why.
+
+### 405 rules, and 179 of them can never apply to the book
+`renderGovernance` listed the whole corpus. On a book of equity-listed
+companies most of it belongs to somebody else entirely &mdash; LLPs, One Person
+Companies, debt-only issuers, unlisted companies.
+
+| | rules to verify |
+|---|---|
+| the corpus | **405** |
+| scoped to one equity-listed company | **226** |
+| an LLP book | far fewer, and **no LODR at all** |
+
+**`govOnBook(rules, clients)`** filters to what can reach an entity the practice
+actually holds, and it is **on by default** &mdash; a queue that opens showing
+405 when 226 apply is most of the reason nobody starts. The toggle sits beside
+the search box, because a narrowed list that does not say it narrowed is
+&sect;3k's defect (a filter that does not say it filtered).
+
+**An empty book returns EVERYTHING, not nothing.** Before any company has
+loaded, filtering would empty the screen and read as *"no rules to check"*,
+which is the opposite of true. Same reasoning as `lgScopeToOrg` in &sect;3a, and
+the suite asserts it from both ends.
+
+### The ordered queue holds 134 of 226, and the tab said 134
+`govAmendedQueue` drops a rule with no amendment evidence:
+
+```js
+var e = lgAmendFor(r.law, r.section || '');
+if(!e) continue;
+```
+
+**That exclusion is correct and is asserted** &mdash; the tab says *"amended
+since it was written"*, and a rule with no evidence was not shown to have been
+amended. It is unchanged.
+
+What was wrong is that nothing said so. Measured on an equity-listed book:
+
+```
+still to check            226
+in the ordered queue      134
+in NO ordered queue        92
+```
+
+**Work the tab top to bottom and you finish 134 believing you are done**, while
+92 rules that apply to your clients were never offered. That is &sect;3o's paged
+register, &sect;3k's year filter and &sect;3v's *"period mismatch: 0"* which was
+nought out of six &mdash; a list that reads as complete when it is not.
+
+`govQueueGap` counts it and the screen states it, on the amended tab only:
+
+> **134** of **226** rules still to check carry amendment evidence and are
+> ordered here, most recently amended first. The other **92** carry none &mdash;
+> either the provision has not been amended, or this extraction could not
+> attribute the footnote to it. **They are not in this queue.** They are under
+> *To check*, and working this list to the end does not finish them.
+
+The suite asserts `queued + missing === open`, so the sentence can never
+disagree with the tabs beside it.
+
+### Three of my own on the way through
+- **I called two functions without reading them.** `lgAmendFor(law, cite)` takes
+  two arguments and `govAmendedQueue(rules, stateOf)` takes two; I passed a rule
+  object to both and got *"0 of 405 carry amendment evidence"* and a
+  TypeError. &sect;3t's *"I asserted values I had not read"*, again. The real
+  figure is 228.
+- **I computed `gapNote` and never rendered it** &mdash; &sect;3n's shape
+  exactly, a value computed correctly that reaches no screen. Caught by reading
+  the assembly line back, and there is now a smoke check and a mutation for it.
+- **The toggle's label wrapped its input.** Valid HTML and a real accessible
+  name, but not the `<label for>` pattern `entCheck` uses, so the named-control
+  scan reported it unnamed. Restructured to match the file rather than widen the
+  check again &mdash; &sect;4b's lesson, one release old.
+
+### What this does NOT do
+It does not verify a single rule. **Only reading the provision does that**, and
+`govSave` still refuses a verification with no instrument behind it. What
+changed is the size and honesty of the list: 405 &rarr; 226 for an
+equity-listed book, ordered most-recently-amended first, and saying out loud
+that the ordering reaches 134 of them.
+
+### Coverage
+Smoke **96 &rarr; 100**, suite **709 &rarr; 721**, mutations **179 &rarr; 184**.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -3921,7 +4017,7 @@ entity has to be marked on the Entities form.
   names the fix, because the only symptom of the drift was a mutation anchor
   that started matching twice (§4b).
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (96 structural checks), `node tests/compliance.test.js` (709 assertions, run against `index.html` itself), `node tests/mutation.js` (179 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 405 rules across seven corpora; it reports how many periods it actually compared, currently 151), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (100 structural checks), `node tests/compliance.test.js` (721 assertions, run against `index.html` itself), `node tests/mutation.js` (184 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 405 rules across seven corpora; it reports how many periods it actually compared, currently 151), and `node tests/backend.test.js` (94 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **`python tools/amendments.py` regenerates the amendment evidence AND re-embeds
   it into `index.html`.** It reads the compilations in `reference/`, which is
   gitignored — so `rules/amendments.json` and `rules/amendments_embed.json` are
@@ -3938,7 +4034,7 @@ entity has to be marked on the Entities form.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v192.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v193.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/025` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

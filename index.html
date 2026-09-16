@@ -534,6 +534,10 @@ body.side-min .side-foot svg{transform:rotate(180deg);}
 .gov-ev-warn{font-size:11.5px;color:#8A5A00;background:#FFF8E6;border:1px solid #F5E3B8;
   border-radius:6px;padding:8px 10px;margin-top:9px;line-height:1.55;}
 .gov-am{font-size:11px;color:var(--ink-soft);margin-top:3px;}
+.gov-onbook{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-mid);white-space:nowrap;cursor:pointer;}
+.gov-onbook input{width:14px;height:14px;cursor:pointer;}
+.gov-gap{font-size:12.5px;line-height:1.55;color:var(--ink-mid);}
+.gov-gap b{color:var(--navy);}
 .gov-chip{flex-shrink:0;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:6px;margin-top:2px;white-space:nowrap;}
 .gov-chip.ok{background:var(--ok-wash);color:var(--ok);}
 .gov-chip.warn{background:var(--warn-wash);color:var(--warn);}
@@ -1540,7 +1544,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v192">
+      <meta id="build-version" content="v193">
     </div>
   </div>
   <div class="cc-search">
@@ -9508,6 +9512,9 @@ var GOV_STATUS = {
 
 var GOV_ROWS = null;      // verification records, loaded once
 var GOV_FILTER = 'todo';
+// Scoped to the book by default. With no companies loaded govOnBook returns
+// everything, so this cannot empty the screen before a session has data.
+var GOV_ONBOOK = true;
 var GOV_Q = '';
 
 // Every rule the system holds, flattened across the corpora.
@@ -9592,6 +9599,50 @@ function govState(rule){
 //
 // Pure, and separate from the screen, because the direction of this sort is the
 // whole value: reversed it would look just as busy and be exactly backwards.
+// Which of these rules can reach an entity the practice actually holds?
+//
+// Rule Governance listed all 405. On a book of equity-listed companies 202 of
+// them can never apply -- they belong to LLPs, One Person Companies, debt-only
+// issuers and unlisted companies. Verifying those is work nobody needs done,
+// and it is most of the list.
+//
+// `clients` is a parameter so this can be tested without a session; it falls
+// back to the live book. An EMPTY book returns everything rather than nothing:
+// a filter that empties the screen when no company has loaded yet would read as
+// "no rules to check", which is the opposite of true (SS3a's rule for
+// lgScopeToOrg, same reasoning).
+function govOnBook(rules, clients){
+  var book = clients || (typeof CLIENTS !== 'undefined' ? CLIENTS : []);
+  if(!book || !book.length) return rules.slice();
+  var reach = {};
+  book.forEach(function(c){
+    var rows = [];
+    try{ rows = getComplianceChart(c, {includeNA:true, allYears:true}); }catch(e){ return; }
+    rows.forEach(function(r){
+      var k = (typeof lgCompanionKey === 'function') ? lgCompanionKey(r.key) : r.key;
+      if(k) reach[k] = true;
+    });
+  });
+  return rules.filter(function(r){ return reach[r.id] === true; });
+}
+
+// How much of the book's own worklist the amended queue does NOT carry.
+//
+// The queue is "amended since it was written", and a rule with no amendment
+// evidence was not shown to have been amended -- so leaving it out is correct
+// and is asserted. What is NOT correct is letting the count read as the whole
+// job: 113 of 203 rules on an equity-listed book carry evidence, and the other
+// 90 are in no ordered list at all. SS3o's footer rule -- a page that reads as
+// the whole register is the defect.
+function govQueueGap(rules, stateOf){
+  var open = rules.filter(function(r){
+    var st = stateOf(r);
+    return st === 'unverified' || st === 'flagged';
+  });
+  var queued = govAmendedQueue(rules, stateOf).length;
+  return { open: open.length, queued: queued, missing: Math.max(0, open.length - queued) };
+}
+
 function govAmendedQueue(rules, stateOf){
   var out = [];
   for(var i = 0; i < rules.length; i++){
@@ -9614,6 +9665,7 @@ function govAmendedQueue(rules, stateOf){
 }
 
 function govSetFilter(f){ GOV_FILTER = f; renderGovernance(); }
+function govSetOnBook(on){ GOV_ONBOOK = !!on; renderGovernance(); }
 function govSearch(v){ GOV_Q = String(v||'').toLowerCase(); renderGovernance(); }
 
 function govOpen(ruleId){
@@ -12700,6 +12752,9 @@ function renderGovernance(){
   }
 
   var rules = lgAllRules();
+  // Everything below counts the SCOPED list when the filter is on, so the tab
+  // counts, the "N shown" figure and the queue gap all describe one thing.
+  if(GOV_ONBOOK) rules = govOnBook(rules);
   var byState = {flagged:[], unverified:[], current:[], needs_update:[], superseded:[],
                  not_applicable_anymore:[]};
   rules.forEach(function(r){ (byState[govState(r)] || byState.unverified).push(r); });
@@ -12766,6 +12821,19 @@ function renderGovernance(){
     ['amended','Amended since it was written', amendedCount],
     ['all','All', rules.length]
   ];
+
+  // What the amended queue does not carry. Stated next to it, because the
+  // count reads as the worklist and it is not the worklist.
+  var gap = govQueueGap(rules, govState);
+  var gapNote = (GOV_FILTER === 'amended' && gap.missing > 0)
+    ? '<div class="cc-card" style="margin-top:16px;"><div class="cc-card-b">'+
+      '<div class="gov-gap"><b>'+gap.queued+'</b> of <b>'+gap.open+'</b> rules still to check '+
+      'carry amendment evidence and are ordered here, most recently amended first. '+
+      'The other <b>'+gap.missing+'</b> carry none &mdash; either the provision has not '+
+      'been amended, or this extraction could not attribute the footnote to it. '+
+      '<b>They are not in this queue.</b> They are under <i>To check</i>, and working '+
+      'this list to the end does not finish them.</div></div></div>'
+    : '';
   var tabs = '<div class="mw-tabs">'+TABS.map(function(t){
     return '<div class="mw-tab'+(GOV_FILTER===t[0]?' on':'')+'" onclick="govSetFilter('+
       lgArg(t[0])+')">'+t[1]+' <span class="mw-tab-count">'+t[2]+'</span></div>';
@@ -12787,6 +12855,11 @@ function renderGovernance(){
   var bar = '<div class="cc-card cc-toolbar"><div class="cc-toolrow">'+
     '<input id="gov-q" aria-label="Search a provision or rule" class="lg-field" style="flex:1;min-width:200px;" placeholder="Search a '+
       'provision or rule&hellip;" value="'+entEsc(GOV_Q)+'" oninput="govSearch(this.value)">'+
+    // input then <label for>, the same shape as entCheck: the visible text
+    // becomes the accessible name and cannot drift away from it (SS3q).
+    '<span class="gov-onbook"><input type="checkbox" id="gov-onbook"'+
+      (GOV_ONBOOK?' checked':'')+' onchange="govSetOnBook(this.checked)">'+
+      '<label for="gov-onbook">Only rules that reach a company on my book</label></span>'+
     '<span class="aud-days">'+pick.length+' shown</span>'+
   '</div></div>';
 
@@ -12828,7 +12901,7 @@ function renderGovernance(){
     : '<div class="cc-card" style="margin-top:16px;"><div class="cc-card-b">'+
       '<div class="cc-none" style="text-align:left;">Nothing in this list.</div></div></div>';
 
-  root.innerHTML = head + banner + chips + corpus + tabs + bar + list;
+  root.innerHTML = head + banner + chips + corpus + tabs + bar + gapNote + list;
 }
 
 // ═══════════════════════════════════════════════════

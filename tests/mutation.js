@@ -965,6 +965,37 @@ const MUTATIONS = [
   { name: 'the entity form checkbox caption goes back to a div (SS4b r/w SS3q)',
     from: "<label for=\"'+id+'\" style=\"font-size:11px;color:var(--ink-soft);font-weight:600;cursor:pointer;\">",
     to:   "<div style=\"font-size:11px;color:var(--ink-soft);font-weight:600;cursor:pointer;\">" },
+  // ── SS4c: the verification queue, scoped to the book ─────────
+  // A filter that empties the screen before any company has loaded reads as
+  // "no rules to check", which is the opposite of true. SS3a's rule for
+  // lgScopeToOrg, and the reason the empty-book branch exists at all.
+  { name: 'an empty book empties the verification queue (SS4c r/w SS3a)',
+    from: '  if(!book || !book.length) return rules.slice();',
+    to:   '  if(!book || !book.length) return [];' },
+
+  // Scoping that does not scope leaves 405 rules in front of a CS whose book
+  // needs 226 verified - which is why the queue has sat untouched.
+  { name: 'the book filter stops filtering (SS4c)',
+    from: '  return rules.filter(function(r){ return reach[r.id] === true; });',
+    to:   '  return rules.slice();' },
+
+  // The queue is "amended since it was written" and correctly drops a rule with
+  // no evidence. Reporting the shortfall as zero is what turns that into a list
+  // that reads as the whole job - SS3o's paged register, SS3v's "0 of six".
+  { name: 'the queue stops reporting what it leaves out (SS4c r/w SS3o)',
+    from: '  return { open: open.length, queued: queued, missing: Math.max(0, open.length - queued) };',
+    to:   '  return { open: open.length, queued: queued, missing: 0 };' },
+
+  // SS3n: a value computed correctly that reaches no screen.
+  { name: 'the queue gap is computed and never rendered (SS4c r/w SS3n)',
+    from: '  root.innerHTML = head + banner + chips + corpus + tabs + bar + gapNote + list;',
+    to:   '  root.innerHTML = head + banner + chips + corpus + tabs + bar + list;' },
+
+  // The tab counts and the gap must describe the SAME list. Scoping the list
+  // but not the counts would put one number against another number's list.
+  { name: 'the screen counts the corpus while showing the book (SS4c)',
+    from: '  if(GOV_ONBOOK) rules = govOnBook(rules);',
+    to:   '  if(false) rules = govOnBook(rules);' },
 ];
 
 const src = fs.readFileSync(INDEX, 'utf8');

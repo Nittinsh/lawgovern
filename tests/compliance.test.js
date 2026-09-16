@@ -2795,7 +2795,78 @@ describe('lodr debt chapters');
      'a debt rule reached an entity with no listed debt');
 }
 
-// ── 12. Dashboard invariants ──────────────────────────────────────────────────────────────
+// -- 11w. the verification queue, scoped to the book (SS4c) ----
+// Rule Governance listed all 405 rules. On an equity-listed book 179 of them
+// can never apply - they belong to LLPs, OPCs, debt-only issuers and unlisted
+// companies - and verifying those is work nobody needs done. The queue has sat
+// untouched since v157, and being four times longer than the job is part of why.
+describe('verification queue scoping');
+{
+  const CRg = 10000000;
+  const mkg = (t, cin, o) => Object.assign({ id:'G-'+t, name:t, type:t,
+    fyend:'2026-03-31', capital:5*CRg, turnover:40*CRg, networth:CRg,
+    netprofit:CRg, borrowings:0, cin: cin, chart:{} }, o || {});
+  const all = app.lgAllRules();
+  const unv = () => 'unverified';
+
+  const listedBook = [mkg('listed', 'L17110MH2009PLC195422')];
+  const llpBook    = [mkg('llp', 'AAB-1234')];
+
+  ok('the corpus is large enough to be worth scoping', all.length > 300, all.length);
+
+  const scoped = app.govOnBook(all, listedBook);
+  ok('scoping to one listed company drops most of the corpus',
+     scoped.length > 0 && scoped.length < all.length,
+     scoped.length + ' of ' + all.length);
+
+  // SS3a's rule for lgScopeToOrg, same reasoning: a filter that empties the
+  // screen before any company has loaded reads as "no rules to check", which is
+  // the opposite of true. An empty book must return everything.
+  check('an empty book returns the whole corpus, not nothing',
+        app.govOnBook(all, []).length, all.length);
+  check('a null book returns the whole corpus too',
+        app.govOnBook(all, null).length, all.length);
+
+  // An LLP has no Board and no LODR (SS2z). Scoping to an LLP book must not
+  // offer LODR rules for verification.
+  const llpScoped = app.govOnBook(all, llpBook);
+  const lodrOnLlp = llpScoped.filter(r => /LODR/i.test(r.law || ''));
+  ok('scoping to an LLP book offers no LODR rules to verify',
+     lodrOnLlp.length === 0, lodrOnLlp.map(r => r.section).slice(0, 4).join(', '));
+  ok('and it is smaller than a listed book', llpScoped.length < scoped.length,
+     llpScoped.length + ' vs ' + scoped.length);
+
+  // Adding a company can only ADD rules to verify, never remove them.
+  const twoBook = listedBook.concat([mkg('private', 'U51909MH2018PTC300111')]);
+  ok('adding a company never shrinks the worklist',
+     app.govOnBook(all, twoBook).length >= scoped.length,
+     'the book grew and the list got smaller');
+
+  // -- what the amended queue does NOT carry ---------------------
+  // govAmendedQueue drops a rule with no amendment evidence, and that is
+  // deliberate and asserted above: "amended since it was written" is what it
+  // says. What must not happen is the count reading as the whole worklist.
+  const gap = app.govQueueGap(scoped, unv);
+  check('the gap accounts for every open rule', gap.queued + gap.missing, gap.open);
+  ok('the ordered queue is smaller than the worklist', gap.queued < gap.open,
+     gap.queued + ' of ' + gap.open);
+  ok('and the shortfall is reported, not implied', gap.missing > 0,
+     'nothing is reported as missing, so the note would never show');
+
+  // A rule already checked is not "still to check".
+  const oneDone = (r) => r.id === scoped[0].id ? 'current' : 'unverified';
+  ok('a verified rule leaves the worklist',
+     app.govQueueGap(scoped, oneDone).open === gap.open - 1,
+     'verifying a rule did not reduce the open count');
+
+  // The screen must only claim what it counted: with the filter on, the tab
+  // counts and the gap describe the SAME list.
+  ok('the gap is computed from the scoped list, not the corpus',
+     app.govQueueGap(scoped, unv).open < app.govQueueGap(all, unv).open,
+     'scoping did not change the worklist size');
+}
+
+// ── 12. Dashboard invariants ────────────────────────────────────────────────────────────────────────
 describe('dashboard invariants');
 {
   app.CLIENTS = [LISTED, PRIVATE];

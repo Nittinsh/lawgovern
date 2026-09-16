@@ -293,6 +293,23 @@ function eq(name, a, b) { ok(name, a === b, `${a} !== ${b}`); }
      'cmApplies ignores what is listed');
 }
 
+// -- 6c. the queue gap reaches the screen (SS4c) ---------------
+// SS3n: a value computed correctly that nothing renders. govQueueGap can be
+// right and the reader still never told that the ordered queue holds 134 of
+// 226 rules. The compliance suite calls the engine directly and cannot see it.
+{
+  const gv = js.slice(js.indexOf('function renderGovernance'),
+                      js.indexOf('function renderGovernance') + 14000);
+  ok('the governance screen scopes to the book', /GOV_ONBOOK\s*\)\s*rules\s*=\s*govOnBook/.test(gv),
+     'renderGovernance does not scope the rule list');
+  ok('the queue gap is computed', gv.indexOf('govQueueGap(') >= 0,
+     'govQueueGap is never called');
+  ok('and it is rendered', /innerHTML[^;]*gapNote/.test(gv),
+     'gapNote is computed but never reaches innerHTML');
+  ok('the book filter is offered on screen', gv.indexOf('govSetOnBook(') >= 0,
+     'nothing can turn the filter off');
+}
+
 // -- 6b. the embedded corpora match their JSON files (SS4b) ----
 // Each hand-authored corpus ships TWICE: as rules/<name>.json in the repo and
 // as an inline blob in index.html. Editing the file changes nothing the app
