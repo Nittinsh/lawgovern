@@ -2446,7 +2446,7 @@ describe('lodr chapter IV supplement');
 {
   const LS = app.LODR_SUP_DATA;
   ok('the supplement is loaded', !!(LS && LS.rules && LS.rules.length), 'LODR_SUP_DATA missing');
-  check('eighteen obligations', (LS.rules || []).length, 18);
+  check('thirty-eight obligations', (LS.rules || []).length, 38);
 
   // THE INVARIANT (SS3y). Where a rule states a period, that period must appear
   // in the quote. Nothing upstream constrains a hand-authored corpus; without
@@ -2465,8 +2465,15 @@ describe('lodr chapter IV supplement');
      unsupported.length === 0, unsupported.join(' | '));
 
   // A quote that cannot show who is bound is not evidence of anything (SS3x).
+  // LODR does not always bind with "shall". Reg 17(7) reads "The minimum
+  // information TO BE PLACED BEFORE the board of directors is specified in
+  // Part A of Schedule II" -- a gerundive, and the obligation is real. SS4a
+  // hit this with PIT, where the check read only for "shall" and reported
+  // Reg 3(3) as unbound: narrowing a check until it is wrong about a real
+  // provision is SS2x from the other direction.
+  const BINDS = /shall|to be placed before|is void/i;
   const unbound = (LS.rules || []).filter(r =>
-    !r.quote || r.quote.length < 60 || !/shall/i.test(r.quote));
+    !r.quote || r.quote.length < 60 || !BINDS.test(r.quote));
   ok('every quote carries the binding verb', unbound.length === 0,
      unbound.map(r => r.id).join(', '));
 
@@ -2480,7 +2487,7 @@ describe('lodr chapter IV supplement');
   const supOf = (c) => app.getComplianceChart(c).filter(r => /^LODR-SUP/.test(r.key || ''));
 
   const listed = mk('listed', 'L17110MH2009PLC195422');
-  check('a listed entity receives all eighteen', supOf(listed).length, 18);
+  check('a listed entity receives all thirty-eight', supOf(listed).length, 38);
   check('a private company receives none', supOf(mk('private','U51909MH2018PTC300111')).length, 0);
   check('a public unlisted company receives none', supOf(mk('public','U51909MH2015PLC300444')).length, 0);
   check('an OPC receives none', supOf(mk('opc','U74999MH2020OPC300222')).length, 0);
@@ -2544,7 +2551,7 @@ describe('lodr chapter IV supplement');
   const exc = app.lgExcludedFor(mk('private','U51909MH2018PTC300111'))
     .filter(e => /^Reg /.test(e.section || '') &&
                  (LS.rules || []).some(r => r.regulation === e.section));
-  check('a private company is told all eighteen do not apply', exc.length, 18);
+  check('a private company is told all thirty-eight do not apply', exc.length, 38);
   const noReason = exc.filter(e => !e.reasons || !e.reasons.length);
   ok('and is given a reason for every one', noReason.length === 0,
      noReason.map(e => e.section).join(', '));
@@ -3629,6 +3636,105 @@ describe('the year count and the register it opens');
     check('choosing ' + y.fy + ' shows its rows plus every continuous one',
           y.n + continuous, shown);
   });
+}
+
+describe('a committee the register never said to constitute');
+{
+  const CG = { id:'CG-L', name:'CG Listed', type:'listed', fyend:'2026-03-31',
+    capital:5e8, turnover:2e9, networth:1e8, netprofit:1e7, borrowings:0,
+    cin:'L17110MH2009PLC195422', chart:{} };
+  const rows = app.getComplianceChart(CG);
+  const text = r => String(r.obligation || '') + ' ' + String(r.section || '');
+
+  // THE INVARIANT. SS3z's completeness pass counted uncited PROVISIONS, so
+  // Reg 18 looked covered while Reg 18(1) -- constitute the audit committee --
+  // was absent, and the register told a listed company to hold four audit
+  // committee meetings a year without ever telling it to form the committee.
+  // Naming four rules would not catch the fifth committee somebody adds later.
+  const COMMITTEES = [
+    ['audit committee',                    /audit committee/i],
+    ['nomination and remuneration committee', /nomination and remuneration/i],
+    ['stakeholders relationship committee', /stakeholders relationship/i],
+    ['risk management committee',          /risk management committee/i],
+  ];
+  COMMITTEES.forEach(([name, re_]) => {
+    const mine = rows.filter(r => re_.test(text(r)));
+    const meets = mine.filter(r => /meet|meeting/i.test(text(r)));
+    const formed = mine.filter(r => /constitute|compris|members|quorum/i.test(text(r)));
+    if (!meets.length) return;   // no meeting duty on this book, nothing to pair
+    ok('the ' + name + ' is required to be constituted, not only to meet',
+       formed.length > 0,
+       'the register requires ' + meets.length + ' meeting duty(ies) and names ' +
+       'no constitution or composition requirement');
+  });
+
+  // The four constitution rules themselves, by citation.
+  ['Reg 18(1)', 'Reg 19(1)', 'Reg 20(1)', 'Reg 21(1)'].forEach(sec => {
+    ok(sec + ' is on an equity-listed register',
+       rows.some(r => String(r.section || '') === sec), 'absent');
+  });
+
+  const by = {};
+  rows.forEach(r => { by[String(r.section || '')] = r; });
+
+  // Reg 18(1) is STRICTER than s.177 of the Companies Act, which needs only a
+  // majority of independent directors. A listed entity must meet this one, and
+  // stating the weaker test would under-state the duty (SS3t).
+  ok('the audit committee test is two-thirds independent, not a majority',
+     !!by['Reg 18(1)'] && /two-thirds/i.test(by['Reg 18(1)'].obligation || '') &&
+     !/majority/i.test(by['Reg 18(1)'].obligation || ''),
+     by['Reg 18(1)'] ? by['Reg 18(1)'].obligation : '(absent)');
+
+  // Reg 21(5) confines the WHOLE of Reg 21 to the top 1000 listed entities and
+  // to an HVDLE. This app holds no market-capitalisation rank, so the row must
+  // say the test cannot be evaluated here rather than asserting it applies.
+  // SS2z: the wrong law against the wrong entity class.
+  const rmc = rows.filter(r => /^Reg 21\(/.test(String(r.section || '')));
+  ok('every Risk Management Committee row names the top-1000 limit',
+     rmc.length > 0 && rmc.every(r => /top 1000/i.test(r.appliesToText || '')),
+     rmc.map(r => r.section).join(', ') || '(none)');
+  ok('and says the rank cannot be evaluated here',
+     rmc.every(r => /cannot be evaluated/i.test(r.appliesToText || '')),
+     'a row asserts the top-1000 test without being able to apply it');
+
+  // Reg 15(2) exempts a small listed entity from regulations 17 to 27 outright.
+  // Both limbs, and it is "and" -- capital <= Rs 10 cr AND net worth <= Rs 25 cr.
+  // Scoped to the rules THIS pass authored. Sweeping every Reg 17-21 row
+  // caught Reg 20(3) -- the SRC chairperson attending the AGM -- whose date is
+  // AGM-anchored and correct, which is SS3u's mistake exactly.
+  const cg = rows.filter(r => /^LODR-SUP-REG-(1[789]|2[01])/.test(r.key || ''));
+  ok('this pass authored rules that reach the register', cg.length >= 20,
+     'only ' + cg.length + ' reached it');
+  const silent = cg.filter(r => !/Reg 15\(2\)/.test(r.appliesToText || ''));
+  ok('every rule authored here names the Reg 15(2) small-entity exemption',
+     silent.length === 0, silent.map(r => r.section).join(', '));
+
+  // REPORTED, NOT REPAIRED (SS3j). The GENERATED Reg 17-21 rules are
+  // inconsistent about this: Reg 17(1) says "subject to Reg 15(2) exemption"
+  // and Reg 17(2), 17(3), 17(8), 17(10) and 18(2)(a) say only "Equity-listed",
+  // though Reg 15(2) exempts a small listed entity from all of regulations 17
+  // to 27. lodr_periodic.json is generated and must not be hand-edited (SS2k),
+  // so this records the gap rather than closing it.
+  const genCg = rows.filter(r => /^Reg (1[789]|2[01])\(/.test(String(r.section || '')) &&
+                                 !/^LODR-SUP/.test(r.key || ''));
+  const genSilent = genCg.filter(r => !/Reg 15\(2\)/.test(r.appliesToText || ''));
+  ok('the generated Reg 17-21 rules are still silent on Reg 15(2) - known gap',
+     genSilent.length > 0,
+     'they now carry it; delete this assertion and tighten the one above');
+
+  // SS2k: none of the rules authored here runs from a date this app holds.
+  const dated = cg.filter(r => r.due);
+  ok('no rule authored here carries an invented date',
+     dated.length === 0, dated.map(r => r.section + '=' + r.due).join(', '));
+
+  // And SS3i -- not on the list, but BECAUSE.
+  const exc = app.lgExcludedFor({ id:'CG-P', name:'P', type:'private',
+    fyend:'2026-03-31', capital:5e8, turnover:2e9,
+    cin:'U51909MH2018PTC300111', chart:{} }) || [];
+  const cgExc = exc.filter(e => /^Reg (1[789]|2[01])\(/.test(String(e.section || '')));
+  ok('a private company is told the committee rules do not apply, with a reason',
+     cgExc.length > 0 && cgExc.every(e => e.reasons && e.reasons.length),
+     cgExc.length ? 'some carry no reason' : 'none reported at all');
 }
 
 // The access-check assertions are async — they drive a stubbed database through

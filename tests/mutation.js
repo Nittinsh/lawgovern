@@ -1227,6 +1227,34 @@ const MUTATIONS = [
   { name: 'the year option stops saying what its number counts (SS4k r/w SS3k)',
     from: "  return String(fy) + ' (' + n + ' dated to it)';",
     to:   "  return String(fy) + ' (' + n + ')';" },
+  // -- SS4m: a committee the register never said to constitute -
+  // The audit committee constitution rule disappears again, leaving the
+  // register telling a listed company to hold four audit committee meetings a
+  // year without ever telling it to form the committee.
+  { name: 'the audit committee need not be constituted, only to meet (SS4m)',
+    from: "\"title\":\"Constitute a qualified and independent audit committee",
+    to:   "\"title\":\"Review matters relating to the audit committee" },
+
+  // Reg 18(1) requires TWO-THIRDS independent. s.177 of the Companies Act needs
+  // only a majority, and a listed entity must meet the stricter test -- stating
+  // the weaker one under-states the duty, which is SS3t's branch.
+  { name: 'the audit committee test drops to a Companies Act majority (SS4m)',
+    from: "at least two-thirds independent, all financially literate",
+    to:   "a majority independent, all financially literate" },
+
+  // Reg 21(5) confines the WHOLE of Reg 21 to the top 1000 listed entities and
+  // an HVDLE. Losing that puts a Risk Management Committee obligation on every
+  // listed company on the book -- SS2z, the wrong law against the wrong class.
+  { name: 'the Risk Management Committee reaches every listed company (SS4m r/w SS2z)',
+    from: "\"detail\":\"Reg 21(5) confines the whole of Reg 21",
+    to:   "\"appliesToText\":\"Equity-listed\",\"detail\":\"Reg 21 confines" },
+
+  // Reg 15(2) exempts a small listed entity from regulations 17 to 27 outright,
+  // on BOTH limbs. A row that does not say so asserts a duty the entity may not
+  // owe.
+  { name: 'a committee rule stops naming the Reg 15(2) exemption (SS4m)',
+    from: "\"title\":\"Constitute a Stakeholders Relationship Committee",
+    to:   "\"appliesToText\":\"Equity-listed\",\"title\":\"Constitute a Stakeholders Relationship Committee" },
 ];
 
 const src = fs.readFileSync(INDEX, 'utf8');

@@ -1,454 +1,1180 @@
 {
-  "meta": {
-    "source": "reference/sebi-lodr-2015/lodr.txt",
-    "instrument": "SEBI (Listing Obligations and Disclosure Requirements) Regulations, 2015 - as amended up to July 14, 2026",
-    "authored": "Read from the held text, provision by provision. NOT generated from 'LODR Compliance Calendar and Material Events.xlsx' - unlike lodr_periodic.json and lodr_events.json, which build_lodr.py generates from the owner's spreadsheet and which must not be hand-edited. This file is hand-authored against reference/ and every rule carries the words it came from in `quote`.",
-    "scope": "Chapter IV only - the obligations of a listed entity which has listed its SPECIFIED SECURITIES. That is the customer: an Indian company whose equity is listed. Chapters VII to IX bind the issuers of Indian depository receipts, securitised debt instruments and mutual fund units; Chapter X binds the recognised stock exchanges; Chapter XI is the procedure on default. None of those is this product's user, and loading them would hand a listed company somebody else's obligations.",
-    "why": "The generated corpus cites 56 of the 151 numbered provisions in the regulation body. Nothing had ever asked which obligations the regulation creates that the corpus does not carry at all. A missing rule cannot be wrong - it is absent, so no assertion, mutation or release gate can see it.",
-    "readingNotes": [
-      "The compilation prints the wording PRIOR TO substitution or omission inside quotes, in footnotes. Three periods that look current are not, and were excluded: Reg 41(9)/(10) (the practising company secretary certificate on share transfers) and Reg 43(3) (five working days to recommend a dividend) were BOTH OMITTED w.e.f. 13.12.2024, and the twenty-one days printed under Reg 28 is the old Reg 27(2)(a) corporate governance report.",
-      "Reg 31A appears twice in the document. The FIRST occurrence is a footnote reproducing the pre-2021 regulation; the operative text is the second. Reading the first would have carried a repealed thirty-day deadline and a three-to-six-month gap that the Third Amendment 2024 replaced.",
-      "Working-day periods are stated and NOT computed. There is no exchange holiday calendar here, and for a period that runs BACKWARD from an event - Reg 29's prior intimation, Reg 42's record-date notice - counting working days as calendar days produces a LATER deadline than the law allows. That errs in the unsafe direction, unlike Reg 7(2) in the PIT centre where the same approximation errs early."
-    ],
-    "excluded": {
-      "Reg 16": "Definitions for Chapter IV. Creates no obligation.",
-      "Reg 41(9) and 41(10)": "Omitted by the Third Amendment 2024 w.e.f. 13.12.2024. The annual practising-company-secretary certificate on share transfer timelines is no longer required, and a CS working from memory still reaches for it.",
-      "Reg 43(3) and 43(5)": "Omitted by the Third Amendment 2024 w.e.f. 13.12.2024 - the five working days before a dividend recommendation, and the thirty-day gap between transfer-book closures.",
-      "Reg 31A(3)(a)(iv)": "The thirty days to decide an application binds the RECOGNISED STOCK EXCHANGE, not the listed entity. Reading the period without reading the subject is how an obligation that is not owed reaches a register."
-    }
+ "meta": {
+  "source": "reference/sebi-lodr-2015/lodr.txt",
+  "instrument": "SEBI (Listing Obligations and Disclosure Requirements) Regulations, 2015 - as amended up to July 14, 2026",
+  "authored": "Read from the held text, provision by provision. NOT generated from 'LODR Compliance Calendar and Material Events.xlsx' - unlike lodr_periodic.json and lodr_events.json, which build_lodr.py generates from the owner's spreadsheet and which must not be hand-edited. This file is hand-authored against reference/ and every rule carries the words it came from in `quote`.",
+  "scope": "Chapter IV only - the obligations of a listed entity which has listed its SPECIFIED SECURITIES. That is the customer: an Indian company whose equity is listed. Chapters VII to IX bind the issuers of Indian depository receipts, securitised debt instruments and mutual fund units; Chapter X binds the recognised stock exchanges; Chapter XI is the procedure on default. None of those is this product's user, and loading them would hand a listed company somebody else's obligations.",
+  "why": "The generated corpus cites 56 of the 151 numbered provisions in the regulation body. Nothing had ever asked which obligations the regulation creates that the corpus does not carry at all. A missing rule cannot be wrong - it is absent, so no assertion, mutation or release gate can see it.",
+  "readingNotes": [
+   "The compilation prints the wording PRIOR TO substitution or omission inside quotes, in footnotes. Three periods that look current are not, and were excluded: Reg 41(9)/(10) (the practising company secretary certificate on share transfers) and Reg 43(3) (five working days to recommend a dividend) were BOTH OMITTED w.e.f. 13.12.2024, and the twenty-one days printed under Reg 28 is the old Reg 27(2)(a) corporate governance report.",
+   "Reg 31A appears twice in the document. The FIRST occurrence is a footnote reproducing the pre-2021 regulation; the operative text is the second. Reading the first would have carried a repealed thirty-day deadline and a three-to-six-month gap that the Third Amendment 2024 replaced.",
+   "Working-day periods are stated and NOT computed. There is no exchange holiday calendar here, and for a period that runs BACKWARD from an event - Reg 29's prior intimation, Reg 42's record-date notice - counting working days as calendar days produces a LATER deadline than the law allows. That errs in the unsafe direction, unlike Reg 7(2) in the PIT centre where the same approximation errs early."
+  ],
+  "excluded": {
+   "Reg 16": "Definitions for Chapter IV. Creates no obligation.",
+   "Reg 41(9) and 41(10)": "Omitted by the Third Amendment 2024 w.e.f. 13.12.2024. The annual practising-company-secretary certificate on share transfer timelines is no longer required, and a CS working from memory still reaches for it.",
+   "Reg 43(3) and 43(5)": "Omitted by the Third Amendment 2024 w.e.f. 13.12.2024 - the five working days before a dividend recommendation, and the thirty-day gap between transfer-book closures.",
+   "Reg 31A(3)(a)(iv)": "The thirty days to decide an application binds the RECOGNISED STOCK EXCHANGE, not the listed entity. Reading the period without reading the subject is how an obligation that is not owed reaches a register."
   },
-  "rules": [
-    {
-      "id": "LODR-SUP-REG-15-1A",
-      "sourceRow": 1,
-      "law": "SEBI LODR 2015",
-      "regulation": "Reg 15(1A)",
-      "chapter": "IV",
-      "area": "High value debt listed entity",
-      "title": "Comply with the corporate governance regulations within six months of crossing the high value debt threshold",
-      "detail": "Where the outstanding value of listed non-convertible debt securities becomes equal to or greater than Rs 5,000 crore during the year, comply with Reg 15 and Regs 16 to 27 within six months of the trigger. Compliance may be reported in the corporate governance compliance report from the third quarter following the trigger.",
-      "quote": "in case the value of the outstanding listed non-convertible debt securities becomes equal to or greater than the specified threshold of Rupees Five Thousand Crore during the course of the year, the high value debt listed entity shall ensure compliance with these provisions within six months from the date of such trigger, and the disclosures of such compliance may be made in the corporate governance compliance report on and from the third quarter following the date of the trigger",
-      "frequency": "On crossing the threshold",
-      "timelineText": "Within six months from the date of the trigger",
-      "due": { "type": "at_trigger", "when": "Outstanding listed non-convertible debt securities reach Rs 5,000 crore" },
-      "dueConfidence": "trigger",
-      "appliesTo": { "entityType": ["listed"] },
-      "appliesToText": "Listed entity with outstanding listed non-convertible debt securities of Rs 5,000 crore or more",
-      "owner": "CS / Compliance",
-      "evidence": "Computation of outstanding listed NCD value; board note on the corporate governance provisions adopted",
-      "risk": "High",
-      "priority": "High",
-      "submitTo": "Stock exchange",
-      "signedBy": "Company Secretary",
-      "notes": "The threshold figure was substituted from Rupees Five Hundred Crore to Rupees Five Thousand Crore; the held text carries the earlier figure only in a footnote. Whether this entity holds listed non-convertible debt securities at all is a fact about the company that nothing here records, so this is raised for decision rather than asserted."
-    },
-    {
-      "id": "LODR-SUP-REG-15-CIRP",
-      "sourceRow": 2,
-      "law": "SEBI LODR 2015",
-      "regulation": "Reg 15(2B)",
-      "chapter": "IV",
-      "area": "Post-resolution-plan compliance",
-      "title": "Comply with the board and committee composition regulations within three months of a resolution plan being approved",
-      "detail": "Where a resolution plan has been approved under section 31 of the Insolvency Code, comply with Reg 17 (board of directors) within three months of the approval, and with Regs 18, 19, 20 and 21 (audit, nomination and remuneration, stakeholders relationship and risk management committees) within three months of the approval.",
-      "quote": "such listed entity shall ensure compliance with regulation 17 within a period of three months of approval of resolution plan under section 31 of the Insolvency Code",
-      "frequency": "On approval of a resolution plan",
-      "timelineText": "Within a period of three months of approval of the resolution plan",
-      "due": { "type": "at_trigger", "when": "Resolution plan approved under section 31 of the Insolvency Code" },
-      "dueConfidence": "trigger",
-      "appliesTo": { "entityType": ["listed"] },
-      "appliesToText": "Listed entity under a resolution plan approved under section 31 of the Insolvency Code",
-      "owner": "CS / Compliance",
-      "evidence": "Tribunal order approving the resolution plan; board and committee reconstitution resolutions",
-      "risk": "High",
-      "priority": "High",
-      "submitTo": "Stock exchange",
-      "signedBy": "Company Secretary",
-      "notes": "Two separate three-month clocks run from the same date - one for Reg 17 and one for Regs 18 to 21. Reconstituting the board without reconstituting the committees leaves the second unmet."
-    },
-    {
-      "id": "LODR-SUP-REG-26A-1",
-      "sourceRow": 3,
-      "law": "SEBI LODR 2015",
-      "regulation": "Reg 26A(1)",
-      "chapter": "IV",
-      "area": "Key managerial personnel",
-      "title": "Fill a vacancy in the office of CEO, Managing Director, Whole Time Director or Manager within three months",
-      "detail": "Any vacancy in the office of Chief Executive Officer, Managing Director, Whole Time Director or Manager is to be filled at the earliest and in any case not later than three months from the date of the vacancy; six months where the appointment needs the approval of a regulatory, government or statutory authority. The vacancy may not be filled by an interim appointment unless that appointment itself satisfies the law applicable to a fresh appointment.",
-      "quote": "Any vacancy in the office of Chief Executive Officer, Managing Director, Whole Time Director or Manager shall be filled by the listed entity at the earliest and in any case not later than three months from the date of such vacancy: Provided that where the listed entity is required to obtain approval of regulatory, government or statutory authorities to fill up such vacancies, then the vacancies shall be filled up by the listed entity at the earliest and in any case not later than six months from the date of vacancy",
-      "frequency": "On a vacancy arising",
-      "timelineText": "Not later than three months from the date of the vacancy; six months where a regulatory, government or statutory approval is required",
-      "due": { "type": "at_trigger", "when": "The office falls vacant" },
-      "dueConfidence": "trigger",
-      "appliesTo": { "entityType": ["listed"] },
-      "appliesToText": "Every listed entity",
-      "owner": "CS / Board",
-      "evidence": "Board resolution appointing the replacement; date the office fell vacant",
-      "risk": "High",
-      "priority": "High",
-      "submitTo": "Stock exchange; Registrar of Companies",
-      "signedBy": "Company Secretary",
-      "notes": "This app holds no record of the date an office fell vacant, so the deadline is stated rather than computed. The proviso on interim appointments is the limb most often missed: an interim appointment that does not meet the requirements for a fresh appointment does not stop the clock."
-    },
-    {
-      "id": "LODR-SUP-REG-26A-2",
-      "sourceRow": 4,
-      "law": "SEBI LODR 2015",
-      "regulation": "Reg 26A(2)",
-      "chapter": "IV",
-      "area": "Key managerial personnel",
-      "title": "Fill a vacancy in the office of Chief Financial Officer within three months",
-      "detail": "Any vacancy in the office of the Chief Financial Officer is to be filled at the earliest and in any case not later than three months from the date of the vacancy; six months where the appointment needs the approval of a regulatory, government or statutory authority.",
-      "quote": "Any vacancy in the office of the Chief Financial Officer shall be filled by the listed entity at the earliest and in any case not later than three months from the date of such vacancy: Provided that where the listed entity is required to obtain approval of regulatory, government or statutory authorities to fill up such vacancy, then the vacancy shall be filled up by the listed entity at the earliest and in any case not later than six months from the date of vacancy",
-      "frequency": "On a vacancy arising",
-      "timelineText": "Not later than three months from the date of the vacancy; six months where a regulatory, government or statutory approval is required",
-      "due": { "type": "at_trigger", "when": "The office of Chief Financial Officer falls vacant" },
-      "dueConfidence": "trigger",
-      "appliesTo": { "entityType": ["listed"] },
-      "appliesToText": "Every listed entity",
-      "owner": "CS / Board",
-      "evidence": "Board resolution appointing the Chief Financial Officer; date the office fell vacant",
-      "risk": "High",
-      "priority": "High",
-      "submitTo": "Stock exchange; Registrar of Companies",
-      "signedBy": "Company Secretary",
-      "notes": "A separate sub-regulation from Reg 26A(1) and a separate office. Filling the Managing Director's chair does not answer for the Chief Financial Officer's."
-    },
-    {
-      "id": "LODR-SUP-REG-26A-3",
-      "sourceRow": 5,
-      "law": "SEBI LODR 2015",
-      "regulation": "Reg 26A(3)",
-      "chapter": "IV",
-      "area": "Key managerial personnel",
-      "title": "Fill key managerial vacancies within three months of a resolution plan being approved",
-      "detail": "Where a resolution plan has been approved under section 31 of the Insolvency Code, any vacancy in the office of Chief Executive Officer, Managing Director, Whole Time Director, Manager or Chief Financial Officer is to be filled within three months of that approval. In the interim the entity must have not less than one full-time key managerial personnel managing its day-to-day affairs.",
-      "quote": "Any vacancy in the office of Chief Executive Officer, Managing Director, Whole Time Director or Manager or Chief Financial Officer of such listed entity in respect of which a resolution plan under section 31 of the Insolvency Code has been approved, shall be filled within a period of three months of such approval",
-      "frequency": "On approval of a resolution plan",
-      "timelineText": "Within a period of three months of approval of the resolution plan",
-      "due": { "type": "at_trigger", "when": "Resolution plan approved under section 31 of the Insolvency Code" },
-      "dueConfidence": "trigger",
-      "appliesTo": { "entityType": ["listed"] },
-      "appliesToText": "Listed entity under a resolution plan approved under section 31 of the Insolvency Code",
-      "owner": "CS / Board",
-      "evidence": "Tribunal order approving the resolution plan; appointment resolutions; record of the full-time KMP in office in the interim",
-      "risk": "High",
-      "priority": "High",
-      "submitTo": "Stock exchange",
-      "signedBy": "Company Secretary",
-      "notes": "The interim requirement is a condition in its own right - at least one full-time key managerial personnel must be managing the day-to-day affairs throughout, not merely at the end of the three months."
-    },
-    {
-      "id": "LODR-SUP-REG-28-1",
-      "sourceRow": 6,
-      "law": "SEBI LODR 2015",
-      "regulation": "Reg 28(1)",
-      "chapter": "IV",
-      "area": "Issue of securities",
-      "title": "Obtain in-principle approval from the stock exchanges before issuing securities",
-      "detail": "Before issuing securities, obtain an in-principle approval from the recognised stock exchanges: from all exchanges having nationwide trading terminals where the securities are listed on such exchanges; from all exchanges on which the securities are proposed to be listed where they are not; and from all nationwide exchanges where both.",
-      "quote": "The listed entity, before issuing securities, shall obtain an in-principle approval from recognised stock exchange(s)",
-      "frequency": "On every issue of securities",
-      "timelineText": "Before issuing securities",
-      "due": { "type": "at_trigger", "when": "Before an issue of securities" },
-      "dueConfidence": "trigger",
-      "appliesTo": { "entityType": ["listed"] },
-      "appliesToText": "Every listed entity issuing securities",
-      "owner": "CS / Compliance",
-      "evidence": "In-principle approval letter from each relevant stock exchange",
-      "risk": "High",
-      "priority": "High",
-      "submitTo": "Stock exchange",
-      "signedBy": "Company Secretary",
-      "notes": "The regulation fixes an ORDER, not a period: the approval must precede the issue. Reg 28(2) disapplies it for securities issued under a scheme of arrangement for which a No-Objection Letter has already been obtained under Reg 37."
-    },
-    {
-      "id": "LODR-SUP-REG-29-1",
-      "sourceRow": 7,
-      "law": "SEBI LODR 2015",
-      "regulation": "Reg 29(1)",
-      "chapter": "IV",
-      "area": "Prior intimation",
-      "title": "Give the stock exchange at least two working days prior intimation of a board meeting considering results, buyback, delisting, fund raising, dividend or bonus",
-      "detail": "Give prior intimation of at least two working days, excluding the date of the intimation and the date of the meeting, of a board meeting at which any of these is due to be considered: financial results (quarterly, half yearly or annual); a buyback proposal; voluntary delisting; fund raising by further public offer, rights issue, ADRs/GDRs/FCCBs, qualified institutions placement, debt issue, preferential issue or any other method, and determination of issue price; declaration or recommendation of dividend, issue of convertible securities or debentures carrying a right to subscribe to equity, or passing over of dividend; a bonus proposal; alteration in the form or nature of listed securities or in holders' rights; alteration in the date on which interest on debentures or bonds, or the redemption amount, is payable.",
-      "quote": "The listed entity shall give prior intimation of at least two working days in advance, excluding the date of the intimation and date of the meeting, to stock exchange about the meeting of the board of directors in which any of the following proposals is due to be considered",
-      "frequency": "Before every qualifying board meeting",
-      "timelineText": "At least two working days in advance, excluding the date of the intimation and the date of the meeting",
-      "due": { "type": "at_trigger", "when": "Before a board meeting considering a listed proposal" },
-      "dueConfidence": "trigger",
-      "appliesTo": { "entityType": ["listed"] },
-      "appliesToText": "Every listed entity convening a board meeting on a listed proposal",
-      "owner": "CS / Compliance",
-      "evidence": "Intimation letter to each stock exchange with its filing timestamp; notice of the board meeting",
-      "risk": "High",
-      "priority": "High",
-      "submitTo": "Stock exchange",
-      "signedBy": "Company Secretary",
-      "notes": "Deliberately NOT computed. Both ends are excluded and the count is in WORKING days, and there is no exchange holiday calendar here - so a calendar-day approximation would place the deadline LATER than the regulation allows, which is the unsafe direction for a prior intimation. The proviso also requires intimation where a general meeting or postal ballot is proposed for shareholder approval of further fund raising, indicating the type of issuance."
-    },
-    {
-      "id": "LODR-SUP-REG-30A",
-      "sourceRow": 8,
-      "law": "SEBI LODR 2015",
-      "regulation": "Reg 30A",
-      "chapter": "IV",
-      "area": "Material events",
-      "title": "Disclose the shareholder and promoter agreements that bind the listed entity",
-      "detail": "Disclose to the stock exchanges and on the website the agreements specified in clause 5A of para A of part A of Schedule III to which the listed entity is not itself a party, and the number of such agreements subsisting on the date clause 5A was notified, together with their salient features.",
-      "quote": "the parties to the agreements shall inform the listed entity, about the agreement to which such a listed entity is not a party and the listed entity shall in turn disclose all such subsisting agreements to the Stock Exchanges and on its website within the timelines as specified by the Board",
-      "frequency": "On an agreement being entered into or notified to the entity",
-      "timelineText": "Within the timelines as specified by the Board",
-      "due": { "type": "at_trigger", "when": "The listed entity is informed of a qualifying agreement" },
-      "dueConfidence": "trigger",
-      "appliesTo": { "entityType": ["listed"] },
-      "appliesToText": "Every listed entity bound by an agreement specified in clause 5A of para A of part A of Schedule III",
-      "owner": "CS / Compliance",
-      "evidence": "Intimations received from shareholders, promoters, directors and key managerial personnel; disclosure filed with the exchanges; website record",
-      "risk": "High",
-      "priority": "High",
-      "submitTo": "Stock exchange; company website",
-      "signedBy": "Company Secretary",
-      "notes": "The two working days in Reg 30A(1) is the duty of the SHAREHOLDERS, PROMOTERS, RELATED PARTIES, DIRECTORS, KEY MANAGERIAL PERSONNEL AND EMPLOYEES who are parties to the agreement - it runs to the listed entity, not from it. The listed entity's own period is the one the Board specifies. Reading the two days as the company's deadline would put a filing on this register that the company does not owe."
-    },
-    {
-      "id": "LODR-SUP-REG-31A-3",
-      "sourceRow": 9,
-      "law": "SEBI LODR 2015",
-      "regulation": "Reg 31A(3)(a)",
-      "chapter": "IV",
-      "area": "Promoter reclassification",
-      "title": "Run the promoter reclassification sequence - board views, exchange no-objection, shareholder approval and notification",
-      "detail": "On a promoter's request for reclassification as public: the board analyses the request and provides its views in the immediate next board meeting or within two months of receiving the request, whichever is earlier; the entity applies for the recognised stock exchange's no-objection within five days of the board's consideration; the entity places the request before shareholders within sixty days of receiving the no-objection letter; the request is approved by ordinary resolution on which the promoter seeking reclassification and persons related to them do not vote; and the entity notifies the exchanges within five days of obtaining shareholder approval and effects the reclassification.",
-      "quote": "the board of directors of the listed entity shall analyze such request which is compliant with the conditions specified in clause (b) of sub-regulation (3) and provide their views in the immediate next board meeting or within two months from the date of receipt of the request from its promoter(s), whichever is earlier; the listed entity shall submit an application seeking no-objection of the recognized stock exchange for such reclassification request along with the views of the board of directors within five days of consideration of the request by the board of directors; the listed entity shall place the reclassification request before the shareholders in a general meeting for approval, within sixty days of receipt of no-objection letter from the recognized stock exchange; the listed entity shall notify the stock exchanges within five days of obtaining shareholder approval and effect the reclassification",
-      "frequency": "On a promoter requesting reclassification",
-      "timelineText": "Board views in the immediate next board meeting or within two months of the request, whichever is earlier; application within five days of the board's consideration; shareholders within sixty days of the no-objection letter; exchanges notified within five days of shareholder approval",
-      "due": { "type": "at_trigger", "when": "A promoter requests reclassification as a public shareholder" },
-      "dueConfidence": "trigger",
-      "appliesTo": { "entityType": ["listed"] },
-      "appliesToText": "Listed entity where a promoter seeks reclassification as a public shareholder",
-      "owner": "CS / Compliance",
-      "evidence": "Promoter's request with its date of receipt; board minutes recording the views; application to each exchange; no-objection letter; shareholder resolution; notification to the exchanges",
-      "risk": "High",
-      "priority": "High",
-      "submitTo": "Stock exchange; shareholders",
-      "signedBy": "Company Secretary",
-      "notes": "FOUR deadlines on the listed entity in one sequence, each running from a different event. The thirty days in Reg 31A(3)(a)(iv) is NOT one of them - it binds the recognised stock exchange to decide the application. The held compilation also prints two earlier versions of this provision in footnotes, carrying thirty days from shareholder approval and a three-to-six-month board-to-shareholders gap; both were replaced by the Third Amendment 2024 w.e.f. 13.12.2024 and neither is the law."
-    },
-    {
-      "id": "LODR-SUP-REG-31A-9",
-      "sourceRow": 10,
-      "law": "SEBI LODR 2015",
-      "regulation": "Reg 31A(9)",
-      "chapter": "IV",
-      "area": "Promoter reclassification",
-      "title": "Disclose a reclassification under a resolution plan within one day of the plan being approved",
-      "detail": "Where the reclassification of an existing promoter or promoter group is made under a resolution plan approved under section 31 of the Insolvency Code, the conditions in Reg 31A(5), (6) and (7)(b) do not apply, provided the existing promoter and promoter group do not remain in control and the reclassification, with the underlying rationale, is disclosed to the stock exchanges within one day of the resolution plan being approved.",
-      "quote": "such re-classification along with the underlying rationale shall be disclosed to the stock exchanges within one day of the resolution plan being approved",
-      "frequency": "On approval of a resolution plan",
-      "timelineText": "Within one day of the resolution plan being approved",
-      "due": { "type": "at_trigger", "when": "Resolution plan approved under section 31 of the Insolvency Code" },
-      "dueConfidence": "trigger",
-      "appliesTo": { "entityType": ["listed"] },
-      "appliesToText": "Listed entity reclassifying a promoter under a resolution plan approved under section 31 of the Insolvency Code",
-      "owner": "CS / Compliance",
-      "evidence": "Tribunal order approving the resolution plan; disclosure to the exchanges with its filing timestamp",
-      "risk": "High",
-      "priority": "High",
-      "submitTo": "Stock exchange",
-      "signedBy": "Company Secretary",
-      "notes": "One day, not one working day - the regulation says day. This is the exemption route, and the disclosure is a CONDITION of it: miss the day and the ordinary Reg 31A(3) sequence applies instead."
-    },
-    {
-      "id": "LODR-SUP-REG-31B",
-      "sourceRow": 11,
-      "law": "SEBI LODR 2015",
-      "regulation": "Reg 31B(1)",
-      "chapter": "IV",
-      "area": "Shareholder rights",
-      "title": "Re-approve any special right granted to shareholders by special resolution once every five years",
-      "detail": "Any special right granted to the shareholders of a listed entity is subject to approval by the shareholders in a general meeting by special resolution once in every five years, starting from the date the special right was granted. Special rights subsisting when the regulation came into force required approval by special resolution within five years of that date.",
-      "quote": "Any special right granted to the shareholders of a listed entity shall be subject to the approval by the shareholders in a general meeting by way of a special resolution once in every five years starting from the date of grant of such special right",
-      "frequency": "Once every five years per right granted",
-      "timelineText": "Once in every five years starting from the date of grant of the special right",
-      "due": { "type": "at_trigger", "when": "Five years from the grant of the special right, and every five years after" },
-      "dueConfidence": "trigger",
-      "appliesTo": { "entityType": ["listed"] },
-      "appliesToText": "Listed entity that has granted any special right to a shareholder",
-      "owner": "CS / Board",
-      "evidence": "Instrument granting the special right with its date; special resolution re-approving it",
-      "risk": "High",
-      "priority": "High",
-      "submitTo": "Shareholders; stock exchange",
-      "signedBy": "Company Secretary",
-      "notes": "A five-year clock that runs from the grant of each right, so different rights fall due on different dates. This app holds no register of special rights, so the cadence is stated and not computed. It is the kind of obligation that is met once and then forgotten for five years."
-    },
-    {
-      "id": "LODR-SUP-REG-35",
-      "sourceRow": 12,
-      "law": "SEBI LODR 2015",
-      "regulation": "Reg 35",
-      "chapter": "IV",
-      "area": "Periodic submissions",
-      "title": "Submit the Annual Information Memorandum to the stock exchanges",
-      "detail": "Submit an Annual Information Memorandum to the stock exchanges in the manner specified by the Board from time to time.",
-      "quote": "The listed entity shall submit to the stock exchange(s) an Annual Information Memorandum in the manner specified by the Board from time to time",
-      "frequency": "Annual",
-      "timelineText": "In the manner specified by the Board from time to time",
-      "due": { "type": "at_trigger", "when": "As specified by the Board" },
-      "dueConfidence": "trigger",
-      "appliesTo": { "entityType": ["listed"] },
-      "appliesToText": "Every listed entity",
-      "owner": "CS / Compliance",
-      "evidence": "Annual Information Memorandum as filed, with the exchange acknowledgement",
-      "risk": "Medium",
-      "priority": "Medium",
-      "submitTo": "Stock exchange",
-      "signedBy": "Company Secretary",
-      "notes": "The regulation delegates both the manner and the timing to the Board and fixes no period of its own. The obligation is real and its deadline is not in this text - which is a different thing from there being no deadline."
-    },
-    {
-      "id": "LODR-SUP-REG-37",
-      "sourceRow": 13,
-      "law": "SEBI LODR 2015",
-      "regulation": "Reg 37",
-      "chapter": "IV",
-      "area": "Scheme of arrangement",
-      "title": "File the draft scheme of arrangement with the stock exchanges and obtain a No-objection letter before approaching the Tribunal",
-      "detail": "File the draft scheme of arrangement, with the fee specified in Schedule XI, with the stock exchanges for a No-objection letter before filing the scheme with any Court or Tribunal; do not file the scheme with a Court or Tribunal until that letter is obtained; and place the letter before the Court or Tribunal when seeking approval. On sanction, submit the documents the Board or the exchanges prescribe.",
-      "quote": "the listed entity desirous of undertaking a scheme of arrangement or involved in a scheme of arrangement, shall file the draft scheme of arrangement, proposed to be filed before any Court or Tribunal under sections 391-394 and 101 of the Companies Act, 1956 or under Sections 230-234 and Section 66 of Companies Act, 2013, whichever applicable, along with a non-refundable fee as specified in Schedule XI, with the stock exchange(s) for obtaining the No-objection letter, before filing such scheme with any Court or Tribunal, in terms of requirements specified by the Board or stock exchange(s) from time to time. Provided that the validity of the No-objection letter of stock exchanges shall be six months from the date of issuance, within which the draft scheme of arrangement shall be submitted to the Court or Tribunal",
-      "frequency": "On every scheme of arrangement",
-      "timelineText": "Before filing the scheme with any Court or Tribunal; the No-objection letter is valid for six months from issue",
-      "due": { "type": "at_trigger", "when": "Before filing a scheme of arrangement with a Court or Tribunal" },
-      "dueConfidence": "trigger",
-      "appliesTo": { "entityType": ["listed"] },
-      "appliesToText": "Listed entity undertaking or involved in a scheme of arrangement",
-      "owner": "CS / Compliance",
-      "evidence": "Draft scheme as filed with each exchange; fee receipt; No-objection letter with its date of issue; record of the letter being placed before the Tribunal",
-      "risk": "Critical",
-      "priority": "High",
-      "submitTo": "Stock exchange; Court or Tribunal",
-      "signedBy": "Company Secretary",
-      "notes": "The six-month validity of the No-objection letter is a deadline of its own: the draft scheme must reach the Court or Tribunal inside it, or the letter lapses and the exchange process restarts."
-    },
-    {
-      "id": "LODR-SUP-REG-37A",
-      "sourceRow": 14,
-      "law": "SEBI LODR 2015",
-      "regulation": "Reg 37A",
-      "chapter": "IV",
-      "area": "Disposal of an undertaking",
-      "title": "Obtain prior shareholder approval by special resolution before disposing of the whole or substantially the whole of an undertaking outside a scheme",
-      "detail": "Where a listed entity sells, leases or otherwise disposes of the whole or substantially the whole of its undertaking, or of any one of its undertakings, otherwise than under a scheme of arrangement, it must take prior approval of shareholders by special resolution and disclose the object, the commercial rationale and the use of the proceeds in the statement annexed to the notice. The special resolution is acted upon only if the votes cast by public shareholders in favour exceed those cast against.",
-      "quote": "A listed entity carrying out sale, lease or otherwise disposal of the whole or substantially the whole of the undertaking of such entity or where it owns more than one undertaking, of the whole or substantially the whole of any of such undertakings, shall - (a) take prior approval of shareholders by way of special resolution",
-      "frequency": "On every such disposal",
-      "timelineText": "Prior to the transaction",
-      "due": { "type": "at_trigger", "when": "Before a disposal of the whole or substantially the whole of an undertaking" },
-      "dueConfidence": "trigger",
-      "appliesTo": { "entityType": ["listed"] },
-      "appliesToText": "Listed entity disposing of the whole or substantially the whole of an undertaking outside a scheme of arrangement",
-      "owner": "CS / Board",
-      "evidence": "Notice with the annexed statement; special resolution; scrutiniser's report showing the public shareholder vote separately",
-      "risk": "Critical",
-      "priority": "High",
-      "submitTo": "Shareholders; stock exchange",
-      "signedBy": "Company Secretary",
-      "notes": "The public-shareholder majority is a second and independent test: a special resolution can carry on the total vote and still fail this proviso. The scrutiniser's report therefore has to separate the public shareholders' votes, which an ordinary special resolution does not require."
-    },
-    {
-      "id": "LODR-SUP-REG-41",
-      "sourceRow": 15,
-      "law": "SEBI LODR 2015",
-      "regulation": "Reg 41",
-      "chapter": "IV",
-      "area": "Securities",
-      "title": "Observe the standing restrictions on lien, calls in advance and differential rights",
-      "detail": "Do not exercise a lien on fully paid shares, and on partly paid shares only for moneys called or payable at a fixed time; where an amount is paid in advance of calls, stipulate that it may carry interest but confers no right to dividend or to participate in profits; do not issue shares conferring superior or inferior rights as to dividend, or inferior voting rights, against equity shares already listed; and do not select listed securities for redemption otherwise than pro rata or by lot unless the terms of issue provide otherwise.",
-      "quote": "The listed entity shall not exercise a lien on its fully paid shares and that in respect of partly paid shares it shall not exercise any lien except in respect of moneys called or payable at a fixed time in respect of such shares",
-      "frequency": "Continuous",
-      "timelineText": "Continuous",
-      "due": { "type": "continuous" },
-      "dueConfidence": "none",
-      "appliesTo": { "entityType": ["listed"] },
-      "appliesToText": "Every listed entity",
-      "owner": "CS / Compliance",
-      "evidence": "Articles of association; terms of issue; register of members",
-      "risk": "Medium",
-      "priority": "Medium",
-      "submitTo": "-",
-      "signedBy": "Company Secretary",
-      "notes": "Reg 41(9) and 41(10) - the annual certificate from a practising company secretary that share certificates were issued within thirty days of lodgement, and its filing with the exchanges - were OMITTED by the Third Amendment 2024 w.e.f. 13.12.2024. The held compilation still prints that wording, in a footnote, as the text prior to omission. It is not carried here as an obligation because it is no longer one. The proviso to Reg 41(3) permits a listed entity with SR equity shares to issue further SR equity shares to its SR shareholders through a bonus, split or rights issue."
-    },
-    {
-      "id": "LODR-SUP-REG-42",
-      "sourceRow": 16,
-      "law": "SEBI LODR 2015",
-      "regulation": "Reg 42",
-      "chapter": "IV",
-      "area": "Record date",
-      "title": "Intimate the record date to the stock exchanges at least three working days in advance",
-      "detail": "Intimate the record date to all stock exchanges where the entity is listed, or where derivatives on its stock are available or its stock forms part of an index on which derivatives are available, for a declaration of dividend, an issue of right or bonus shares, an issue of shares on conversion of debentures or other convertible securities, shares arising out of rights attached to such securities, corporate actions such as mergers, de-mergers and splits, and any other purpose the exchanges specify. Give notice of at least three working days, excluding the date of intimation and the record date; at least seven working days for corporate actions through a scheme of arrangement under Reg 37. Keep a gap of at least five working days between two record dates.",
-      "quote": "The listed entity shall give notice in advance of atleast three working days (excluding the date of intimation and the record date) to stock exchange(s) of record date specifying the purpose of the record date: Provided that in the case of corporate actions through schemes of arrangement covered under regulation 37, the listed entity shall give notice in advance of atleast seven working days (excluding the date of intimation and the record date). The listed entity shall ensure the time gap of at least five working days between two record dates",
-      "frequency": "On every record date",
-      "timelineText": "At least three working days in advance, excluding the date of intimation and the record date; at least seven working days for corporate actions through a scheme of arrangement under Reg 37; at least five working days between two record dates",
-      "due": { "type": "at_trigger", "when": "Before every record date" },
-      "dueConfidence": "trigger",
-      "appliesTo": { "entityType": ["listed"] },
-      "appliesToText": "Every listed entity fixing a record date",
-      "owner": "CS / Compliance",
-      "evidence": "Intimation to each exchange with its filing timestamp; board or committee resolution fixing the record date",
-      "risk": "High",
-      "priority": "High",
-      "submitTo": "Stock exchange",
-      "signedBy": "Company Secretary",
-      "notes": "The two periods were SWAPPED by the Third Amendment 2024 w.e.f. 13.12.2024: the general notice went from seven working days to three, and the scheme-of-arrangement notice from three to seven. A Company Secretary working from memory will have them the wrong way round. The gap between two record dates changed in the same amendment from thirty days to five working days. Not computed - working days, both ends excluded, no exchange holiday calendar here, and the count runs backward from the record date so a calendar-day approximation would fall later than the regulation allows."
-    },
-    {
-      "id": "LODR-SUP-REG-43-1",
-      "sourceRow": 17,
-      "law": "SEBI LODR 2015",
-      "regulation": "Reg 43(1)",
-      "chapter": "IV",
-      "area": "Dividend",
-      "title": "Declare and disclose dividend on a per share basis only",
-      "detail": "Declare and disclose the dividend on a per share basis only.",
-      "quote": "The listed entity shall declare and disclose the dividend on per share basis only",
-      "frequency": "On every declaration of dividend",
-      "timelineText": "Continuous",
-      "due": { "type": "continuous" },
-      "dueConfidence": "none",
-      "appliesTo": { "entityType": ["listed"] },
-      "appliesToText": "Every listed entity declaring a dividend",
-      "owner": "CS / Compliance",
-      "evidence": "Board resolution and the outcome filed with the exchanges, expressed per share",
-      "risk": "Medium",
-      "priority": "Medium",
-      "submitTo": "Stock exchange",
-      "signedBy": "Company Secretary",
-      "notes": "A manner requirement, not a filing: a dividend announced as a percentage of face value does not satisfy it. Reg 43(3) - recommending or declaring dividend at least five working days before the record date - and Reg 43(5) were OMITTED by the Third Amendment 2024 w.e.f. 13.12.2024, and the held text prints both only as the wording prior to omission."
-    },
-    {
-      "id": "LODR-SUP-REG-45",
-      "sourceRow": 18,
-      "law": "SEBI LODR 2015",
-      "regulation": "Reg 45",
-      "chapter": "IV",
-      "area": "Change of name",
-      "title": "Satisfy the conditions for a change of name, and change the name within six months where the activities have changed",
-      "detail": "A change of name is permitted only where at least one year has elapsed since the last name change, and either at least fifty per cent of total revenue in the preceding one year came from the new activity suggested by the new name, or the amount invested in the new activity or project is at least fifty per cent of the assets. Where a listed entity has changed its activities and its name does not reflect them, it must change its name in line with those activities within six months of the change of activities.",
-      "quote": "if any listed entity has changed its activities which are not reflected in its name, it shall change its name in line with its activities within a period of six months from the change of activities in compliance of provisions as applicable to change of name prescribed under Companies Act, 2013",
-      "frequency": "On a change of name or of activities",
-      "timelineText": "Within a period of six months from the change of activities",
-      "due": { "type": "at_trigger", "when": "The entity changes its activities" },
-      "dueConfidence": "trigger",
-      "appliesTo": { "entityType": ["listed"] },
-      "appliesToText": "Listed entity that has changed its activities, or seeks to change its name",
-      "owner": "CS / Board",
-      "evidence": "Board and shareholder resolutions; revenue or investment computation supporting the fifty per cent test; certificate from a practising chartered accountant on compliance with the conditions",
-      "risk": "High",
-      "priority": "Medium",
-      "submitTo": "Stock exchange; Registrar of Companies",
-      "signedBy": "Company Secretary",
-      "notes": "Two different obligations in one regulation: conditions that GATE a voluntary change of name, and a duty to change the name within six months where the activities have already moved. The second is the one nobody diarises. The application for the change must carry a certificate from a practising chartered accountant stating compliance with the Reg 45(1) conditions."
-    }
-  ]
+  "subProvisionPass": "v203: LODR Chapters III-IV were checked at SUB-PROVISION level. SS3z counted uncited PROVISIONS, so Reg 18 looked covered while Reg 18(1) - constitute the audit committee - was absent. Reg 15(2) and Reg 21(5) scoping read before authoring."
+ },
+ "rules": [
+  {
+   "id": "LODR-SUP-REG-15-1A",
+   "sourceRow": 1,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 15(1A)",
+   "chapter": "IV",
+   "area": "High value debt listed entity",
+   "title": "Comply with the corporate governance regulations within six months of crossing the high value debt threshold",
+   "detail": "Where the outstanding value of listed non-convertible debt securities becomes equal to or greater than Rs 5,000 crore during the year, comply with Reg 15 and Regs 16 to 27 within six months of the trigger. Compliance may be reported in the corporate governance compliance report from the third quarter following the trigger.",
+   "quote": "in case the value of the outstanding listed non-convertible debt securities becomes equal to or greater than the specified threshold of Rupees Five Thousand Crore during the course of the year, the high value debt listed entity shall ensure compliance with these provisions within six months from the date of such trigger, and the disclosures of such compliance may be made in the corporate governance compliance report on and from the third quarter following the date of the trigger",
+   "frequency": "On crossing the threshold",
+   "timelineText": "Within six months from the date of the trigger",
+   "due": {
+    "type": "at_trigger",
+    "when": "Outstanding listed non-convertible debt securities reach Rs 5,000 crore"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entity with outstanding listed non-convertible debt securities of Rs 5,000 crore or more",
+   "owner": "CS / Compliance",
+   "evidence": "Computation of outstanding listed NCD value; board note on the corporate governance provisions adopted",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": "Stock exchange",
+   "signedBy": "Company Secretary",
+   "notes": "The threshold figure was substituted from Rupees Five Hundred Crore to Rupees Five Thousand Crore; the held text carries the earlier figure only in a footnote. Whether this entity holds listed non-convertible debt securities at all is a fact about the company that nothing here records, so this is raised for decision rather than asserted."
+  },
+  {
+   "id": "LODR-SUP-REG-15-CIRP",
+   "sourceRow": 2,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 15(2B)",
+   "chapter": "IV",
+   "area": "Post-resolution-plan compliance",
+   "title": "Comply with the board and committee composition regulations within three months of a resolution plan being approved",
+   "detail": "Where a resolution plan has been approved under section 31 of the Insolvency Code, comply with Reg 17 (board of directors) within three months of the approval, and with Regs 18, 19, 20 and 21 (audit, nomination and remuneration, stakeholders relationship and risk management committees) within three months of the approval.",
+   "quote": "such listed entity shall ensure compliance with regulation 17 within a period of three months of approval of resolution plan under section 31 of the Insolvency Code",
+   "frequency": "On approval of a resolution plan",
+   "timelineText": "Within a period of three months of approval of the resolution plan",
+   "due": {
+    "type": "at_trigger",
+    "when": "Resolution plan approved under section 31 of the Insolvency Code"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entity under a resolution plan approved under section 31 of the Insolvency Code",
+   "owner": "CS / Compliance",
+   "evidence": "Tribunal order approving the resolution plan; board and committee reconstitution resolutions",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": "Stock exchange",
+   "signedBy": "Company Secretary",
+   "notes": "Two separate three-month clocks run from the same date - one for Reg 17 and one for Regs 18 to 21. Reconstituting the board without reconstituting the committees leaves the second unmet."
+  },
+  {
+   "id": "LODR-SUP-REG-26A-1",
+   "sourceRow": 3,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 26A(1)",
+   "chapter": "IV",
+   "area": "Key managerial personnel",
+   "title": "Fill a vacancy in the office of CEO, Managing Director, Whole Time Director or Manager within three months",
+   "detail": "Any vacancy in the office of Chief Executive Officer, Managing Director, Whole Time Director or Manager is to be filled at the earliest and in any case not later than three months from the date of the vacancy; six months where the appointment needs the approval of a regulatory, government or statutory authority. The vacancy may not be filled by an interim appointment unless that appointment itself satisfies the law applicable to a fresh appointment.",
+   "quote": "Any vacancy in the office of Chief Executive Officer, Managing Director, Whole Time Director or Manager shall be filled by the listed entity at the earliest and in any case not later than three months from the date of such vacancy: Provided that where the listed entity is required to obtain approval of regulatory, government or statutory authorities to fill up such vacancies, then the vacancies shall be filled up by the listed entity at the earliest and in any case not later than six months from the date of vacancy",
+   "frequency": "On a vacancy arising",
+   "timelineText": "Not later than three months from the date of the vacancy; six months where a regulatory, government or statutory approval is required",
+   "due": {
+    "type": "at_trigger",
+    "when": "The office falls vacant"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Every listed entity",
+   "owner": "CS / Board",
+   "evidence": "Board resolution appointing the replacement; date the office fell vacant",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": "Stock exchange; Registrar of Companies",
+   "signedBy": "Company Secretary",
+   "notes": "This app holds no record of the date an office fell vacant, so the deadline is stated rather than computed. The proviso on interim appointments is the limb most often missed: an interim appointment that does not meet the requirements for a fresh appointment does not stop the clock."
+  },
+  {
+   "id": "LODR-SUP-REG-26A-2",
+   "sourceRow": 4,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 26A(2)",
+   "chapter": "IV",
+   "area": "Key managerial personnel",
+   "title": "Fill a vacancy in the office of Chief Financial Officer within three months",
+   "detail": "Any vacancy in the office of the Chief Financial Officer is to be filled at the earliest and in any case not later than three months from the date of the vacancy; six months where the appointment needs the approval of a regulatory, government or statutory authority.",
+   "quote": "Any vacancy in the office of the Chief Financial Officer shall be filled by the listed entity at the earliest and in any case not later than three months from the date of such vacancy: Provided that where the listed entity is required to obtain approval of regulatory, government or statutory authorities to fill up such vacancy, then the vacancy shall be filled up by the listed entity at the earliest and in any case not later than six months from the date of vacancy",
+   "frequency": "On a vacancy arising",
+   "timelineText": "Not later than three months from the date of the vacancy; six months where a regulatory, government or statutory approval is required",
+   "due": {
+    "type": "at_trigger",
+    "when": "The office of Chief Financial Officer falls vacant"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Every listed entity",
+   "owner": "CS / Board",
+   "evidence": "Board resolution appointing the Chief Financial Officer; date the office fell vacant",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": "Stock exchange; Registrar of Companies",
+   "signedBy": "Company Secretary",
+   "notes": "A separate sub-regulation from Reg 26A(1) and a separate office. Filling the Managing Director's chair does not answer for the Chief Financial Officer's."
+  },
+  {
+   "id": "LODR-SUP-REG-26A-3",
+   "sourceRow": 5,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 26A(3)",
+   "chapter": "IV",
+   "area": "Key managerial personnel",
+   "title": "Fill key managerial vacancies within three months of a resolution plan being approved",
+   "detail": "Where a resolution plan has been approved under section 31 of the Insolvency Code, any vacancy in the office of Chief Executive Officer, Managing Director, Whole Time Director, Manager or Chief Financial Officer is to be filled within three months of that approval. In the interim the entity must have not less than one full-time key managerial personnel managing its day-to-day affairs.",
+   "quote": "Any vacancy in the office of Chief Executive Officer, Managing Director, Whole Time Director or Manager or Chief Financial Officer of such listed entity in respect of which a resolution plan under section 31 of the Insolvency Code has been approved, shall be filled within a period of three months of such approval",
+   "frequency": "On approval of a resolution plan",
+   "timelineText": "Within a period of three months of approval of the resolution plan",
+   "due": {
+    "type": "at_trigger",
+    "when": "Resolution plan approved under section 31 of the Insolvency Code"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entity under a resolution plan approved under section 31 of the Insolvency Code",
+   "owner": "CS / Board",
+   "evidence": "Tribunal order approving the resolution plan; appointment resolutions; record of the full-time KMP in office in the interim",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": "Stock exchange",
+   "signedBy": "Company Secretary",
+   "notes": "The interim requirement is a condition in its own right - at least one full-time key managerial personnel must be managing the day-to-day affairs throughout, not merely at the end of the three months."
+  },
+  {
+   "id": "LODR-SUP-REG-28-1",
+   "sourceRow": 6,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 28(1)",
+   "chapter": "IV",
+   "area": "Issue of securities",
+   "title": "Obtain in-principle approval from the stock exchanges before issuing securities",
+   "detail": "Before issuing securities, obtain an in-principle approval from the recognised stock exchanges: from all exchanges having nationwide trading terminals where the securities are listed on such exchanges; from all exchanges on which the securities are proposed to be listed where they are not; and from all nationwide exchanges where both.",
+   "quote": "The listed entity, before issuing securities, shall obtain an in-principle approval from recognised stock exchange(s)",
+   "frequency": "On every issue of securities",
+   "timelineText": "Before issuing securities",
+   "due": {
+    "type": "at_trigger",
+    "when": "Before an issue of securities"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Every listed entity issuing securities",
+   "owner": "CS / Compliance",
+   "evidence": "In-principle approval letter from each relevant stock exchange",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": "Stock exchange",
+   "signedBy": "Company Secretary",
+   "notes": "The regulation fixes an ORDER, not a period: the approval must precede the issue. Reg 28(2) disapplies it for securities issued under a scheme of arrangement for which a No-Objection Letter has already been obtained under Reg 37."
+  },
+  {
+   "id": "LODR-SUP-REG-29-1",
+   "sourceRow": 7,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 29(1)",
+   "chapter": "IV",
+   "area": "Prior intimation",
+   "title": "Give the stock exchange at least two working days prior intimation of a board meeting considering results, buyback, delisting, fund raising, dividend or bonus",
+   "detail": "Give prior intimation of at least two working days, excluding the date of the intimation and the date of the meeting, of a board meeting at which any of these is due to be considered: financial results (quarterly, half yearly or annual); a buyback proposal; voluntary delisting; fund raising by further public offer, rights issue, ADRs/GDRs/FCCBs, qualified institutions placement, debt issue, preferential issue or any other method, and determination of issue price; declaration or recommendation of dividend, issue of convertible securities or debentures carrying a right to subscribe to equity, or passing over of dividend; a bonus proposal; alteration in the form or nature of listed securities or in holders' rights; alteration in the date on which interest on debentures or bonds, or the redemption amount, is payable.",
+   "quote": "The listed entity shall give prior intimation of at least two working days in advance, excluding the date of the intimation and date of the meeting, to stock exchange about the meeting of the board of directors in which any of the following proposals is due to be considered",
+   "frequency": "Before every qualifying board meeting",
+   "timelineText": "At least two working days in advance, excluding the date of the intimation and the date of the meeting",
+   "due": {
+    "type": "at_trigger",
+    "when": "Before a board meeting considering a listed proposal"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Every listed entity convening a board meeting on a listed proposal",
+   "owner": "CS / Compliance",
+   "evidence": "Intimation letter to each stock exchange with its filing timestamp; notice of the board meeting",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": "Stock exchange",
+   "signedBy": "Company Secretary",
+   "notes": "Deliberately NOT computed. Both ends are excluded and the count is in WORKING days, and there is no exchange holiday calendar here - so a calendar-day approximation would place the deadline LATER than the regulation allows, which is the unsafe direction for a prior intimation. The proviso also requires intimation where a general meeting or postal ballot is proposed for shareholder approval of further fund raising, indicating the type of issuance."
+  },
+  {
+   "id": "LODR-SUP-REG-30A",
+   "sourceRow": 8,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 30A",
+   "chapter": "IV",
+   "area": "Material events",
+   "title": "Disclose the shareholder and promoter agreements that bind the listed entity",
+   "detail": "Disclose to the stock exchanges and on the website the agreements specified in clause 5A of para A of part A of Schedule III to which the listed entity is not itself a party, and the number of such agreements subsisting on the date clause 5A was notified, together with their salient features.",
+   "quote": "the parties to the agreements shall inform the listed entity, about the agreement to which such a listed entity is not a party and the listed entity shall in turn disclose all such subsisting agreements to the Stock Exchanges and on its website within the timelines as specified by the Board",
+   "frequency": "On an agreement being entered into or notified to the entity",
+   "timelineText": "Within the timelines as specified by the Board",
+   "due": {
+    "type": "at_trigger",
+    "when": "The listed entity is informed of a qualifying agreement"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Every listed entity bound by an agreement specified in clause 5A of para A of part A of Schedule III",
+   "owner": "CS / Compliance",
+   "evidence": "Intimations received from shareholders, promoters, directors and key managerial personnel; disclosure filed with the exchanges; website record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": "Stock exchange; company website",
+   "signedBy": "Company Secretary",
+   "notes": "The two working days in Reg 30A(1) is the duty of the SHAREHOLDERS, PROMOTERS, RELATED PARTIES, DIRECTORS, KEY MANAGERIAL PERSONNEL AND EMPLOYEES who are parties to the agreement - it runs to the listed entity, not from it. The listed entity's own period is the one the Board specifies. Reading the two days as the company's deadline would put a filing on this register that the company does not owe."
+  },
+  {
+   "id": "LODR-SUP-REG-31A-3",
+   "sourceRow": 9,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 31A(3)(a)",
+   "chapter": "IV",
+   "area": "Promoter reclassification",
+   "title": "Run the promoter reclassification sequence - board views, exchange no-objection, shareholder approval and notification",
+   "detail": "On a promoter's request for reclassification as public: the board analyses the request and provides its views in the immediate next board meeting or within two months of receiving the request, whichever is earlier; the entity applies for the recognised stock exchange's no-objection within five days of the board's consideration; the entity places the request before shareholders within sixty days of receiving the no-objection letter; the request is approved by ordinary resolution on which the promoter seeking reclassification and persons related to them do not vote; and the entity notifies the exchanges within five days of obtaining shareholder approval and effects the reclassification.",
+   "quote": "the board of directors of the listed entity shall analyze such request which is compliant with the conditions specified in clause (b) of sub-regulation (3) and provide their views in the immediate next board meeting or within two months from the date of receipt of the request from its promoter(s), whichever is earlier; the listed entity shall submit an application seeking no-objection of the recognized stock exchange for such reclassification request along with the views of the board of directors within five days of consideration of the request by the board of directors; the listed entity shall place the reclassification request before the shareholders in a general meeting for approval, within sixty days of receipt of no-objection letter from the recognized stock exchange; the listed entity shall notify the stock exchanges within five days of obtaining shareholder approval and effect the reclassification",
+   "frequency": "On a promoter requesting reclassification",
+   "timelineText": "Board views in the immediate next board meeting or within two months of the request, whichever is earlier; application within five days of the board's consideration; shareholders within sixty days of the no-objection letter; exchanges notified within five days of shareholder approval",
+   "due": {
+    "type": "at_trigger",
+    "when": "A promoter requests reclassification as a public shareholder"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entity where a promoter seeks reclassification as a public shareholder",
+   "owner": "CS / Compliance",
+   "evidence": "Promoter's request with its date of receipt; board minutes recording the views; application to each exchange; no-objection letter; shareholder resolution; notification to the exchanges",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": "Stock exchange; shareholders",
+   "signedBy": "Company Secretary",
+   "notes": "FOUR deadlines on the listed entity in one sequence, each running from a different event. The thirty days in Reg 31A(3)(a)(iv) is NOT one of them - it binds the recognised stock exchange to decide the application. The held compilation also prints two earlier versions of this provision in footnotes, carrying thirty days from shareholder approval and a three-to-six-month board-to-shareholders gap; both were replaced by the Third Amendment 2024 w.e.f. 13.12.2024 and neither is the law."
+  },
+  {
+   "id": "LODR-SUP-REG-31A-9",
+   "sourceRow": 10,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 31A(9)",
+   "chapter": "IV",
+   "area": "Promoter reclassification",
+   "title": "Disclose a reclassification under a resolution plan within one day of the plan being approved",
+   "detail": "Where the reclassification of an existing promoter or promoter group is made under a resolution plan approved under section 31 of the Insolvency Code, the conditions in Reg 31A(5), (6) and (7)(b) do not apply, provided the existing promoter and promoter group do not remain in control and the reclassification, with the underlying rationale, is disclosed to the stock exchanges within one day of the resolution plan being approved.",
+   "quote": "such re-classification along with the underlying rationale shall be disclosed to the stock exchanges within one day of the resolution plan being approved",
+   "frequency": "On approval of a resolution plan",
+   "timelineText": "Within one day of the resolution plan being approved",
+   "due": {
+    "type": "at_trigger",
+    "when": "Resolution plan approved under section 31 of the Insolvency Code"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entity reclassifying a promoter under a resolution plan approved under section 31 of the Insolvency Code",
+   "owner": "CS / Compliance",
+   "evidence": "Tribunal order approving the resolution plan; disclosure to the exchanges with its filing timestamp",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": "Stock exchange",
+   "signedBy": "Company Secretary",
+   "notes": "One day, not one working day - the regulation says day. This is the exemption route, and the disclosure is a CONDITION of it: miss the day and the ordinary Reg 31A(3) sequence applies instead."
+  },
+  {
+   "id": "LODR-SUP-REG-31B",
+   "sourceRow": 11,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 31B(1)",
+   "chapter": "IV",
+   "area": "Shareholder rights",
+   "title": "Re-approve any special right granted to shareholders by special resolution once every five years",
+   "detail": "Any special right granted to the shareholders of a listed entity is subject to approval by the shareholders in a general meeting by special resolution once in every five years, starting from the date the special right was granted. Special rights subsisting when the regulation came into force required approval by special resolution within five years of that date.",
+   "quote": "Any special right granted to the shareholders of a listed entity shall be subject to the approval by the shareholders in a general meeting by way of a special resolution once in every five years starting from the date of grant of such special right",
+   "frequency": "Once every five years per right granted",
+   "timelineText": "Once in every five years starting from the date of grant of the special right",
+   "due": {
+    "type": "at_trigger",
+    "when": "Five years from the grant of the special right, and every five years after"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entity that has granted any special right to a shareholder",
+   "owner": "CS / Board",
+   "evidence": "Instrument granting the special right with its date; special resolution re-approving it",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": "Shareholders; stock exchange",
+   "signedBy": "Company Secretary",
+   "notes": "A five-year clock that runs from the grant of each right, so different rights fall due on different dates. This app holds no register of special rights, so the cadence is stated and not computed. It is the kind of obligation that is met once and then forgotten for five years."
+  },
+  {
+   "id": "LODR-SUP-REG-35",
+   "sourceRow": 12,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 35",
+   "chapter": "IV",
+   "area": "Periodic submissions",
+   "title": "Submit the Annual Information Memorandum to the stock exchanges",
+   "detail": "Submit an Annual Information Memorandum to the stock exchanges in the manner specified by the Board from time to time.",
+   "quote": "The listed entity shall submit to the stock exchange(s) an Annual Information Memorandum in the manner specified by the Board from time to time",
+   "frequency": "Annual",
+   "timelineText": "In the manner specified by the Board from time to time",
+   "due": {
+    "type": "at_trigger",
+    "when": "As specified by the Board"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Every listed entity",
+   "owner": "CS / Compliance",
+   "evidence": "Annual Information Memorandum as filed, with the exchange acknowledgement",
+   "risk": "Medium",
+   "priority": "Medium",
+   "submitTo": "Stock exchange",
+   "signedBy": "Company Secretary",
+   "notes": "The regulation delegates both the manner and the timing to the Board and fixes no period of its own. The obligation is real and its deadline is not in this text - which is a different thing from there being no deadline."
+  },
+  {
+   "id": "LODR-SUP-REG-37",
+   "sourceRow": 13,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 37",
+   "chapter": "IV",
+   "area": "Scheme of arrangement",
+   "title": "File the draft scheme of arrangement with the stock exchanges and obtain a No-objection letter before approaching the Tribunal",
+   "detail": "File the draft scheme of arrangement, with the fee specified in Schedule XI, with the stock exchanges for a No-objection letter before filing the scheme with any Court or Tribunal; do not file the scheme with a Court or Tribunal until that letter is obtained; and place the letter before the Court or Tribunal when seeking approval. On sanction, submit the documents the Board or the exchanges prescribe.",
+   "quote": "the listed entity desirous of undertaking a scheme of arrangement or involved in a scheme of arrangement, shall file the draft scheme of arrangement, proposed to be filed before any Court or Tribunal under sections 391-394 and 101 of the Companies Act, 1956 or under Sections 230-234 and Section 66 of Companies Act, 2013, whichever applicable, along with a non-refundable fee as specified in Schedule XI, with the stock exchange(s) for obtaining the No-objection letter, before filing such scheme with any Court or Tribunal, in terms of requirements specified by the Board or stock exchange(s) from time to time. Provided that the validity of the No-objection letter of stock exchanges shall be six months from the date of issuance, within which the draft scheme of arrangement shall be submitted to the Court or Tribunal",
+   "frequency": "On every scheme of arrangement",
+   "timelineText": "Before filing the scheme with any Court or Tribunal; the No-objection letter is valid for six months from issue",
+   "due": {
+    "type": "at_trigger",
+    "when": "Before filing a scheme of arrangement with a Court or Tribunal"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entity undertaking or involved in a scheme of arrangement",
+   "owner": "CS / Compliance",
+   "evidence": "Draft scheme as filed with each exchange; fee receipt; No-objection letter with its date of issue; record of the letter being placed before the Tribunal",
+   "risk": "Critical",
+   "priority": "High",
+   "submitTo": "Stock exchange; Court or Tribunal",
+   "signedBy": "Company Secretary",
+   "notes": "The six-month validity of the No-objection letter is a deadline of its own: the draft scheme must reach the Court or Tribunal inside it, or the letter lapses and the exchange process restarts."
+  },
+  {
+   "id": "LODR-SUP-REG-37A",
+   "sourceRow": 14,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 37A",
+   "chapter": "IV",
+   "area": "Disposal of an undertaking",
+   "title": "Obtain prior shareholder approval by special resolution before disposing of the whole or substantially the whole of an undertaking outside a scheme",
+   "detail": "Where a listed entity sells, leases or otherwise disposes of the whole or substantially the whole of its undertaking, or of any one of its undertakings, otherwise than under a scheme of arrangement, it must take prior approval of shareholders by special resolution and disclose the object, the commercial rationale and the use of the proceeds in the statement annexed to the notice. The special resolution is acted upon only if the votes cast by public shareholders in favour exceed those cast against.",
+   "quote": "A listed entity carrying out sale, lease or otherwise disposal of the whole or substantially the whole of the undertaking of such entity or where it owns more than one undertaking, of the whole or substantially the whole of any of such undertakings, shall - (a) take prior approval of shareholders by way of special resolution",
+   "frequency": "On every such disposal",
+   "timelineText": "Prior to the transaction",
+   "due": {
+    "type": "at_trigger",
+    "when": "Before a disposal of the whole or substantially the whole of an undertaking"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entity disposing of the whole or substantially the whole of an undertaking outside a scheme of arrangement",
+   "owner": "CS / Board",
+   "evidence": "Notice with the annexed statement; special resolution; scrutiniser's report showing the public shareholder vote separately",
+   "risk": "Critical",
+   "priority": "High",
+   "submitTo": "Shareholders; stock exchange",
+   "signedBy": "Company Secretary",
+   "notes": "The public-shareholder majority is a second and independent test: a special resolution can carry on the total vote and still fail this proviso. The scrutiniser's report therefore has to separate the public shareholders' votes, which an ordinary special resolution does not require."
+  },
+  {
+   "id": "LODR-SUP-REG-41",
+   "sourceRow": 15,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 41",
+   "chapter": "IV",
+   "area": "Securities",
+   "title": "Observe the standing restrictions on lien, calls in advance and differential rights",
+   "detail": "Do not exercise a lien on fully paid shares, and on partly paid shares only for moneys called or payable at a fixed time; where an amount is paid in advance of calls, stipulate that it may carry interest but confers no right to dividend or to participate in profits; do not issue shares conferring superior or inferior rights as to dividend, or inferior voting rights, against equity shares already listed; and do not select listed securities for redemption otherwise than pro rata or by lot unless the terms of issue provide otherwise.",
+   "quote": "The listed entity shall not exercise a lien on its fully paid shares and that in respect of partly paid shares it shall not exercise any lien except in respect of moneys called or payable at a fixed time in respect of such shares",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Every listed entity",
+   "owner": "CS / Compliance",
+   "evidence": "Articles of association; terms of issue; register of members",
+   "risk": "Medium",
+   "priority": "Medium",
+   "submitTo": "-",
+   "signedBy": "Company Secretary",
+   "notes": "Reg 41(9) and 41(10) - the annual certificate from a practising company secretary that share certificates were issued within thirty days of lodgement, and its filing with the exchanges - were OMITTED by the Third Amendment 2024 w.e.f. 13.12.2024. The held compilation still prints that wording, in a footnote, as the text prior to omission. It is not carried here as an obligation because it is no longer one. The proviso to Reg 41(3) permits a listed entity with SR equity shares to issue further SR equity shares to its SR shareholders through a bonus, split or rights issue."
+  },
+  {
+   "id": "LODR-SUP-REG-42",
+   "sourceRow": 16,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 42",
+   "chapter": "IV",
+   "area": "Record date",
+   "title": "Intimate the record date to the stock exchanges at least three working days in advance",
+   "detail": "Intimate the record date to all stock exchanges where the entity is listed, or where derivatives on its stock are available or its stock forms part of an index on which derivatives are available, for a declaration of dividend, an issue of right or bonus shares, an issue of shares on conversion of debentures or other convertible securities, shares arising out of rights attached to such securities, corporate actions such as mergers, de-mergers and splits, and any other purpose the exchanges specify. Give notice of at least three working days, excluding the date of intimation and the record date; at least seven working days for corporate actions through a scheme of arrangement under Reg 37. Keep a gap of at least five working days between two record dates.",
+   "quote": "The listed entity shall give notice in advance of atleast three working days (excluding the date of intimation and the record date) to stock exchange(s) of record date specifying the purpose of the record date: Provided that in the case of corporate actions through schemes of arrangement covered under regulation 37, the listed entity shall give notice in advance of atleast seven working days (excluding the date of intimation and the record date). The listed entity shall ensure the time gap of at least five working days between two record dates",
+   "frequency": "On every record date",
+   "timelineText": "At least three working days in advance, excluding the date of intimation and the record date; at least seven working days for corporate actions through a scheme of arrangement under Reg 37; at least five working days between two record dates",
+   "due": {
+    "type": "at_trigger",
+    "when": "Before every record date"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Every listed entity fixing a record date",
+   "owner": "CS / Compliance",
+   "evidence": "Intimation to each exchange with its filing timestamp; board or committee resolution fixing the record date",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": "Stock exchange",
+   "signedBy": "Company Secretary",
+   "notes": "The two periods were SWAPPED by the Third Amendment 2024 w.e.f. 13.12.2024: the general notice went from seven working days to three, and the scheme-of-arrangement notice from three to seven. A Company Secretary working from memory will have them the wrong way round. The gap between two record dates changed in the same amendment from thirty days to five working days. Not computed - working days, both ends excluded, no exchange holiday calendar here, and the count runs backward from the record date so a calendar-day approximation would fall later than the regulation allows."
+  },
+  {
+   "id": "LODR-SUP-REG-43-1",
+   "sourceRow": 17,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 43(1)",
+   "chapter": "IV",
+   "area": "Dividend",
+   "title": "Declare and disclose dividend on a per share basis only",
+   "detail": "Declare and disclose the dividend on a per share basis only.",
+   "quote": "The listed entity shall declare and disclose the dividend on per share basis only",
+   "frequency": "On every declaration of dividend",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Every listed entity declaring a dividend",
+   "owner": "CS / Compliance",
+   "evidence": "Board resolution and the outcome filed with the exchanges, expressed per share",
+   "risk": "Medium",
+   "priority": "Medium",
+   "submitTo": "Stock exchange",
+   "signedBy": "Company Secretary",
+   "notes": "A manner requirement, not a filing: a dividend announced as a percentage of face value does not satisfy it. Reg 43(3) - recommending or declaring dividend at least five working days before the record date - and Reg 43(5) were OMITTED by the Third Amendment 2024 w.e.f. 13.12.2024, and the held text prints both only as the wording prior to omission."
+  },
+  {
+   "id": "LODR-SUP-REG-45",
+   "sourceRow": 18,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 45",
+   "chapter": "IV",
+   "area": "Change of name",
+   "title": "Satisfy the conditions for a change of name, and change the name within six months where the activities have changed",
+   "detail": "A change of name is permitted only where at least one year has elapsed since the last name change, and either at least fifty per cent of total revenue in the preceding one year came from the new activity suggested by the new name, or the amount invested in the new activity or project is at least fifty per cent of the assets. Where a listed entity has changed its activities and its name does not reflect them, it must change its name in line with those activities within six months of the change of activities.",
+   "quote": "if any listed entity has changed its activities which are not reflected in its name, it shall change its name in line with its activities within a period of six months from the change of activities in compliance of provisions as applicable to change of name prescribed under Companies Act, 2013",
+   "frequency": "On a change of name or of activities",
+   "timelineText": "Within a period of six months from the change of activities",
+   "due": {
+    "type": "at_trigger",
+    "when": "The entity changes its activities"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed entity that has changed its activities, or seeks to change its name",
+   "owner": "CS / Board",
+   "evidence": "Board and shareholder resolutions; revenue or investment computation supporting the fifty per cent test; certificate from a practising chartered accountant on compliance with the conditions",
+   "risk": "High",
+   "priority": "Medium",
+   "submitTo": "Stock exchange; Registrar of Companies",
+   "signedBy": "Company Secretary",
+   "notes": "Two different obligations in one regulation: conditions that GATE a voluntary change of name, and a duty to change the name within six months where the activities have already moved. The second is the one nobody diarises. The application for the change must carry a certificate from a practising chartered accountant stating compliance with the Reg 45(1) conditions."
+  },
+  {
+   "id": "LODR-SUP-REG-17-1A",
+   "sourceRow": 19,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 17(1A)",
+   "chapter": "IV",
+   "area": "Board composition",
+   "title": "No non-executive director aged seventy-five or more may be appointed or continue in office unless a special resolution is passed, with the justification in the explanatory statement",
+   "detail": "This is a continuing requirement, not a one-off. A director who crosses seventy-five in office must have a special resolution passed for the directorship to continue.",
+   "quote": "No listed entity shall appoint a person or continue the directorship of any person as a non -executive director who has attained the age of seventy five years unless a special resolution is passed to that effect",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board / committee minutes",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null,
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-SUP-REG-17-1E",
+   "sourceRow": 20,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 17(1E)",
+   "chapter": "IV",
+   "area": "Board composition",
+   "title": "Fill any vacancy in the office of a director at the earliest and in any case within three months of the vacancy",
+   "detail": "The period runs from the date the vacancy arises, which this app does not record - there is no register of board vacancies here, so no date is computed. Where the vacancy causes non-compliance with Reg 18(1), 19(1) or (2), 20(2) or (2A), or 21(2) or (3), the proviso requires compliance at the earliest and in any case within three months.",
+   "quote": "Any vacancy in the office of a director shall be filled by th e listed entity at the earliest and in any case not later than three months from the date",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board / committee minutes",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null,
+   "frequency": "On a vacancy arising",
+   "timelineText": "Within three months of the vacancy",
+   "due": {
+    "type": "at_trigger",
+    "when": "A vacancy arises in the office of a director"
+   },
+   "dueConfidence": "trigger"
+  },
+  {
+   "id": "LODR-SUP-REG-17-2A",
+   "sourceRow": 21,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 17(2A)",
+   "chapter": "IV",
+   "area": "Board meetings",
+   "title": "Board meeting quorum: one-third of total strength or three directors, whichever is higher, including at least one independent director",
+   "detail": "A board meeting held without an independent director present is inquorate for a top 2000 entity however many directors attend.",
+   "quote": "The quorum for every meeting of the board of directors of the top 2000 listed entities shall be one -third of its total strength or three directors, whichever is higher, including at least one independent director",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed, top 2000 by market capitalisation. This app does not hold a market capitalisation rank, so that test cannot be evaluated here - confirm it before relying on this row. Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board / committee minutes",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null,
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-SUP-REG-17-4",
+   "sourceRow": 22,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 17(4)",
+   "chapter": "IV",
+   "area": "Board responsibilities",
+   "title": "Board to satisfy itself that plans are in place for orderly succession to the board and to senior management",
+   "detail": "Evidenced by the minute recording that the board considered succession. Nothing is filed.",
+   "quote": "The board of directors of the listed entity shall satisfy itself that pla ns are in place for orderly succession for appointment to the board of directors and senior management",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board / committee minutes",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null,
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-SUP-REG-17-7",
+   "sourceRow": 23,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 17(7)",
+   "chapter": "IV",
+   "area": "Board responsibilities",
+   "title": "Place the minimum information specified in Part A of Schedule II before the board of directors",
+   "detail": "Part A of Schedule II lists the items - annual operating plans, quarterly results, minutes of committee meetings, default information, and others. The Schedule is in the held compilation; the individual items are not carried as separate rules here.",
+   "quote": "The minimum information to be placed before the board of directors is specified in Part A of Schedule II",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board / committee minutes",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null,
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-SUP-REG-18-1",
+   "sourceRow": 24,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 18(1)",
+   "chapter": "IV",
+   "area": "Audit committee",
+   "title": "Constitute a qualified and independent audit committee: minimum three directors, at least two-thirds independent, all financially literate and at least one with accounting or related financial management expertise",
+   "detail": "The register carried the audit committee MEETING requirement (Reg 18(2)(a)) without the requirement to constitute the committee at all. Note the composition test is stricter than s.177 of the Companies Act, which requires only a majority of independent directors - a listed entity must meet this one. Where the entity has outstanding SR equity shares the committee must comprise only independent directors.",
+   "quote": "Every listed entity shall constitute a qualified and independent audit committee in accordance with the terms of reference, subject to the following: (a) The audit committee shall have minimum three directors as members.",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board / committee minutes",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null,
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-SUP-REG-18-3",
+   "sourceRow": 25,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 18(3)",
+   "chapter": "IV",
+   "area": "Audit committee",
+   "title": "The role of the audit committee and the information it must review are as specified in Part C of Schedule II",
+   "detail": "Part C of Schedule II sets the terms of reference. The Schedule is in the held compilation; its individual items are not carried as separate rules here.",
+   "quote": "The role of the audit committee and the information to be reviewed by the audit committee shall be as specified in Part C of Schedule II",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board / committee minutes",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null,
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-SUP-REG-19-1",
+   "sourceRow": 26,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 19(1)",
+   "chapter": "IV",
+   "area": "Nomination and remuneration committee",
+   "title": "Constitute the nomination and remuneration committee: at least three directors, all non-executive, and at least two-thirds independent",
+   "detail": "The two-thirds independence test was substituted in; it is stricter than s.178 of the Companies Act.",
+   "quote": "The board of directors shall constitute the nomination and remuneration committee as follows: (a) the committee shall comprise of at least three directors ; (b) all directors of the committee shall be non -executive directors; and (c) at least two-thirds of the directors shall be independent directors",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board / committee minutes",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null,
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-SUP-REG-19-2",
+   "sourceRow": 27,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 19(2)",
+   "chapter": "IV",
+   "area": "Nomination and remuneration committee",
+   "title": "The chairperson of the nomination and remuneration committee shall be an independent director",
+   "detail": "Distinct from the composition test in Reg 19(1): a committee can be two-thirds independent and still be chaired by the wrong person.",
+   "quote": "The Chairperson of the nomination and remuneration committee shall be an independent director",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board / committee minutes",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null,
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-SUP-REG-19-2A",
+   "sourceRow": 28,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 19(2A)",
+   "chapter": "IV",
+   "area": "Nomination and remuneration committee",
+   "title": "Quorum for a nomination and remuneration committee meeting: two members or one third of the committee, whichever is greater, including at least one independent director in attendance",
+   "detail": "Note \"whichever is GREATER\" here, against \"whichever is HIGHER\" for the Risk Management Committee in Reg 21(3B) - the same test, worded differently in the two regulations.",
+   "quote": "The quorum for a meeting of the nomination and remuneration committee shall be either two members or one third of the members of the committee, whichever is greater, including at least one independent director in attendance",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board / committee minutes",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null,
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-SUP-REG-19-4",
+   "sourceRow": 29,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 19(4)",
+   "chapter": "IV",
+   "area": "Nomination and remuneration committee",
+   "title": "The role of the nomination and remuneration committee is as specified in Part D of Schedule II",
+   "detail": "Part D of Schedule II sets the terms of reference for both this committee and the Stakeholders Relationship Committee.",
+   "quote": "The role of the nomination and remuneration committee shall be as specified as in Part D of the Sched ule II",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board / committee minutes",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null,
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-SUP-REG-20-1",
+   "sourceRow": 30,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 20(1)",
+   "chapter": "IV",
+   "area": "Stakeholders relationship committee",
+   "title": "Constitute a Stakeholders Relationship Committee to look into the various aspects of interest of shareholders, debenture holders and other security holders",
+   "detail": "Binds every listed entity subject to Reg 15(2), not only those with listed debt - debenture holders are named as one of the constituencies, not as the trigger.",
+   "quote": "The listed entity shall constitute a Stakeholders Relationship Committee to specifically look into various aspects of interest of shareholders, debenture holders and other security holders",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board / committee minutes",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null,
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-SUP-REG-20-2",
+   "sourceRow": 31,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 20(2)",
+   "chapter": "IV",
+   "area": "Stakeholders relationship committee",
+   "title": "The chairperson of the Stakeholders Relationship Committee shall be a non-executive director",
+   "detail": "Non-executive, not independent - a different and weaker test from the one Reg 19(2) applies to the nomination and remuneration committee. Reading either across to the other is the common error.",
+   "quote": "The chairperson of this committee shall be a non -executive director",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board / committee minutes",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null,
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-SUP-REG-20-2A",
+   "sourceRow": 32,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 20(2A)",
+   "chapter": "IV",
+   "area": "Stakeholders relationship committee",
+   "title": "At least three directors, with at least one independent director, shall be members of the Stakeholders Relationship Committee",
+   "detail": "Where the entity has outstanding SR equity shares, at least two-thirds of the committee must comprise independent directors.",
+   "quote": "At least three directors, with at least one being an independent director, shall be members of the Committee",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board / committee minutes",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null,
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-SUP-REG-20-4",
+   "sourceRow": 33,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 20(4)",
+   "chapter": "IV",
+   "area": "Stakeholders relationship committee",
+   "title": "The role of the Stakeholders Relationship Committee is as specified in Part D of Schedule II",
+   "detail": "Part D of Schedule II sets the terms of reference.",
+   "quote": "The role of the Stakeholders Relationship Committee shall be as specified as in Part D of the Schedule II",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board / committee minutes",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null,
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-SUP-REG-21-1",
+   "sourceRow": 34,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 21(1)",
+   "chapter": "IV",
+   "area": "Risk management committee",
+   "title": "Constitute a Risk Management Committee",
+   "detail": "Reg 21(5) confines the whole of Reg 21 to the top 1000 listed entities and to a high value debt listed entity. The register already carried the committee MEETING cadence (Reg 21(3A)) without the requirement to constitute it.",
+   "quote": "The board of directors shall constitute a Risk Management Committee",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed, top 1000 by market capitalisation (Reg 21(5)); also a high value debt listed entity. This app does not hold a market capitalisation rank, so the top-1000 test cannot be evaluated here - confirm it before relying on this row. Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board / committee minutes",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null,
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-SUP-REG-21-3",
+   "sourceRow": 35,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 21(3)",
+   "chapter": "IV",
+   "area": "Risk management committee",
+   "title": "The chairperson of the Risk Management Committee shall be a member of the board of directors; senior executives may be members of the committee",
+   "detail": "This is the one committee whose membership may include people who are not directors.",
+   "quote": "The Chairperson of the Risk management committee shall be a member of the board of directors and senior executives of th e listed entity may be members of the committee",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed, top 1000 by market capitalisation (Reg 21(5)); also a high value debt listed entity. This app does not hold a market capitalisation rank, so the top-1000 test cannot be evaluated here - confirm it before relying on this row. Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board / committee minutes",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null,
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-SUP-REG-21-3B",
+   "sourceRow": 36,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 21(3B)",
+   "chapter": "IV",
+   "area": "Risk management committee",
+   "title": "Quorum for a Risk Management Committee meeting: two members or one third of the committee, whichever is higher, including at least one member of the board of directors in attendance",
+   "detail": "At least one BOARD MEMBER in attendance, not one independent director - a different test from the nomination and remuneration committee quorum in Reg 19(2A).",
+   "quote": "The quorum for a meeting of the Risk Management Committee shall be either two members or one third of the members of the committee, whichever is higher, including at least one member of the board of directors in attendance",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed, top 1000 by market capitalisation (Reg 21(5)); also a high value debt listed entity. This app does not hold a market capitalisation rank, so the top-1000 test cannot be evaluated here - confirm it before relying on this row. Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board / committee minutes",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null,
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-SUP-REG-21-4",
+   "sourceRow": 37,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 21(4)",
+   "chapter": "IV",
+   "area": "Risk management committee",
+   "title": "The board shall define the role and responsibility of the Risk Management Committee, and that function shall specifically cover cyber security",
+   "detail": "The cyber security limb was added by amendment and is easy to miss: a risk management charter that does not address cyber security does not meet Reg 21(4).",
+   "quote": "The board of directors shall define the role and responsibility of the Risk Management Committee and may delegate monitoring and reviewing of the risk management plan to the commit tee and such other functions as it may deem fit",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed, top 1000 by market capitalisation (Reg 21(5)); also a high value debt listed entity. This app does not hold a market capitalisation rank, so the top-1000 test cannot be evaluated here - confirm it before relying on this row. Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board / committee minutes",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null,
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-SUP-REG-21-6",
+   "sourceRow": 38,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 21(6)",
+   "chapter": "IV",
+   "area": "Risk management committee",
+   "title": "The Risk Management Committee has power to seek information from any employee, obtain outside professional advice, and secure the attendance of outsiders with relevant expertise",
+   "detail": "A power rather than a duty, carried because a committee charter that does not confer these powers does not match the regulation.",
+   "quote": "The Risk Management Committee shall have powers to seek information from any employee, obtain outside legal or other professional advice and secure attendance of outsiders with relevant expertise, if it considers necessary",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed, top 1000 by market capitalisation (Reg 21(5)); also a high value debt listed entity. This app does not hold a market capitalisation rank, so the top-1000 test cannot be evaluated here - confirm it before relying on this row. Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board / committee minutes",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null,
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none"
+  }
+ ]
 }

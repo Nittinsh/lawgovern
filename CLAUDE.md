@@ -4980,6 +4980,134 @@ for all 421.
 
 ---
 
+## 4m. THE COMMITTEE THE REGISTER NEVER SAID TO CONSTITUTE (v203)
+
+The owner: *"ok do 2"* &mdash; the sub-provision completeness pass, chosen over
+finishing the correctness read because **a wrong rule is visible on the register
+and a CS can catch it; a missing one cannot be caught by anybody.**
+
+**The register told an equity-listed company to hold four audit committee
+meetings a year and never told it to constitute the audit committee.** Same for
+the Nomination and Remuneration Committee, the Stakeholders Relationship
+Committee and the Risk Management Committee. Every committee obligation in LODR
+was a meeting cadence with no committee behind it.
+
+### Why no check could see it
+&sect;3z's completeness pass asked *"which PROVISIONS does the corpus not
+cite?"* Reg 18 is cited &mdash; by Reg 18(2)(a), the meeting rule &mdash; so Reg
+18 looked covered while **Reg 18(1) was absent**.
+
+&sect;4a wrote the warning one release later, about PIT: *"Reg 3 has six
+sub-regulations and the corpus cited two. A completeness check that stops at the
+provision number would have reported PIT as almost done."* **That warning was
+never applied back to LODR.**
+
+A missing rule cannot be wrong, it is absent (&sect;3x). Nothing turns red, and
+none of 859 assertions, 222 mutations or the release gate could see it.
+
+### The count, and the two ways it was wrong first
+| | |
+|---|---|
+| crude first pass | 144 |
+| after rejecting out-of-sequence numbers | 111 |
+| **after excluding provisions cited BARE** | **94** |
+
+Two corrections, both &sect;2z's *"the list was right and the sentence counting
+it was not"*:
+
+- **Sub-regulations run in ascending order.** A `(1)` appearing after `(4)`
+  inside a provision is quoted prior wording in a footnote &mdash; &sect;3z's
+  repealed-span trap, one level down. 144 &rarr; 111.
+- **A rule citing `Reg 41` with no sub-number summarises the whole provision.**
+  Fifty provisions are cited that way, so their sub-regulations are not gaps.
+  111 &rarr; 94.
+
+### Twenty authored, and the scoping was read BEFORE the obligation
+Reading the duty without reading who it binds is &sect;3y's s.84 and
+&sect;3z's Reg 30A. Two facts settled first:
+
+- **Reg 15(2)** &mdash; regulations 17 to 27 **do not apply** to a listed entity
+  whose paid-up equity capital does not exceed Rs 10 crore **and** whose net
+  worth does not exceed Rs 25 crore. Both limbs; it is "and". Every rule
+  authored here carries it.
+- **Reg 21(5)** &mdash; the whole of Reg 21 binds only the **top 1000** listed
+  entities and an HVDLE. Authoring the Risk Management Committee as applying to
+  every listed company would have been &sect;2z. This app holds no market
+  capitalisation rank, so the row says the test **cannot be evaluated here**
+  rather than asserting it applies.
+
+Reg 17(1A), 17(1E), 17(2A), 17(4), 17(7); Reg 18(1), 18(3); Reg 19(1), 19(2),
+19(2A), 19(4); Reg 20(1), 20(2), 20(2A), 20(4); Reg 21(1), 21(3), 21(3B),
+21(4), 21(6). Every quote verified verbatim against the held compilation before
+anything was written; **20 authored, 0 refused.**
+
+### Three distinctions a CS is paid for, now on the register
+- **Reg 18(1) needs TWO-THIRDS independent directors. s.177 of the Companies
+  Act needs only a majority.** A listed entity must meet the stricter test, and
+  the register carried neither.
+- **Reg 19(2)** requires the NRC chairperson to be **independent**;
+  **Reg 20(2)** requires the SRC chairperson only to be **non-executive**.
+  Reading either across to the other is the common error.
+- **Reg 19(2A)** says a quorum of two or one third "whichever is **greater**";
+  **Reg 21(3B)** says "whichever is **higher**", and requires a **board member**
+  in attendance rather than an independent director.
+
+### The assertion is the invariant, not the four rule ids
+> **If the register requires a committee to MEET, it must also require that
+> committee to be CONSTITUTED.**
+
+Naming Reg 18(1), 19(1), 20(1) and 21(1) would not catch the fifth committee
+somebody adds later. The invariant would.
+
+### Two assertions of mine that were wrong about correct code
+- *"No corporate governance row carries an invented date"* swept every Reg 17-21
+  row and caught **Reg 20(3)** &mdash; the SRC chairperson attending the AGM,
+  which **is** AGM-anchored and correct. &sect;3u's mistake exactly, one release
+  after &sect;2k created the rule it was enforcing.
+- *"Every Reg 17-21 row names the Reg 15(2) exemption"* swept the **generated**
+  rules too. **Reg 17(1) carries the note and Reg 17(2), 17(3), 17(8), 17(10)
+  and 18(2)(a) do not**, though Reg 15(2) exempts a small listed entity from all
+  of regulations 17 to 27. `lodr_periodic.json` is generated and must not be
+  hand-edited (&sect;2k), so that is **reported, not repaired** (&sect;3j) &mdash;
+  with an assertion that will fail the day it is fixed, so the note cannot go
+  stale.
+
+### And a check that was wrong about a real provision, for the second time
+The quote invariant read only for **"shall"** and reported **Reg 17(7)** as
+unbound. *"The minimum information **to be placed before** the board of
+directors is specified in Part A of Schedule II"* binds by gerundive. &sect;4a
+hit this precisely, with PIT Reg 3(3): narrowing a check until it is wrong about
+a real provision is &sect;2x from the other direction. PIT needed three binding
+forms; this is a fourth.
+
+### An explanation that reached nothing
+Reg 17(1E) states three months and carries no date, so &sect;3e's invariant
+demands a reason &mdash; and the mechanism is the `LG_NO_DEADLINE_WHY` table,
+not a field on the rule. My `noDeadlineWhy` field was read by nothing
+(&sect;3n). Moved into the table and dropped from the JSON, so the reason lives
+in one place. The period is certain and **the anchor is not held**: this app
+keeps no register of board vacancies.
+
+### Coverage
+Register **302 &rarr; 322** on an equity-listed company; **0** on public,
+private, OPC and LLP, each told the twenty do not apply with a reason
+(&sect;3i). Suite **859 &rarr; 875**, mutations **222 &rarr; 226 caught, 0
+missed, 0 skipped**, smoke 105, backend 96. Gate **421 &rarr; 441 rules**, 399
+citations, 0 unresolved, 159 periods compared, 0 mismatches.
+
+### What is still not done
+**74 of the 94 sub-provision gaps remain** &mdash; Reg 23 to 27, Reg 30 to 33,
+Reg 36, 39, 40, 43, 44, 46 and 47. Some are applicability or definitions rather
+than obligations (Reg 15(1), 16(1)), some bind SEBI (Reg 13(5)) or the exchange
+(Reg 31A(2)), and some bind directors personally rather than the entity (Reg
+30(11A), Reg 30A(1)) &mdash; but **none of those has been read yet**, so which
+is which is unknown rather than zero.
+
+And the correctness read of the 85 generated LODR rules is **unfinished**.
+Nothing here verifies a rule: Rule Governance reads "Never checked" for all 441.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -5068,7 +5196,7 @@ for all 421.
   names the fix, because the only symptom of the drift was a mutation anchor
   that started matching twice (§4b).
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (859 assertions, run against `index.html` itself), `node tests/mutation.js` (222 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 421 rules across eight corpora; it reports how many periods it actually compared, currently 158, and self-checks its own period parser AND its provision locator before it reads a line of law), and `node tests/backend.test.js` (96 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (875 assertions, run against `index.html` itself), `node tests/mutation.js` (226 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 441 rules across eight corpora; it reports how many periods it actually compared, currently 158, and self-checks its own period parser AND its provision locator before it reads a line of law), and `node tests/backend.test.js` (96 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **`python tools/rule_audit.py` regenerates `rules/audit_findings.json` AND
   re-embeds it into `index.html` as `var LG_GATE`** — on every run, not behind
   a flag, so the reviewer's evidence cannot drift behind the gate that produced
@@ -5091,7 +5219,7 @@ for all 421.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v202.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v203.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/026` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**
