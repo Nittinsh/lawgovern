@@ -4880,6 +4880,106 @@ that one of them was stating repealed law on a live register, and no longer is.
 
 ---
 
+## 4l. READING 288 RULES BY LOOKING FOR ONE SIGNATURE (v202)
+
+&sect;4k found `LODR-REG-24-1` by reading eight rules by hand. At that rate the
+175 never-read rules were days of work, so the question became: **what did that
+defect look like mechanically?**
+
+Its wording appeared in the provision it cites **exactly once, inside footnote
+239**, which reads *"Prior to the substitution, sub-regulation (1) read as
+follows"*. The operative text said the opposite. That is a signature, and it
+can be searched for.
+
+`stale_wording.py` normalises to letters only (defeating `w ithin`,
+`forty -five` and inline footnote markers in one move, as &sect;3z established),
+pulls distinctive three-word runs out of each rule's own title, and asks whether
+**every** occurrence in the cited provision sits inside a superseded quote.
+
+**288 rules read mechanically. 13 flagged. Reg 24-1 was one of them** &mdash;
+the detector independently found the defect already known, which is the only
+reason to believe anything else it said.
+
+That run used a snapshot of the audit library taken **before** the v201 locator
+fix. As shipped it reads **297 and flags 12**: the corrected locator bounds Reg
+17 at Reg 17A instead of running past it, so Reg 17(10) now resolves against
+operative text. **The Reg 17(10) finding below is unaffected** &mdash; it was
+settled by reading the provision, not by trusting the detector &mdash; but the
+two counts describe the same tool and both belong here.
+
+### Precision is poor, and that is why it is a shortlist and never a screen
+Of the 13, **ten were false positives**, for two distinct reasons worth keeping:
+
+- **`69[...]` marks an INSERTION, not a repeal.** These compilations bracket
+  substituted-in text with its footnote number, so live text sits inside
+  brackets that look exactly like dead text. Reg 10(1A), Reg 13(2), Reg 58(1).
+- **A flat lookbehind crosses a sub-provision heading.** Reg 17(3)'s wording is
+  plainly operative &mdash; `<<<PAGE 33>>> 33 (3) The board of directors shall
+  periodically review compliance reports` &mdash; and was flagged because an
+  unrelated footnote about an *Explanation* fell inside the 500-character
+  window behind it.
+
+Adding a "sub-provision heading intervenes" test to fix the second made the
+detector report **Reg 24-1 as operative** &mdash; a false negative on the one
+case known to be true, because the footnote's *quoted prior text* contains
+sub-provision headings of its own. So the refinement was **withdrawn and the
+context printed instead**, the same call &sect;3v made when a narrowing was
+wrong half the time. &sect;2x: a screen that is wrong four times in five is
+worse than no screen.
+
+### The one it found: Reg 17(10) under-states the duty
+```
+rule said       "Performance evaluation of independent directors by the
+                 entire board of directors."
+
+Reg 17(10) now  "The evaluation of independent directors shall be done by the
+                 entire board of directors WHICH SHALL INCLUDE - (a)
+                 performance of the directors; and (b) fulfillment of the
+                 independence criteria ... and their independence from the
+                 management."
+```
+The 2018 Amendment Regulations (w.e.f. 1.4.2019) **added a limb**. A board that
+evaluates performance alone has not complied &mdash; and the limb it misses is
+the independence assessment, which is the whole point of evaluating an
+**independent** director. Same class and same direction as Reg 24(1):
+&sect;3t's branch a CS cannot notice. Corrected through `LG_TEXT_PATCH`.
+
+### Three the shortlist raised and the reading cleared
+- **Reg 52(7)/(7A)** &mdash; the rule covers both current limbs, utilisation
+  *and* material deviation. The flagged phrase was "use of proceeds"; the
+  current text says "use of **issue** proceeds".
+- **Reg 24A(1)(a)** &mdash; **"incorporated in India" IS live here.** The same
+  four words that are repealed in Reg 24(1) are current in Reg 24A. That is
+  exactly why the Reg 24(1) fix was scoped to one rule id rather than to a
+  phrase.
+- **Reg 62M(1)** &mdash; describes annexing the report, which was replaced by a
+  cross-reference to Reg 24A on 22.1.2026. The substance is unchanged and
+  Reg 24A does require it, so this is wording currency, not a wrong obligation.
+  Reported, not patched (&sect;3j) &mdash; and it is HVDLE, so it reaches no
+  equity-listed book.
+
+### A mutation that removed wording no assertion looked at
+Reg 17(10)'s added limb has two parts joined by "and" &mdash; *fulfilment of
+the independence criteria* **and** *their independence from the management*. I
+asserted the first and mutated the second, so the mutation went **MISSED**
+against a build that had the bug. &sect;2t: strengthen the assertion, do not
+move the mutation. Both parts are the obligation, so both are asserted, and
+performance with them.
+
+### Coverage
+Smoke **105**, suite **852 -> 859**, mutations **221 -> 222 caught, 0 missed, 0
+skipped**, backend **96**, gate clear at 421 rules / 158 periods / 0 mismatches.
+
+### What this does and does not establish
+**Two rules in the corpus were stating repealed law, and both now state the
+current text.** 288 of 327 generated rules have been checked **against one
+signature only** &mdash; wording that survives solely inside a superseded quote.
+A rule that is wrong in some other way, or that omits an obligation entirely,
+is invisible to this and remains so. Rule Governance still reads "Never checked"
+for all 421.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -4968,7 +5068,7 @@ that one of them was stating repealed law on a live register, and no longer is.
   names the fix, because the only symptom of the drift was a mutation anchor
   that started matching twice (§4b).
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (852 assertions, run against `index.html` itself), `node tests/mutation.js` (221 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 421 rules across eight corpora; it reports how many periods it actually compared, currently 158, and self-checks its own period parser AND its provision locator before it reads a line of law), and `node tests/backend.test.js` (96 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (859 assertions, run against `index.html` itself), `node tests/mutation.js` (222 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 421 rules across eight corpora; it reports how many periods it actually compared, currently 158, and self-checks its own period parser AND its provision locator before it reads a line of law), and `node tests/backend.test.js` (96 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **`python tools/rule_audit.py` regenerates `rules/audit_findings.json` AND
   re-embeds it into `index.html` as `var LG_GATE`** — on every run, not behind
   a flag, so the reviewer's evidence cannot drift behind the gate that produced
@@ -4991,7 +5091,7 @@ that one of them was stating repealed law on a live register, and no longer is.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v201.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v202.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/026` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

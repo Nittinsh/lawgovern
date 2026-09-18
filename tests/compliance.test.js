@@ -3548,6 +3548,25 @@ describe('a generated rule that stated the law wrongly');
   ok('and carries the words it was corrected against', !!patched.textPatchedFrom,
      'no authority travelled with the correction');
 
+  // Reg 17(10): the substitution ADDED a limb, so the stale wording
+  // under-states the duty rather than misstating it.
+  const r1710 = rowsFor(LISTED).find(r => /Reg 17\(10\)/.test(r.section || ''));
+  ok('Reg 17(10) is on a listed register', !!r1710, 'the row went missing');
+  // The added limb has TWO parts and the provision joins them with "and":
+  // "(b) fulfillment of the independence criteria ... AND their independence
+  // from the management". Asserting one and mutating the other is how the
+  // first version of this went MISSED -- the wording it removed was wording
+  // nothing looked at.
+  ok('and names the independence CRITERIA limb the 2019 substitution added',
+     !!r1710 && /independence criteria/i.test(r1710.obligation || ''),
+     r1710 ? r1710.obligation : '(no row)');
+  ok('and the independence FROM MANAGEMENT limb, which is the other half',
+     !!r1710 && /independence from the management/i.test(r1710.obligation || ''),
+     r1710 ? r1710.obligation : '(no row)');
+  ok('and still names performance, which the old wording had right',
+     !!r1710 && /performance/i.test(r1710.obligation || ''),
+     r1710 ? r1710.obligation : '(no row)');
+
   // It must reach the REGISTER...
   const row = rowsFor(LISTED).find(r => /Reg 24\(1\)/.test(r.section || ''));
   ok('Reg 24(1) is on a listed register', !!row, 'the row went missing');

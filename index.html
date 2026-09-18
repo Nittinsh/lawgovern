@@ -1545,7 +1545,7 @@ input[type="text"], input[type="password"], textarea, select {
       <div class="t">Compliance Solutions</div>
       <!-- Build marker kept out of the interface but still readable, so a deploy
            can be confirmed with: document.getElementById('build-version').content -->
-      <meta id="build-version" content="v201">
+      <meta id="build-version" content="v202">
     </div>
   </div>
   <div class="cc-search">
@@ -5040,6 +5040,27 @@ var LG_SCOPE_PATCH = {
 // the provision, the corrected wording and the reason are all required and a
 // partial entry is ignored -- SS4j's bar, applied to text.
 var LG_TEXT_PATCH = {
+  'LODR-REG-17-10': {
+    title: 'Evaluation of independent directors by the entire board of '
+         + 'directors - the evaluation MUST include (a) performance of the '
+         + 'directors and (b) fulfilment of the independence criteria and '
+         + 'their independence from the management. The directors being '
+         + 'evaluated do not participate.',
+    from: 'Reg 17(10), as substituted w.e.f. 1.4.2019: "The evaluation of '
+        + 'independent directors shall be done by the entire board of '
+        + 'directors which shall include - (a) performance of the directors; '
+        + 'and (b) fulfillment of the independence criteria as specified in '
+        + 'these regulations and their independence from the management: '
+        + 'Provided that in the above evaluation, the directors who are '
+        + 'subject to evaluation shall not participate."',
+    why: 'The rule carried "Performance evaluation of independent directors '
+       + 'by the entire board", which is the wording PRIOR to the 2018 '
+       + 'Amendment Regulations (w.e.f. 1.4.2019). The substitution added a '
+       + 'second mandatory limb: the board must also assess fulfilment of the '
+       + 'independence criteria and independence from management. A board '
+       + 'that evaluates performance alone has not complied - and that is the '
+       + 'limb which matters most for an INDEPENDENT director.'
+  },
   'LODR-REG-24-1': {
     title: 'Appoint at least one independent director of the listed entity on '
          + 'the board of each unlisted material subsidiary, whether '

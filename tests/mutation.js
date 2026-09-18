@@ -1213,6 +1213,10 @@ const MUTATIONS = [
     from: "  if(rule.textPatchedFrom){",
     to:   "  if(false){" },
 
+  { name: 'Reg 17(10) loses the independence limb added in 2019 (SS4k)',
+    from: "         + 'their independence from the management. The directors being '",
+    to:   "         + 'and nothing else. The directors being '" },
+
   // -- SS4k: the year count that disagreed with its own screen -
   // The selector said 82 and the register then showed 254. The filter is
   // correct; the number beside it counted a different population.
