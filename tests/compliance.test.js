@@ -2446,7 +2446,7 @@ describe('lodr chapter IV supplement');
 {
   const LS = app.LODR_SUP_DATA;
   ok('the supplement is loaded', !!(LS && LS.rules && LS.rules.length), 'LODR_SUP_DATA missing');
-  check('thirty-eight obligations', (LS.rules || []).length, 38);
+  check('eighty-one obligations', (LS.rules || []).length, 81);
 
   // THE INVARIANT (SS3y). Where a rule states a period, that period must appear
   // in the quote. Nothing upstream constrains a hand-authored corpus; without
@@ -2487,7 +2487,7 @@ describe('lodr chapter IV supplement');
   const supOf = (c) => app.getComplianceChart(c).filter(r => /^LODR-SUP/.test(r.key || ''));
 
   const listed = mk('listed', 'L17110MH2009PLC195422');
-  check('a listed entity receives all thirty-eight', supOf(listed).length, 38);
+  check('a listed entity receives all eighty-one', supOf(listed).length, 81);
   check('a private company receives none', supOf(mk('private','U51909MH2018PTC300111')).length, 0);
   check('a public unlisted company receives none', supOf(mk('public','U51909MH2015PLC300444')).length, 0);
   check('an OPC receives none', supOf(mk('opc','U74999MH2020OPC300222')).length, 0);
@@ -2551,7 +2551,7 @@ describe('lodr chapter IV supplement');
   const exc = app.lgExcludedFor(mk('private','U51909MH2018PTC300111'))
     .filter(e => /^Reg /.test(e.section || '') &&
                  (LS.rules || []).some(r => r.regulation === e.section));
-  check('a private company is told all thirty-eight do not apply', exc.length, 38);
+  check('a private company is told all eighty-one do not apply', exc.length, 81);
   const noReason = exc.filter(e => !e.reasons || !e.reasons.length);
   ok('and is given a reason for every one', noReason.length === 0,
      noReason.map(e => e.section).join(', '));
@@ -3735,6 +3735,94 @@ describe('a committee the register never said to constitute');
   ok('a private company is told the committee rules do not apply, with a reason',
      cgExc.length > 0 && cgExc.every(e => e.reasons && e.reasons.length),
      cgExc.length ? 'some carry no reason' : 'none reported at all');
+}
+
+describe('the rest of the LODR sub-provision pass');
+{
+  const L = { id:'SP-L', name:'SP Listed', type:'listed', fyend:'2026-03-31',
+    capital:5e8, turnover:2e9, networth:1e8, netprofit:1e7, borrowings:0,
+    cin:'L17110MH2009PLC195422', chart:{} };
+  const rows = app.getComplianceChart(L);
+  const by = {};
+  rows.forEach(r => { if (/^LODR-SUP/.test(r.key || '')) by[String(r.section || '')] = r; });
+
+  // Three obligations the corpus had NO rule for at all, under any citation.
+  // Each was confirmed absent by searching every LODR rule title and detail
+  // before it was authored, because three copies of one figure is how SS3n's
+  // penalties screen went five years out of date.
+  [['Reg 44(1)', /e-?voting/i,            'remote e-voting for all shareholder resolutions'],
+   ['Reg 25(10)', /insurance/i,           'Directors and Officers insurance'],
+   ['Reg 33(2)', /approv|authenticat/i,   'approval and authentication of financial results'],
+   ['Reg 30(1)', /material/i,             'the board judgment of materiality'],
+   ['Reg 46(1)', /website/i,              'a functional website']
+  ].forEach(([sec, re_, what]) => {
+    ok(sec + ' is on the register - ' + what,
+       !!by[sec] && re_.test(by[sec].obligation || ''),
+       by[sec] ? by[sec].obligation : '(absent)');
+  });
+
+  // Reg 30(1) is the RESIDUAL duty and must not read as the Schedule III list,
+  // which the register already carries under Reg 30(2) in 25 separate rules.
+  // The QUOTE lives on the rule, not on the register row -- getComplianceChart
+  // copies only selected fields onto a row (SS2j), and the first version of
+  // this read an undefined field off the row and failed for that reason.
+  const supRule = id => (app.LODR_SUP_DATA.rules || []).find(r => r.id === id);
+  ok('Reg 30(1) is the board-judgment limb, not the deemed-material list',
+     /opinion of the board/i.test((supRule('LODR-SUP-REG-30-1') || {}).quote || ''),
+     ((supRule('LODR-SUP-REG-30-1') || {}).quote || '(absent)').slice(0, 90));
+
+  // SS3y's s.84 and SS3z's Reg 30A: read the period AND the subject. Reg 40(5)'s
+  // sixty working days binds the TRANSFEROR, who must serve a prohibitory order.
+  // Claiming it as the entity's deadline would put a duty on the company that
+  // Reg 40(5) does not impose.
+  const r405 = (app.LODR_SUP_DATA.rules || []).find(r => r.id === 'LODR-SUP-REG-40-5');
+  ok('Reg 40(5) says the sixty working days binds the transferor, not the entity',
+     !!r405 && /bind the TRANSFEROR|binds the TRANSFEROR/i.test(r405.detail || ''),
+     r405 ? (r405.detail || '').slice(0, 100) : '(absent)');
+  ok('and Reg 40(5) itself carries no date',
+     !!by['Reg 40(5)'] && !by['Reg 40(5)'].due,
+     by['Reg 40(5)'] ? String(by['Reg 40(5)'].due) : '(absent)');
+
+  // SS4a: a retention period is NOT a deadline. Nothing falls due; nothing may
+  // be taken down early, and a CS reading a blank could delete the record.
+  ok('Reg 30(8) five-year website retention is carried, in the quoted words',
+     /minimum period of five years/i.test((supRule('LODR-SUP-REG-30-8') || {}).quote || ''),
+     ((supRule('LODR-SUP-REG-30-8') || {}).quote || '(absent)').slice(0, 110));
+
+  // The top-1000 tests this app cannot evaluate must say so rather than assert.
+  ['Reg 21(3C)', 'Reg 25(10)'].forEach(sec => {
+    ok(sec + ' names the top-1000 limit it cannot evaluate here',
+       !!by[sec] && /top 1000/i.test(by[sec].appliesToText || '') &&
+       /cannot be evaluated/i.test(by[sec].appliesToText || ''),
+       by[sec] ? (by[sec].appliesToText || '').slice(0, 80) : '(absent)');
+  });
+
+  // Chapter III binds every listed entity, including a debt-only issuer, which
+  // may be an UNLISTED company (SS4b). Scoping those to equity alone would hide
+  // them from exactly the entity Chapter III exists for.
+  const CH3 = ['LODR-SUP-REG-6-2', 'LODR-SUP-REG-7-2', 'LODR-SUP-REG-10-2'];
+  CH3.forEach(id => {
+    const r = (app.LODR_SUP_DATA.rules || []).find(x => x.id === id);
+    ok(id + ' reaches debt listings too, not equity alone',
+       !!r && (r.appliesTo.listingType || []).indexOf('ncs') >= 0,
+       r ? JSON.stringify(r.appliesTo) : '(absent)');
+  });
+
+  // Reg 6(2)'s quote is STITCHED across a footnote block that separates the
+  // lead-in from the limbs. SS3z: every limb must verify on its own, and the
+  // quote must show the DUTY, not only who carries it.
+  const r62 = (app.LODR_SUP_DATA.rules || []).find(r => r.id === 'LODR-SUP-REG-6-2');
+  ok('Reg 6(2) quote carries the duty limbs, not just the lead-in',
+     !!r62 && /ensuring conformity/i.test(r62.quote || '') &&
+     /correctness, authenticity/i.test(r62.quote || ''),
+     r62 ? (r62.quote || '').slice(0, 90) : '(absent)');
+  ok('and is marked as stitched rather than passing as contiguous',
+     !!r62 && r62.quoteStitched === true, 'not marked');
+
+  // SS2k, across the whole pass.
+  const dated = Object.keys(by).filter(k => by[k].due);
+  ok('no rule in this pass carries an invented date', dated.length === 0,
+     dated.join(', '));
 }
 
 // The access-check assertions are async — they drive a stubbed database through

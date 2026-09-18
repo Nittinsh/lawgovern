@@ -1175,6 +1175,1303 @@
     "type": "continuous"
    },
    "dueConfidence": "none"
+  },
+  {
+   "id": "LODR-SUP-REG-6-2",
+   "sourceRow": 39,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 6(2)",
+   "chapter": "III",
+   "area": "Compliance officer",
+   "title": "The compliance officer is responsible for conformity in letter and spirit, co-ordination with and reporting to SEBI, the exchanges and the depositories, correctness of everything filed, and monitoring the grievance email address",
+   "detail": "Reg 6(2) is what the appointment in Reg 6(1) is FOR. Note limb (c): the compliance officer answers for the correctness, authenticity and comprehensiveness of everything the entity files - not merely that it was filed on time. The quote is stitched across a footnote block that separates the lead-in from the limbs in the held compilation; every limb verifies on its own.",
+   "quote": "The compliance officer of the listed entity shall be responsible for - ... (a) ensuring conformity with the regulatory provisions applicable to the listed entity in letter and spirit. ... (b) co-ordination with and reporting to the Board, recognised stock exchange(s) and depositories with respect to compliance with rules, regulations and other directives of these authorities in manner as specified from time to time. ... (c) ensuring that the correct procedures have been followed that w ould result in the correctness, authenticity and comprehensiveness of the information, statements and reports filed by the listed entity under these regulations. ... (d) monitoring email address of grievance redressal division as designated by the listed entity for the purpose of registering complaints by investors",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity",
+     "ncs",
+     "hvdle"
+    ]
+   },
+   "appliesToText": "All listed entities",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null,
+   "quoteStitched": true
+  },
+  {
+   "id": "LODR-SUP-REG-7-2",
+   "sourceRow": 40,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 7(2)",
+   "chapter": "III",
+   "area": "Share transfer agent",
+   "title": "Keep all share transfer facility activities in house or with a SEBI-registered Registrar to an issue and share transfer agent",
+   "detail": "A third party that is not a registered RTA may not run the share transfer facility.",
+   "quote": "The listed entity shall ensure that all activities in relation to 63[***]share transfer facility are maintained either in house or by Registrar to an issue and share transfer agent registered with the Board.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity",
+     "ncs",
+     "hvdle"
+    ]
+   },
+   "appliesToText": "All listed entities",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-10-2",
+   "sourceRow": 41,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 10(2)",
+   "chapter": "III",
+   "area": "Filing",
+   "title": "Put in place the infrastructure required to file on the electronic platform",
+   "detail": "The duty behind Reg 10(1): filing electronically is not optional, so neither is the capability to do it.",
+   "quote": "The listed entity shall put in pla ce infrastructure as required for compliance with sub-regulation (1). Scheme of Arrangement. 11. The listed entity shall ensure that any scheme of arrangement /amalgamation /merger /reconstruction /reduction of capital etc.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity",
+     "ncs",
+     "hvdle"
+    ]
+   },
+   "appliesToText": "All listed entities",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-21-3C",
+   "sourceRow": 42,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 21(3C)",
+   "chapter": "IV",
+   "area": "Risk management committee",
+   "title": "Not more than two hundred and ten days may elapse between two consecutive Risk Management Committee meetings",
+   "detail": "A cadence AND a gap limit. Two meetings in a financial year satisfies Reg 21(3A) and can still breach this if they fall too far apart.",
+   "quote": "The meetings of the risk management committee shall be conducted in such a manner that on a continuous basis not more than 197[two hundred and ten] days shall elapse between any two consecutive meetings.]",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed, top 1000 by market capitalisation (Reg 21(5) for Reg 21; Reg 25(10) states its own limit); also a high value debt listed entity where the regulation says so. This app does not hold a market capitalisation rank, so that test cannot be evaluated here - confirm it before relying on this row. Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-23-1A",
+   "sourceRow": 43,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 23(1A)",
+   "chapter": "IV",
+   "area": "Related party transactions",
+   "title": "A related party transaction for brand usage or royalty is material where it exceeds the threshold Reg 23(1A) states",
+   "detail": "A separate and lower materiality test than the general one in Reg 23(1). Brand and royalty payments to a promoter group entity are the common case.",
+   "quote": "Notwithstanding the above, [wi th effect from July 01, 2019]210 a transaction involving payments made to a related party with respect to brand usage or royalty shall be considered material if the transaction(s) to be entered into individually or taken together with previous transactions d uring a financial year, exceed 211{five} percent of the annual consolidated turnover of the listed entity as per the last audited financial statements of the listed entit",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-24-3",
+   "sourceRow": 44,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 24(3)",
+   "chapter": "IV",
+   "area": "Subsidiaries",
+   "title": "Place the minutes of the board meetings of the unlisted subsidiary before the board of the listed entity",
+   "detail": "Every unlisted subsidiary, not only a material one.",
+   "quote": "The minutes of the meetings of the board of directors of the unlisted subsidiary shall be placed at the meeting of the board of directors of the listed entity.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-24-4",
+   "sourceRow": 45,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 24(4)",
+   "chapter": "IV",
+   "area": "Subsidiaries",
+   "title": "The management of the unlisted subsidiary must periodically bring a statement of all significant transactions and arrangements to the listed entity board",
+   "detail": "The Explanation defines a significant transaction as one exceeding ten percent of total revenues, expenses, assets or profits of the unlisted subsidiary.",
+   "quote": "The management of the unlisted subsidiary shall periodically bring to the noti ce of the board of directors of the listed entity, a statement of all significant transactions and arrangements entered into by the unlisted subsidiary.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-24-5",
+   "sourceRow": 46,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 24(5)",
+   "chapter": "IV",
+   "area": "Subsidiaries",
+   "title": "Do not dispose of shares in a material subsidiary reducing shareholding to fifty percent or below, or cease control, without a special resolution",
+   "detail": "Note \"or equal to\" was inserted: reducing to exactly fifty percent triggers it. An exception applies to a divestment under a scheme of arrangement sanctioned by a Court or Tribunal.",
+   "quote": "A listed entity shall not dispose of shares in its material subsidiary resulting in reduction of its shareholding (either on its own or together with other subsidiaries) to less than 243[or equal to ] fifty percent or cease the exercise of control over the subsidiary without passing a special resolution in its General Meeting except in cases where such divestment is made under a scheme of arrangement duly approved by a Court/Tribunal[, or under a resolutio",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-24-6",
+   "sourceRow": 47,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 24(6)",
+   "chapter": "IV",
+   "area": "Subsidiaries",
+   "title": "Selling, disposing or leasing more than twenty percent of a material subsidiary assets in a financial year requires prior shareholder approval by special resolution",
+   "detail": "Measured on an aggregate basis across the financial year, so a series of small disposals can cross it. Excepted where made under a scheme of arrangement sanctioned by a Court or Tribunal.",
+   "quote": "Selling, disposing and leasing of assets amounting to more than twenty percent of the assets of the mate rial subsidiary on an aggregate basis during a financial year shall require prior approval of shareholders by way of special resolution, unless the sale/disposal/lease is made under a scheme of arrangement duly approved by a Court/Tribunal[, or under a resolution plan duly approved under section 31 of the Insolvency Code and such an event is disclosed t",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-24A-1B",
+   "sourceRow": 48,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 24A(1B)",
+   "chapter": "IV",
+   "area": "Secretarial audit",
+   "title": "The Secretarial Auditor may provide only such other services as the board approves, and none that the Board has restricted",
+   "detail": "Mirrors the auditor independence regime. Engaging the Secretarial Auditor for restricted work compromises the appointment itself.",
+   "quote": "Secretarial Auditor not to render certain services: A Secretarial Auditor appointed under these regulations shall provide to the listed entity only such other services as are approved by the board of directors, but which shall not include any services as specified by the Board in this behalf.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-24A-1C",
+   "sourceRow": 49,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 24A(1C)",
+   "chapter": "IV",
+   "area": "Secretarial audit",
+   "title": "With effect from 1 April 2025, ensure compliance with Reg 24A(1), (1A) and (1B) on appointment, re-appointment or continuation of the Secretarial Auditor",
+   "detail": "A transition provision that is now live. Association of an individual or firm as Secretarial Auditor before that date counts towards the tenure limits.",
+   "quote": "With effec t from April 1, 2025, every listed entity shall ensure compliance with sub - regulation (1), (1A) and (1B) for appointment, re -appointment or continuation of the Secretarial Auditor of the listed entity:",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-25-1",
+   "sourceRow": 50,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 25(1)",
+   "chapter": "IV",
+   "area": "Independent directors",
+   "title": "No person may be appointed or continue as an alternate director for an independent director",
+   "detail": "In force since 1 October 2018. An independent director cannot be stood in for.",
+   "quote": "No person shall be appointed or continue as an alternate director for an independent director of a listed entity with effect from October 1, 2018.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-25-2",
+   "sourceRow": 51,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 25(2)",
+   "chapter": "IV",
+   "area": "Independent directors",
+   "title": "The maximum tenure of independent directors is as prescribed by the Companies Act 2013 and the rules made under it",
+   "detail": "LODR defers to the Act here: two consecutive terms of up to five years, then a three-year cooling off.",
+   "quote": "The maximum tenure of independent directors shall be in accordance with the Companies Act, 2013 and rules made thereunder, in this regard, from time to time. 256[(2A).",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-25-4",
+   "sourceRow": 52,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 25(4)",
+   "chapter": "IV",
+   "area": "Independent directors",
+   "title": "At their separate meeting the independent directors must review the performance of non-independent directors and the board, review the chairperson, and assess the quality and timeliness of the flow of information",
+   "detail": "The separate meeting is required by Reg 25(3); this is what it must actually do. A meeting held without these items on the agenda does not discharge it.",
+   "quote": "The independent directors in the meeting referred in sub -regulation (3) shall, inter alia - (a) review the performance of non -independent directors and the board of directors as a whole; (b) review the performance of the chairperson of the listed entity, taking into account the views of executive directors and non -executive directors;",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-25-9",
+   "sourceRow": 53,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 25(9)",
+   "chapter": "IV",
+   "area": "Independent directors",
+   "title": "The board must take on record the independent director declaration under Reg 25(8) only after assessing its veracity",
+   "detail": "Reg 25(8) puts the declaration duty on the independent director, at the first board meeting they attend and at the first board meeting of every financial year. This sub-regulation is the entity duty: not merely to receive it, but to assess it.",
+   "quote": "The board of directors of the listed entity shall take on record the declaration and confirmation submitted by the independent director under sub -regulation (8) after undertaking due assessment of the veracity of the same.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-25-10",
+   "sourceRow": 54,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 25(10)",
+   "chapter": "IV",
+   "area": "Independent directors",
+   "title": "Take out Directors and Officers insurance for all independent directors, of such quantum and for such risks as the board determines",
+   "detail": "Top 1000 by market capitalisation. The quantum is the board decision, so the evidence is the policy plus the minute fixing it.",
+   "quote": "264[The] top 265{1000 } listed entities by market capitalization 266[***] shall undertake Direct ors and Officers insurance (‘D and O insurance’) for all their independent directors of such quantum and for such risks as may be determined by its board of directors.]",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed, top 1000 by market capitalisation (Reg 21(5) for Reg 21; Reg 25(10) states its own limit); also a high value debt listed entity where the regulation says so. This app does not hold a market capitalisation rank, so that test cannot be evaluated here - confirm it before relying on this row. Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-26-1",
+   "sourceRow": 55,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 26(1)",
+   "chapter": "IV",
+   "area": "Board committees",
+   "title": "A director may not be a member of more than ten committees or chairperson of more than five, across all listed entities",
+   "detail": "The limit binds the DIRECTOR, not the entity - counted only across audit committees and stakeholders relationship committees of public companies. The entity duty is to verify it before appointment, and Reg 26(2) requires every director to inform the entity of positions held elsewhere.",
+   "quote": "A director shall not be a member in more than ten committees or act as chairperson of more than five commit tees across all listed entities in which he 271[/she] is a director which shall be determined as follows:",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed. Reg 15(2) exemption: these corporate governance provisions do not apply where paid-up equity share capital does not exceed Rs 10 crore AND net worth does not exceed Rs 25 crore on the last day of the previous financial year.",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-30-1",
+   "sourceRow": 56,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 30(1)",
+   "chapter": "IV",
+   "area": "Material events",
+   "title": "Disclose any event or information which in the opinion of the board of directors is material",
+   "detail": "Distinct from the deemed-material events in Para A of Part A of Schedule III, which the register already carries. This is the residual duty: an event nobody listed is still disclosable if the board considers it material.",
+   "quote": "Every listed entity shall make disclosures of any events or information which, in the opinion of the board of directors of the listed company, is material.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-30-7",
+   "sourceRow": 57,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 30(7)",
+   "chapter": "IV",
+   "area": "Material events",
+   "title": "Keep disclosing material developments on a regular basis until the event is resolved or closed, with relevant explanations",
+   "detail": "A disclosure is not discharged by the first announcement. An unresolved event carries a continuing duty to update.",
+   "quote": "The listed entity shall, with respect to disclosures referred to in this regulation, make disclosures updating material developments on a regular basis, till such time the event is resolved/closed, with relevant explanations.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-30-8",
+   "sourceRow": 58,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 30(8)",
+   "chapter": "IV",
+   "area": "Material events",
+   "title": "Host every event or information disclosed to the stock exchanges on the entity website for a minimum of five years, and thereafter per the archival policy",
+   "detail": "A retention period, not a deadline - nothing falls due, and nothing may be taken down early.",
+   "quote": "The listed entity shall disclose on its website all such events or information which has been disclosed to stock exchange(s) under this regulation , and such disclosures shall be hosted on the website of the listed entity for a minimum period of five years and thereafter as per the archival policy of the listed entity, as disclosed on its website.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-30-9",
+   "sourceRow": 59,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 30(9)",
+   "chapter": "IV",
+   "area": "Material events",
+   "title": "Disclose all events or information about subsidiaries which are material for the listed entity",
+   "detail": "Materiality is measured against the listed entity, not against the subsidiary.",
+   "quote": "The listed entity shall disclose all events or information with respect to subsidiaries which are material for the listed entity.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-30-10",
+   "sourceRow": 60,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 30(10)",
+   "chapter": "IV",
+   "area": "Material events",
+   "title": "Provide a specific and adequate reply to all queries raised by the stock exchanges on any event or information",
+   "detail": "No period is stated for the entity. The proviso requires the exchange to disseminate the clarification as soon as reasonably practicable.",
+   "quote": "The listed entity shall provide specific and adequate reply to all queries raised by stock exchange(s) with respect to any events or information:",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-30-13",
+   "sourceRow": 61,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 30(13)",
+   "chapter": "IV",
+   "area": "Material events",
+   "title": "Where disclosure follows a communication from a regulatory, statutory, enforcement or judicial authority, disclose that communication along with the event",
+   "detail": "The communication itself is disclosable, not only the fact of it. Easy to miss when an order arrives and only its outcome is announced.",
+   "quote": "In case an event or information is required to be disclosed by the listed entity in terms of the provisions of this regulation, pursuant to the rec eipt of a communication from any regulatory, statutory, enforcement or judicial authority, the listed entity shall disclose such communication, along with the event or information, unless disclosure of such communication is prohibited by such authority.] 325[Disclosure requirements for certain types of agreemen",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-31-3",
+   "sourceRow": 62,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 31(3)",
+   "chapter": "IV",
+   "area": "Shareholding pattern",
+   "title": "Comply with the circulars and directions the Board issues on maintenance of shareholding in dematerialised form",
+   "detail": "A delegating provision: the requirements live in SEBI circulars, which are not held here.",
+   "quote": "The listed entity shall comply with circulars or directions issued by the Board fro m time to time with respect to maintenance of shareholding in dematerialized form.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-31-4",
+   "sourceRow": 63,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 31(4)",
+   "chapter": "IV",
+   "area": "Shareholding pattern",
+   "title": "Every entity in the promoter and promoter group must be disclosed separately in the shareholding pattern on the exchange websites",
+   "detail": "Separately, in the formats the Board specifies - a consolidated promoter-group figure does not satisfy it.",
+   "quote": "All entities falling under promoter and promoter group shall be disclosed separately in the shareholding pattern appearing on the website of all stock exchanges having nationwide trading terminals where the specified securities of the entity are listed, in accordance with the formats specified by the Board.] 328[Conditions for re -classification of any person as promoter / public",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-32-2",
+   "sourceRow": 64,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 32(2)",
+   "chapter": "IV",
+   "area": "Use of issue proceeds",
+   "title": "Continue giving the deviation and variation statement until the issue proceeds are fully utilised or the stated purpose achieved",
+   "detail": "The duty does not stop at the end of a financial year; it runs with the money.",
+   "quote": "The statement(s) specified in sub -regulation (1), shall be continued to be given till such time the issue proceeds have been fully utilised or the purpose for which these proceeds were raised has been achieved.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-32-3",
+   "sourceRow": 65,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 32(3)",
+   "chapter": "IV",
+   "area": "Use of issue proceeds",
+   "title": "Place the deviation and variation statement before the audit committee for review, and submit it to the stock exchanges after that review",
+   "detail": "The audit committee review comes first. Submitting without it is a defect in the process even where the figures are right.",
+   "quote": "The statement(s) specified in sub -regulatio n (1), shall be placed before the audit committee for review and after such review, shall be submitted to the stock exchange(s).",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-32-7A",
+   "sourceRow": 66,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 32(7A)",
+   "chapter": "IV",
+   "area": "Use of issue proceeds",
+   "title": "Where funds were raised by preferential allotment or qualified institutions placement, disclose their utilisation every year in the Annual Report until fully utilised",
+   "detail": "An annual Annual Report duty that runs for as many years as the money takes to spend.",
+   "quote": "Where an entity has raised funds through preferential allotment or qualified institutions placement, the listed entity shall disclose every year, the utilization of such funds during that year in its Annual Report until such funds are fully utilize d.]",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-33-1",
+   "sourceRow": 67,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 33(1)",
+   "chapter": "IV",
+   "area": "Financial results",
+   "title": "Prepare financial results on the accrual basis with uniform accounting policies, and comply with the other requirements of Reg 33(1)",
+   "detail": "The preparation requirements, as distinct from the submission deadlines the register already carries under Reg 33(3).",
+   "quote": "While preparing financial results, the listed entity shall comply with the following: (a) The financial results shall be prepared on the basis of accrual accounting policy and shall be in accordance with uniform accounting practices adopted for all the periods.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-33-2",
+   "sourceRow": 68,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 33(2)",
+   "chapter": "IV",
+   "area": "Financial results",
+   "title": "Approve and authenticate the financial results in the manner Reg 33(2) requires",
+   "detail": "Quarterly results are approved by the board; the limited review or audit report is placed before the board with them. A results announcement approved otherwise is not authenticated.",
+   "quote": "The approval and authentication of the financial results shall be done by listed entity in the following manner: (a) The quarterly financial results submitted shall be approved by the board of directors:",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-36-4",
+   "sourceRow": 69,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 36(4)",
+   "chapter": "IV",
+   "area": "Annual report",
+   "title": "Make the disclosures to the stock exchanges in XBRL format, in accordance with the guidelines the exchanges specify",
+   "detail": "Format is part of the obligation: a disclosure made in the wrong format is not made.",
+   "quote": "The disclosures made by the listed entity with immediate effect from date of notification of these amendments - (a) to the stock exchanges shall be in XBRL format in accordance with the guidelines specified by the stock exchanges from time to time;",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-36-5",
+   "sourceRow": 70,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 36(5)",
+   "chapter": "IV",
+   "area": "General meetings",
+   "title": "Where a statutory auditor or Secretarial Auditor is proposed for appointment or re-appointment, the AGM notice explanatory statement must carry the disclosures Reg 36(5) lists",
+   "detail": "Proposed fees, terms, material change in fee from the outgoing auditor, and the basis of recommendation including credentials. A standard explanatory statement will not contain these unless they are put there.",
+   "quote": "The notice being sent to shareholders for an annual general meeting, where the statutory auditor(s) 395[or Secretarial Auditor ] is/are proposed t o be appointed/re -appointed shall include the following disclosures as a part of the explanatory statement to the notice:",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-39-1",
+   "sourceRow": 71,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 39(1)",
+   "chapter": "IV",
+   "area": "Securities",
+   "title": "Comply with Rule 19(3) of the Securities Contracts (Regulation) Rules 1957 for allotment, transfer, subdivision, consolidation, renewal, exchange and duplicates",
+   "detail": "A cross-reference to rules made under a different Act, which are not held here.",
+   "quote": "The listed entity shall comply with Rule 19(3) of Securities Contract (Regulations) Rules, 1957 in respect of Letter/Advices of Allotment, Acceptance or Rights, transfers, subdivision, consolidation, renewal, exchanges, issuance of duplicates thereof or a ny other purpose.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-39-4",
+   "sourceRow": 72,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 39(4)",
+   "chapter": "IV",
+   "area": "Securities",
+   "title": "Follow the procedural requirements in Schedule VI for securities that remain unclaimed or lie in the escrow account",
+   "detail": "Unclaimed shares from a public issue are a live obligation long after the issue closes.",
+   "quote": "The listed entity shall comply wi th the procedural requirements specified in Schedule VI while dealing with securities issued pursuant to the public issue or any other issue, physical or otherwise, which remain unclaimed and/or are lying in the escrow account, as applicable. Transfer or transmission or transposition of securities.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-40-4",
+   "sourceRow": 73,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 40(4)",
+   "chapter": "IV",
+   "area": "Transfer of securities",
+   "title": "Do not register a transfer where a statutory prohibition, attachment or prohibitory order of a competent authority restrains it",
+   "detail": "A refusal that is required, not permitted. Registering in the face of an order is the breach.",
+   "quote": "The listed entity shall not register transfer when any statutory prohibition or any attachment or prohibitory order of a competent authority restrains it from transferring the securities from the na me of the transferor(s).",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-40-5",
+   "sourceRow": 74,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 40(5)",
+   "chapter": "IV",
+   "area": "Transfer of securities",
+   "title": "Do not register a transfer where the transferor objects, subject to the condition in the proviso",
+   "detail": "The sixty working days in the proviso bind the TRANSFEROR, who must serve a prohibitory order within that time. Reading it as the entity deadline would put a duty on the company that Reg 40(5) does not impose.",
+   "quote": "The listed entity shall not register the transfer of its securities in the name of the transferee(s) when the transferor(s) objects to the transfer: Provided that the transferor serves on the listed entity, within sixty working days of raising the objection, a prohibitory order of a Court of competent jurisdiction.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-40-7",
+   "sourceRow": 75,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 40(7)",
+   "chapter": "IV",
+   "area": "Transfer of securities",
+   "title": "Comply with all procedural requirements for transfer and transmission of securities as specified by the Board from time to time",
+   "detail": "A delegating provision: the requirements live in SEBI circulars, which are not held here.",
+   "quote": "414[The listed entity shall comply with all procedural requirements with respect to transfer and transmission of securities as specified by the Board from time to time.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-43-2",
+   "sourceRow": 76,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 43(2)",
+   "chapter": "IV",
+   "area": "Dividend",
+   "title": "The dividend distribution policy must contain the parameters Reg 43(2) lists",
+   "detail": "Circumstances in which shareholders may or may not expect dividend, the financial parameters, internal and external factors, the policy on retained earnings and on utilisation of retained earnings. A policy missing any of them does not meet Reg 43(2).",
+   "quote": "The dividend distribution policy shall include the following parameters: (a) the circumstances under which the shareholders of the listed entities may or may not expect dividend; (b) the financial parameters that shall be considered while declaring dividend; (c) internal and external factors that shall be considered for declaration of dividend; (d) policy as to how the retained earnings shall be utilized;",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-44-1",
+   "sourceRow": 77,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 44(1)",
+   "chapter": "IV",
+   "area": "Shareholder meetings",
+   "title": "Provide remote e-voting to shareholders in respect of ALL shareholder resolutions",
+   "detail": "All resolutions, without exception. The register carried the Reg 44(3) results-submission duty and never the duty to provide the facility at all.",
+   "quote": "The listed entity shall provide the facility of remote e-voting facility to its shareholders, in respect of all shareholders' resolutions .",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-44-2",
+   "sourceRow": 78,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 44(2)",
+   "chapter": "IV",
+   "area": "Shareholder meetings",
+   "title": "Provide the e-voting facility in compliance with the Companies (Management and Administration) Rules 2014",
+   "detail": "Those Rules are not held in reference/, so their requirements rest on the Act side rather than on a text held here.",
+   "quote": "The e -voting facility to be provided to shareholders in terms of sub -regulation (1), shall be provided in compliance with the conditions specified under the Companies (Management and Administration) Rules, 2014 , or amendments made thereto .",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-44-4",
+   "sourceRow": 79,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 44(4)",
+   "chapter": "IV",
+   "area": "Shareholder meetings",
+   "title": "Send proxy forms to holders of securities, stating that a holder may vote either for or against each resolution",
+   "detail": "The proviso disapplies this for a general meeting held only through electronic means.",
+   "quote": "The listed entity shall send proxy forms to holders of securities in all cases mentioning that a holder may vote either for or against each resolution 437[:] 438[Provided that the requirement to send proxy forms shall not be applicable to general meetings held only through electronic mode .]",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-46-1",
+   "sourceRow": 80,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 46(1)",
+   "chapter": "IV",
+   "area": "Website",
+   "title": "Maintain a functional website containing the basic information about the listed entity",
+   "detail": "Functional is the operative word. The contents required are in Reg 46(2), which the register already carries.",
+   "quote": "The listed entity shall maintain a functional website containing the basic information about the listed entity.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "LODR-SUP-REG-47-4",
+   "sourceRow": 81,
+   "law": "SEBI LODR 2015",
+   "regulation": "Reg 47(4)",
+   "chapter": "IV",
+   "area": "Newspaper publication",
+   "title": "Publish the Reg 47(1) information in at least one English national daily circulating in substantially the whole of India AND one daily in the language of the region of the registered office",
+   "detail": "Two publications, not one. The register carried the Reg 47(1) duty to publish and not the requirement about where.",
+   "quote": "The information at sub -regulation (1) shall be published in at least one English language national daily newspaper circulating in the whole or substantially the whole of India and in one daily newspaper published in the language of the region, where the registered office of the listed entity is situated:",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "listingType": [
+     "equity"
+    ]
+   },
+   "appliesToText": "Equity-listed",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
   }
  ]
 }

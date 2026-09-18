@@ -5108,6 +5108,117 @@ Nothing here verifies a rule: Rule Governance reads "Never checked" for all 441.
 
 ---
 
+## 4n. THE REST OF THE SUB-PROVISION PASS (v204)
+
+&sect;4m authored twenty of the ninety-four gaps and named the remaining
+seventy-four as *"none of those has been read yet, so which is which is unknown
+rather than zero."* All seventy-four read. **Forty-three authored, thirty-one
+excluded with a reason.** The LODR supplement goes 38 &rarr; 81 rules and the
+corpus 441 &rarr; 484.
+
+### Three obligations the corpus had no rule for under ANY citation
+Checked by searching every LODR rule's title and detail before authoring, not
+by trusting the gap list &mdash; three copies of one figure is how &sect;3n's
+penalties screen went five years stale.
+
+| | |
+|---|---|
+| **Reg 44(1)** | **remote e-voting for ALL shareholder resolutions.** The register carried Reg 44(3), submitting the voting RESULTS, and never the duty to provide the facility |
+| **Reg 25(10)** | **Directors and Officers insurance** for every independent director, top 1000 |
+| **Reg 33(1), 33(2)** | **preparation, approval and authentication of the financial results** &mdash; the register carried the submission deadlines under Reg 33(3) and nothing about how the results are made or approved |
+
+And **Reg 26(1)**, the ten-committee and five-chairmanship limit, existed only
+as **Reg 62O** &mdash; the HVDLE copy, which can never reach an equity issuer.
+The same shape as the audit committee in &sect;4m: the obligation was in the
+file, scoped to somebody else.
+
+### Reg 30(1) was absent, and my own earlier table said it was not
+The residual materiality duty &mdash; *"any events or information which, in the
+opinion of the board of directors, is material"* &mdash; is what catches an
+event Schedule III does not list. The register holds **25 rules citing Reg
+30(2)**, the deemed-material list, and none citing Reg 30(1).
+
+&sect;4m's first table reported Reg 30 as citing sub-provision (1). That was a
+**false match on `Reg 30 r/w Sch III Part A A(1) proviso`**, where the regex
+took the `(1)` of the Schedule item. &sect;2z's shape for the fourth time in
+this project: the list was right and the sentence counting it was not.
+
+### Quotes are EXTRACTED, not retyped
+Each rule's quote is pulled from the held compilation by the authoring script,
+so a paraphrase cannot creep into a field that must be verbatim &mdash;
+&sect;3z caught two quotes where mine had. **43 authored, 0 refused.**
+
+**One came out a stub and the length floor let it through.** Reg 6(2) reads
+*"The compliance officer of the listed entity shall be responsible for -"* and
+then the extraction prints **900 characters of footnotes** before the (a) to
+(d) limbs resume on the next page. The quote showed who is bound and not what
+the duty is, which is half of &sect;3x. Stitched across the footnote block and
+verified **limb by limb**, as &sect;3z does for the two quotes that span
+sub-clauses, and marked `quoteStitched` so it cannot pass as contiguous.
+
+The other eight short quotes were checked and are **complete sub-provisions**:
+Reg 21(1) genuinely is one sentence.
+
+### Reading the period without reading the subject, twice more
+- **Reg 40(5)'s sixty working days binds the TRANSFEROR**, who must serve a
+  prohibitory order within them. The entity's duty &mdash; not to register the
+  transfer &mdash; has no period at all. Claiming the sixty days would put a
+  deadline on the company that Reg 40(5) does not impose. &sect;3y's s.84 and
+  &sect;3z's Reg 30A, now a third and fourth time.
+- **Reg 25(8)** binds every independent director to submit the declaration.
+  The entity's duty is **Reg 25(9)**: to assess its veracity and take it on
+  record. Only Reg 25(9) is authored, and it names Reg 25(8) in its detail.
+
+### Thirty-one excluded, each with its reason recorded
+Applicability and interpretation (Reg 15(1), (1B), (1C), (2), (2A), (3), Reg
+16(1), 21(5), 23(5), 23(6), 24(7), 32(8), 33(5), 40(11), 43(3)); duties on
+somebody else (Reg 13(5) binds SEBI, Reg 31A(2) the stock exchange, Reg 30(11A)
+the promoter, director, KMP or senior management, Reg 26(2) every director);
+discretionary in terms (Reg 19(3), 27(1), 30(11) &mdash; though **Reg 30(11)'s
+proviso IS mandatory for the top 100 and top 250**, a rank not held here, so it
+is named rather than asserted); HVDLE-only (Reg 25(12)); and **Reg 23(8), which
+is spent** &mdash; it required existing material related party contracts to go
+to the first general meeting after these regulations were notified, in 2015.
+&sect;4j's treatment of the repealed Reg 7(1)(a): an obligation that no longer
+bites is not carried.
+
+### Chapter III binds a debt-only issuer, which may be an unlisted company
+Reg 6(2), 7(2) and 10(2) are scoped `equity, ncs, hvdle`, not equity alone.
+&sect;4b established that a **private company with listed NCDs** owes Chapter V
+and Chapter III and nothing under Chapter IV. Scoping these to equity would
+hide them from exactly the entity Chapter III exists for.
+
+### And a &sect;2j trap in my own assertions
+Two new assertions read `quote` **off the register row**. `getComplianceChart`
+copies only selected fields onto a row, and `quote` is not among them &mdash;
+so both read `undefined` and failed. That is the defect this project has
+recorded four times, committed inside the test written to catch it. They read
+the rule now.
+
+### Coverage
+Register **322 &rarr; 365** on an equity-listed company; **0** on public,
+private, OPC and LLP, each told all eighty-one do not apply with a reason.
+Suite **875 &rarr; 892**, mutations **226 &rarr; 231 caught, 0 missed, 0
+skipped**, smoke 105, backend 96. Gate **441 &rarr; 484 rules**, 442 citations,
+0 unresolved, 159 periods compared, 0 mismatches.
+
+### What this does and does not close
+**LODR Chapters III and IV are now read at sub-provision level.** That is the
+first time any law in this corpus has been.
+
+It does not touch: **Chapter V and V-A at sub-provision level** (the debt and
+HVDLE chapters, authored provision-level in &sect;4b); **the Companies Act,
+PIT and Depositories corpora**, which have had provision-level passes only and
+will carry the same class of gap; and **the Schedules**, where Schedule II
+Parts A to E are cited by these rules and carried as cross-references rather
+than as items.
+
+And the correctness read of the 85 generated LODR rules is still unfinished.
+Nothing here verifies a rule: Rule Governance reads "Never checked" for all
+484.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -5196,7 +5307,7 @@ Nothing here verifies a rule: Rule Governance reads "Never checked" for all 441.
   names the fix, because the only symptom of the drift was a mutation anchor
   that started matching twice (§4b).
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (875 assertions, run against `index.html` itself), `node tests/mutation.js` (226 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 441 rules across eight corpora; it reports how many periods it actually compared, currently 158, and self-checks its own period parser AND its provision locator before it reads a line of law), and `node tests/backend.test.js` (96 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (892 assertions, run against `index.html` itself), `node tests/mutation.js` (231 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 484 rules across eight corpora; it reports how many periods it actually compared, currently 158, and self-checks its own period parser AND its provision locator before it reads a line of law), and `node tests/backend.test.js` (96 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **`python tools/rule_audit.py` regenerates `rules/audit_findings.json` AND
   re-embeds it into `index.html` as `var LG_GATE`** — on every run, not behind
   a flag, so the reviewer's evidence cannot drift behind the gate that produced
@@ -5219,7 +5330,7 @@ Nothing here verifies a rule: Rule Governance reads "Never checked" for all 441.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v203.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v204.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/026` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

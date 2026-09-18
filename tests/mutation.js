@@ -1255,6 +1255,41 @@ const MUTATIONS = [
   { name: 'a committee rule stops naming the Reg 15(2) exemption (SS4m)',
     from: "\"title\":\"Constitute a Stakeholders Relationship Committee",
     to:   "\"appliesToText\":\"Equity-listed\",\"title\":\"Constitute a Stakeholders Relationship Committee" },
+  // -- SS4n: the rest of the sub-provision pass ----------------
+  // Remote e-voting for ALL shareholder resolutions goes missing again. The
+  // register carried the Reg 44(3) duty to submit voting RESULTS and never the
+  // duty to provide the facility at all.
+  { name: 'remote e-voting is not required at all (SS4n)',
+    from: "\"title\":\"Provide remote e-voting to shareholders in respect of ALL shareholder resolutions\"",
+    to:   "\"title\":\"Submit the voting results after the meeting\"" },
+
+  // Reg 25(10) states its own top-1000 limit. Losing it puts a Directors and
+  // Officers insurance obligation on every listed company on the book -- SS2z.
+  { name: 'D and O insurance reaches every listed company (SS4n r/w SS2z)',
+    from: "\"detail\":\"Top 1000 by market capitalisation. The quantum is the board decision",
+    to:   "\"appliesToText\":\"Equity-listed\",\"detail\":\"The quantum is the board decision" },
+
+  // SS3y's s.84 and SS3z's Reg 30A: read the period AND the subject. Reg 40(5)'s
+  // sixty working days binds the TRANSFEROR, who must serve a prohibitory order
+  // within them. Claiming it as the entity's deadline puts a duty on the
+  // company that Reg 40(5) does not impose.
+  { name: 'the transferor’s sixty working days becomes the entity’s deadline (SS4n)',
+    from: "The sixty working days in the proviso bind the TRANSFEROR",
+    to:   "The entity has sixty working days" },
+
+  // Reg 30(1) is the RESIDUAL materiality duty -- an event nobody listed is
+  // still disclosable if the board thinks it material. Collapsing it into the
+  // Schedule III list loses the only limb that catches the unlisted event.
+  { name: 'the board judgment of materiality collapses into Schedule III (SS4n)',
+    from: "\"quote\":\"Every listed entity shall make disclosures of any events or information",
+    to:   "\"quote\":\"Events specified in Para A of Part A of Schedule III are deemed material" },
+
+  // SS3x: a quote that cannot show the DUTY is not evidence of it. Reg 6(2)'s
+  // quote is stitched across a footnote block; stripping the limbs returns it
+  // to the stub that shows only who is bound.
+  { name: 'the compliance officer quote goes back to a bare lead-in (SS4n r/w SS3x)',
+    from: "ensuring conformity with the regulatory provisions applicable to the listed entity in letter and spirit",
+    to:   "doing the needful" },
 ];
 
 const src = fs.readFileSync(INDEX, 'utf8');
