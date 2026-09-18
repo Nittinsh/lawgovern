@@ -3495,6 +3495,123 @@ describe('dashboard invariants');
         Object.values(byLaw).reduce((a, b) => a + b, 0), s.totalObligations);
 }
 
+describe('a generated rule that stated the law wrongly');
+{
+  // LODR-REG-24-1 carried "incorporated in India" -- the wording footnote 239
+  // records as PRIOR to the 2018 Amendment Regulations (w.e.f. 1.4.2019). The
+  // current text reads "whether incorporated in India or not", so as written
+  // the rule told a listed entity with a material FOREIGN subsidiary that the
+  // independent-director duty did not reach it. SS3t: hiding an obligation is
+  // the one failure a CS cannot notice.
+  const T = app.LG_TEXT_PATCH || {};
+  const tids = Object.keys(T);
+  ok('the text patch table is not empty', tids.length > 0, 'nothing in LG_TEXT_PATCH');
+
+  // THE EVIDENCE BAR (SS4j, applied to text). A table that can rewrite a
+  // statement of law on somebody's say-so is worse than the error it mends.
+  tids.forEach(id => {
+    const e = T[id];
+    ok(id + ' carries the corrected wording', !!e.title && e.title.length > 20,
+       e.title || '(none)');
+    ok(id + ' quotes the provision it was corrected against',
+       !!e.from && e.from.length > 40, e.from || '(none)');
+    ok(id + ' says why the correction was needed', !!e.why && e.why.length > 40,
+       e.why || '(none)');
+  });
+
+  // Total, and tested against its CONTRACT rather than the data (SS3e): a
+  // partial entry must correct NOTHING, or the bar is decorative.
+  check('an unknown id is left alone',
+        app.lgTextPatch({ id: 'NOT-A-RULE', title: 'untouched' }).title, 'untouched');
+  // A REAL partial entry. The first version of this passed id 'X', which has
+  // no entry at all -- so it returned at "if(!e)" and never reached the
+  // evidence bar, and the mutation that removed the bar went MISSED. SS4j: the
+  // obvious repair would have produced a check that passes vacuously.
+  {
+    const T2 = app.LG_TEXT_PATCH;
+    T2['ZZ-PARTIAL-NO-FROM'] = { title: 'a corrected wording long enough to pass',
+                                 why: 'a reason long enough to pass the length floor' };
+    T2['ZZ-PARTIAL-NO-WHY']  = { title: 'a corrected wording long enough to pass',
+                                 from: 'a provision quote long enough to pass the floor' };
+    T2['ZZ-PARTIAL-NO-TITLE'] = { from: 'a provision quote long enough to pass',
+                                  why: 'a reason long enough to pass the length floor' };
+    ['ZZ-PARTIAL-NO-FROM', 'ZZ-PARTIAL-NO-WHY', 'ZZ-PARTIAL-NO-TITLE'].forEach(id => {
+      check(id + ' corrects nothing',
+            app.lgTextPatch({ id: id, title: 'untouched' }).title, 'untouched');
+      delete T2[id];
+    });
+  }
+
+  const patched = app.lgTextPatch({ id: 'LODR-REG-24-1', title: 'stale' });
+  ok('a full entry does correct the wording', patched.title !== 'stale',
+     'the patch did not apply');
+  ok('and carries the words it was corrected against', !!patched.textPatchedFrom,
+     'no authority travelled with the correction');
+
+  // It must reach the REGISTER...
+  const row = rowsFor(LISTED).find(r => /Reg 24\(1\)/.test(r.section || ''));
+  ok('Reg 24(1) is on a listed register', !!row, 'the row went missing');
+  ok('and the register no longer limits it to Indian subsidiaries',
+     !!row && /whether incorporated in India or not/i.test(row.obligation || ''),
+     row ? row.obligation : '(no row)');
+  ok('and does not carry the pre-2019 wording',
+     !!row && !/subsidiary incorporated in India\./i.test(row.obligation || ''),
+     row ? row.obligation : '(no row)');
+
+  // ...AND the screen built to review it. lgAllRules builds its own shape and
+  // does not go through lgPatchRule, so without its own call the reviewer reads
+  // the uncorrected wording in the very screen meant to catch it (SS3n).
+  const gr = (app.lgAllRules() || []).find(r => r.id === 'LODR-REG-24-1');
+  ok('the review list carries the corrected rule', !!gr, 'not in lgAllRules');
+  ok('the reviewer is shown the corrected wording',
+     !!gr && /whether incorporated in India or not/i.test(gr.title || ''),
+     gr ? gr.title : '(missing)');
+
+  // Tested through the ASSEMBLY, not the leaf. SS4g: every new assertion called
+  // govGateBlock directly, so deleting it from the modal changed nothing.
+  const modal = app.govEvidenceBlock ? app.govEvidenceBlock(gr) : '';
+  ok('and the modal says it was corrected, and against what',
+     modal.indexOf('Corrected against') >= 0 && modal.indexOf('1.4.2019') >= 0,
+     'the correction reached no screen');
+}
+
+describe('the year count and the register it opens');
+{
+  // The selector offered "2026-27 (82)" and choosing it showed 254 rows. The
+  // difference is every continuous obligation: lgApplyFyFilter KEEPS a row with
+  // no period end (SS3k, deliberately), while lgFyList SKIPS those same rows
+  // when it counts. The filter is right; the number beside it was not.
+  const all = app.getComplianceChart(LISTED, { allYears: true });
+  const continuous = all.filter(r => !r.periodEnd).length;
+  ok('a listed register does hold continuous obligations', continuous > 0,
+     'no continuous rows, so this cannot be exercised');
+
+  check('lgFyContinuous counts exactly those rows',
+        app.lgFyContinuous([LISTED]), continuous);
+  check('and no entities means none of them', app.lgFyContinuous([]), 0);
+  check('and a bad argument does not throw', app.lgFyContinuous(null), 0);
+
+  // The gap the label has to account for, asserted as a RELATION so it cannot
+  // drift: year rows + continuous == what choosing that year shows.
+  // AND THE LABEL THE READER ACTUALLY SEES. The first version of this block
+  // asserted lgFyContinuous and the arithmetic and nothing else, so reverting
+  // the option to a bare "(82)" went MISSED -- SS3n, a value computed
+  // correctly that reaches no screen, for the fourth time in this project.
+  const lbl = app.lgFyLabel('2026-27', 82);
+  ok('the year label carries its number', lbl.indexOf('82') >= 0, lbl);
+  ok('and says what that number counts, so it cannot read as the row count',
+     /dated to it|of this year|belong/i.test(lbl), lbl);
+
+  const years = app.lgFyList(LISTED);
+  ok('the selector offers at least one year', years.length > 0, 'no years offered');
+  years.forEach(y => {
+    const shown = all.filter(r => !r.periodEnd ||
+      app.lgFyOfPeriod(r.periodEnd, 3, 31) === y.fy).length;
+    check('choosing ' + y.fy + ' shows its rows plus every continuous one',
+          y.n + continuous, shown);
+  });
+}
+
 // The access-check assertions are async — they drive a stubbed database through
 // a promise. Everything above is synchronous, so the report has to wait for
 // them or it would print before they had run.

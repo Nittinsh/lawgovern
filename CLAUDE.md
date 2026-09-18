@@ -4739,6 +4739,147 @@ allowed to drop something they do.
 
 ---
 
+## 4k. A RULE THAT STATED THE LAW AS IT STOOD IN 2018 (v201)
+
+The owner, on the two-week status: *"i dont have time to do this because i have
+caught up with other work also..so i have you test this"*. So the reading is
+mine and the signature stays theirs -- `govSave` still refuses a verification
+with no instrument named, and a CS carries professional responsibility for it.
+
+Scoped first, because the size of the job was the whole argument. Of 421 rules
+**240 reach an equity-listed company**; 65 of those are hand-authored here and
+already carry the words they were read from (&sect;3x). **175 come from the
+owner's spreadsheet and nobody has ever read them against a text.**
+
+And they are not equally checkable. LODR is amended to **14 July 2026** and PIT
+to **12 March 2025**; the Act text is **01.04.2021**. So 126 can be checked
+properly and **49 can only be matched against a five-year-old Act**, where a
+tick proves much less. Stated before starting rather than discovered at the end.
+
+### Eight rules in, one was quoting law repealed seven years ago
+`LODR-REG-24-1` read *"...on the board of each unlisted material subsidiary
+**incorporated in India**"*. Reg 24(1) was substituted by the 2018 Amendment
+Regulations **w.e.f. 1.4.2019** and now reads *"...of an unlisted material
+subsidiary, **whether incorporated in India or not**"* -- and footnote 239
+quotes the rule's own wording as the text **prior to** that substitution.
+Checked before claiming it, because &sect;3e's footnote trap has cost this
+project three sections; here the footnote proved the corpus wrong rather than
+the reading.
+
+The direction is the dangerous one. A listed client with a material **foreign**
+subsidiary was being told the independent-director duty did not reach it.
+&sect;3t: **hiding an obligation is the one failure a CS cannot notice**, because
+a missing row looks like nothing at all.
+
+`lodr_periodic.json` is generated and must not be hand-edited (&sect;2k), so
+`LG_TEXT_PATCH` sits beside `LG_DUE_PATCH` and `LG_SCOPE_PATCH` -- a date, a
+class and now a wording, each carrying the provision it was corrected against.
+
+**The evidence bar is structural, not promised.** An entry missing the
+corrected wording, the provision or the reason is **ignored and the rule keeps
+its original text** -- &sect;4j's rule, applied to text. A table that can rewrite
+a statement of law on somebody's say-so is worse than the error it mends.
+
+**Deliberately NOT corrected:** the regulation says *"an"* unlisted material
+subsidiary and the rule says *"each"*. Whether one independent director covers
+every material subsidiary is a reading this app does not settle, so the
+stricter *"each"* is kept -- the safe direction -- and the question is named in
+the patch's own `why`. &sect;3j: reported, not silently repaired.
+
+### The review screen builds its own list and never patched
+`lgAllRules` does not go through `lgPatchRule`. So the correction reached the
+register and **the reviewer would have signed off the uncorrected wording in the
+very screen built to catch it** -- &sect;3n exactly. It patches now, and
+`govClaimBlock` prints *"Corrected against..."* with the instrument and date,
+because a rule the app silently rewrote is not one anybody should certify.
+
+### ELEVEN PROVISIONS THE AUDIT COULD NOT READ AT ALL
+Not on the owner's list, and the read would have been blind without it.
+
+The SEBI heading pattern required a sub-regulation marker -- `10. (1)`. A
+regulation written as a **single paragraph** (`11. The listed entity shall
+ensure...`) matched nothing, and **Reg 43A prints as `43A (1)` with no full
+stop**. Reg 5, 8, 9, 11, 12, 14, 17A, 38, 43A, 48 and 55 were all invisible.
+
+A provision that cannot be located reads as *"nothing to check"* -- &sect;3v's
+defect, where this audit compared six of 327 rules and reported *"period
+mismatch: 0"*. **Reg 55 is also the cadence &sect;4h could not read**, reported
+then as `noctx`; this is why.
+
+**Two guards, both earned by a measured regression rather than reasoned about:**
+- making the full stop optional let a **cross-reference** (`regulation 17 (1)`)
+  claim a heading;
+- the extraction prints a running header `<<<PAGE 27>>> 27`, so a **page number**
+  followed by a list item `(1)` impersonated one. **Reg 27 and Reg 57 both
+  pointed at the wrong text** before the guard went in. &sect;3f again -- the
+  text contains numbers that are real, current, and about something else.
+
+Verified before writing: **116 -> 142 provisions located, zero existing spans
+moved, zero lost.** Gate periods compared **155 -> 158**, mismatches 0.
+
+`LOCATOR_MUST_RESOLVE` / `LOCATOR_MUST_NOT_MOVE` give it the self-check the
+period parser got in &sect;4h, for the same reason: `mutation.js` mutates
+`index.html` and cannot reach `tools/rule_audit.py` at all. Both directions are
+pinned, because &sect;3w is explicit that fixing one shape and breaking the other
+"looked like progress". Watched failing before being trusted (&sect;3c): exit 2,
+naming Reg 43A.
+
+### The year selector disagreed with its own screen by 172 rows
+```
+the selector offered        2026-27 (82)
+choosing it actually showed 254 rows
+```
+`lgApplyFyFilter` **keeps** a row with no period end, deliberately -- hiding
+"maintain the registered office" behind a year filter would let choosing a year
+silently switch off a duty that never stops applying (&sect;3k). `lgFyList`
+**skips** those same rows when it builds the label, because `lgFyOfPeriod(null)`
+is falsy. **Two functions written to two different rules**, in the section that
+built the feature.
+
+The filter is correct. The number beside it broke the standing constraint that
+every number be traceable to an underlying record -- this one traced to a
+different record set from the screen it opened.
+
+Kept at 82 on the owner's call, and made to say what it counts: `2026-27 (82
+dated to it)` with `+ 172 continuous, shown in every year` beside it. Raising it
+to 254 would have made every year read alike and lost the signal that 2026-27
+carries more dated work than 2025-26.
+
+### Three blind spots in my own new tests, all found by the runner
+- **A mutation that was a no-op.** `out.textPatchedFrom = ''` was inserted
+  directly above `out.textPatchedFrom = e.from;`, which overwrote it on the next
+  line. &sect;3r's shape exactly. Re-anchored onto the assignment itself.
+- **An assertion that passed vacuously.** The evidence-bar test called
+  `lgTextPatch` with an id that has **no entry at all**, so it returned at
+  `if(!e)` and never reached the bar -- it passed whether the bar existed or
+  not. &sect;4j warned about this precise repair and I made it anyway. Three real
+  partial entries are now injected and removed (&sect;3e: when the data cannot
+  exercise a guard, test the guard's contract).
+- **The label reached no assertion.** I asserted `lgFyContinuous` and the
+  arithmetic relation and never what the reader sees, so reverting the option to
+  a bare `(82)` went MISSED. &sect;3n/&sect;2j, **fourth time in this project**.
+  `lgFyLabel` is a pure function now, because a label the suite cannot call is
+  one nothing can test (&sect;2y).
+
+### And a reading of my own tooling that was an artifact
+One mutation run reported **212 caught, 9 missed**. It was launched in the
+background and I kept editing `index.html` while it read the repo. A suite run
+against files being written underneath it measures nothing. Re-run clean:
+**221 caught, 0 missed, 0 skipped.** Worth keeping as a rule -- *never run the
+mutation suite concurrently with an edit to the files it reads.*
+
+### Coverage
+Smoke **105**, suite **827 -> 852**, mutations **214 -> 221 caught, 0 missed, 0
+skipped**, backend **96**. Gate: 421 rules, 379 citations, **158 periods
+compared (38%), 0 mismatches**.
+
+### What this does NOT do
+**It verifies nothing.** Rule Governance still reads "Never checked" for all
+421. Eight of the 126 readable rules have been read; 118 remain. What changed is
+that one of them was stating repealed law on a live register, and no longer is.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -4827,7 +4968,7 @@ allowed to drop something they do.
   names the fix, because the only symptom of the drift was a mutation anchor
   that started matching twice (§4b).
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (827 assertions, run against `index.html` itself), `node tests/mutation.js` (214 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 421 rules across eight corpora; it reports how many periods it actually compared, currently 155, and self-checks its own period parser before it reads a line of law), and `node tests/backend.test.js` (96 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (852 assertions, run against `index.html` itself), `node tests/mutation.js` (221 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 421 rules across eight corpora; it reports how many periods it actually compared, currently 158, and self-checks its own period parser AND its provision locator before it reads a line of law), and `node tests/backend.test.js` (96 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **`python tools/rule_audit.py` regenerates `rules/audit_findings.json` AND
   re-embeds it into `index.html` as `var LG_GATE`** — on every run, not behind
   a flag, so the reviewer's evidence cannot drift behind the gate that produced
@@ -4850,7 +4991,7 @@ allowed to drop something they do.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v200.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v201.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/026` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

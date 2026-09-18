@@ -307,12 +307,32 @@ def provision_spans(text, law):
         return _SPANS[key]
     a, b = body_start(text, law), body_end(text, law)
     body = text[a:b]
-    pats = ([r'(?<![\d.])(\d{1,3}[A-Z]{0,2})\s*\.\s*(?:\d{1,4}\[)?\(1\)']
+    # The full stop is OPTIONAL because Reg 43A prints as "43A (1)". That
+    # relaxation lets a cross-reference ("regulation 17 (1)") claim a heading,
+    # so the words that introduce one are excluded by lookbehind.
+    #
+    # The second pattern is for a regulation written as a SINGLE paragraph with
+    # no sub-regulation marker -- "11. The listed entity shall ensure..." --
+    # which the first pattern cannot see. Eleven LODR provisions are of that
+    # shape, including Reg 55, whose cadence SS4h could not read.
+    pats = ([r'(?<![\d.])(?<!regulation )(?<!regulations )(?<!sub-regulation )'
+             r'(?<!Regulation )(?<!Regulations )'
+             r'(\d{1,3}[A-Z]{0,2})\s*\.?\s*(?:\d{1,4}\[)?\(1\)',
+             r'(?<![\d.])(\d{1,3}[A-Z]{0,2})\s*\.\s*(?:\d{1,4}\[)?'
+             r'(?:The|Every|No|A|An|In|Where|Notwithstanding|All|Each|Any|On'
+             r'|If|Upon|Subject)\b']
             if law != CA_STALE else
             [r'(?:^|\s|\[)(\d{1,3}[A-Z]{0,2})\s*\.\s*[A-Z]'])
     first = {}
     for pat in pats:
         for m in re.finditer(pat, body):
+            # This extraction prints a running header, "<<<PAGE 27>>> 27", so a
+            # PAGE NUMBER followed by a list item "(1)" looks exactly like a
+            # heading once the full stop is optional. Reg 27 and Reg 57 both
+            # regressed this way. SS3f -- the text contains numbers that are
+            # real, current, and about something else.
+            if '>>>' in body[max(0, m.start() - 16):m.start()]:
+                continue
             p = m.group(1).upper()
             if p not in first:
                 first[p] = m.start()
@@ -416,6 +436,58 @@ for law, (path, asof) in SOURCES.items():
         print('%-28s %s  (%d KB)' % (law, asof, len(texts[law]) // 1024))
     except Exception as e:
         print('%-28s COULD NOT READ: %s' % (law, e))
+
+# ── the locator checks itself too ──────────────────────────────
+# A provision that cannot be located reads as "nothing to check", which is how
+# this audit compared SIX of 327 rules while reporting "period mismatch: 0"
+# (SS3v). Eleven LODR provisions written as a single paragraph were invisible
+# until v201, including Reg 55, whose cadence SS4h could not read.
+#
+# Both directions, because SS3w: fixing one shape and breaking the other looks
+# like progress.
+LOCATOR_MUST_RESOLVE = {
+    'SEBI LODR 2015': ['5', '8', '9', '11', '12', '14', '17A', '38', '43A',
+                       '48', '55',
+                       # and the ones that always worked, so the relaxation
+                       # cannot quietly cost us a provision it used to find.
+                       '17', '23', '24', '30', '33', '47', '52', '62C'],
+}
+# A page header prints as "<<<PAGE 27>>> 27 (1) a firm of auditors...", and a
+# cross-reference as "regulation 17 (1)". Neither is a heading. Both DID claim
+# one before the guards went in: Reg 27 and Reg 57 regressed exactly this way.
+LOCATOR_MUST_NOT_MOVE = {
+    'SEBI LODR 2015': ['27', '57'],
+}
+
+_locbad = []
+for _law, _want in LOCATOR_MUST_RESOLVE.items():
+    _t = texts.get(_law)
+    if not _t:
+        continue
+    _spans = provision_spans(_t, _law)
+    for _p in _want:
+        if _p not in _spans:
+            _locbad.append((_law, _p, 'not located'))
+for _law, _want in LOCATOR_MUST_NOT_MOVE.items():
+    _t = texts.get(_law)
+    if not _t:
+        continue
+    _spans = provision_spans(_t, _law)
+    for _p in _want:
+        _hit = _spans.get(_p)
+        if not _hit:
+            _locbad.append((_law, _p, 'not located'))
+            continue
+        _head = _t[_hit[0]:_hit[0] + 90]
+        if '>>>' in _t[max(0, _hit[0] - 16):_hit[0]]:
+            _locbad.append((_law, _p, 'a page header claimed it: ' + _head[:60]))
+
+if _locbad:
+    print('LOCATOR SELF-CHECK FAILED — the audit cannot be trusted this run.')
+    for _law, _p, _why in _locbad:
+        print('   %-30s %-6s %s' % (_law, _p, _why))
+    print('\nEvery provision above is one a rule in the corpus cites.')
+    sys.exit(2)
 
 print()
 present = {law: (sections_present(t) if law == CA_STALE else regs_present(t))

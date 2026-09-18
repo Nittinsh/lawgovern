@@ -1186,6 +1186,43 @@ const MUTATIONS = [
   { name: 'a repeal stops quoting what the provision used to say (SS4j r/w SS3t)',
     from: "    was: 'Every promoter, member of the promoter group, key managerial personnel ' +",
     to:   "    wasNotRecorded: 'Every promoter, member of the promoter group, key managerial personnel ' +" },
+  // -- SS4k: a generated rule that stated the law wrongly ------
+  // The pre-2019 wording comes back: a listed entity with a material FOREIGN
+  // subsidiary is told the independent-director duty does not reach it.
+  // SS3t -- hiding an obligation is the branch a CS cannot notice.
+  { name: 'the corrected wording stops reaching the register (SS4k)',
+    from: "  rule = lgTextPatch(rule);",
+    to:   "  // no text patch" },
+
+  { name: 'the correction is applied but keeps no authority (SS4k)',
+    from: "  out.textPatchedFrom = e.from;",
+    to:   "  out.textPatchedFrom = '';" },
+
+  // THE EVIDENCE BAR. Without it this table rewrites law on somebody's say-so.
+  { name: 'a text patch with no provision behind it corrects anyway (SS4k)',
+    from: "if(!e.title || !e.from || !e.why) return rule;",
+    to:   "if(!e.title) return rule;" },
+
+  // SS3n: a correction that reaches the register and NOT the screen built to
+  // review it is a value computed correctly that reaches no screen.
+  { name: 'the reviewer is shown the uncorrected wording (SS4k r/w SS3n)',
+    from: "        r.textPatchedFrom = tp.textPatchedFrom;",
+    to:   "        r.textPatchedFrom = null;" },
+
+  { name: 'the modal stops saying the rule was corrected (SS4k r/w SS3n)',
+    from: "  if(rule.textPatchedFrom){",
+    to:   "  if(false){" },
+
+  // -- SS4k: the year count that disagreed with its own screen -
+  // The selector said 82 and the register then showed 254. The filter is
+  // correct; the number beside it counted a different population.
+  { name: 'continuous obligations stop being counted for the year note (SS4k)',
+    from: "        if(!r.periodEnd) n++;",
+    to:   "        if(false) n++;" },
+
+  { name: 'the year option stops saying what its number counts (SS4k r/w SS3k)',
+    from: "  return String(fy) + ' (' + n + ' dated to it)';",
+    to:   "  return String(fy) + ' (' + n + ')';" },
 ];
 
 const src = fs.readFileSync(INDEX, 'utf8');
