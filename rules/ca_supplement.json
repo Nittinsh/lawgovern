@@ -399,6 +399,231 @@
    "submitTo": "Members, directors and auditors",
    "signedBy": "CS or a director",
    "notes": "Counted backwards from a meeting the company fixes, so no date is computed -- the register holds no planned meeting date. The period runs BACKWARD from the meeting, so treating clear days as calendar days would produce a LATER last date than the Act allows (SS3z)."
+  },
+  {
+   "id": "CA-SUP-SEC-100-6",
+   "sourceRow": 13,
+   "law": "Companies Act 2013",
+   "regulation": "Section 100(6)",
+   "area": "General meetings",
+   "title": "Reimburse the requisitionists the reasonable expenses of a meeting the Board failed to call, and recover the sum from the defaulting directors fee",
+   "detail": "Arises only where the Board did not act on a valid requisition under s.100(4). The Act requires the company to reimburse AND to deduct the sum from the fee or other remuneration payable to the directors who defaulted.",
+   "quote": "Any reasonable expenses incurred by the requisitionists in call ing a meeting under sub -section ( 4) shall be reimbursed to the requisitionists by the company and the sums so paid shall be deducted from any fee or other remuneration under section 197 payable to such of the directors who were in default in calling the me eting. 101. Notice of meeting.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed"
+    ]
+   },
+   "appliesToText": "Every company other than a One Person Company, which holds no general meeting, where a requisitioned meeting was called by the requisitionists themselves",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-124-2",
+   "sourceRow": 14,
+   "law": "Companies Act 2013",
+   "regulation": "Section 124(2)",
+   "area": "Dividend",
+   "title": "Within ninety days of transferring an amount to the Unpaid Dividend Account, prepare a statement of the names, last known addresses and unpaid dividend of each person, and place it on the company website",
+   "detail": "The ninety days runs from the transfer to the Unpaid Dividend Account, which itself is due within seven days after the thirty days in s.124(1). This app does not record the dividend declaration, so the date cannot be computed - the period is certain and the anchor is not held.",
+   "quote": "The company shall, within a period of ninety days of making any transfer of an amount under sub - section ( 1) to the Unpaid Dividend Account, prepare a statement containing the names, their last known addresses and the unpaid dividend to be paid to each person and place it on the website of the company, if any, and also on any other website approved by the Central Government for this purpose, in such form, manner and other particulars as may be prescribed.",
+   "frequency": "On a transfer to the Unpaid Dividend Account",
+   "timelineText": "Within ninety days of the transfer",
+   "due": {
+    "type": "at_trigger",
+    "when": "An amount is transferred to the Unpaid Dividend Account"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company that has transferred an amount to the Unpaid Dividend Account",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-124-3",
+   "sourceRow": 15,
+   "law": "Companies Act 2013",
+   "regulation": "Section 124(3)",
+   "area": "Dividend",
+   "title": "Pay interest at twelve per cent per annum on any amount not transferred to the Unpaid Dividend Account, from the date of default, for the benefit of the members in proportion to the amount remaining unpaid",
+   "detail": "The interest runs to the MEMBERS, not to the Government. It accrues from the date of default, so it is a growing liability rather than a fixed penalty.",
+   "quote": "If an y default is made in transferring the total amount referred to in sub -section ( 1) or any part thereof to the Unpaid Dividend Account of the company, it shall pay, from the date of such default, interest on so much of the amount as has not been transferred to the said account, at the rate of twelve per cent.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company that has defaulted in transferring to the Unpaid Dividend Account",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-124-5",
+   "sourceRow": 16,
+   "law": "Companies Act 2013",
+   "regulation": "Section 124(5)",
+   "area": "IEPF",
+   "title": "Transfer to the Investor Education and Protection Fund any money in the Unpaid Dividend Account that remains unpaid or unclaimed for seven years from the date of transfer, together with interest accrued, and send a statement of the details",
+   "detail": "Seven years from the transfer to the Unpaid Dividend Account, not from the declaration. A retention-then-transfer duty with a very long clock, which is exactly why it is missed - the person who declared the dividend has usually left by the time it falls.",
+   "quote": "Any money transferred to the Unpaid Dividend Account of a company in pursuance of this secti on which remains unpaid or unclaimed for a period of seven years from the date of such transfer shall be transferred by the company along with interest accrued, if any, thereon to the Fund established under sub-section ( 1) of section 125 and the co mpany shall send a statement in the prescribed form of the details of such transfer to the authority which administers the said Fund and that authority shall issue a receipt to",
+   "frequency": "On the seventh anniversary of each transfer",
+   "timelineText": "Seven years from the date of transfer to the Unpaid Dividend Account",
+   "due": {
+    "type": "at_trigger",
+    "when": "Money has been in the Unpaid Dividend Account for seven years"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company holding money in an Unpaid Dividend Account",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-124-6",
+   "sourceRow": 17,
+   "law": "Companies Act 2013",
+   "regulation": "Section 124(6)",
+   "area": "IEPF",
+   "title": "Transfer to the Investor Education and Protection Fund all SHARES on which dividend has not been paid or claimed for seven consecutive years, with a statement of the details",
+   "detail": "The SHARES themselves, not only the dividend. Seven CONSECUTIVE years of unpaid or unclaimed dividend, so a single year of payment resets the count. The shareholder may claim the shares back from the Fund.",
+   "quote": "All shares in respect of which1[dividend has not been paid or claimed for seven consecutive years or more shall be] transferred by the company in the name of Investor Education and Protection Fund along with a statement containing such details as may be prescribed: Provided that any claim ant of shares transferred above shall be entitled to claim the transfer of shares from Investor Education and Protection Fund in accordance with such procedure and on submission of such documents as may be prescribed.",
+   "frequency": "On seven consecutive years of unclaimed dividend",
+   "timelineText": "Seven consecutive years",
+   "due": {
+    "type": "at_trigger",
+    "when": "Dividend on a share is unpaid or unclaimed for seven consecutive years"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company with shares carrying dividend unpaid or unclaimed for seven consecutive years",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-129-2",
+   "sourceRow": 18,
+   "law": "Companies Act 2013",
+   "regulation": "Section 129(2)",
+   "area": "Financial statements",
+   "title": "The Board of Directors shall lay the financial statements for the financial year before every annual general meeting",
+   "detail": "The duty to LAY them, as distinct from preparing them under s.129(1) or filing them under s.137. An OPC has no AGM, so this does not reach one.",
+   "quote": "At every a nnual general meeting of a company, the Board of Directors of the company shall lay before such meeting financial statements for the financial year.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed"
+    ]
+   },
+   "appliesToText": "Every company other than a One Person Company, which holds no annual general meeting",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-129-5",
+   "sourceRow": 19,
+   "law": "Companies Act 2013",
+   "regulation": "Section 129(5)",
+   "area": "Financial statements",
+   "title": "Where the financial statements do not comply with the accounting standards, disclose in them the deviation, the reasons for it, and its financial effects",
+   "detail": "Not a permission to deviate - a requirement to disclose the deviation, the reasons AND the financial effects if it happens. All three.",
+   "quote": "Without prejudice to sub -section ( 1), where the financial statements of a company do not comply with the accounting standards referred to in sub -section ( 1), the company shall disclose in its financial statements, the deviation f rom the accounting standards, the reasons for such deviation and the financial effects, if any, arising out of such deviation.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company whose financial statements deviate from the accounting standards",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
   }
  ]
 }

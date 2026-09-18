@@ -5219,6 +5219,161 @@ Nothing here verifies a rule: Rule Governance reads "Never checked" for all
 
 ---
 
+## 4o. THE ACT, PIT, AND SCHEDULE II (v205)
+
+The owner set the scope: *"do only these Companies Act, PIT and the Schedules
+... ignore LODR Chapters V and V-A (debt, HVDLE) and Depositories corpora as my
+focus is only on equity only."* Debt and Depositories untouched.
+
+**Ten rules authored, 78 Schedule II items carried, and one finding about the
+reference text itself that is worth more than any of them.**
+
+### THE HELD COMPANIES ACT IS MISSING AN AMENDMENT BEFORE ITS OWN STATED DATE
+This file has said since &sect;2c that the Act text is *"as amended upto
+01.04.2021 &mdash; over five years stale"*. It is worse than stale.
+
+**s.92(3) in the held text still reads *"An extract of the annual return ...
+shall form part of the Board's report."*** That wording was substituted
+**w.e.f. 28 August 2020** &mdash; the MGT-9 extract replaced by the web link of
+the annual return &mdash; which is **sixteen months before the date the text
+claims**. The current wording appears nowhere in the file: zero occurrences.
+
+Calibrated rather than assumed, against seven known pre-2021 amendments:
+
+| | commenced | in the held text |
+|---|---|---|
+| s.92(3) web-link of the annual return | 28.08.2020 | **NO** |
+| s.137(3) penalty of ten thousand rupees | 21.12.2020 | yes |
+| s.135(6) Unspent CSR Account | 22.01.2021 | yes |
+| s.135(5) three preceding financial years | 22.01.2021 | yes |
+| s.149(1) woman director | 01.04.2014 | yes |
+| s.403 one hundred rupees per day | 07.05.2018 | yes |
+| s.184(1) first Board meeting each FY | 01.04.2014 | yes |
+
+**One of seven.** And my first run said two of seven, because I searched for
+*"first meeting of the Board of Directors"* where the Act says *"first meeting
+of the Board"*. &sect;3t &mdash; asserting a value I had not read &mdash; caught
+by reading it.
+
+**Confirmed independently, from inside the app.** `CHK_DIRREP` item (a) already
+reads *"The web address, if any, where the annual return under s.92(3) has been
+placed"*. The owner's own checklist carries the current wording while the
+reference text carries the repealed one. There is now an assertion that it
+keeps doing so.
+
+**So s.92(3) is deliberately NOT authored.** A rule from that text would put the
+abolished MGT-9 extract on a live register &mdash; the Reg 24(1) defect of
+&sect;4k, self-inflicted. There is an assertion refusing any rule cited to it.
+
+### The gap counts were wrong twice more before they were right
+| | CA | PIT |
+|---|---|---|
+| first pass | 47 | 15 |
+| after excluding s.2, the definitions section | 39 | 15 |
+| **after excluding sections cited BARE** | **24** | **3** |
+
+Two parser corrections, both &sect;2z's shape:
+- **A citation can name several sub-provisions.** `Section 100(2), (4)` cites
+  both, and the parser took only `(2)` &mdash; so s.100(4), authored in
+  &sect;3y, read as missing.
+- **A section can be cited BOTH bare and with sub-numbers.** Rules cite
+  `Section 92` *and* `Section 92(2)`. The parser saw the sub-citation and
+  reported every other sub-section as a gap, including s.101(2) to (4) and
+  s.177(2) to (10), which bare summary rules carry.
+
+### Ten authored; what the Act pass actually found
+**The IEPF transfers were absent.** The register carried s.124(1) &mdash; move
+unpaid dividend to the Unpaid Dividend Account &mdash; and neither of the two
+transfers that follow:
+
+- **s.124(5)** &mdash; money unpaid or unclaimed for **seven years** goes to the
+  Fund under s.125, with interest and a statement. (The Act does not use the
+  words "Investor Education and Protection Fund" here; it says *"the Fund
+  established under sub-section (1) of section 125"*. My first assertion
+  required the full name and failed against a correct rule.)
+- **s.124(6)** &mdash; **the SHARES themselves**, where dividend is unpaid or
+  unclaimed for **seven consecutive years**. Not the dividend: the holding. A
+  single year of payment resets the count.
+
+Also s.100(6) (reimburse requisitionists and recover from the defaulting
+directors' fee), s.124(2) (statement within ninety days, on the website),
+s.124(3) (interest at twelve per cent to the MEMBERS, not the Government),
+s.129(2) (lay the financial statements before every AGM) and s.129(5) (disclose
+a deviation from the accounting standards, its reasons AND its financial
+effects).
+
+**PIT: Reg 6(1), 6(2), 6(3)** &mdash; the form and content of every Chapter III
+disclosure. Reg 6(2) brings in **immediate relatives and anyone for whom the
+discloser takes trading decisions**; Reg 6(3) brings in **derivatives at traded
+value**. A company collecting only an insider's own cash trades is collecting an
+incomplete disclosure.
+
+### s.100(6) reached a One Person Company, and a year-old assertion caught it
+&sect;3y recorded that *"s.100 is correctly absent for an OPC, which holds no
+general meeting"*. I authored the reimbursement limb against every company
+class. The assertion written then failed immediately. s.129(2) was scoped
+correctly from the start for the same reason &mdash; no AGM, no duty to lay
+accounts before one.
+
+### A CITATION STRING IS NOT UNIQUE ACROSS LAWS
+Two assertions in this suite filtered `lgExcludedFor` by comparing a row's
+section text to a corpus's regulation strings. **PIT Reg 6(2) and LODR Reg 6(2)
+are different obligations sharing one string**, so each count pulled in the
+other law's rows &mdash; 81 became 84, and 15 became 17. Both now match on the
+law as well, and an assertion records that the collision exists so the shortcut
+cannot come back.
+
+### Schedule II Parts A to D, carried as items
+The register cited them as cross-references &mdash; *"as specified in Part C of
+Schedule II"* &mdash; and **the items themselves were on no screen at all**.
+
+**78 items: Part A 15, Part B 4, Part C 38, Part D 21.** They live in the
+**Checklists** panel, not the register, because &sect;2z built that panel for
+exactly this: clause-level content worked through rather than filed on a date,
+where s.134(3)(a)-(q) and s.143(3)(a)-(j) already sit. Eighteen dated rows would
+not have been improved by burying them under seventy-eight undated ones
+(&sect;3o).
+
+**Part E is NOT carried.** Reg 27(1) says the entity *"may, at its discretion"*
+comply with it. A discretionary Part listed as a checklist of duties asserts
+something the regulation does not &mdash; the same reason Reg 27(1) itself was
+excluded in &sect;4n. There is a mutation that carries it and an assertion that
+catches that.
+
+Each Part is split by its own numbering &mdash; Part A and B by capital letter,
+C and D by bracketed number &mdash; rather than one guessed shape (&sect;3q).
+Every item is `held:true` because Schedule II **is** in the held compilation,
+and `only:'listed'` because it binds a listed entity.
+
+The extraction's split words ("a nd", "th e") are repaired **from an explicit
+list**, not by a general rule that would merge real words. That is the opposite
+call from &sect;4g, which leaves a rule's verbatim `quote` broken so a reviewer
+sees the text they are collating against; a checklist item is read, not
+collated.
+
+### Coverage
+Register **365 &rarr; 375** listed, **63 &rarr; 70** public and private,
+**61 &rarr; 66** OPC, LLP unchanged at 3. Suite **892 &rarr; 921**, mutations
+**231 &rarr; 236 caught, 0 missed, 0 skipped**, smoke 105, backend 96. Gate
+**484 &rarr; 494 rules**, 452 citations, 0 unresolved, 159 periods compared, 0
+mismatches. Checklist tabs **5 &rarr; 9**.
+
+### What is still not read
+- **34 Companies Act sections cited BARE** &mdash; one summary rule each for
+  s.134, s.149, s.173/174/118, s.177/178 and thirty more. A single rule titled
+  "Board's Report and statutory disclosures" does not carry s.134(3)'s
+  seventeen clauses. This is the largest remaining gap in the corpus and it is
+  **unmeasured**.
+- **LODR Chapters V and V-A, and the Depositories corpus** &mdash; excluded by
+  the owner, equity-only focus.
+- **Schedule III, IV, V and VI** &mdash; Schedule III Part A is carried as 125
+  event rules; the others are not read.
+- The correctness read of the 85 generated LODR rules.
+
+Nothing here verifies a rule. Rule Governance reads "Never checked" for all 494.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -5307,7 +5462,7 @@ Nothing here verifies a rule: Rule Governance reads "Never checked" for all
   names the fix, because the only symptom of the drift was a mutation anchor
   that started matching twice (§4b).
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (892 assertions, run against `index.html` itself), `node tests/mutation.js` (231 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 484 rules across eight corpora; it reports how many periods it actually compared, currently 158, and self-checks its own period parser AND its provision locator before it reads a line of law), and `node tests/backend.test.js` (96 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (921 assertions, run against `index.html` itself), `node tests/mutation.js` (236 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 494 rules across eight corpora; it reports how many periods it actually compared, currently 158, and self-checks its own period parser AND its provision locator before it reads a line of law), and `node tests/backend.test.js` (96 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **`python tools/rule_audit.py` regenerates `rules/audit_findings.json` AND
   re-embeds it into `index.html` as `var LG_GATE`** — on every run, not behind
   a flag, so the reviewer's evidence cannot drift behind the gate that produced
@@ -5330,7 +5485,7 @@ Nothing here verifies a rule: Rule Governance reads "Never checked" for all
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v204.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v205.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/026` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**

@@ -1290,6 +1290,37 @@ const MUTATIONS = [
   { name: 'the compliance officer quote goes back to a bare lead-in (SS4n r/w SS3x)',
     from: "ensuring conformity with the regulatory provisions applicable to the listed entity in letter and spirit",
     to:   "doing the needful" },
+  // -- SS4o: the Act, PIT and Schedule II ---------------------
+  // s.124(6) transfers the SHARES to the IEPF, not only the dividend. Losing
+  // that leaves the shareholder's holding where it is and the company in
+  // breach of the one limb of s.124 with a seven-year clock on it.
+  { name: 'the IEPF transfer covers the dividend but not the shares (SS4o)',
+    from: "\"quote\":\"All shares in respect of which",
+    to:   "\"quote\":\"All dividend in respect of which" },
+
+  // Seven YEARS, from the date of transfer to the Unpaid Dividend Account.
+  { name: 'the IEPF seven years becomes seven months (SS4o)',
+    from: "for a period of seven years from the date of such transfer",
+    to:   "for a period of seven months from the date of such transfer" },
+
+  // SS3y: "s.100 is correctly absent for an OPC, which holds no general
+  // meeting." s.129(2) lays the financial statements before an AGM, and an
+  // OPC holds none. SS2z -- the wrong law against the wrong entity class.
+  { name: 'a One Person Company is told to lay accounts before an AGM (SS4o r/w SS2z)',
+    from: "\"id\":\"CA-SUP-SEC-129-2\",\"sourceRow\"",
+    to:   "\"appliesTo\":{\"entityType\":[\"private\",\"public\",\"listed\",\"opc\"]},\"id\":\"CA-SUP-SEC-129-2\",\"sourceRow\"" },
+
+  // Reg 27(1): the entity "may, at its discretion" comply with Part E. Carrying
+  // it as a checklist of duties asserts something the regulation does not.
+  { name: 'the discretionary Schedule II Part E is carried as duties (SS4o)',
+    from: "var CHK_SCH2D = [",
+    to:   "var CHK_SCH2E = [" },
+
+  // Schedule II binds a listed entity. An unlisted company must not be shown
+  // its board-paper list as though it owed it.
+  { name: 'a Schedule II item is shown to an unlisted company (SS4o)',
+    from: "Annual operating plans and budgets and any updates.', held:true, only:'listed'",
+    to:   "Annual operating plans and budgets and any updates.', held:true" },
 ];
 
 const src = fs.readFileSync(INDEX, 'utf8');

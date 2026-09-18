@@ -2369,7 +2369,7 @@ describe('companies act supplement');
 {
   const CS = app.CA_SUP_DATA;
   ok('the supplement is loaded', !!(CS && CS.rules && CS.rules.length), 'CA_SUP_DATA missing');
-  check('twelve obligations', (CS.rules || []).length, 12);   // SS4i added s.101(1)
+  check('nineteen obligations', (CS.rules || []).length, 19);   // SS4o added 7 sub-provision rules
 
   // THE INVARIANT. Where a rule states a period, that period must appear in
   // the quote. Otherwise the register asserts a number the evidence beside it
@@ -2548,8 +2548,11 @@ describe('lodr chapter IV supplement');
   // list BECAUSE". For an unlisted company every one of these must appear as
   // excluded WITH a reason -- which is also what makes appliesTo load-bearing
   // here, since the register call itself sits behind an isListed guard.
+  // Matched on the LAW as well as the citation. PIT Reg 6(2) and LODR
+  // Reg 6(2) are two different obligations sharing one citation string, and
+  // filtering on the string alone pulled PIT rows into a LODR count.
   const exc = app.lgExcludedFor(mk('private','U51909MH2018PTC300111'))
-    .filter(e => /^Reg /.test(e.section || '') &&
+    .filter(e => /^Reg /.test(e.section || '') && e.law === 'SEBI LODR 2015' &&
                  (LS.rules || []).some(r => r.regulation === e.section));
   check('a private company is told all eighty-one do not apply', exc.length, 81);
   const noReason = exc.filter(e => !e.reasons || !e.reasons.length);
@@ -2632,7 +2635,7 @@ describe('pit supplement');
 {
   const PS = app.PIT_SUP_DATA;
   ok('the supplement is loaded', !!(PS && PS.rules && PS.rules.length), 'PIT_SUP_DATA missing');
-  check('twelve obligations', (PS.rules || []).length, 12);   // SS4i added Reg 7(1)(b)
+  check('fifteen obligations', (PS.rules || []).length, 15);   // SS4o added Reg 6(1)-(3)
 
   // THE INVARIANT (SS3y/SS3z).
   const WORDS = /\b(two|three|four|five|six|seven|eight|nine|ten|fifteen|thirty|sixty|ninety)\s+(working\s+|trading\s+|calendar\s+)?(days?|months?|years?)\b/gi;
@@ -2678,7 +2681,7 @@ describe('pit supplement');
   const supP = (c) => app.getComplianceChart(c).filter(r => /^PIT-SUP/.test(r.key || ''));
   const listedP = mkp('listed', 'L17110MH2009PLC195422');
 
-  check('a listed company receives all twelve', supP(listedP).length, 12);
+  check('a listed company receives all fifteen', supP(listedP).length, 15);
   check('a private company receives none', supP(mkp('private','U51909MH2018PTC300111')).length, 0);
   check('a public unlisted company receives none', supP(mkp('public','U51909MH2015PLC300444')).length, 0);
   check('an LLP receives none', supP(mkp('llp','AAB-1234')).length, 0);
@@ -2688,9 +2691,13 @@ describe('pit supplement');
      datedP.map(r => r.section + '=' + r.due).join(', '));
 
   // SS3i: an unlisted company must be told these do not apply, and why.
+  // Matched on the LAW too. LODR Reg 6(2) and Reg 7(2) share their citation
+  // strings with PIT Reg 6(2) and 7(2) -- two different laws, one string, and
+  // filtering on the string alone pulled two LODR rows into this count.
   const excP = app.lgExcludedFor(mkp('private','U51909MH2018PTC300111'))
-    .filter(e => (PS.rules || []).some(r => r.regulation === e.section));
-  check('a private company is told all twelve do not apply', excP.length, 12);
+    .filter(e => e.law === 'SEBI PIT Regulations 2015' &&
+                 (PS.rules || []).some(r => r.regulation === e.section));
+  check('a private company is told all fifteen do not apply', excP.length, 15);
   ok('and is given a reason for every one',
      excP.every(e => e.reasons && e.reasons.length), 'a reason is missing');
 
@@ -3823,6 +3830,119 @@ describe('the rest of the LODR sub-provision pass');
   const dated = Object.keys(by).filter(k => by[k].due);
   ok('no rule in this pass carries an invented date', dated.length === 0,
      dated.join(', '));
+}
+
+describe('the Act and PIT sub-provision pass');
+{
+  const CAS = app.CA_SUP_DATA, PITS = app.PIT_SUP_DATA;
+  const caRule = id => (CAS.rules || []).find(r => r.id === id);
+  const pitRule = id => (PITS.rules || []).find(r => r.id === id);
+
+  // IEPF. s.124(5) transfers the MONEY after seven years; s.124(6) transfers
+  // the SHARES after seven CONSECUTIVE years. Two different transfers, and the
+  // register carried neither -- only s.124(1), the move into the Unpaid
+  // Dividend Account.
+  // s.124(5) does NOT use the words "Investor Education and Protection Fund".
+  // It says "the Fund established under sub-section (1) of section 125", which
+  // IS the IEPF. The first version of this assertion required the full name
+  // and failed against a correct rule -- SS3t, asserting a value I had not read.
+  ok('s.124(5) transfers unclaimed money to the s.125 Fund after seven years',
+     /seven years/i.test((caRule('CA-SUP-SEC-124-5') || {}).quote || '') &&
+     /section 125/i.test((caRule('CA-SUP-SEC-124-5') || {}).quote || ''),
+     ((caRule('CA-SUP-SEC-124-5') || {}).quote || '(absent)').slice(0, 130));
+  ok('s.124(6) transfers the SHARES, not only the dividend',
+     /All shares/i.test((caRule('CA-SUP-SEC-124-6') || {}).quote || '') &&
+     /seven consecutive years/i.test((caRule('CA-SUP-SEC-124-6') || {}).quote || ''),
+     ((caRule('CA-SUP-SEC-124-6') || {}).quote || '(absent)').slice(0, 110));
+
+  // SS3y: "s.100 is correctly absent for an OPC, which holds no general
+  // meeting." I authored s.100(6) against every class and the assertion
+  // written a release ago caught it. s.129(2) is the same -- it lays the
+  // financial statements before an AGM, and an OPC holds none.
+  ['CA-SUP-SEC-100-6', 'CA-SUP-SEC-129-2'].forEach(id => {
+    const r = caRule(id);
+    ok(id + ' does not reach a One Person Company',
+       !!r && (r.appliesTo.entityType || []).indexOf('opc') < 0,
+       r ? JSON.stringify(r.appliesTo) : '(absent)');
+  });
+
+  // THE HELD ACT IS MISSING AN AMENDMENT BEFORE ITS OWN STATED DATE. s.92(3)
+  // was substituted w.e.f. 28.08.2020 -- the web-link of the annual return
+  // replacing the MGT-9 extract -- and the text labelled "as amended upto
+  // 01.04.2021" still carries the extract. So s.92(3) is deliberately NOT
+  // authored: a rule from that text would put an abolished form on a live
+  // register, which is the Reg 24(1) defect self-inflicted.
+  ok('no rule is authored from the stale s.92(3)',
+     !(CAS.rules || []).some(r => /Section 92\(3\)/.test(r.regulation || '')),
+     'a rule was authored from a provision the held text has wrong');
+  // And the app's own checklist already knows the CURRENT wording, which is
+  // how the hole was confirmed independently of the reference text.
+  ok('the Directors Report checklist carries the web-address version of s.92(3)',
+     (app.CHK_DIRREP || []).some(i => /web address/i.test(i.t || '') &&
+                                      /s\.92\(3\)/.test(i.t || '')),
+     'the checklist no longer names it');
+
+  // PIT Reg 6(2) and 6(3): a Chapter III disclosure that covers only the
+  // person's own trades in the cash segment is incomplete.
+  ok('PIT Reg 6(2) brings in immediate relatives and controlled accounts',
+     /immediate relatives/i.test((pitRule('PIT-SUP-REG-6-2') || {}).quote || '') &&
+     /takes trading decisions/i.test((pitRule('PIT-SUP-REG-6-2') || {}).quote || ''),
+     ((pitRule('PIT-SUP-REG-6-2') || {}).quote || '(absent)').slice(0, 110));
+  ok('PIT Reg 6(3) brings in derivatives at traded value',
+     /derivatives/i.test((pitRule('PIT-SUP-REG-6-3') || {}).quote || '') &&
+     /traded value/i.test((pitRule('PIT-SUP-REG-6-3') || {}).quote || ''),
+     ((pitRule('PIT-SUP-REG-6-3') || {}).quote || '(absent)').slice(0, 110));
+
+  // A citation string is not unique across laws: PIT Reg 6(2) and LODR
+  // Reg 6(2) are different obligations. Anything matching rules by section
+  // text alone must also match the law -- two assertions in this suite were
+  // counting across laws before this was noticed.
+  const clash = (app.lgAllRules() || []).filter(r => r.section === 'Reg 6(2)');
+  ok('Reg 6(2) exists in more than one law, so section alone cannot identify a rule',
+     clash.length > 1 && new Set(clash.map(r => r.law)).size > 1,
+     clash.map(r => r.law).join(' | '));
+}
+
+describe('LODR Schedule II carried as items');
+{
+  // The register cited Schedule II as a cross-reference -- "as specified in
+  // Part C of Schedule II" -- and the items were on no screen at all.
+  const PARTS = [['A', 15], ['B', 4], ['C', 38], ['D', 21]];
+  let total = 0;
+  PARTS.forEach(([p, n]) => {
+    const L = app['CHK_SCH2' + p] || [];
+    check('Schedule II Part ' + p + ' carries its items', L.length, n);
+    total += L.length;
+    ok('Part ' + p + ' items all cite Schedule II and the regulation that pulls them in',
+       L.every(i => /^Sch II Part /.test(i.c || '') && /r\/w Reg /.test(i.c || '')),
+       'an item does not cite its Part or its regulation');
+    // Schedule II IS in the held compilation, so every item is held:true --
+    // SS2z: a checklist that mixes "the Act says this" with "I believe this"
+    // and marks neither is worse than no checklist.
+    ok('Part ' + p + ' items are marked as held in reference/',
+       L.every(i => i.held === true), 'an item is not marked held');
+    // Schedule II binds a listed entity. An unlisted company must not see it.
+    ok('Part ' + p + ' items are scoped to a listed entity',
+       L.every(i => i.only === 'listed'), 'an item is not listed-only');
+  });
+  check('seventy-eight Schedule II items in all', total, 78);
+
+  // PART E IS DISCRETIONARY. Reg 27(1): the entity "may, at its discretion"
+  // comply with Part E. Listing it as a checklist of duties would assert
+  // something the regulation does not -- the same reason Reg 27(1) itself was
+  // excluded from the register.
+  ok('Schedule II Part E is NOT carried, because Reg 27(1) makes it discretionary',
+     typeof app.CHK_SCH2E === 'undefined',
+     'Part E was carried as though it were mandatory');
+
+  // Every checklist tab must resolve to a list, or a tab renders empty.
+  const missing = (app.CHK_TABS || []).filter(t => {
+    try { app.CHK_MODE = t[0]; return !(app.chkList() || []).length; }
+    catch (e) { return true; }
+  });
+  ok('every checklist tab resolves to a non-empty list',
+     missing.length === 0, missing.map(t => t[0]).join(', '));
+  check('nine checklist tabs', (app.CHK_TABS || []).length, 9);
 }
 
 // The access-check assertions are async — they drive a stubbed database through

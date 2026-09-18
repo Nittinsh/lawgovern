@@ -366,6 +366,93 @@
    "submitTo": "Received by the company; no filing",
    "signedBy": "The person making the disclosure",
    "notes": "No date is computed: this app holds no register of appointments, so there is nothing for the seven days to run from. The period is stated regardless -- a period this app cannot compute is not a period that does not exist (SS3x)."
+  },
+  {
+   "id": "PIT-SUP-REG-6-1",
+   "sourceRow": 13,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Reg 6(1)",
+   "area": "Disclosures",
+   "title": "Make every public disclosure under Chapter III in the form the Board specifies",
+   "detail": "The form is specified by SEBI, so it can change without the regulation changing. A disclosure made in a superseded form is not made.",
+   "quote": "Every public disclosure under this Chapter shall be made in such form as may be specified.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed company making or forwarding a Chapter III disclosure",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "PIT-SUP-REG-6-2",
+   "sourceRow": 14,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Reg 6(2)",
+   "area": "Disclosures",
+   "title": "A Chapter III disclosure must cover trading by the person immediate relatives AND by any other person for whom that person takes trading decisions",
+   "detail": "Collecting only the individual own trades produces an incomplete disclosure. The NOTE to Reg 6(2) records that the intention is to bring within the net trades by anyone whose decisions the discloser controls.",
+   "quote": "The disclosures to be made by any person under this Chapter shall include those relating to trading by such person’s immediate relatives, and by any other person for whom such person takes trading decisions. NOTE: It is intended that disclosure of trades would need to be of not only those executed by the person concerned but also by the immediate relatives and of other persons for whom the person concerned takes trading decisions.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed company collecting and forwarding Chapter III disclosures",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "PIT-SUP-REG-6-3",
+   "sourceRow": 15,
+   "law": "SEBI PIT Regulations 2015",
+   "regulation": "Reg 6(3)",
+   "area": "Disclosures",
+   "title": "A disclosure of trading in securities must also include trading in DERIVATIVES of those securities, taken at the traded value of the derivatives",
+   "detail": "Derivatives are counted at traded value, not at notional or premium. Reg 6(3) has a proviso on derivatives trading by designated persons which must be read with Reg 4(3).",
+   "quote": "The disclosures of trading in securities shall also include trading in derivatives of securities and the traded value of the derivatives shall be taken into account for purposes of this Chapter:",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed company collecting and forwarding Chapter III disclosures",
+   "owner": "CS",
+   "evidence": "Board minutes / filing record",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
   }
  ]
 }
