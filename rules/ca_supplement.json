@@ -624,6 +624,524 @@
    "submitTo": null,
    "signedBy": "Board",
    "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-149-3",
+   "sourceRow": 20,
+   "law": "Companies Act 2013",
+   "regulation": "Section 149(3)",
+   "area": "Board composition",
+   "title": "At least one director must have stayed in India for not less than 182 days during the financial year",
+   "detail": "The RESIDENT DIRECTOR test. calcBoardCheck reports it as \"not tested\" because the directors register holds no residency field - so the obligation existed in the calculator as an untested row and on no register row at all. A newly incorporated company applies the proviso: the period is counted proportionately from incorporation.",
+   "quote": "Every company shall have at least one director who stays in India for a total period of not less than one hundred and eighty -two days during the financial year:",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company",
+   "owner": "CS",
+   "evidence": "Board minutes / register",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-149-8",
+   "sourceRow": 21,
+   "law": "Companies Act 2013",
+   "regulation": "Section 149(8)",
+   "area": "Independent directors",
+   "title": "The company AND its independent directors must abide by the Code for Independent Directors in Schedule IV",
+   "detail": "Schedule IV is the Code: the guidelines of professional conduct, the role and functions, the duties, the manner of appointment, re-appointment, resignation and removal, the separate meetings, and the evaluation mechanism. It binds the COMPANY as well as the directors. Schedule IV is not carried item by item here.",
+   "quote": "The company and independent directors shall abide by the provisions specified in Schedule IV.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "public",
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed public company; and every other public company in the class Rule 4 of the Companies (Appointment and Qualification of Directors) Rules 2014 prescribes. Those Rules are NOT in reference/, so the class test cannot be evaluated here - confirm it before relying on this row.",
+   "owner": "CS",
+   "evidence": "Board minutes / register",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-149-9",
+   "sourceRow": 22,
+   "law": "Companies Act 2013",
+   "regulation": "Section 149(9)",
+   "area": "Independent directors",
+   "title": "An independent director is not entitled to any stock option, and may be paid only sitting fees, reimbursement and profit-related commission approved by the members",
+   "detail": "Granting an independent director an option is not merely irregular - s.149(9) says they are not entitled to it. The remuneration that IS permitted is fixed by the same sub-section, subject to s.197 and s.198.",
+   "quote": "Notwithstanding anything contained in any other provision of this Act, but subject to the provisions of sections 197 and 198, an independent director shall not be entitled to any stock option and may receive remuneration by way of fee provided under sub -section ( 5) of section 197, reimbursement of expenses for participation in the Board and other meetings and profit related commission as may be approved by the members.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "public",
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed public company; and every other public company in the class Rule 4 of the Companies (Appointment and Qualification of Directors) Rules 2014 prescribes. Those Rules are NOT in reference/, so the class test cannot be evaluated here - confirm it before relying on this row.",
+   "owner": "CS",
+   "evidence": "Board minutes / register",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-149-10",
+   "sourceRow": 23,
+   "law": "Companies Act 2013",
+   "regulation": "Section 149(10)",
+   "area": "Independent directors",
+   "title": "An independent director holds office for a term of up to five consecutive years, and re-appointment requires a SPECIAL resolution and disclosure in the Board report",
+   "detail": "An ordinary resolution does not re-appoint an independent director. The term is a maximum, not a default.",
+   "quote": "Subject to the provisions of section 152, an indepen dent director shall hold office for a term up to five consecutive years on the Board of a company, but shall be eligible for reappointment on passing of a special resolution by the company and disclosure of such appointment in the Board's report.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "public",
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed public company; and every other public company in the class Rule 4 of the Companies (Appointment and Qualification of Directors) Rules 2014 prescribes. Those Rules are NOT in reference/, so the class test cannot be evaluated here - confirm it before relying on this row.",
+   "owner": "CS",
+   "evidence": "Board minutes / register",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-149-11",
+   "sourceRow": 24,
+   "law": "Companies Act 2013",
+   "regulation": "Section 149(11)",
+   "area": "Independent directors",
+   "title": "No independent director may hold office for more than two consecutive terms, and is then ineligible for three years",
+   "detail": "The cooling-off is the limb most often missed, and s.149(11) adds a second condition: during those three years the person must not be appointed in or associated with the company in any other capacity, directly or indirectly.",
+   "quote": "Notw ithstanding anything contained in sub -section ( 10), no independent director shall hold office for more than two consecutive terms, but such independent director shall be eligible for appointment after the expiration of three years of ceasing to become an i ndependent director: Provided that an independent director shall not, during the said period of three years, be appointed in or be associated with the company in any other capacity, either directly or indirectly. Explanation.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "public",
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed public company; and every other public company in the class Rule 4 of the Companies (Appointment and Qualification of Directors) Rules 2014 prescribes. Those Rules are NOT in reference/, so the class test cannot be evaluated here - confirm it before relying on this row.",
+   "owner": "CS",
+   "evidence": "Board minutes / register",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-149-13",
+   "sourceRow": 25,
+   "law": "Companies Act 2013",
+   "regulation": "Section 149(13)",
+   "area": "Independent directors",
+   "title": "Independent directors are NOT liable to retire by rotation",
+   "detail": "s.152(6) and (7) do not apply to them. Counting an independent director into the rotating two-thirds is the error this sub-section exists to prevent, and it changes how many directors actually retire at the AGM.",
+   "quote": "The provisions of sub -sections ( 6) and ( 7) of section 152 in respect of retirement of directors by rotation shall not be applicable to appointment of independent directors. 150. Manner of selection of independ ent directors and maintenance of databank of independent directors.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "public",
+     "listed"
+    ]
+   },
+   "appliesToText": "Listed public company; and every other public company in the class Rule 4 of the Companies (Appointment and Qualification of Directors) Rules 2014 prescribes. Those Rules are NOT in reference/, so the class test cannot be evaluated here - confirm it before relying on this row.",
+   "owner": "CS",
+   "evidence": "Board minutes / register",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-177-2",
+   "sourceRow": 26,
+   "law": "Companies Act 2013",
+   "regulation": "Section 177(2)",
+   "area": "Audit committee",
+   "title": "The Audit Committee must have a minimum of three directors with independent directors forming a MAJORITY, and a majority of members including the chairperson must be able to read and understand financial statements",
+   "detail": "Note the difference from LODR Reg 18(1), which requires TWO-THIRDS independent. A listed entity must meet the stricter LODR test; an unlisted company in the prescribed class meets this one.",
+   "quote": "The Audit Committee shall consist of a minimum of three directors with independent directors forming a majority: Provided that majority of members of Audit Committee including its Chairperson shall be persons with ability to read and understand, the financial statement.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "public",
+     "listed"
+    ]
+   },
+   "appliesToText": "Every listed company, and every other company in the class s.177(1) says \"may be prescribed\". Rule 6 of the Companies (Meetings of Board and its Powers) Rules 2014 sets it; those Rules are NOT in reference/, so the class test cannot be evaluated here.",
+   "owner": "CS",
+   "evidence": "Board minutes / register",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-177-4",
+   "sourceRow": 27,
+   "law": "Companies Act 2013",
+   "regulation": "Section 177(4)",
+   "area": "Audit committee",
+   "title": "The Board must specify the Audit Committee terms of reference IN WRITING, covering at least the matters s.177(4) lists",
+   "detail": "Recommendation for appointment, remuneration and terms of the auditors; review and monitoring of their independence and audit effectiveness; examination of the financial statement and the auditors report; approval or subsequent modification of related party transactions; scrutiny of inter-corporate loans and investments; valuation of undertakings or assets; evaluation of internal financial controls and risk management systems; and monitoring the end use of funds raised through public offers. A committee operating without written terms does not meet s.177(4).",
+   "quote": "Every Audit Committee shall act in accordance with the terms of reference specified in writing by the Board which shall, inter alia, include, — (i) the recommendation for appointment , remuneration and terms of appointment of auditors of the company; (ii) review and monitor the auditor’s independence and performance, and effectiveness of audit process; (iii) examination of the financial statement and the auditors’ report thereon; (iv) approval or any subsequent modification of transactions of the company with related parties: 1.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "public",
+     "listed"
+    ]
+   },
+   "appliesToText": "Every listed company, and every other company in the class s.177(1) says \"may be prescribed\". Rule 6 of the Companies (Meetings of Board and its Powers) Rules 2014 sets it; those Rules are NOT in reference/, so the class test cannot be evaluated here.",
+   "owner": "CS",
+   "evidence": "Board minutes / register",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-177-6",
+   "sourceRow": 28,
+   "law": "Companies Act 2013",
+   "regulation": "Section 177(6)",
+   "area": "Audit committee",
+   "title": "The Audit Committee has authority to investigate any matter in its terms of reference or referred by the Board, power to obtain outside professional advice, and FULL ACCESS to the information contained in the records of the company",
+   "detail": "A power the company must not obstruct, not merely one the charter may grant.",
+   "quote": "The Audit Committee shall have authority to investigate into any matter in relation to the items specified in sub -section ( 4) or refe rred to it by the Board and for this purpose shall have power to obtain professional advice from external sources and have full access to information contained in the records of the company.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "public",
+     "listed"
+    ]
+   },
+   "appliesToText": "Every listed company, and every other company in the class s.177(1) says \"may be prescribed\". Rule 6 of the Companies (Meetings of Board and its Powers) Rules 2014 sets it; those Rules are NOT in reference/, so the class test cannot be evaluated here.",
+   "owner": "CS",
+   "evidence": "Board minutes / register",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-177-7",
+   "sourceRow": 29,
+   "law": "Companies Act 2013",
+   "regulation": "Section 177(7)",
+   "area": "Audit committee",
+   "title": "The auditors and the key managerial personnel have a RIGHT TO BE HEARD at Audit Committee meetings considering the auditors report, but no right to vote",
+   "detail": "A procedural right the company must honour when the committee considers the auditors report.",
+   "quote": "The auditors of a company and the key managerial personnel sh all have a right to be heard in the meetings of the Audit Committee when it considers the auditor’s report but shall not have the right to vote.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "public",
+     "listed"
+    ]
+   },
+   "appliesToText": "Every listed company, and every other company in the class s.177(1) says \"may be prescribed\". Rule 6 of the Companies (Meetings of Board and its Powers) Rules 2014 sets it; those Rules are NOT in reference/, so the class test cannot be evaluated here.",
+   "owner": "CS",
+   "evidence": "Board minutes / register",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-177-8",
+   "sourceRow": 30,
+   "law": "Companies Act 2013",
+   "regulation": "Section 177(8)",
+   "area": "Board report",
+   "title": "The Board report must disclose the composition of the Audit Committee, and where the Board did not accept any recommendation of the Committee, that fact with the reasons",
+   "detail": "A disclosure duty sitting in s.177 rather than in s.134, which is why it is missed. The second limb bites only when the Board has declined a recommendation - and that is exactly when it matters.",
+   "quote": "The Board’s report under sub -section ( 3) of section 134 shall disclose the composition of an Audit Committe e and where the Board had not accepted any recommendation of the Audit Committee, the same shall be disclosed in such report along with the reasons therefor.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "public",
+     "listed"
+    ]
+   },
+   "appliesToText": "Every listed company, and every other company in the class s.177(1) says \"may be prescribed\". Rule 6 of the Companies (Meetings of Board and its Powers) Rules 2014 sets it; those Rules are NOT in reference/, so the class test cannot be evaluated here.",
+   "owner": "CS",
+   "evidence": "Board minutes / register",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-177-9",
+   "sourceRow": 31,
+   "law": "Companies Act 2013",
+   "regulation": "Section 177(9)",
+   "area": "Vigil mechanism",
+   "title": "Establish a vigil mechanism for directors and employees to report genuine concerns",
+   "detail": "Distinct from LODR Reg 22, which carries the same duty for a listed entity under the listing regulations. A company in the prescribed class owes this under the Act whether or not it is listed.",
+   "quote": "Every listed company or such class or classes of companies, as may be prescribed, shall establ ish a vigil mechanism for directors and employees to report genuine concerns in such manner as may be prescribed.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "public",
+     "listed"
+    ]
+   },
+   "appliesToText": "Every listed company, and every other company in the class s.177(9) says \"may be prescribed\". Rule 6 of the Companies (Meetings of Board and its Powers) Rules 2014 sets it; those Rules are NOT in reference/, so the class test cannot be evaluated here.",
+   "owner": "CS",
+   "evidence": "Board minutes / register",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-177-10",
+   "sourceRow": 32,
+   "law": "Companies Act 2013",
+   "regulation": "Section 177(10)",
+   "area": "Vigil mechanism",
+   "title": "The vigil mechanism must provide adequate safeguards against victimisation and DIRECT ACCESS to the chairperson of the Audit Committee in appropriate or exceptional cases",
+   "detail": "Both limbs. A mechanism that routes every report through management does not meet s.177(10).",
+   "quote": "The vigil mechanism under sub -section ( 9) shall provide for adequate safeguards against victimisation of persons who use such mechanism a nd make provision for direct access to the chairperson of the Audit Committee in appropriate or exceptional cases: Provided that the details of establishment of such mechanism shall be disclosed by the company on its website, if any, and in the Board’s rep ort. 178. Nomination and Remuneration Committee and Stakeholders Relationship Committee.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "public",
+     "listed"
+    ]
+   },
+   "appliesToText": "Every listed company, and every other company in the class s.177(9) says \"may be prescribed\". Rule 6 of the Companies (Meetings of Board and its Powers) Rules 2014 sets it; those Rules are NOT in reference/, so the class test cannot be evaluated here.",
+   "owner": "CS",
+   "evidence": "Board minutes / register",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-139-2",
+   "sourceRow": 33,
+   "law": "Companies Act 2013",
+   "regulation": "Section 139(2)",
+   "area": "Auditor rotation",
+   "title": "An individual may not be appointed auditor for more than ONE term of five consecutive years, and an audit firm for more than TWO terms of five consecutive years",
+   "detail": "SS2q named this as the one remaining auditor obligation worth a register and the highest-consequence one: miss it and the auditor is disqualified. It is a multi-year clock across appointments, so no date is computed from a single meeting - this app holds no auditor tenure register.",
+   "quote": "No listed company or a company belonging to such class or classes of companies as may be prescribed, shall appoint or re -appoint — (a) an individual as auditor for more than one term of five c onsecutive years; and (b) an audit firm as auditor for more than two terms of five consecutive years: Provided that — (i) an individual auditor who has completed his term under clause ( a) shall not be eligible for re-appointment as auditor in the same compa ny for five years from the completion of his term;",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "public",
+     "listed"
+    ]
+   },
+   "appliesToText": "Every listed company, and every other company in the class s.139(2) says \"may be prescribed\". Rule 5 of the Companies (Audit and Auditors) Rules 2014 sets it; those Rules are NOT in reference/, so the class test cannot be evaluated here.",
+   "owner": "CS",
+   "evidence": "Board minutes / register",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-139-6",
+   "sourceRow": 34,
+   "law": "Companies Act 2013",
+   "regulation": "Section 139(6)",
+   "area": "Auditor appointment",
+   "title": "The FIRST auditor must be appointed by the Board within thirty days of the date of registration; failing which the members appoint within ninety days at an extraordinary general meeting",
+   "detail": "Thirty days from REGISTRATION, not from the first board meeting. This app holds the incorporation year from the CIN but not the registration date, so the period is certain and the anchor is not held. The auditor so appointed holds office until the conclusion of the first annual general meeting.",
+   "quote": "Notwithstanding anything contained in sub -section ( 1), the first auditor of a company, other t han a Government company, shall be appointed by the Board of Directors within thirty days from the date of registration of the company and in the case of failure of the Board to appoint such auditor, it shall inform the members of the company, who shall wi thin ninety days at an extraordinary general meeting appoint such auditor and such auditor shall hold office till the conclusion of the first annual general meeting. 1. Subs.",
+   "frequency": "On incorporation",
+   "timelineText": "Within thirty days of registration",
+   "due": {
+    "type": "at_trigger",
+    "when": "The company is registered"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company other than a Government company",
+   "owner": "CS",
+   "evidence": "Board minutes / register",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-139-8",
+   "sourceRow": 35,
+   "law": "Companies Act 2013",
+   "regulation": "Section 139(8)",
+   "area": "Auditor appointment",
+   "title": "A casual vacancy in the office of auditor is filled by the Board within thirty days; where it arose from RESIGNATION the appointment must also be approved by the members at a general meeting within three months of the Board recommendation",
+   "detail": "Two periods and two bodies. A resignation vacancy filled by the Board alone is not complete: the members must approve within three months. The auditor so appointed holds office to the conclusion of the next annual general meeting.",
+   "quote": "Any casual vacancy in the office of an auditor shall — (i) in the case of a company other than a company whose accounts a re subject to audit by an auditor appointed by the Comptroller and Auditor -General of India, be filled by the Board of Directors within thirty days, but if such casual vacancy is as a result of the resignation of an auditor, such appointment shall also be approved by the company at a general meeting convened within three months of the recommendation of the Board and he shall hold the office till the conclusion of",
+   "frequency": "On a casual vacancy",
+   "timelineText": "Within thirty days, and three months for member approval on a resignation",
+   "due": {
+    "type": "at_trigger",
+    "when": "A casual vacancy arises in the office of auditor"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company other than one audited by the Comptroller and Auditor-General",
+   "owner": "CS",
+   "evidence": "Board minutes / register",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-139-11",
+   "sourceRow": 36,
+   "law": "Companies Act 2013",
+   "regulation": "Section 139(11)",
+   "area": "Auditor appointment",
+   "title": "Where the company must constitute an Audit Committee, every auditor appointment including a casual vacancy must be made after taking the Committee recommendation into account",
+   "detail": "The sequence is the obligation: the Committee recommends, then the Board or members appoint. An appointment made first and reported to the Committee afterwards does not meet s.139(11).",
+   "quote": "Where a company is required to constitute an Audit Committee under section 1 77, all appointments, including the filling of a casual vacancy of an auditor under this section shall be made after taking into account the recommendations of such committee. 140. Removal, resignation of auditor and giving of special notice.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "public",
+     "listed"
+    ]
+   },
+   "appliesToText": "Every listed company, and every other company in the class s.177(1) says \"may be prescribed\". Rule 6 of the Companies (Meetings of Board and its Powers) Rules 2014 sets it; those Rules are NOT in reference/, so the class test cannot be evaluated here.",
+   "owner": "CS",
+   "evidence": "Board minutes / register",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
   }
  ]
 }

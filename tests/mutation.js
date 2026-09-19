@@ -1321,6 +1321,37 @@ const MUTATIONS = [
   { name: 'a Schedule II item is shown to an unlisted company (SS4o)',
     from: "Annual operating plans and budgets and any updates.', held:true, only:'listed'",
     to:   "Annual operating plans and budgets and any updates.', held:true" },
+  // -- SS4p: the Act governance sections ----------------------
+  // s.139(2): an INDIVIDUAL gets one term of five years, a FIRM two. Swapping
+  // them lets an individual auditor run ten years, and SS2q records the
+  // consequence: the auditor is disqualified.
+  { name: 'auditor rotation gives an individual two terms (SS4p r/w SS2q)',
+    from: "\"title\":\"An individual may not be appointed auditor for more than ONE term of five consecutive years",
+    to:   "\"title\":\"An individual may not be appointed auditor for more than TWO terms of five consecutive years" },
+
+  // s.149(3): the resident-director test. SS2y's calcBoardCheck cannot evaluate
+  // it, so the rule stating it is the only place the duty appears at all.
+  { name: 'the resident-director period drops below 182 days (SS4p)',
+    from: "at least one director who stays in India for a total period of not less than one hundred and eighty",
+    to:   "at least one director who stays in India for a total period of not less than eighty" },
+
+  // s.177(2) is a MAJORITY independent; LODR Reg 18(1) is TWO-THIRDS. Reading
+  // one across to the other is the error both rules exist to keep apart.
+  { name: 'the Act audit committee test is read across from LODR (SS4p r/w SS4m)',
+    from: "\"title\":\"The Audit Committee must have a minimum of three directors with independent directors forming a MAJORITY",
+    to:   "\"title\":\"The Audit Committee must have a minimum of three directors with independent directors forming TWO-THIRDS" },
+
+  // The independent-director tenure rules turn on public-company machinery.
+  // Putting them on a private company is SS2z.
+  { name: 'independent-director tenure reaches a private company (SS4p r/w SS2z)',
+    from: "\"id\":\"CA-SUP-SEC-149-11\",\"sourceRow\"",
+    to:   "\"appliesTo\":{\"entityType\":[\"private\",\"public\",\"listed\",\"opc\"]},\"id\":\"CA-SUP-SEC-149-11\",\"sourceRow\"" },
+
+  // A class the app cannot evaluate must SAY so (SS2j), or the row asserts a
+  // duty against a company that may not be in the prescribed class at all.
+  { name: 'a prescribed-class rule stops saying the Rule is not held (SS4p)',
+    from: "\"id\":\"CA-SUP-SEC-177-9\",\"sourceRow\"",
+    to:   "\"appliesToText\":\"Every company\",\"id\":\"CA-SUP-SEC-177-9\",\"sourceRow\"" },
 ];
 
 const src = fs.readFileSync(INDEX, 'utf8');

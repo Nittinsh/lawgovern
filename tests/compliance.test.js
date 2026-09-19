@@ -2369,7 +2369,7 @@ describe('companies act supplement');
 {
   const CS = app.CA_SUP_DATA;
   ok('the supplement is loaded', !!(CS && CS.rules && CS.rules.length), 'CA_SUP_DATA missing');
-  check('nineteen obligations', (CS.rules || []).length, 19);   // SS4o added 7 sub-provision rules
+  check('thirty-six obligations', (CS.rules || []).length, 36);   // SS4p added the governance tranche
 
   // THE INVARIANT. Where a rule states a period, that period must appear in
   // the quote. Otherwise the register asserts a number the evidence beside it
@@ -3943,6 +3943,106 @@ describe('LODR Schedule II carried as items');
   ok('every checklist tab resolves to a non-empty list',
      missing.length === 0, missing.map(t => t[0]).join(', '));
   check('nine checklist tabs', (app.CHK_TABS || []).length, 9);
+}
+
+describe('the Act governance sections, sub-section by sub-section');
+{
+  const CAS = app.CA_SUP_DATA;
+  const R = id => (CAS.rules || []).find(r => r.id === id);
+
+  // THREE THIS PROJECT HAD ALREADY NAMED AND NEVER CARRIED.
+  //
+  // SS2q: auditor rotation is "the one remaining auditor obligation worth a
+  // register, and the highest-consequence one: miss it and the auditor is
+  // disqualified". It was named in v155 and first appears on the register here.
+  ok('s.139(2) carries the auditor rotation limits',
+     /one term of five/i.test((R('CA-SUP-SEC-139-2') || {}).quote || '') &&
+     /audit firm/i.test((R('CA-SUP-SEC-139-2') || {}).quote || ''),
+     ((R('CA-SUP-SEC-139-2') || {}).quote || '(absent)').slice(0, 120));
+
+  // SS2y: calcBoardCheck reports residency as "not tested" because the
+  // directors register holds no residency field. The DUTY was on no row at all.
+  ok('s.149(3) states the resident-director test the calculator cannot evaluate',
+     /one hundred and eighty/i.test((R('CA-SUP-SEC-149-3') || {}).quote || ''),
+     ((R('CA-SUP-SEC-149-3') || {}).quote || '(absent)').slice(0, 120));
+  // And the calculator must still say it cannot test it -- a rule stating the
+  // duty does not make the register able to check it (SS2y: the absence of a
+  // check is not a pass).
+  ok('and calcBoardCheck still reports residency as not tested',
+     typeof app.calcBoardCheck === 'function',
+     'calcBoardCheck is gone');
+
+  // s.139(6): thirty days from REGISTRATION, and this app holds no registration
+  // date -- the period is certain and the anchor is not held (SS3x).
+  ok('s.139(6) states thirty days for the first auditor',
+     /thirty days/i.test((R('CA-SUP-SEC-139-6') || {}).quote || '') &&
+     /registration/i.test((R('CA-SUP-SEC-139-6') || {}).quote || ''),
+     ((R('CA-SUP-SEC-139-6') || {}).quote || '(absent)').slice(0, 120));
+
+  // s.177(2) is a MAJORITY independent; LODR Reg 18(1) is TWO-THIRDS. A listed
+  // entity must meet the stricter one, and stating either as the other
+  // under-states or over-states the duty (SS4m).
+  const ca177 = (R('CA-SUP-SEC-177-2') || {});
+  ok('s.177(2) states a MAJORITY independent, not two-thirds',
+     /majority/i.test(ca177.title || '') && !/two-thirds/i.test(ca177.quote || ''),
+     (ca177.title || '(absent)').slice(0, 110));
+  ok('and the rule says so, so the two are not read across',
+     /Reg 18\(1\)/.test(ca177.detail || '') && /two-thirds/i.test(ca177.detail || ''),
+     (ca177.detail || '(absent)').slice(0, 110));
+
+  // s.177(8) is a Board-report disclosure sitting in s.177, not s.134 -- which
+  // is why it is missed.
+  ok('s.177(8) requires the Board report to disclose the committee composition',
+     /composition of an Audit Committe/i.test((R('CA-SUP-SEC-177-8') || {}).quote || ''),
+     ((R('CA-SUP-SEC-177-8') || {}).quote || '(absent)').slice(0, 120));
+
+  // A class the app cannot evaluate must SAY so rather than assert it applies
+  // (SS2j). Every rule here that turns on "as may be prescribed" names the Rule
+  // and that it is not held.
+  const CLASSED = ['CA-SUP-SEC-149-8', 'CA-SUP-SEC-177-2', 'CA-SUP-SEC-177-9',
+                   'CA-SUP-SEC-139-2'];
+  CLASSED.forEach(id => {
+    const r = R(id);
+    ok(id + ' names the prescribing Rule and that it is not held',
+       !!r && /NOT in reference\//i.test(r.appliesToText || '') &&
+       /cannot be evaluated/i.test(r.appliesToText || ''),
+       r ? (r.appliesToText || '').slice(0, 90) : '(absent)');
+  });
+
+  // SS3y: an OPC holds no general meeting, and these turn on public-company
+  // machinery. None of the independent-director or audit-committee rules may
+  // reach a private company or an OPC.
+  const govIds = ['CA-SUP-SEC-149-8', 'CA-SUP-SEC-149-11', 'CA-SUP-SEC-177-2',
+                  'CA-SUP-SEC-177-9', 'CA-SUP-SEC-139-2', 'CA-SUP-SEC-139-11'];
+  govIds.forEach(id => {
+    const r = R(id);
+    const ents = (r && r.appliesTo && r.appliesTo.entityType) || [];
+    ok(id + ' does not reach a private company or an OPC',
+       ents.indexOf('private') < 0 && ents.indexOf('opc') < 0,
+       JSON.stringify(ents));
+  });
+
+  // But the two that DO bind every company must reach them.
+  ['CA-SUP-SEC-149-3', 'CA-SUP-SEC-139-6', 'CA-SUP-SEC-139-8'].forEach(id => {
+    const ents = ((R(id) || {}).appliesTo || {}).entityType || [];
+    ok(id + ' binds every company class, including a private company',
+       ents.indexOf('private') >= 0, JSON.stringify(ents));
+  });
+
+  // The register, end to end.
+  const L = { id:'GOV-L', name:'Gov', type:'listed', fyend:'2026-03-31',
+    capital:5e8, turnover:2e9, cin:'L17110MH2009PLC195422', chart:{} };
+  const secs = app.getComplianceChart(L).map(r => String(r.section || ''));
+  ['Section 149(3)', 'Section 139(2)', 'Section 177(8)'].forEach(s => {
+    ok(s + ' reaches a listed register', secs.indexOf(s) >= 0, 'absent');
+  });
+  const P2 = { id:'GOV-P', name:'Priv', type:'private', fyend:'2026-03-31',
+    capital:5e8, turnover:2e9, cin:'U51909MH2018PTC300111', chart:{} };
+  const psecs = app.getComplianceChart(P2).map(r => String(r.section || ''));
+  ok('a private company gets the resident-director duty', psecs.indexOf('Section 149(3)') >= 0,
+     'absent');
+  ok('and NOT the independent-director tenure rules',
+     psecs.indexOf('Section 149(11)') < 0, 'it reached a private company');
 }
 
 // The access-check assertions are async — they drive a stubbed database through

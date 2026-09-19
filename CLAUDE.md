@@ -5374,6 +5374,91 @@ Nothing here verifies a rule. Rule Governance reads "Never checked" for all 494.
 
 ---
 
+## 4p. THE SECTIONS CITED BARE (v206)
+
+&sect;4o named this the largest remaining gap and said it was **unmeasured**.
+Measured:
+
+| | |
+|---|---|
+| Companies Act sections cited BARE with more than one sub-section | **34** |
+| sub-sections behind them | **181** |
+| of those, plausibly obligations (penalties, savings and machinery excluded) | **158** |
+
+Every one of those 181 sits behind a **single summary rule**. s.134 has eight
+sub-sections and one rule titled *"Board's Report and statutory disclosures"*.
+s.173, s.174 and s.118 &mdash; three sections &mdash; share one rule.
+
+**The convention that produced this was safe for LODR and is not safe for an
+Act.** &sect;4m and &sect;4n treat a provision cited without a sub-number as
+summarised whole, because a LODR regulation is short. An Act section is not.
+
+### The rate, measured on one section rather than guessed
+s.149 has eleven sub-sections behind *"Independent director applicability"*.
+Read one by one, **six are separate obligations**: the resident-director test
+(3), Schedule IV (8), no stock options (9), the five-year term (10), the
+two-term cap and three-year cooling off (11), and exemption from retirement by
+rotation (13). Four are the Government's power, the definition, the liability
+limitation, and a duty on the director. **Roughly 50%, so the 158 is 75 to 80
+real rules** &mdash; about twice the size of &sect;4n.
+
+### Seventeen authored, and three were already named in this file
+| | |
+|---|---|
+| **s.139(2)** auditor **rotation** | &sect;2q, in v155: *"the one remaining auditor obligation worth a register, and the highest-consequence one: miss it and the auditor is disqualified."* Named then, carried now |
+| **s.149(3)** the **resident director**, 182 days | &sect;2y's `calcBoardCheck` reports residency as **"not tested"** because the directors register holds no such field. So the obligation existed in the calculator as an untested row and **on no register row at all** |
+| **s.139(6)** the **first auditor**, thirty days from **registration** | the classic new-incorporation miss. Thirty days from REGISTRATION, not from the first board meeting, and this app holds no registration date &mdash; the period is certain and the anchor is not held (&sect;3x) |
+
+Also s.149(8)&ndash;(13); s.177(2), (4), (6), (7), (8), (9), (10); s.139(8) and
+(11).
+
+### The two tests that must not be read across each other
+**s.177(2) requires a MAJORITY of independent directors. LODR Reg 18(1)
+requires TWO-THIRDS.** &sect;4m authored the LODR one; this authors the Act one,
+and **each rule's detail names the other**, because a listed entity must meet
+the stricter test and an unlisted company in the prescribed class meets this
+one. There is a mutation that reads one across to the other.
+
+### s.177(8) is a Board-report duty that does not live in s.134
+*"The Board's report under sub-section (3) of section 134 shall disclose the
+composition of an Audit Committee and where the Board had not accepted any
+recommendation of the Audit Committee, the same shall be disclosed in such
+report together with the reasons."* It sits in s.177, which is why a
+s.134-shaped checklist misses it, and the second limb bites exactly when the
+Board has declined a recommendation.
+
+### "As may be prescribed" is a class this app cannot evaluate
+s.149(6)'s ID class, s.177(1)'s audit-committee class and s.139(2)'s rotation
+class all turn on **Rules not in `reference/`** &mdash; Rule 4 of the Appointment
+and Qualification of Directors Rules, Rule 6 of the Meetings of Board Rules,
+Rule 5 of the Audit and Auditors Rules. Each rule **names the Rule and says the
+test cannot be evaluated here**, so the condition reaches the What Applies
+review (&sect;2j) instead of being silently resolved in favour of applying. Same
+treatment as PAS-3 under Rule 12 (&sect;2n) and BEN-2 under the SBO Rules
+(&sect;2o).
+
+### Coverage
+Register **375 &rarr; 392** listed, **70 &rarr; 87** public, **70 &rarr; 73**
+private, **66 &rarr; 69** OPC. The private and OPC gains are only s.149(3),
+s.139(6) and s.139(8), which bind every company; the independent-director and
+audit-committee rules correctly reach neither. Suite **921 &rarr; 946**,
+mutations **236 &rarr; 241 caught, 0 missed, 0 skipped**, smoke 105, backend 96.
+Gate **494 &rarr; 511 rules**, 469 citations, 0 unresolved, 0 mismatches.
+
+### What is still not done
+**Seventeen of about 78.** The remaining heavy sections are s.90 (11 duties
+behind *"Significant Beneficial Ownership workflow"*), s.118 (9), s.186 (9),
+s.12 (7), s.89 (6), s.134 (6), s.135 (6), s.148 (6) and twenty-five more.
+
+And the caveat from &sect;4o travels with all of it: **the held Act is missing
+at least one amendment from before its own stated date**, so every rule authored
+from it carries that risk. A current consolidated Act in `reference/` would make
+this whole exercise more reliable, and that is not something I can obtain.
+
+Nothing here verifies a rule. Rule Governance reads "Never checked" for all 511.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -5462,7 +5547,7 @@ Nothing here verifies a rule. Rule Governance reads "Never checked" for all 494.
   names the fix, because the only symptom of the drift was a mutation anchor
   that started matching twice (§4b).
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (921 assertions, run against `index.html` itself), `node tests/mutation.js` (236 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 494 rules across eight corpora; it reports how many periods it actually compared, currently 158, and self-checks its own period parser AND its provision locator before it reads a line of law), and `node tests/backend.test.js` (96 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (946 assertions, run against `index.html` itself), `node tests/mutation.js` (241 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 511 rules across eight corpora; it reports how many periods it actually compared, currently 158, and self-checks its own period parser AND its provision locator before it reads a line of law), and `node tests/backend.test.js` (96 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **`python tools/rule_audit.py` regenerates `rules/audit_findings.json` AND
   re-embeds it into `index.html` as `var LG_GATE`** — on every run, not behind
   a flag, so the reviewer's evidence cannot drift behind the gate that produced
@@ -5485,7 +5570,7 @@ Nothing here verifies a rule. Rule Governance reads "Never checked" for all 494.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v205.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v206.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/026` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**
