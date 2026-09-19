@@ -146,9 +146,10 @@ _WITHIN = r'w\s?i\s?t\s?h\s?i\s?n'
 # the governing words sit before the list and each item has none. Without this
 # the twelve-hour limb -- which most Schedule III rules turn on -- is invisible.
 LEAD = (r'(?:' + _WITHIN + r'|not\s+later\s+than|no\s+later\s+than|at\s+least'
+        r'|not\s+less\s+than'
         r'|before\s+the\s+expiry\s+of|\((?:i{1,3}|iv|v)\))')
 # "a period of", "a further period of" etc. sit between the lead-in and the number.
-FILLER = r'(?:\s+(?:a|an|the|further|maximum|minimum|period|of|such)){0,4}'
+FILLER = r'(?:\s+(?:a|an|the|further|maximum|minimum|period|of|such|clear)){0,4}'
 UNITS = (r'calendar\s+days?|working\s+days?|business\s+days?|trading\s+days?|'
          r'clear\s+days?|days?|hours?|months?|weeks?|years?')
 # Up to three word-tokens, so "forty -five" and "one hundred and twenty" are
@@ -157,7 +158,7 @@ UNITS = (r'calendar\s+days?|working\s+days?|business\s+days?|trading\s+days?|'
 # Digits FIRST. With the word-branch first, "within 2 working days" captured
 # "2 working" as the number and "days" as the unit, int() threw, and the match
 # was silently dropped -- so a plainly readable period parsed as none at all.
-PERIOD = re.compile(LEAD + FILLER + r'\s+(\d+|(?:\w+[\s-]+){0,2}?\w+)\s+(' + UNITS + r')', re.I)
+PERIOD = re.compile(LEAD + FILLER + r'\s+(\d+|(?:\w+[\s-]+){0,3}?\w+)\s+(' + UNITS + r')', re.I)
 
 # The regulations spell numbers, and not always with a hyphen — "twenty one
 # days" is two words in the LODR text. Reading only "twenty-one" made Reg 31's
@@ -167,7 +168,8 @@ _WORDS = {'one':1,'two':2,'three':3,'four':4,'five':5,'six':6,'seven':7,'eight':
           'fifteen':15,'sixteen':16,'eighteen':18,'twenty':20,'twentyone':21,
           'twentyfour':24,'thirty':30,'thirtyone':31,'forty':40,'fortyfive':45,
           'fortyeight':48,'sixty':60,'seventy':70,'ninety':90,'onehundred':100,
-          'hundred':100,'onehundredandtwenty':120,'hundredandtwenty':120}
+          'hundred':100,'onehundredandtwenty':120,'hundredandtwenty':120,
+          'onehundredandeighty':180,'hundredandeighty':180}
 # Keyed with spaces and hyphens stripped, so every way the texts write a number
 # collapses to one entry.
 WORDNUM = dict((re.sub(r'[\s-]+', '', k), v) for k, v in _WORDS.items())
@@ -203,6 +205,26 @@ CADENCE_1 = re.compile(
     + UNITS + r')', re.I)
 
 
+# A DURATION IS NOT A DEADLINE EITHER, and it states its number FIRST.
+#
+# s.124(5) transfers what has stayed "unpaid or unclaimed for a period of seven
+# years" and s.124(6) the SHARES where the dividend is unpaid "for seven
+# consecutive years". Neither has a lead-in word, so PERIOD could not see it and
+# both rules -- authored by hand in SS4o -- were filed as stating no period at
+# all. SS4a made the same point about PIT Reg 3(6): a retention period is not a
+# deadline, and it is still a number the text has to agree with.
+#
+# Two shapes again, for the same reason as the cadence: "for N units", and a
+# label that opens with the number. Anchoring the second at the start of the
+# string keeps it out of the middle of a statute, where a bare number and unit
+# is far too common to read as the period.
+DURATION_FOR = re.compile(
+    r'\bfor\s+(?:a\s+(?:further\s+)?period\s+of\s+)?(\d+|(?:\w+[\s-]+){0,3}?\w+)'
+    r'\s+(?:consecutive\s+)?(' + UNITS + r')', re.I)
+DURATION_LEAD = re.compile(
+    r'^\s*(\d+|(?:\w+[\s-]+){0,3}?\w+)\s+(?:consecutive\s+)?(' + UNITS + r')\b', re.I)
+
+
 def _norm(n, unit):
     """One number and one unit, however the three texts happen to write them."""
     n, unit = str(n).lower().strip(), re.sub(r'\s+', ' ', unit.lower())
@@ -229,6 +251,11 @@ def periods_in(s):
         got = _norm(1, m.group(1))
         if got:
             out.add(got)
+    for pat in (DURATION_FOR, DURATION_LEAD):
+        for m in pat.finditer(s):
+            got = _norm(m.group(1), m.group(2))
+            if got:
+                out.add(got)
     for m in PERIOD.finditer(s):
         n, unit = m.group(1).lower().strip(), re.sub(r'\s+',' ',m.group(2).lower())
         # "within a period of thirty days" can also match with n='of'; the
@@ -382,6 +409,18 @@ PARSER_CASES = [
     ('within 2 working days',           {(2, 'working day')}),   # SS3w, greedy branch
     ('within a period of thirty days',  {(30, 'day')}),          # SS3v, filler
     ('at least three working days',     {(3, 'working day')}),
+    # SS4q -- four more, each a rule whose period had never been compared.
+    ('within one hundred and eighty days',   {(180, 'day')}),   # four tokens
+    ('within 180 days',                      {(180, 'day')}),
+    ('not less than clear twenty-one days',  {(21, 'day')}),    # lead-in + "clear"
+    ('not less than 21 clear days',          {(21, 'day')}),
+    ('for a period of seven years',          {(7, 'year')}),    # a DURATION
+    ('for 7 years',                          {(7, 'year')}),
+    ('unclaimed for seven consecutive years', {(7, 'year')}),
+    ('Seven years from the date of transfer', {(7, 'year')}),   # number first
+    ('7 years from the date of transfer',     {(7, 'year')}),
+    # and the dead map entry this revives
+    ('within one hundred and twenty days',   {(120, 'day')}),
 ]
 _bad = [(s, exp, periods_in(s)) for s, exp in PARSER_CASES if periods_in(s) != exp]
 if _bad:

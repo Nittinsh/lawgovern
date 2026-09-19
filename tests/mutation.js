@@ -1343,15 +1343,45 @@ const MUTATIONS = [
 
   // The independent-director tenure rules turn on public-company machinery.
   // Putting them on a private company is SS2z.
-  { name: 'independent-director tenure reaches a private company (SS4p r/w SS2z)',
-    from: "\"id\":\"CA-SUP-SEC-149-11\",\"sourceRow\"",
-    to:   "\"appliesTo\":{\"entityType\":[\"private\",\"public\",\"listed\",\"opc\"]},\"id\":\"CA-SUP-SEC-149-11\",\"sourceRow\"" },
 
   // A class the app cannot evaluate must SAY so (SS2j), or the row asserts a
   // duty against a company that may not be in the prescribed class at all.
+  // -- SS4q: s.90, s.12, s.118, s.186 -- and two SS4p repairs ----
+  // SS4p prepended a field before the rule's "id". The corpus is a JS
+  // object literal, so the REAL field after the id won and both mutations
+  // changed nothing: they were reported caught because editing the blob
+  // trips the smoke drift check (SS4b), not because any assertion saw them.
+  // Every field anchor below rewrites the rule's OWN copy of the field.
+  { name: 'independent-director tenure reaches a private company (SS4p r/w SS2z)',
+    from: "ion.\",\"frequency\":\"Continuous\",\"timelineText\":\"Continuous\",\"due\":{\"type\":\"continuous\"},\"dueConfidence\":\"none\",\"appliesTo\":{\"entityType\":[\"public\",\"listed\"]}",
+    to:   "ion.\",\"frequency\":\"Continuous\",\"timelineText\":\"Continuous\",\"due\":{\"type\":\"continuous\"},\"dueConfidence\":\"none\",\"appliesTo\":{\"entityType\":[\"private\",\"public\",\"listed\",\"opc\"]}" },
   { name: 'a prescribed-class rule stops saying the Rule is not held (SS4p)',
-    from: "\"id\":\"CA-SUP-SEC-177-9\",\"sourceRow\"",
-    to:   "\"appliesToText\":\"Every company\",\"id\":\"CA-SUP-SEC-177-9\",\"sourceRow\"" },
+    from: "cribed.\",\"frequency\":\"Continuous\",\"timelineText\":\"Continuous\",\"due\":{\"type\":\"continuous\"},\"dueConfidence\":\"none\",\"appliesTo\":{\"entityType\":[\"public\",\"listed\"]},\"appliesToText\":\"Every listed company, and every other company in the class s.177(9) says \\\"may be prescribed\\\". Rule 6 of the Companies (Meetings of Board and its Powers) Rules 2014 sets it; those Rules are NOT in reference/, so the class test cannot be evaluated here.\"",
+    to:   "cribed.\",\"frequency\":\"Continuous\",\"timelineText\":\"Continuous\",\"due\":{\"type\":\"continuous\"},\"dueConfidence\":\"none\",\"appliesTo\":{\"entityType\":[\"public\",\"listed\"]},\"appliesToText\":\"Every company\"" },
+  { name: 'the s.186 loans register stops reaching a private company (SS4q)',
+    from: "er as may be prescribed.\",\"frequency\":\"Continuous\",\"timelineText\":\"Continuous\",\"due\":{\"type\":\"continuous\"},\"dueConfidence\":\"none\",\"appliesTo\":{\"entityType\":[\"private\",\"public\",\"listed\",\"opc\"]}",
+    to:   "er as may be prescribed.\",\"frequency\":\"Continuous\",\"timelineText\":\"Continuous\",\"due\":{\"type\":\"continuous\"},\"dueConfidence\":\"none\",\"appliesTo\":{\"entityType\":[\"listed\"]}" },
+  { name: 'a s.12 registered-office duty is given an invented annual date (SS4q r/w SS2k)',
+    from: "ave d\",\"frequency\":\"Continuous\",\"timelineText\":\"Continuous\",\"due\":{\"type\":\"continuous\"}",
+    to:   "ave d\",\"frequency\":\"Continuous\",\"timelineText\":\"Continuous\",\"due\":{\"type\":\"annual\"}" },
+  { name: 'the BEN-4 application is re-cited to s.90(6), the person\'s own period (SS4q r/w SS3y)',
+    from: "\"regulation\":\"Section 90(7)\"",
+    to:   "\"regulation\":\"Section 90(6)\"" },
+  { name: 'a quote stitched across a footnote block stops saying so (SS4q r/w SS3z)',
+    from: "esolution\",\"frequency\":\"Continuous\",\"timelineText\":\"Continuous\",\"due\":{\"type\":\"continuous\"},\"dueConfidence\":\"none\",\"appliesTo\":{\"entityType\":[\"private\",\"public\",\"listed\",\"opc\"]},\"appliesToText\":\"Every company\",\"owner\":\"CS\",\"evidence\":\"Board minutes / register / filing\",\"risk\":\"High\",\"priority\":\"High\",\"submitTo\":null,\"signedBy\":\"Board\",\"notes\":null,\"quoteStitched\":true",
+    to:   "esolution\",\"frequency\":\"Continuous\",\"timelineText\":\"Continuous\",\"due\":{\"type\":\"continuous\"},\"dueConfidence\":\"none\",\"appliesTo\":{\"entityType\":[\"private\",\"public\",\"listed\",\"opc\"]},\"appliesToText\":\"Every company\",\"owner\":\"CS\",\"evidence\":\"Board minutes / register / filing\",\"risk\":\"High\",\"priority\":\"High\",\"submitTo\":null,\"signedBy\":\"Board\",\"notes\":null,\"quoteStitched\":false" },
+  { name: 'the seven-year IEPF explanation is dropped (SS4q r/w SS3e)',
+    from: "'CA-SUP-SEC-124-5': 'SEVEN YEARS is a WAITING PERIOD",
+    to:   "'CA-SUP-SEC-124-5-GONE': 'SEVEN YEARS is a WAITING PERIOD" },
+  { name: 'an independent director\'s term limit is called a deadline (SS4q r/w SS3e)',
+    from: "'CA-SUP-SEC-149-10': 'FIVE CONSECUTIVE YEARS is a TERM LIMIT, not a deadline. '",
+    to:   "'CA-SUP-SEC-149-10': 'FIVE CONSECUTIVE YEARS is the deadline. '" },
+  { name: 's.186(5) is relaxed to a majority of the directors present (SS4q)',
+    from: "\"The Board resolution must be passed at a meeting with the consent of ALL the directors present",
+    to:   "\"The Board resolution must be passed at a meeting with the consent of a MAJORITY of the directors present" },
+  { name: 's.118(10) stops saying SS-1 and SS-2 are not held (SS4q r/w SS2z)',
+    from: "SS-1 (Board meetings) and SS-2 (general meetings) are ICSI documents and are NOT in reference/",
+    to:   "SS-1 (Board meetings) and SS-2 (general meetings) are carried in full here" },
 ];
 
 const src = fs.readFileSync(INDEX, 'utf8');

@@ -2369,7 +2369,7 @@ describe('companies act supplement');
 {
   const CS = app.CA_SUP_DATA;
   ok('the supplement is loaded', !!(CS && CS.rules && CS.rules.length), 'CA_SUP_DATA missing');
-  check('thirty-six obligations', (CS.rules || []).length, 36);   // SS4p added the governance tranche
+  check('sixty-one obligations', (CS.rules || []).length, 61);   // SS4q added s.90/s.12/s.118/s.186
 
   // THE INVARIANT. Where a rule states a period, that period must appear in
   // the quote. Otherwise the register asserts a number the evidence beside it
@@ -4043,6 +4043,197 @@ describe('the Act governance sections, sub-section by sub-section');
      'absent');
   ok('and NOT the independent-director tenure rules',
      psecs.indexOf('Section 149(11)') < 0, 'it reached a private company');
+}
+
+describe('the Act sections cited bare: s.90, s.12, s.118, s.186');
+{
+  const CAS = app.CA_SUP_DATA;
+  const R = id => (CAS.rules || []).find(r => r.id === id) || {};
+  // The extraction splits words -- "Corporate Ident ity Number", "com pany",
+  // "inves tment". Letters only, so a quote cannot fail a check for the way the
+  // PDF happened to break a line (SS3z).
+  const L = s => String(s || '').toLowerCase().replace(/[^a-z]/g, '');
+  const NEW = (CAS.rules || []).filter(r => /^CA-SUP-SEC-(90|12|118|186)-/.test(r.id));
+  check('twenty-five obligations authored', NEW.length, 25);
+
+  // ---- what was actually missing -------------------------------------
+  // s.90(4A), inserted 15 Aug 2019: the company may not WAIT for a declaration.
+  ok('s.90(4A) makes IDENTIFYING a significant beneficial owner the company duty',
+     L(R('CA-SUP-SEC-90-4A').quote).indexOf(L('take necessary steps to identify')) >= 0,
+     (R('CA-SUP-SEC-90-4A').quote || '(absent)').slice(0, 110));
+
+  // s.186(5): a MAJORITY does not authorise a s.186 transaction.
+  ok('s.186(5) requires the consent of ALL the directors present',
+     L(R('CA-SUP-SEC-186-5').quote).indexOf(L('consent of all the directors present at the meeting')) >= 0,
+     (R('CA-SUP-SEC-186-5').quote || '(absent)').slice(0, 130));
+  ok('and the rule\'s own TITLE says ALL, not a majority',
+     /consent of ALL the directors present/.test(R('CA-SUP-SEC-186-5').title || '') &&
+     !/majority/i.test(R('CA-SUP-SEC-186-5').title || ''),
+     R('CA-SUP-SEC-186-5').title || '(absent)');
+  ok('and the prior approval of the public financial institution',
+     L(R('CA-SUP-SEC-186-5').quote).indexOf(L('prior approval of the public financial institution')) >= 0,
+     (R('CA-SUP-SEC-186-5').quote || '(absent)').slice(0, 130));
+
+  // s.186(2) is "whichever is MORE", and s.186(11) exempts the whole section
+  // EXCEPT sub-section (1) -- so the two-layer limit survives every exemption.
+  ok('s.186(2) takes the HIGHER of the two limbs',
+     L(R('CA-SUP-SEC-186-2').quote).indexOf('whicheverismore') >= 0,
+     (R('CA-SUP-SEC-186-2').quote || '(absent)').slice(-90));
+  ok('and its detail names s.180(1)(c) as a DIFFERENT test',
+     /180\(1\)\(c\)/.test(R('CA-SUP-SEC-186-2').detail || ''),
+     (R('CA-SUP-SEC-186-2').detail || '(absent)').slice(0, 110));
+  ok('s.186(1) says the two-layer limit survives the s.186(11) exemptions',
+     /186\(11\)/.test(R('CA-SUP-SEC-186-1').detail || '') &&
+     /EXCEPT sub-section \(1\)/i.test(R('CA-SUP-SEC-186-1').detail || ''),
+     (R('CA-SUP-SEC-186-1').detail || '(absent)').slice(0, 130));
+
+  // s.118(4): the DISSENT limb is the one that decides who is an officer in
+  // default, and a minute recording only that a resolution passed omits it.
+  ok('s.118(4) records the directors PRESENT and those DISSENTING',
+     L(R('CA-SUP-SEC-118-4').quote).indexOf(L('names of the directors present')) >= 0 &&
+     L(R('CA-SUP-SEC-118-4').quote).indexOf(L('dissenting from, or not concurring')) >= 0,
+     (R('CA-SUP-SEC-118-4').quote || '(absent)').slice(0, 140));
+
+  // s.118(10): the Secretarial Standards are MANDATORY by statute, and SS-1 and
+  // SS-2 are not in reference/ (SS2z). Both halves have to be said.
+  ok('s.118(10) carries the statutory duty to observe the Secretarial Standards',
+     L(R('CA-SUP-SEC-118-10').quote).indexOf(L('shall observe secretarial standards')) >= 0,
+     (R('CA-SUP-SEC-118-10').quote || '(absent)').slice(0, 110));
+  ok('and says SS-1 and SS-2 are not in reference/',
+     /SS-1/.test(R('CA-SUP-SEC-118-10').detail || '') &&
+     /SS-2/.test(R('CA-SUP-SEC-118-10').detail || '') &&
+     /NOT in reference\//.test(R('CA-SUP-SEC-118-10').detail || ''),
+     (R('CA-SUP-SEC-118-10').detail || '(absent)').slice(0, 130));
+
+  // s.12(3)'s limb (c) is the one that is missed -- CIN, telephone, email and
+  // website on every letter and billhead.
+  ok('s.12(3) reaches limb (c): the CIN and contact details on every letter',
+     L(R('CA-SUP-SEC-12-3').quote).indexOf(L('Corporate Identity Number')) >= 0 &&
+     L(R('CA-SUP-SEC-12-3').quote).indexOf(L('billheads')) >= 0,
+     (R('CA-SUP-SEC-12-3').quote || '(absent)').slice(0, 120));
+
+  // ---- READ THE PERIOD AND THE SUBJECT (SS3y's s.84) -----------------
+  // Three periods in this tranche belong to somebody else. SS3v records how
+  // close this audit came to matching s.90(6)'s thirty days to the company.
+  const cited = (CAS.rules || []).map(r => String(r.regulation || ''));
+  ok('nothing claims s.90(6) -- the thirty-day reply is the NOTIFIED PERSON\'s',
+     cited.indexOf('Section 90(6)') < 0, 'a rule cites s.90(6)');
+  ok('nothing claims s.90(8) -- the sixty days is the TRIBUNAL\'s',
+     cited.indexOf('Section 90(8)') < 0, 'a rule cites s.90(8)');
+  ok('nothing claims s.186(6) -- it binds a SEBI Act s.12 intermediary',
+     cited.indexOf('Section 186(6)') < 0, 'a rule cites s.186(6)');
+  // s.12(6) holds three periods and only the sixty days is the company's.
+  ok('s.12(6) claims SIXTY days, not the Regional Director\'s thirty',
+     /sixty/i.test(R('CA-SUP-SEC-12-6').timelineText || '') &&
+     !/thirty/i.test(R('CA-SUP-SEC-12-6').timelineText || ''),
+     R('CA-SUP-SEC-12-6').timelineText || '(absent)');
+  ok('and its detail says which of the three periods are not the company\'s',
+     /Regional Director/i.test(R('CA-SUP-SEC-12-6').detail || '') &&
+     /Registrar/i.test(R('CA-SUP-SEC-12-6').detail || ''),
+     (R('CA-SUP-SEC-12-6').detail || '(absent)').slice(-120));
+
+  // ---- a stitched quote must not pass as contiguous (SS3z, SS4n) -----
+  const stitched = NEW.filter(r => r.quoteStitched).map(r => r.id).sort();
+  check('exactly the two quotes that span a footnote block are marked stitched',
+        stitched.join(','), 'CA-SUP-SEC-118-4,CA-SUP-SEC-12-3');
+
+  // ---- the register, end to end --------------------------------------
+  // All twenty-five bind EVERY company. None reaches an LLP, which is outside
+  // the Companies Act regime altogether (SS2z).
+  const mk = (t, cin) => ({ id: 'Q-' + t, name: t, type: t, fyend: '2026-03-31',
+    capital: 5e8, turnover: 4e9, networth: 1e7, netprofit: 1e7, borrowings: 0,
+    cin: cin, chart: {} });
+  const reach = (t, cin) => {
+    const secs = new Set((app.getComplianceChart(mk(t, cin)) || [])
+      .map(r => String(r.section || '')));
+    return NEW.filter(r => secs.has(r.regulation)).length;
+  };
+  check('all twenty-five reach a listed company', reach('listed', 'L17110MH2009PLC195422'), 25);
+  check('all twenty-five reach a private company', reach('private', 'U51909MH2018PTC300111'), 25);
+  check('all twenty-five reach a One Person Company', reach('opc', 'U51909MH2018OPC300222'), 25);
+  check('and none of them reaches an LLP', reach('llp', 'AAA-1234'), 0);
+
+  // Not one of the twenty-five can be dated: every clock starts on an event no
+  // register here records (SS3x's third kind of silence).
+  const rows = (app.getComplianceChart(mk('listed', 'L17110MH2009PLC195422')) || [])
+    .filter(r => NEW.some(n => n.regulation === String(r.section || '')));
+  check('and not one of them carries an invented date', rows.filter(r => r.due).length, 0);
+}
+
+describe('a number with a blank beside it: the Act supplement invariant');
+{
+  // SS3e: A BLANK IS NOT AN EXPLANATION. The LODR supplement has had this
+  // invariant since SS3z and PIT since SS4a. THE COMPANIES ACT SUPPLEMENT NEVER
+  // GOT ONE -- so every event-anchored rule authored since SS3y showed a
+  // statutory number and said nothing about why it had no date, and 946
+  // assertions could not see it because none looked.
+  //
+  // And this one reads the TITLE as well as timelineText, which is where the
+  // LODR version would still have missed "a term of up to five consecutive
+  // years".
+  const CAS = app.CA_SUP_DATA;
+  const NUM = /\b(one hundred and eighty|twenty[- ]?one|forty[- ]?five|fifteen|thirty|seven|sixty|ninety|three|two|one|five|six|ten|eight|182)\s+(working\s+|consecutive\s+|clear\s+)?(days?|months?|years?)\b/i;
+  const NODATE = t => !t || ['continuous', 'at_trigger', 'event', 'review'].indexOf(t) >= 0;
+  const statesNum = (CAS.rules || []).filter(r =>
+    NODATE((r.due || {}).type) &&
+    (NUM.test(r.timelineText || '') || NUM.test(r.title || '')));
+  // SS3v: a count of failures means nothing without the count of checks behind
+  // it. If the filter stops matching, the assertion below passes vacuously.
+  ok('the invariant has something to check', statesNum.length >= 25,
+     'only ' + statesNum.length + ' undated rules state a number');
+  const unexplained = statesNum.filter(r => !app.lgNoDeadlineWhy({ key: r.id, due: null }));
+  ok('every undated Act rule that states a number explains why it has no date',
+     unexplained.length === 0, unexplained.map(r => r.id).join(', '));
+
+  // THE CONTRACT, BOTH WAYS (SS3e). A mapped key that HAS a date must get
+  // nothing -- an explanation for having no deadline, offered against a row
+  // that has one, is a contradiction on the screen.
+  ok('the same key with a date gets no explanation',
+     app.lgNoDeadlineWhy({ key: 'CA-SUP-SEC-124-5', due: '2026-10-30' }) === null,
+     'an explanation was offered for a dated row');
+  ok('and without one it still gets its explanation',
+     !!app.lgNoDeadlineWhy({ key: 'CA-SUP-SEC-124-5', due: null }), 'no explanation');
+
+  // FIVE DIFFERENT REASONS, and "Deadline not established" reads identically
+  // for all of them. Each explanation has to carry its own.
+  const why = id => String(app.lgNoDeadlineWhy({ key: id, due: null }) || '');
+  const KINDS = [
+    ['CA-SUP-SEC-124-5', /waiting period/i, 'a waiting period'],
+    ['CA-SUP-SEC-124-6', /waiting period/i, 'a waiting period on the SHARES'],
+    ['CA-SUP-SEC-149-3', /measurement/i, 'a measurement over the year'],
+    ['CA-SUP-SEC-149-10', /term limit/i, 'a term limit'],
+    ['CA-SUP-SEC-149-11', /disqualification/i, 'a disqualification'],
+    ['CA-SUP-SEC-139-2', /rotation clock/i, 'a rotation clock'],
+    ['CA-SUP-SEC-90-5', /look-back/i, 'a look-back window'],
+    ['CA-SUP-SECTION-124', /compound/i, 'a compound period'],
+    ['CA-SUP-SECTION-119', /holiday calendar/i, 'working days with no calendar'],
+  ];
+  KINDS.forEach(([id, re_, what]) => {
+    ok(id + ' says it is ' + what, re_.test(why(id)), why(id).slice(0, 110) || '(none)');
+  });
+  // The commonest reason, and the dangerous one: the period is CERTAIN and the
+  // anchor is not held. A CS reading a blank could conclude there is no period.
+  const anchorless = ['CA-SUP-SEC-12-2', 'CA-SUP-SEC-12-4', 'CA-SUP-SEC-12-6',
+                      'CA-SUP-SEC-90-7', 'CA-SUP-SEC-139-6', 'CA-SUP-SECTION-10A'];
+  anchorless.forEach(id => {
+    ok(id + ' names the period and says the anchor is not held',
+       /period is certain/i.test(why(id)) && /holds no |no register/i.test(why(id)),
+       why(id).slice(0, 120) || '(none)');
+  });
+
+  // SS4h, SS4q: four shapes the period parser could not read, three of them
+  // hand-authored here. The gate now compares all four against the held text.
+  // LG_GATE is DERIVED, so this is a regression guard rather than a mutation
+  // target -- the runner is deliberately blind to that blob (SS4g).
+  const G = (typeof app.LG_GATE === 'object' && app.LG_GATE) || {};
+  const GR = G.rules || {};
+  [['CA-SUP-SECTION-10A', 'one hundred and eighty days'],
+   ['CA-SUP-SEC-101-1', 'clear twenty-one days'],
+   ['CA-SUP-SEC-124-5', 'seven years'],
+   ['CA-SUP-SEC-124-6', 'seven consecutive years']].forEach(([id, shape]) => {
+    ok('the gate now confirms "' + shape + '" against the held text',
+       (GR[id] || {}).v === 'ok', id + ' verdict: ' + ((GR[id] || {}).v || 'absent'));
+  });
 }
 
 // The access-check assertions are async — they drive a stubbed database through

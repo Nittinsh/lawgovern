@@ -1142,6 +1142,813 @@
    "submitTo": null,
    "signedBy": "Board",
    "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-90-2",
+   "sourceRow": 37,
+   "law": "Companies Act 2013",
+   "regulation": "Section 90(2)",
+   "area": "Beneficial interest",
+   "title": "Maintain a register of significant beneficial interest declared under s.90(1), and of changes in it",
+   "detail": "BEN-3. The register is the company duty that answers the individual duty in s.90(1): name, date of birth, address and details of ownership. The particulars beyond those are in the Companies (Significant Beneficial Owners) Rules 2018, which are NOT in reference/. An empty register is not the same as there being no significant beneficial owner - see s.90(4A), which makes identifying one the company’s job.",
+   "quote": "Every company shall maintain a register of the interest declared by individuals under sub - section ( 1) and changes therein which shall include the name of individual, his date of birth, address, details of ownership in the company and such other details as may be prescribed.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company",
+   "owner": "CS",
+   "evidence": "Board minutes / register / filing",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-90-3",
+   "sourceRow": 38,
+   "law": "Companies Act 2013",
+   "regulation": "Section 90(3)",
+   "area": "Beneficial interest",
+   "title": "The s.90(2) register must be open to inspection by any member on payment of the prescribed fee",
+   "detail": "A member may inspect; the fee is prescribed by the SBO Rules, not held here. Denying inspection is penalised by s.90(11) in the same breath as failing to maintain the register at all.",
+   "quote": "The register maintained under sub -section ( 2) shall be open to inspection by any member of the company on payment of such fees as may be prescribed.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company",
+   "owner": "CS",
+   "evidence": "Board minutes / register / filing",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-90-4A",
+   "sourceRow": 39,
+   "law": "Companies Act 2013",
+   "regulation": "Section 90(4A)",
+   "area": "Beneficial interest",
+   "title": "The company must take necessary steps to IDENTIFY a significant beneficial owner and require him to comply with s.90",
+   "detail": "Inserted with effect from 15 August 2019, and the limb most often missed: the company may not wait for a declaration under s.90(1). Where nobody has declared, s.90(4A) requires the company to go and find out, and then to require that person to comply. The BEN-2 return under s.90(4) is emitted from the beneficial-interest register, which holds the date the declaration was received (s.89(6)); this duty runs whether or not anything has been received.",
+   "quote": "Every company shall take necessary steps to identify an individual who is a significant beneficial owner in relation to the company and require him to comply with the provisions of this section.]",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company",
+   "owner": "CS",
+   "evidence": "Board minutes / register / filing",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-90-5",
+   "sourceRow": 40,
+   "law": "Companies Act 2013",
+   "regulation": "Section 90(5)",
+   "area": "Beneficial interest",
+   "title": "Give notice in BEN-4 to any person the company believes to be, to know of, or to have been in the last three years a significant beneficial owner",
+   "detail": "Three limbs, and the third is the one that surprises people: a person who WAS a significant beneficial owner at any time in the three years before the notice. The notice is the step that must be taken before the s.90(7) application to the Tribunal becomes available, so skipping it forecloses the remedy.",
+   "quote": "A company shall give notice, in the prescribed manner, to any person (whether or not a member of the company) whom the company knows or has reasonable cause to believe — (a) to be a significant beneficial owner of the company; (b) to be having knowledge of the identity of a s ignificant beneficial owner or another person likely to have such knowledge; or (c) to have been a significant beneficial owner of the company at any time during the three years immediately preceding the date on which the notice is issued, and who is not registered as a significant beneficial owner with the company as required under this section",
+   "frequency": "On becoming aware",
+   "timelineText": "On knowledge or reasonable cause to believe",
+   "due": {
+    "type": "at_trigger",
+    "when": "The company knows or has reasonable cause to believe a person is, knows of, or was a significant beneficial owner"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company",
+   "owner": "CS",
+   "evidence": "Board minutes / register / filing",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-90-7",
+   "sourceRow": 41,
+   "law": "Companies Act 2013",
+   "regulation": "Section 90(7)",
+   "area": "Beneficial interest",
+   "title": "Apply to the Tribunal within FIFTEEN DAYS of the expiry of the BEN-4 notice period where the person does not reply, or replies unsatisfactorily",
+   "detail": "The company’s own deadline, and it is short: fifteen days from the expiry of the period in the notice - which s.90(6) caps at thirty days from the date of the notice. Note s.90(6)’s thirty days is the NOTIFIED PERSON’S period, not the company’s. Where the Tribunal restricts the shares under s.90(8) and no relaxation is applied for within a year, the proviso to s.90(9) transfers those shares to the authority under s.125(5). This app holds no register of BEN-4 notices, so the period is certain and the anchor is not held.",
+   "quote": "The company shall, — (a) where that person fails to give the company the information required by the notice within the time specified therein; or (b) where the information given is not satisfactory, apply to the Tribunal within a period of fifteen days of the expiry of the period specified in the notice, for an order directing that the shares in question be subject to restrictions with regard to transfer of interest, suspension of all rights attached to the shares and such other matters a s may be prescribed.",
+   "frequency": "On a failed or unsatisfactory reply",
+   "timelineText": "Within fifteen days of expiry of the notice period",
+   "due": {
+    "type": "at_trigger",
+    "when": "The period specified in the s.90(5) notice expires without a satisfactory reply"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company",
+   "owner": "CS",
+   "evidence": "Board minutes / register / filing",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-12-1",
+   "sourceRow": 42,
+   "law": "Companies Act 2013",
+   "regulation": "Section 12(1)",
+   "area": "Registered office",
+   "title": "Have a registered office capable of receiving and acknowledging all communications within THIRTY DAYS of incorporation, and at all times thereafter",
+   "detail": "Two duties in one sub-section and the summary rule carries only the second. The thirty-day limb is the one-time establishment deadline at incorporation; \"and at all times thereafter\" is the continuous one. The office must be CAPABLE OF RECEIVING AND ACKNOWLEDGING communications - an address that receives nothing does not satisfy s.12(1), and s.12(9) lets the Registrar physically verify it and move to strike the company off.",
+   "quote": "A company shall, 3[within thirty days of its incorporation] and at all times thereafter, have a registered office capable of receiving and acknowledging all communications and notices as may be addressed to it.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company",
+   "owner": "CS",
+   "evidence": "Board minutes / register / filing",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-12-2",
+   "sourceRow": 43,
+   "law": "Companies Act 2013",
+   "regulation": "Section 12(2)",
+   "area": "Registered office",
+   "title": "Furnish verification of the registered office to the Registrar within THIRTY DAYS of incorporation",
+   "detail": "INC-22. A separate filing from the s.12(1) duty to have the office at all: a company can have a registered office and still be in default of s.12(2). The manner is prescribed by the Companies (Incorporation) Rules 2014, which are NOT in reference/. This app holds no registration date, so the period is certain and the anchor is not held.",
+   "quote": "The com pany shall furnish to the Registrar verification of its registered office within a period of thirty days of its incorporation in such manner as may be prescribed.",
+   "frequency": "On incorporation",
+   "timelineText": "Within thirty days of incorporation",
+   "due": {
+    "type": "at_trigger",
+    "when": "The company is incorporated"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company",
+   "owner": "CS",
+   "evidence": "Board minutes / register / filing",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-12-3",
+   "sourceRow": 44,
+   "law": "Companies Act 2013",
+   "regulation": "Section 12(3)",
+   "area": "Registered office",
+   "title": "Display the name and registered-office address outside every place of business, and print the name, address, CIN, telephone, fax, email and website on every letter, bill and notice",
+   "detail": "The limb that is missed is (c): the Corporate Identity Number, telephone number, fax number if any, email and website addresses on all business letters, billheads, letter papers, notices and other official publications. A letterhead carrying only the name and address does not comply. Where the name was changed in the last two years the former name must be printed alongside for two years from the change.",
+   "quote": "Every company shall — (a) paint or affix its name, and the address of its registered offic e, and keep the same painted or affixed, on the outside of every office or place in which its business is carried on, in a conspicuous position, in legible letters, and if the characters employed therefor are not those of the language or of one of the lang uages in general use in that locality, also in the characters of that language or of one of those languages; 4[(b) have its name engraved in legible characters on its seal, if any;] (c) get its name, address of its registered office and the Corporate Ident ity Number along with telephone number, fax number, if any, e -mail and website addresses, if any, printed in all its business letters, billheads, letter papers and in all its notices and other official publications; and (d) have its name printed on hundies , promissory notes, bills of exchange and such other documents as may be prescribed: Provided that where a company has changed its name or names during the last two years, it shall paint or affix or print, as the case may be, along with its name, the forme r name or names so changed during the last two years as required under clauses ( a) and ( c): Provided further that the words “One Person Company ” shall be mentioned in brackets below the name of such company, wherever its name is printed, affixed or engrave d",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company",
+   "owner": "CS",
+   "evidence": "Board minutes / register / filing",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null,
+   "quoteStitched": true
+  },
+  {
+   "id": "CA-SUP-SEC-12-4",
+   "sourceRow": 45,
+   "law": "Companies Act 2013",
+   "regulation": "Section 12(4)",
+   "area": "Registered office",
+   "title": "Give notice of every change in the situation of the registered office to the Registrar within THIRTY DAYS of the change",
+   "detail": "INC-22, on a change. The thirty days was substituted for fifteen by the Companies (Amendment) Act 2017 with effect from 27 July 2018, so a CS working from the older figure files twice as early as required - the safe direction, but not the period. This app holds no register of office changes, so the period is certain and the anchor is not held.",
+   "quote": "Notice of every change of the situation of the registered office, verified in the manner prescribed, after the date of incorporation of the company, shall be given to the Registrar 1[within thirty days] of the change, who shall record the same.",
+   "frequency": "On a change of registered office",
+   "timelineText": "Within thirty days of the change",
+   "due": {
+    "type": "at_trigger",
+    "when": "The situation of the registered office changes"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company",
+   "owner": "CS",
+   "evidence": "Board minutes / register / filing",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-12-5",
+   "sourceRow": 46,
+   "law": "Companies Act 2013",
+   "regulation": "Section 12(5)",
+   "area": "Registered office",
+   "title": "The registered office may not be moved outside the local limits of its city, town or village except by SPECIAL resolution, and outside the State only with Regional Director confirmation",
+   "detail": "An ordinary resolution does not move a registered office out of its local limits. A move from one State to another, or between the jurisdictions of two Registrars within a State, also needs the confirmation of the Regional Director under the proviso - and s.13(4) requires Central Government approval for the memorandum alteration that goes with an inter-State move. Three separate approvals, and the resolution alone is not enough.",
+   "quote": "Except on the authority of a special resolution passed by a company, the registered office of the company shall not be changed, — (a) in the case of an existing company, outside the local limits of any city, town or village where such office is situated at the commencement of this Act or where it may be situated later by virtue of a special resolution passed by the company; and (b) in the case of any other company, outside the local limits of any city, town or village where such office is first situated or w here it may be situated later by virtue of a special resolution passed by the company: Provided that no company shall change the place of its registered office from the jurisdiction of one Registrar to the jurisdiction of another Registrar within the same State unless such change is confirmed by the Regional Director on an application made in this behalf by the company in the prescribed manner",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company",
+   "owner": "CS",
+   "evidence": "Board minutes / register / filing",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-12-6",
+   "sourceRow": 47,
+   "law": "Companies Act 2013",
+   "regulation": "Section 12(6)",
+   "area": "Registered office",
+   "title": "File the Regional Director confirmation of a registered-office change with the Registrar within SIXTY DAYS of the date of confirmation",
+   "detail": "Three periods sit in this one sub-section and only one is the company’s. The thirty days to communicate the confirmation is the REGIONAL DIRECTOR’S and the thirty days to certify registration is the REGISTRAR’S; the sixty days to file is the company’s, and it is the only one carried here. Until the certificate under s.12(7) issues, the change has not taken effect.",
+   "quote": "The confirmation referred to in sub -section ( 5) shall be communicated within a period of thirty days from the date of receipt of application by the Regional Director to the company and the company shall file the confirmation with the Registrar within a period of sixty days of the date of confirmation who shall register the same and certify the registration within a period of thirty days from the date of filing of such confirmation.",
+   "frequency": "On confirmation of the change",
+   "timelineText": "Within sixty days of the date of confirmation",
+   "due": {
+    "type": "at_trigger",
+    "when": "The Regional Director communicates confirmation of the change of registered office"
+   },
+   "dueConfidence": "trigger",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company",
+   "owner": "CS",
+   "evidence": "Board minutes / register / filing",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-118-2",
+   "sourceRow": 48,
+   "law": "Companies Act 2013",
+   "regulation": "Section 118(2)",
+   "area": "Minutes",
+   "title": "The minutes of each meeting must contain a fair and correct summary of the proceedings",
+   "detail": "The summary rule and the per-meeting s.118(1) row both say minutes must be PREPARED and KEPT. Neither says what they must contain. s.118(2) is the content test, and it is the one an inspection turns on. What must be left OUT is s.118(5) - anything defamatory, irrelevant or detrimental to the company - and s.118(6) gives the Chairman absolute discretion over that, which is why those two are not carried as obligations here.",
+   "quote": "The minutes of each meeting shall contain a fair and correct summary of the proceedings thereat.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company",
+   "owner": "CS",
+   "evidence": "Board minutes / register / filing",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-118-3",
+   "sourceRow": 49,
+   "law": "Companies Act 2013",
+   "regulation": "Section 118(3)",
+   "area": "Minutes",
+   "title": "All appointments made at any such meeting must be included in the minutes",
+   "detail": "Every appointment, at a general meeting, a Board meeting or a committee meeting. s.118(8) then deems appointments of directors, key managerial personnel, auditors and a company secretary in practice to be VALID where the minutes were kept under s.118(1) - so an appointment omitted from the minutes loses that protection.",
+   "quote": "All appointments made at any of the meetings aforesaid shall be included in the minut es of the meeting.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company",
+   "owner": "CS",
+   "evidence": "Board minutes / register / filing",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-118-4",
+   "sourceRow": 50,
+   "law": "Companies Act 2013",
+   "regulation": "Section 118(4)",
+   "area": "Minutes",
+   "title": "Board and committee minutes must also record the names of the directors PRESENT, and for each resolution the names of those DISSENTING or not concurring",
+   "detail": "The dissent limb is the one that is missed, and it is the one that decides who is an officer in default. A minute recording only that a resolution was passed does not comply with s.118(4)(b), and a director who dissented has no record of it.",
+   "quote": "In the case of a meeting of the Board of Directors or of a committee of the Board, the minutes shall also contain — (a) the names of the directors present at the meeting; and (b) in the case of each resolution passed at the meeting, t he names of the directors, if any, dissenting from, or not concurring with the resolution",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company",
+   "owner": "CS",
+   "evidence": "Board minutes / register / filing",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null,
+   "quoteStitched": true
+  },
+  {
+   "id": "CA-SUP-SEC-118-9",
+   "sourceRow": 51,
+   "law": "Companies Act 2013",
+   "regulation": "Section 118(9)",
+   "area": "Minutes",
+   "title": "No report of the proceedings of a general meeting may be circulated or advertised at the company’s expense unless it includes what the minutes must contain",
+   "detail": "This bites on press releases, newspaper advertisements and annual-report summaries of an AGM. A partial account of the proceedings paid for by the company is prohibited outright, not merely incomplete.",
+   "quote": "No document purporting to be a report of the proceedings of any general meeting of a company shall be circulated or advertised at the expense of the compan y, unless it includes the matters required by this section to be contained in the minutes of the proceedings of such meeting.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company",
+   "owner": "CS",
+   "evidence": "Board minutes / register / filing",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-118-10",
+   "sourceRow": 52,
+   "law": "Companies Act 2013",
+   "regulation": "Section 118(10)",
+   "area": "Minutes",
+   "title": "Observe the Secretarial Standards on general and Board meetings specified by the ICSI (SS-1 and SS-2)",
+   "detail": "The Secretarial Standards are MANDATORY by force of this sub-section - not guidance. SS-1 (Board meetings) and SS-2 (general meetings) are ICSI documents and are NOT in reference/, so their individual clauses cannot be carried or checked here; the checklists mark every item resting on them. The statutory duty to observe them is what this row states, and it is in the Act.",
+   "quote": "Every company shall observe secretarial standards with respect to general and Board meetings specified by the Institute of Co mpany Secretaries of India constituted under section 3 of the Company Secretaries Act, 1980 (56 of 1980), and approved as such by the Central Government.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company",
+   "owner": "CS",
+   "evidence": "Board minutes / register / filing",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-186-1",
+   "sourceRow": 53,
+   "law": "Companies Act 2013",
+   "regulation": "Section 186(1)",
+   "area": "Loans and investments",
+   "title": "Investment may be made through NOT MORE THAN TWO LAYERS of investment companies",
+   "detail": "A structural limit on the group, not a monetary one, and note s.186(11): the exemptions in that sub-section apply to the whole of s.186 EXCEPT sub-section (1). So a banking, insurance or infrastructure company, and an investment company or an NBFC, is outside most of s.186 and still inside the two-layer limit. The proviso preserves acquiring a foreign company that has subsidiaries beyond two layers under the law of its own country.",
+   "quote": "Without prejudice to the provisions contained in this Act, a company shall unless otherwise prescribed, make investment through not more than two layers of investment companies:",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company",
+   "owner": "CS",
+   "evidence": "Board minutes / register / filing",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-186-2",
+   "sourceRow": 54,
+   "law": "Companies Act 2013",
+   "regulation": "Section 186(2)",
+   "area": "Loans and investments",
+   "title": "A loan, guarantee, security or acquisition may not exceed 60% of paid-up capital, free reserves and securities premium, or 100% of free reserves and securities premium, WHICHEVER IS MORE",
+   "detail": "Computed by the Loan and investment calculator, which shows both limbs and takes the higher. This is a DIFFERENT test from s.180(1)(c), which caps BORROWING against a similar base: a company can be inside one and outside the other. The Explanation excludes an individual in the employment of the company from the word \"person\", so a staff loan is not caught by limb (a).",
+   "quote": "No company shall directly or indirectly — (a) give any loan to any person or other body corporate; (b) give any guarantee or provide security in connection with a loan to any other body corpora te or person; and (c) acquire by way of subscription, purchase or otherwise, the securities of any other body corporate, exceeding sixty per cent. of its paid -up share capital, free reserves and securities premium account or one hundred per cent. of its fr ee reserves and securities premium account, whichever is more.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company",
+   "owner": "CS",
+   "evidence": "Board minutes / register / filing",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-186-3",
+   "sourceRow": 55,
+   "law": "Companies Act 2013",
+   "regulation": "Section 186(3)",
+   "area": "Loans and investments",
+   "title": "Beyond the s.186(2) limits, a SPECIAL resolution in general meeting must be passed BEFORE the loan, guarantee, security or acquisition",
+   "detail": "\"Previously authorised\" - the sequence is the obligation. A special resolution ratifying a loan already made does not satisfy s.186(3). The proviso exempts a loan, guarantee or security to a wholly owned subsidiary or a joint venture, and an acquisition by a holding company of a wholly owned subsidiary’s securities, from the resolution requirement - but those amounts still count towards the s.186(2) limit, and the particulars still go in the financial statement under s.186(4).",
+   "quote": "Where the aggregate of the loans and inves tment so far made, the amount for which guarantee or security so far provided to or in all other bodies corporate along with the investment, loan, guarantee or security proposed to be made or given by the Board, exceed the limits specified under sub -sectio n (2), no investment or loan shall be made or guarantee shall be given or security shall be provided unless previously authorised by a special resolution passed in a general meeting:",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company",
+   "owner": "CS",
+   "evidence": "Board minutes / register / filing",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-186-4",
+   "sourceRow": 56,
+   "law": "Companies Act 2013",
+   "regulation": "Section 186(4)",
+   "area": "Loans and investments",
+   "title": "Disclose to the members in the financial statement the full particulars AND the purpose for which the recipient will use the loan, guarantee or security",
+   "detail": "Two limbs. The particulars are routinely given; the PURPOSE for which the recipient proposes to use the money is the limb left out, and it is stated in the same sentence.",
+   "quote": "The company shall disclose to the members in the financial statement the full particulars of the loans given, investment made or guarantee given or security provided and the purpose for which the loan or guarantee or security is proposed to be utilised by the recipient of the loan or guarantee or security.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company",
+   "owner": "CS",
+   "evidence": "Board minutes / register / filing",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-186-5",
+   "sourceRow": 57,
+   "law": "Companies Act 2013",
+   "regulation": "Section 186(5)",
+   "area": "Loans and investments",
+   "title": "The Board resolution must be passed at a meeting with the consent of ALL the directors present, and the prior approval of a public financial institution obtained where a term loan is subsisting",
+   "detail": "A majority does not authorise a s.186 transaction - the consent of every director present at the meeting is required, and a circular resolution cannot do it because the consent must be given at a meeting. The public financial institution’s PRIOR approval is needed where any term loan is subsisting, unless the proviso applies: the aggregate stays within the s.186(2) limit and there is no default in repayment.",
+   "quote": "No investment shall be made or loan or guarantee or security given by the company unless the resolution sanctioning it is passed at a meeting of the Board with the consent of all the directors present at the meeting and the prior approval of the public financial institution concerned where any term loan is subsisting, is obtained:",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company",
+   "owner": "CS",
+   "evidence": "Board minutes / register / filing",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-186-7",
+   "sourceRow": 58,
+   "law": "Companies Act 2013",
+   "regulation": "Section 186(7)",
+   "area": "Loans and investments",
+   "title": "No loan may be given at a rate of interest lower than the prevailing yield of the closest-tenor Government Security",
+   "detail": "One, three, five or ten year Government Security, whichever is closest to the tenor of the loan. An interest-free inter-corporate loan, and a loan at a concessional rate, both breach s.186(7) however commercially sensible they look.",
+   "quote": "No loan shall be given under this section at a rate of interest lower than the prevailing yield of one year, three year, five year or ten year Government Security closest to the tenor of the loan.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company",
+   "owner": "CS",
+   "evidence": "Board minutes / register / filing",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-186-8",
+   "sourceRow": 59,
+   "law": "Companies Act 2013",
+   "regulation": "Section 186(8)",
+   "area": "Loans and investments",
+   "title": "A company in default on repayment of deposits or interest may give NO loan, guarantee, security or acquisition while the default subsists",
+   "detail": "An absolute bar for as long as the default continues, and it reaches acquisitions as well as lending. The same shape as the proviso to LODR Reg 61, which bars a dividend while a debt default subsists - a restriction that sits in an unexpected place and is found late.",
+   "quote": "No company which is in default in the repaymen t of any deposits accepted before or after the commencement of this Act or in payment of interest thereon, shall give any loan or give any guarantee or provide any security or make an acquisition till such default is subsisting.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company",
+   "owner": "CS",
+   "evidence": "Board minutes / register / filing",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-186-9",
+   "sourceRow": 60,
+   "law": "Companies Act 2013",
+   "regulation": "Section 186(9)",
+   "area": "Loans and investments",
+   "title": "Keep a register (MBP-2) of every loan, guarantee, security and acquisition made under s.186",
+   "detail": "The particulars and the manner are prescribed by the Companies (Meetings of Board and its Powers) Rules 2014, which are NOT in reference/, so the contents of the register cannot be checked here. The duty to keep it is in the Act.",
+   "quote": "Every company giving lo an or giving a guarantee or providing security or making an acquisition under this section shall keep a register which shall contain such particulars and shall be maintained in such manner as may be prescribed.",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company giving a loan, guarantee or security or making an acquisition under s.186",
+   "owner": "CS",
+   "evidence": "Board minutes / register / filing",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
+  },
+  {
+   "id": "CA-SUP-SEC-186-10",
+   "sourceRow": 61,
+   "law": "Companies Act 2013",
+   "regulation": "Section 186(10)",
+   "area": "Loans and investments",
+   "title": "The MBP-2 register must be kept at the registered office, open to inspection there, and copies furnished to any member on payment of the prescribed fee",
+   "detail": "Three limbs: where it is kept, that it is open, and that extracts and copies go to a member who asks. The fee is prescribed by rules not held here.",
+   "quote": "The register referred to in sub -section (9) shall be kept at the registered office of the company and — (a) shall be open to inspection at such office; and (b) extracts may be taken therefrom by any member, and copies thereof may be furnished to any member of the company on payment of such fees as may be prescribed",
+   "frequency": "Continuous",
+   "timelineText": "Continuous",
+   "due": {
+    "type": "continuous"
+   },
+   "dueConfidence": "none",
+   "appliesTo": {
+    "entityType": [
+     "private",
+     "public",
+     "listed",
+     "opc"
+    ]
+   },
+   "appliesToText": "Every company",
+   "owner": "CS",
+   "evidence": "Board minutes / register / filing",
+   "risk": "High",
+   "priority": "High",
+   "submitTo": null,
+   "signedBy": "Board",
+   "notes": null
   }
  ]
 }

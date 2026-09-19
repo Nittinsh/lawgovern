@@ -5459,6 +5459,205 @@ Nothing here verifies a rule. Rule Governance reads "Never checked" for all 511.
 
 ---
 
+## 4q. A NUMBER WITH A BLANK BESIDE IT (v207)
+
+&sect;4p left the bare-cited Act pass at **seventeen of about seventy-eight**
+and named the next tranche by duty count: s.90 (11), s.118 (9), s.186 (9),
+s.12 (7). All thirty-eight sub-sections behind those four summary rules read.
+**Twenty-five authored, thirteen excluded with a reason** &mdash; and two
+findings that are not about the Act at all.
+
+### What was missing
+**MBP-2. INC-20A’s neighbour INC-22. The two-layer limit. The dissent in the
+minutes. And the Secretarial Standards, which are mandatory by statute.**
+
+| | |
+|---|---|
+| **s.90(2), (3)** | the BEN-3 register of declared significant beneficial interest, and a member’s right to inspect it |
+| **s.90(4A)** | **take necessary steps to IDENTIFY a significant beneficial owner** &mdash; inserted 15 Aug 2019, and the limb most missed: the company may not wait for a declaration |
+| **s.90(5), (7)** | the BEN-4 notice, and the company’s own **fifteen days** to apply to the Tribunal |
+| **s.12(1)&ndash;(6)** | the registered office: thirty days to establish it, INC-22 to verify it, the display duties, thirty days on a change, the special resolution to move it, sixty days to file the Regional Director’s confirmation |
+| **s.118(2), (3), (4)** | what the minutes must CONTAIN &mdash; a fair and correct summary, every appointment, and **the names of those dissenting** |
+| **s.118(9)** | no report of general-meeting proceedings circulated at the company’s expense unless it carries what the minutes must |
+| **s.118(10)** | **observe the Secretarial Standards SS-1 and SS-2** |
+| **s.186(1)&ndash;(10)** | two layers, the 60/100 ceiling, the prior special resolution, the particulars **and the purpose**, unanimous board consent, the interest floor, the deposit-default bar, and the MBP-2 register |
+
+### The three a Company Secretary is most likely to be wrong about
+- **s.186(5) needs the consent of ALL the directors present at the meeting.** A
+  majority does not authorise a s.186 transaction and a circular resolution
+  cannot do it at all, because the consent must be given at a meeting. A
+  majority board resolution reads entirely ordinary, which is what makes it the
+  mutation worth having.
+- **s.118(10) makes SS-1 and SS-2 MANDATORY by force of statute** &mdash; not
+  guidance. &sect;2z quoted that sub-section and used it to justify marking
+  checklist items as resting on a text not held; **the duty itself was on no
+  register row.** The rule states it and says in the same breath that the ICSI
+  standards are not in `reference/`, so their clauses cannot be checked here.
+- **s.186(11) exempts the whole of s.186 EXCEPT sub-section (1).** So a banking,
+  insurance or infrastructure company, an investment company and an NBFC are
+  outside the ceiling, the resolution and the register &mdash; and still inside
+  the two-layer limit.
+
+### Reading the period without reading the subject, for the fifth time
+&sect;3y excluded s.84 on this ground, &sect;3z Reg 30A, &sect;4n Reg 40(5) and
+Reg 25(8). Four more here:
+
+| | the period belongs to |
+|---|---|
+| **s.90(6)** | the NOTIFIED PERSON &mdash; thirty days to reply. **&sect;3v records how nearly this audit matched it to the company’s own rule** |
+| **s.90(8)** | the TRIBUNAL &mdash; sixty days to make its order |
+| **s.12(6)** | three periods in one sub-section: thirty days to communicate is the REGIONAL DIRECTOR’S, thirty days to certify is the REGISTRAR’S, and only the **sixty days to file** is the company’s |
+| **s.186(6)** | a company REGISTERED UNDER s.12 OF THE SEBI ACT &mdash; an intermediary, not a listed issuer |
+
+### Two were already carried, from a register that holds the anchor
+**s.90(4) (BEN-2) and s.118(1) (minutes within thirty days)** are emitted by
+`regDerivedRows` from the beneficial-interest and meetings registers **with a
+date** (&sect;2o, &sect;2l). A corpus rule for either would put a second,
+undated row beside a dated one &mdash; &sect;3n’s duplication. Checked before
+authoring rather than after.
+
+### TWENTY-FIVE RULES STATED A STATUTORY NUMBER AND EXPLAINED NOTHING
+The finding worth more than the tranche, and it is seventeen releases old.
+
+&sect;3e’s rule is *a blank is not an explanation*. The LODR supplement has had
+the invariant enforcing it since &sect;3z and PIT since &sect;4a. **The Companies
+Act supplement never got one.** So every event-anchored rule authored since
+&sect;3y showed a period and a blank, and **946 assertions, 241 mutations and the
+release gate could not see it, because nothing looked.**
+
+Measured: **25 of 61** Act supplement rules are undated and state a number.
+And the reasons are not one reason &mdash; *"Deadline not established"* reads
+identically for all seven of these:
+
+| kind | rules |
+|---|---|
+| the period is certain and **the anchor is not held** | 13 |
+| a **compound** period &mdash; s.124(1) is thirty days AND THEN seven | 1 |
+| a **waiting** period &mdash; s.124(5), s.124(6) | 2 |
+| a **measurement over the year** &mdash; s.149(3)’s 182 days | 1 |
+| a **term limit**, **cooling-off** or **rotation clock** &mdash; s.149(10), (11), s.139(2) | 3 |
+| a **look-back window** &mdash; s.90(5)’s three years decides WHO gets the notice | 1 |
+| **working days with no holiday calendar** &mdash; s.119(2), on top of a missing anchor | 1 |
+
+### And the new invariant reads the TITLE, which is where a reader meets the number
+The LODR and PIT version tests `timelineText` only. That would still have let
+*"An independent director holds office for a term of up to FIVE consecutive
+years"* sit on the register with a blank beside it, because the number is in the
+title. Seven of the twenty-five are in that position. The invariant also asserts
+it **has at least twenty-five rules to check**, because &sect;3v’s lesson is
+that a count of failures means nothing without the count of checks behind it.
+
+### TWO OF SS4p's FIVE MUTATIONS PROVED NOTHING
+Both PREPENDED a field before the rule’s `"id"`:
+
+```
+"appliesTo":{"entityType":[...]},"id":"CA-SUP-SEC-149-11","sourceRow"
+```
+
+**The corpus is a JS object literal, and the last duplicate key wins.** The
+real `appliesTo` sits after the id and overrode the injected one. Verified
+directly rather than reasoned about: after that mutation `entityType` still
+reads `["public","listed"]`.
+
+The runner reported both **caught** &mdash; because editing the embedded blob
+trips the smoke corpus-drift check (&sect;4b), not because either assertion saw
+anything. That is &sect;3r’s *"mutation that changed nothing"*, &sect;4a’s
+*"text changes while its behaviour does not"* and &sect;4d’s *"caught by a
+crash tells you nothing about the assertion meant to catch it"* &mdash; for the
+fourth time, and the first time **dressed as a pass**.
+
+Both are rewritten to rewrite the rule’s OWN copy of the field, with the
+anchor grown leftwards from that occurrence until it is unique. They now fail
+**two named assertions and one** respectively. Every field mutation in this
+release is generated the same way rather than typed.
+
+### Four more shapes the period parser could not read
+&sect;4h fixed the cadence and said so in terms: five rules stated one, three
+written by hand, and *"every one was filed as ‘rule states no period’ and its
+number was never compared against the held text"*. Authoring this tranche
+surfaced four more, and **three of the four rules were authored here**:
+
+| | rule | cause |
+|---|---|---|
+| **one hundred and eighty days** | s.10A(1)(a), INC-20A (&sect;3y) | the word capture allowed at most THREE tokens |
+| **not less than CLEAR twenty-one days** | s.101(1), AGM notice (&sect;4i) | *"not less than"* was not a lead-in, and *"clear"* was not filler |
+| **seven years from the date of transfer** | s.124(5), IEPF (&sect;4o) | a DURATION states its number FIRST and has no lead-in |
+| **seven consecutive years** | s.124(6), the shares (&sect;4o) | the same, plus the word between number and unit |
+
+**The three-token limit also means `onehundredandtwenty:120` has been a DEAD
+map entry since it was written** &mdash; four tokens, never reachable. Raising
+the limit to four revives it, and the pinned case proves it.
+
+The duration is its own shape, not a looser `FILLER`. &sect;4h is explicit:
+loosening FILLER to reach across one thing lets it reach across anything, and a
+parser that matches more than it understands is &sect;2x’s check that cries
+wolf. Ten cases pinned in `PARSER_CASES`, digit and spelled, and **watched
+failing before being trusted** (&sect;3c): breaking the duration branch exits 2
+and names five cases.
+
+Gate: **166 &rarr; 172 periods compared, 0 mismatches.** All four now confirm
+against the held text.
+
+### Quotes are extracted, and s.118(4) prints six footnotes inside itself
+```
+(4) In the case of a meeting of the Board of Directors or of a committee of the
+Board, the minutes shall also contain -- 1.Clause ( e) omitted by Act 1 of
+2018 ... 6.The proviso subs. by Act 29 of 2020 ... <<<PAGE 80>>> 80 (a) the
+names of the directors present at the meeting; and (b) ... dissenting from, or
+not concurring with the resolution.
+```
+Read to the first footnote it is *"the minutes shall also contain &mdash;"*
+&mdash; a stub that shows who is bound and not what the duty is, which is half
+of &sect;3x. The footnote RUN is removed, the quote stitched, marked
+`quoteStitched`, and **every fragment verified verbatim on its own** so it
+cannot pass as contiguous text (&sect;3z, &sect;4n’s Reg 6(2)). Two of the
+twenty-five are stitched and the suite names both.
+
+The footnote pattern is anchored on the footnote VERBS and must terminate in its
+own `(w.e.f. ...)`. A pattern loose enough to match ordinary text would silently
+delete words from a field that must be verbatim.
+
+### Four of my own, all caught by something
+- **I handed a provision-scoped extractor the whole Act.** Every quote came back
+  from section 1 &mdash; *"This Act may be called the Companies Act, 2013"*
+  arrived as the quote for s.12(1). Caught by the DRY RUN, which is the reason
+  to have one.
+- **A tuple with nine items where the loop unpacks eight**, because I left a
+  default `appliesToText` in beside a custom one.
+- **Two assertions wrong about correct text**: the s.12(6) detail says
+  `REGISTRAR` in capitals and my regex was case-sensitive; the s.139(6)
+  explanation says *"holds no registration date"* and my alternation looked for
+  *"incorporation date"*. &sect;3t’s *"I asserted values I had not read"*, and
+  the suite failed them in the minute after they were written.
+- **A browser probe that searched the page’s own script source.**
+  `document.body.innerHTML` contains the `<script>` text, so *"Why there is no
+  date"* matched the CODE that renders it and I read that as the panel having
+  rendered nothing. Driving `lgWhy` properly shows all three kinds of
+  explanation on screen, and s.186(5) correctly showing none.
+
+### Coverage
+Register **392 &rarr; 417** listed, **87 &rarr; 112** public, **73 &rarr; 98**
+private, **69 &rarr; 94** OPC, LLP unchanged at 3 &mdash; correctly, an LLP is
+outside the Companies Act regime (&sect;2z). All twenty-five are STANDING; not
+one carries an invented date. Suite **946 &rarr; 992**, mutations **241 &rarr;
+249 caught, 0 missed, 0 skipped** (10 added, 2 &sect;4p no-ops replaced), smoke
+105, backend 96. Gate **511 &rarr; 536 rules**, 494 citations, 0 unresolved,
+**172 periods compared, 0 mismatches**.
+
+### What is still not done
+**Forty-two of about seventy-eight.** The remaining sections by duty count are
+s.89 (6), s.134 (6), s.135 (6), s.148 (6), s.92 (5), s.123 (5), s.128 (5),
+s.73 (4), s.88 (4), s.188 (4), s.405 (4) and eighteen more.
+
+And &sect;4o’s caveat travels with all of it: **the held Act is missing at
+least one amendment from before its own stated date.** A current consolidated
+Act in `reference/` is the single thing that would most improve this whole
+exercise, and it is not something I can obtain.
+
+Nothing here verifies a rule. Rule Governance reads "Never checked" for all 536.
+
+---
+
 ## 3. ARCHITECTURE
 
 ### Frontend
@@ -5547,7 +5746,7 @@ Nothing here verifies a rule. Rule Governance reads "Never checked" for all 511.
   names the fix, because the only symptom of the drift was a mutation anchor
   that started matching twice (§4b).
 - **JS validation habit:** extract the main script (`html[html.rfind('<script>')+8 : html.rfind('</script>')]`) and `node --check` it before every deploy.
-- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (946 assertions, run against `index.html` itself), `node tests/mutation.js` (241 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 511 rules across eight corpora; it reports how many periods it actually compared, currently 158, and self-checks its own period parser AND its provision locator before it reads a line of law), and `node tests/backend.test.js` (96 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
+- **Run the suite before every deploy:** `node tests/smoke.test.js` (105 structural checks), `node tests/compliance.test.js` (992 assertions, run against `index.html` itself), `node tests/mutation.js` (249 bugs reintroduced against **both** suites, all caught), `python tools/rule_audit.py` (the release gate — 536 rules across eight corpora; it reports how many periods it actually compared, currently 172, and self-checks its own period parser AND its provision locator before it reads a line of law), and `node tests/backend.test.js` (96 checks against the live Supabase project — read-only, safe against production). See `tests/README.md`.
 - **`python tools/rule_audit.py` regenerates `rules/audit_findings.json` AND
   re-embeds it into `index.html` as `var LG_GATE`** — on every run, not behind
   a flag, so the reviewer's evidence cannot drift behind the gate that produced
@@ -5570,7 +5769,7 @@ Nothing here verifies a rule. Rule Governance reads "Never checked" for all 511.
 
 ## 7. WHERE THINGS STAND / WHAT'S NEXT
 
-**Header is at v206.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
+**Header is at v207.** Phase 1 of the owner's implementation spec is complete; Phase 2 is in
 progress. **Every migration through `db/026` is applied** — confirmed against the live database by `node tests/backend.test.js`, which identifies each one by a column only it creates rather than by a note in this file. `db/013` is the drop script, deliberately left commented out.
 
 **Phase 2 — the owner's spec:**
